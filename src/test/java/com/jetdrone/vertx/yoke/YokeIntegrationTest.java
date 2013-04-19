@@ -12,7 +12,7 @@ import static org.vertx.testtools.VertxAssert.*;
 public class YokeIntegrationTest extends TestVerticle {
 
     @Test
-    public void testHTTP() {
+    public void testResponseTime() {
         Yoke yoke = new Yoke(vertx);
         yoke.use(new ResponseTime());
         yoke.use(new Handler<HttpServerRequest>() {
@@ -23,12 +23,6 @@ public class YokeIntegrationTest extends TestVerticle {
         });
         yoke.listen(8181);
 
-
-        vertx.createHttpServer().requestHandler(new Handler<HttpServerRequest>() {
-            public void handle(HttpServerRequest req) {
-                req.response().end();
-            }
-        }).listen(8181);
         vertx.createHttpClient().setPort(8181).getNow("/",new Handler<HttpClientResponse>() {
             @Override
             public void handle(HttpClientResponse resp) {
@@ -37,5 +31,12 @@ public class YokeIntegrationTest extends TestVerticle {
                 testComplete();
             }
         });
+    }
+
+    @Test
+    public void testLib() {
+        Yoke yoke = new Yoke(vertx);
+        yoke.use(new Static("/home/plopes", 0));
+        yoke.listen(8181);
     }
 }

@@ -28,14 +28,25 @@ public class Static extends Middleware {
 
     private final String root;
     private final long maxAge;
+    private final boolean directoryListing;
+    private final boolean includeHidden;
 
-    public Static(String root, long maxAge) {
+    public Static(String root, long maxAge, boolean directoryListing, boolean includeHidden) {
+        if (root.endsWith("/")) {
+            root = root.substring(0, root.length() - 1);
+        }
         this.root = root;
         this.maxAge = maxAge;
+        this.includeHidden = includeHidden;
+        this.directoryListing = directoryListing;
+    }
+
+    public Static(String root,long maxAge) {
+        this(root, maxAge, false, false);
     }
 
     public Static(String root) {
-        this(root, 86400000);
+        this(root, 86400000, false, false);
     }
 
     @Override
@@ -95,14 +106,24 @@ public class Static extends Middleware {
                     next.handle(asyncResult.cause());
                 } else {
 
+                    String normalizedDir = dir.substring(root.length());
+                    if (!normalizedDir.endsWith("/")) {
+                        normalizedDir += "/";
+                    }
+
+                    System.out.println(normalizedDir);
+
                     String file;
-                    StringBuilder files = new StringBuilder("<ul id=\"setFiles\">");
+                    StringBuilder files = new StringBuilder("<ul id=\"files\">");
 
                     for (String s : asyncResult.result()) {
                         file = s.substring(s.lastIndexOf('/') + 1);
+                        // skip dot files
+                        if (!includeHidden && file.charAt(0) == '.') {
+                            continue;
+                        }
                         files.append("<li><a href=\"");
-                        files.append(dir);
-                        files.append("/");
+                        files.append(normalizedDir);
                         files.append(file);
                         files.append("\" title=\"");
                         files.append(file);
@@ -113,20 +134,32 @@ public class Static extends Middleware {
 
                     files.append("</ul>");
 
-                    // TODO: header
-//                    function htmlPath(dir) {
-//                            var curr = [];
-//                    return dir.split('/').map(function(part){
-//                        curr.push(part);
-//                        return '<a href="' + curr.join('/') + '">' + part + '</a>';
-//                    }).join(' / ');
-//                    }
+                    StringBuilder directory = new StringBuilder();
+                    // define access to root
+                    directory.append("<a href=\"/\">/</a> ");
+
+                    StringBuilder expandingPath = new StringBuilder();
+                    String[] dirParts = normalizedDir.split("/");
+                    for (int i = 1; i < dirParts.length; i++) {
+                        // dynamic expansion
+                        expandingPath.append("/");
+                        expandingPath.append(dirParts[i]);
+                        // anchor building
+                        if (i > 1) {
+                            directory.append(" / ");
+                        }
+                        directory.append("<a href=\"");
+                        directory.append(expandingPath.toString());
+                        directory.append("\">");
+                        directory.append(dirParts[i]);
+                        directory.append("</a>");
+                    }
 
                     request.response().putHeader("Content-Type", "text/html");
                     request.response().end(
-                            directoryTemplate.replace("{directory}", dir)
-                                    .replace("{linked-path}", "")
-                                    .replace("{setFiles}", files.toString()));
+                            directoryTemplate.replace("{title}", (String) request.get("title")).replace("{directory}", normalizedDir)
+                                    .replace("{linked-path}", directory.toString())
+                                    .replace("{files}", files.toString()));
                 }
             }
         });
@@ -204,15 +237,28 @@ public class Static extends Middleware {
                                     if (props.failed()) {
                                         next.handle(props.cause());
                                     } else {
-                                        // write cache control headers
-                                        writeHeaders(request, props.result());
-                                        // verify if we are still fresh
-                                        if (isFresh(request)) {
-                                            request.response().setStatusCode(304);
-                                            request.response().end();
+                                        if (props.result().isDirectory()) {
+                                            if (directoryListing) {
+                                                // write cache control headers
+                                                writeHeaders(request, props.result());
+                                                // verify if we are still fresh
+                                                if (isFresh(request)) {
+                                                    request.response().setStatusCode(304);
+                                                    request.response().end();
+                                                } else {
+                                                    sendDirectory(request, file, props.result(), next);
+                                                }
+                                            } else {
+                                                // we are not listing directories
+                                                next.handle(null);
+                                            }
                                         } else {
-                                            if (props.result().isDirectory()) {
-                                                sendDirectory(request, file, props.result(), next);
+                                            // write cache control headers
+                                            writeHeaders(request, props.result());
+                                            // verify if we are still fresh
+                                            if (isFresh(request)) {
+                                                request.response().setStatusCode(304);
+                                                request.response().end();
                                             } else {
                                                 sendFile(request, file, props.result());
                                             }
