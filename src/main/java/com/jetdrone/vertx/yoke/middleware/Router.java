@@ -23,7 +23,7 @@ public class Router extends Middleware {
     private Middleware noMatchHandler;
 
     @Override
-    public void handle(HttpServerRequest request, Handler<Object> next) {
+    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
 
         switch (request.method()) {
             case "GET":
@@ -74,7 +74,7 @@ public class Router extends Middleware {
     public Router get(String pattern, final Handler<HttpServerRequest> handler) {
         return get(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -98,7 +98,7 @@ public class Router extends Middleware {
     public Router put(String pattern, final Handler<HttpServerRequest> handler) {
         return put(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -122,7 +122,7 @@ public class Router extends Middleware {
     public Router post(String pattern, final Handler<HttpServerRequest> handler) {
         return post(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -146,7 +146,7 @@ public class Router extends Middleware {
     public Router delete(String pattern, final Handler<HttpServerRequest> handler) {
         return delete(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -170,7 +170,7 @@ public class Router extends Middleware {
     public Router options(String pattern, final Handler<HttpServerRequest> handler) {
         return options(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -194,7 +194,7 @@ public class Router extends Middleware {
     public Router head(String pattern, final Handler<HttpServerRequest> handler) {
         return head(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -218,7 +218,7 @@ public class Router extends Middleware {
     public Router trace(String pattern, final Handler<HttpServerRequest> handler) {
         return trace(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -242,7 +242,7 @@ public class Router extends Middleware {
     public Router connect(String pattern, final Handler<HttpServerRequest> handler) {
         return connect(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -266,7 +266,7 @@ public class Router extends Middleware {
     public Router patch(String pattern, final Handler<HttpServerRequest> handler) {
         return patch(pattern, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -326,7 +326,7 @@ public class Router extends Middleware {
     public Router get(Pattern regex, final Handler<HttpServerRequest> handler) {
         return get(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -350,7 +350,7 @@ public class Router extends Middleware {
     public Router put(Pattern regex, final Handler<HttpServerRequest> handler) {
         return put(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -374,7 +374,7 @@ public class Router extends Middleware {
     public Router post(Pattern regex, final Handler<HttpServerRequest> handler) {
         return post(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -398,7 +398,7 @@ public class Router extends Middleware {
     public Router delete(Pattern regex, final Handler<HttpServerRequest> handler) {
         return delete(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -422,7 +422,7 @@ public class Router extends Middleware {
     public Router options(Pattern regex, final Handler<HttpServerRequest> handler) {
         return options(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -446,7 +446,7 @@ public class Router extends Middleware {
     public Router head(Pattern regex, final Handler<HttpServerRequest> handler) {
         return head(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -470,7 +470,7 @@ public class Router extends Middleware {
     public Router trace(Pattern regex, final Handler<HttpServerRequest> handler) {
         return trace(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -494,7 +494,7 @@ public class Router extends Middleware {
     public Router connect(Pattern regex, final Handler<HttpServerRequest> handler) {
         return connect(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -518,7 +518,7 @@ public class Router extends Middleware {
     public Router patch(Pattern regex, final Handler<HttpServerRequest> handler) {
         return patch(regex, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -578,7 +578,7 @@ public class Router extends Middleware {
     public Router noMatch(final Handler<HttpServerRequest> handler) {
         return noMatch(new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -608,7 +608,7 @@ public class Router extends Middleware {
         bindings.add(binding);
     }
 
-    private void route(HttpServerRequest request, Handler<Object> next, List<PatternBinding> bindings) {
+    private void route(YokeHttpServerRequest request, Handler<Object> next, List<PatternBinding> bindings) {
         for (PatternBinding binding: bindings) {
             Matcher m = binding.pattern.matcher(request.path());
             if (m.matches()) {
