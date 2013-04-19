@@ -1,74 +1,65 @@
 <!DOCTYPE html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Yoke : " />
-
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>Yoke</title>
+    <title>Yoke - middleware for Vert.x</title>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+      <link rel="stylesheet" href="style.css">
+      <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+      <script src="docs.js"></script>
   </head>
-
   <body>
+    <div id="content">
+      <h1>Yoke</h1>
+        <div id="" class="comment">
+          <h2></h2>
+          <div class="description">
+            <p>Connect is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>,<br />shipping with over 12 bundled middleware.</p>
+            <pre><code>Yoke yoke = new Yoke(vertx);
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/pmlopes/yoke">View on GitHub</a>
+yoke.use(new Favicon());
+yoke.use(new Static("webroot"));
+yoke.use(new Router() {{
+  all("/hello", new Handler<HttpServerRequest>() {
+    @Override
+    public void handle(HttpServerRequest request) {
+      request.response().end("Hello World!");
+    }
+  });
+}});
 
-          <h1 id="project_title">Yoke</h1>
-          <h2 id="project_tagline"></h2>
+yoke.listen(3000);</code></pre>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/pmlopes/yoke/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/pmlopes/yoke/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+            <h2>Installation</h2>
+
+            <pre><code>$ npm install connect</code></pre>
+
+            <h2>Middleware</h2>
+
+            <ul>
+              <li><a href="BasicAuth.html">BasicAuth</a> basic http authentication</li>
+              <li><a href="BodyParser.html">BodyParser</a> extensible request body parser</li>
+              <li><a href="CookieParser.html">CookieParser</a> cookie parser</li>
+              <li><a href="ErrorHandler.html">ErrorHandler</a> flexible error handler</li>
+              <li><a href="Favicon.html">Favicon</a> efficient favicon server (with default icon)</li>
+              <li><a href="Limit.html">Limit</a> limit the bytesize of request bodies</li>
+              <li><a href="MethodOverride.html">MethodOverride</a> faux HTTP method support</li>
+              <li><a href="ResponseTime.html">ResponseTime</a> calculates response-time and exposes via x-response-time</li>
+              <li><a href="Router.html">Router</a> flexible routing based on RouteMatcher</li>
+              <li><a href="Static.html">Static</a> streaming static file server supporting directory listings</li>
+              <li><a href="Timeout.html">Timeout</a> request timeouts</li>
+              <li><a href="Vhost.html">Vhost</a> virtual host sub-domain mapping middleware</li>
+            </ul>
+
+            <h2>Links</h2>
+
+            <ul>
+              <li>GitHub <a href="https://github.com/pmlopes/yoke">repository</a></li>
+            </ul>
+          </div>
+        </div>
     </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-    </div>
-
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Yoke maintained by <a href="https://github.com/pmlopes">pmlopes</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
+    <ul id="menu">
+      <li><a href="#"></a></li>
+    </ul>
   </body>
 </html>
