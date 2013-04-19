@@ -103,7 +103,7 @@ public class BodyParser extends Middleware {
                                                 mapBody.put(attribute.getName(), attribute.getValue());
                                             } else {
                                                 if (value instanceof List) {
-                                                    ((List<?>) value).add(attribute.getValue());
+                                                    ((List<String>) value).add(attribute.getValue());
                                                 } else {
                                                     List<String> l = new ArrayList<>();
                                                     l.add((String) value);
