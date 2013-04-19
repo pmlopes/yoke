@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
@@ -206,11 +207,19 @@ public class Yoke {
                             } else {
                                 // reached the end and no handler was able to answer the request
                                 request.response().setStatusCode(404);
-                                errorHandler.handle(request, null);
+                                if (errorHandler != null) {
+                                    errorHandler.handle(request, null);
+                                } else {
+                                    request.response().end(HttpResponseStatus.valueOf(404).reasonPhrase());
+                                }
                             }
                         } else {
                             request.put("error", error);
-                            errorHandler.handle(request, null);
+                            if (errorHandler != null) {
+                                errorHandler.handle(request, null);
+                            } else {
+                                request.response().end(HttpResponseStatus.valueOf(500).reasonPhrase());
+                            }
                         }
                     }
                 }.handle(null);
