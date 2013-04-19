@@ -96,6 +96,7 @@ public class Static extends Middleware {
         }
     }
 
+    // TODO: serve plain/text and json
     private void sendDirectory(final YokeHttpServerRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
