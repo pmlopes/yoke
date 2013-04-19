@@ -159,24 +159,6 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse write(Buffer chunk, Handler<AsyncResult<Void>> doneHandler) {
-        triggerHeadersHandler();
-        return response.write(chunk, doneHandler);
-    }
-
-    @Override
-    public HttpServerResponse write(String chunk, String enc, Handler<AsyncResult<Void>> doneHandler) {
-        triggerHeadersHandler();
-        return response.write(chunk, enc, doneHandler);
-    }
-
-    @Override
-    public HttpServerResponse write(String chunk, Handler<AsyncResult<Void>> doneHandler) {
-        triggerHeadersHandler();
-        return response.write(chunk, doneHandler);
-    }
-
-    @Override
     public void end(String chunk) {
         triggerHeadersHandler();
         response.end(chunk);
@@ -224,7 +206,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse exceptionHandler(Handler<Exception> handler) {
+    public HttpServerResponse exceptionHandler(Handler<Throwable> handler) {
         return response.exceptionHandler(handler);
     }
 }

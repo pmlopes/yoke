@@ -28,21 +28,21 @@ public class MethodOverride extends Middleware {
                 if (method != null) {
                     if (method instanceof String) {
                         ((Map) body).remove(key);
-                        request.method((String) method);
+                        request.setMethod((String) method);
                     }
                 }
             } else if (body instanceof JsonObject) {
                 String method = ((JsonObject) body).getString(key);
                 if (method != null) {
                     ((JsonObject) body).removeField(key);
-                    request.method(method);
+                    request.setMethod(method);
                 }
             }
         } else {
-            String xHttpMethodOverride = request.headers().get("x-http-method-override");
+            String xHttpMethodOverride = request.headers().get("x-http-setMethod-override");
 
             if (xHttpMethodOverride != null) {
-                request.method(xHttpMethodOverride);
+                request.setMethod(xHttpMethodOverride);
             }
         }
 

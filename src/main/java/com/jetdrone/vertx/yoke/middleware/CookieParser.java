@@ -4,7 +4,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -68,7 +67,7 @@ public class CookieParser extends Middleware {
                 }
             }
 
-            request.cookies(cookies);
+            request.setCookies(cookies);
         }
 
         next.handle(null);

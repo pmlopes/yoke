@@ -162,13 +162,13 @@ public class Yoke {
     }
 
     /**
-     * Starts the server listening at a given port bind to localhost.
+     * Starts the server listening at a given port bind to all available interfaces.
      *
      * @param port the server TCP port
      * @return HttpServer
      */
     public HttpServer listen(int port) {
-        return listen(port, "localhost");
+        return listen(port, "0.0.0.0");
     }
 
     /**

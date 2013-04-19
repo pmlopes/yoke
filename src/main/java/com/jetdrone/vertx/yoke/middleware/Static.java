@@ -96,7 +96,7 @@ public class Static extends Middleware {
                 } else {
 
                     String file;
-                    StringBuilder files = new StringBuilder("<ul id=\"files\">");
+                    StringBuilder files = new StringBuilder("<ul id=\"setFiles\">");
 
                     for (String s : asyncResult.result()) {
                         file = s.substring(s.lastIndexOf('/') + 1);
@@ -126,7 +126,7 @@ public class Static extends Middleware {
                     request.response().end(
                             directoryTemplate.replace("{directory}", dir)
                                     .replace("{linked-path}", "")
-                                    .replace("{files}", files.toString()));
+                                    .replace("{setFiles}", files.toString()));
                 }
             }
         });

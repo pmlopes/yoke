@@ -25,7 +25,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     // the original response
     private final YokeHttpServerResponse response;
 
-    // we can overrride the method
+    // we can overrride the setMethod
     private String method;
     private long bodyLengthLimit = -1;
     private Object body;
@@ -41,17 +41,17 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
 
 
     /**
-     * The original HTTP method for the request. One of GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
+     * The original HTTP setMethod for the request. One of GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
      */
     public String originalMethod() {
         return request.method();
     }
 
     /**
-     * Package level mutator for the overrided method
-     * @param newMethod new method GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
+     * Package level mutator for the overrided setMethod
+     * @param newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
      */
-    void method(String newMethod) {
+    void setMethod(String newMethod) {
         this.method = newMethod.toUpperCase();
     }
 
@@ -63,14 +63,14 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
-     * Holds the maximum allowed length for the body data. -1 for unlimited
+     * Holds the maximum allowed length for the setBody data. -1 for unlimited
      */
     public long bodyLengthLimit() {
         return bodyLengthLimit;
     }
 
     /**
-     * Returns true if this request has body
+     * Returns true if this request has setBody
      *
      * @return true if content-length or transfer-encoding is present
      */
@@ -80,7 +80,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
-     * Returns the content length of this request body or -1 if header is not present.
+     * Returns the content length of this request setBody or -1 if header is not present.
      */
     public long contentLength() {
         String contentLengthHeader = headers().get("content-length");
@@ -92,14 +92,14 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
-     * The request body and eventually a parsed version of it in json or map
+     * The request setBody and eventually a parsed version of it in json or map
      */
     public Object body() {
         return body;
     }
 
     /**
-     * The request body and eventually a parsed version of it in json or map
+     * The request setBody and eventually a parsed version of it in json or map
      */
     public JsonObject jsonBody() {
         if (body != null && body instanceof JsonObject) {
@@ -109,7 +109,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
-     * The request body and eventually a parsed version of it in json or map
+     * The request setBody and eventually a parsed version of it in json or map
      */
     public Map<String, Object> mapBody() {
         if (body != null && body instanceof Map) {
@@ -119,7 +119,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
-     * The request body and eventually a parsed version of it in json or map
+     * The request setBody and eventually a parsed version of it in json or map
      */
     public Buffer bufferBody() {
         if (body != null && body instanceof Buffer) {
@@ -129,24 +129,24 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
-     * Mutator for the request body
-     * The request body and eventually a parsed version of it in json or map
+     * Mutator for the request setBody
+     * The request setBody and eventually a parsed version of it in json or map
      */
-    void body(Object body) {
+    void setBody(Object body) {
         this.body = body;
     }
 
     /**
-     * The uploaded files
+     * The uploaded setFiles
      */
     public Map<String, FileUpload> files() {
         return files;
     }
 
     /**
-     * The uploaded files
+     * The uploaded setFiles
      */
-    void files(Map<String, FileUpload> files) {
+    void setFiles(Map<String, FileUpload> files) {
         this.files = files;
     }
 
@@ -160,7 +160,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     /**
      * Cookies
      */
-    void cookies(Set<Cookie> cookies) {
+    void setCookies(Set<Cookie> cookies) {
         this.cookies = cookies;
     }
 
@@ -305,7 +305,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      * @see org.vertx.java.core.http.HttpServerRequest#exceptionHandler(org.vertx.java.core.Handler)
      */
     @Override
-    public HttpServerRequest exceptionHandler(Handler<Exception> handler) {
+    public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
         return request.exceptionHandler(handler);
     }
 }

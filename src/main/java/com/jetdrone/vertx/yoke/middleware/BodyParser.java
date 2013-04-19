@@ -24,7 +24,7 @@ public class BodyParser extends Middleware {
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         final String method = request.method();
 
-        // GET and HEAD have no body
+        // GET and HEAD have no setBody
         if ("GET".equals(method) || "HEAD".equals(method)) {
             next.handle(null);
         } else {
@@ -60,11 +60,11 @@ public class BodyParser extends Middleware {
                                 if (jsonString.length() > 0) {
                                     switch (jsonString.charAt(0)) {
                                         case '{':
-                                            request.body(new JsonObject(jsonString));
+                                            request.setBody(new JsonObject(jsonString));
                                             next.handle(null);
                                             break;
                                         case '[':
-                                            request.body(new JsonArray(jsonString));
+                                            request.setBody(new JsonArray(jsonString));
                                             next.handle(null);
                                             break;
                                         default:
@@ -78,7 +78,7 @@ public class BodyParser extends Middleware {
                             }
                         } else if (contentType.contains("application/x-www-form-urlencoded")) {
                             QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString("UTF-8"));
-                            request.body(queryStringDecoder.parameters());
+                            request.setBody(queryStringDecoder.parameters());
                             next.handle(null);
                         } else if (contentType.contains("multipart/form-data")) {
                             HttpPostRequestDecoder decoder = null;
@@ -93,7 +93,7 @@ public class BodyParser extends Middleware {
                                     switch (data.getHttpDataType()) {
                                         case Attribute:
                                             if (request.body() == null) {
-                                                request.body(new HashMap<String, Object>());
+                                                request.setBody(new HashMap<String, Object>());
                                             }
                                             final Attribute attribute = (Attribute) data;
                                             final Map<String, Object> mapBody = request.mapBody();
@@ -114,7 +114,7 @@ public class BodyParser extends Middleware {
                                             break;
                                         case FileUpload:
                                             if (request.files() == null) {
-                                                request.files(new HashMap<String, FileUpload>());
+                                                request.setFiles(new HashMap<String, FileUpload>());
                                             }
                                             FileUpload fileUpload = (FileUpload) data;
                                             request.files().put(fileUpload.getName(), fileUpload);
