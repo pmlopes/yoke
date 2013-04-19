@@ -1,11 +1,14 @@
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.Engine;
 import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.http.impl.DefaultHttpServerRequest;
+import org.vertx.java.core.json.JsonObject;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -29,11 +32,11 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     private Map<String, FileUpload> files;
     private Set<Cookie> cookies;
 
-    public YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context) {
+    public YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context, Map<String, Engine> engines) {
         super(context);
         this.request = request;
         this.method = request.method();
-        this.response = new YokeHttpServerResponse(request.response());
+        this.response = new YokeHttpServerResponse(request.response(), this, engines);
     }
 
 
@@ -96,6 +99,36 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     }
 
     /**
+     * The request body and eventually a parsed version of it in json or map
+     */
+    public JsonObject jsonBody() {
+        if (body != null && body instanceof JsonObject) {
+            return (JsonObject) body;
+        }
+        return null;
+    }
+
+    /**
+     * The request body and eventually a parsed version of it in json or map
+     */
+    public Map<String, Object> mapBody() {
+        if (body != null && body instanceof Map) {
+            return (Map<String, Object>) body;
+        }
+        return null;
+    }
+
+    /**
+     * The request body and eventually a parsed version of it in json or map
+     */
+    public Buffer bufferBody() {
+        if (body != null && body instanceof Buffer) {
+            return (Buffer) body;
+        }
+        return null;
+    }
+
+    /**
      * Mutator for the request body
      * The request body and eventually a parsed version of it in json or map
      */
@@ -138,6 +171,13 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
         return request;
     }
 
+    public HttpRequest nettyRequest() {
+        if (request instanceof DefaultHttpServerRequest) {
+            return ((DefaultHttpServerRequest) request).nettyRequest();
+        }
+        return null;
+    }
+
     /**
      * @see org.vertx.java.core.http.HttpServerRequest#method()
      */
@@ -177,7 +217,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      * @see org.vertx.java.core.http.HttpServerRequest#response()
      */
     @Override
-    public HttpServerResponse response() {
+    public YokeHttpServerResponse response() {
         return response;
     }
 

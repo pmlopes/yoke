@@ -9,7 +9,6 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
-import org.vertx.java.core.http.HttpServerRequest;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -50,7 +49,7 @@ public class Static extends Middleware {
         }
     }
 
-    private void writeHeaders(final HttpServerRequest request, final FileProps props) {
+    private void writeHeaders(final YokeHttpServerRequest request, final FileProps props) {
 
         Map<String, Object> headers = request.response().headers();
 
@@ -71,7 +70,7 @@ public class Static extends Middleware {
         }
     }
 
-    private void sendFile(final HttpServerRequest request, final String file, final FileProps props) {
+    private void sendFile(final YokeHttpServerRequest request, final String file, final FileProps props) {
         // write content type
         String contentType = MimeType.getMime(file);
         String charset = MimeType.getCharset(contentType);
@@ -86,7 +85,7 @@ public class Static extends Middleware {
         }
     }
 
-    private void sendDirectory(final HttpServerRequest request, final String dir, final FileProps props, final Handler<Object> next) {
+    private void sendDirectory(final YokeHttpServerRequest request, final String dir, final FileProps props, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
         fileSystem.readDir(dir, new AsyncResultHandler<String[]>() {
@@ -133,7 +132,7 @@ public class Static extends Middleware {
         });
     }
 
-    private boolean isFresh(final HttpServerRequest request) {
+    private boolean isFresh(final YokeHttpServerRequest request) {
         // defaults
         boolean etagMatches = true;
         boolean notModified = true;
@@ -182,7 +181,7 @@ public class Static extends Middleware {
     }
 
     @Override
-    public void handle(final HttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         if (!"GET".equals(request.method()) && !"HEAD".equals(request.method())) {
             next.handle(null);
         } else {

@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
@@ -35,6 +36,7 @@ public class Yoke {
 
     private List<MountedMiddleware> middlewareList = new ArrayList<>();
     private Middleware errorHandler;
+    private Map<String, Engine> engineMap = new HashMap<>();
 
     public Yoke use(String route, Middleware middleware) {
         if (middleware.isErrorHandler()) {
@@ -55,7 +57,7 @@ public class Yoke {
     public Yoke use(String route, final Handler<HttpServerRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
             @Override
-            public void handle(HttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         }));
@@ -66,8 +68,19 @@ public class Yoke {
         return use("/", handler);
     }
 
-    public void set(String key, Object value) {
-        defaultContext.put(key, value);
+    public Yoke engine(String extension, Engine engine) {
+        engineMap.put(extension, engine);
+        return this;
+    }
+
+    public Yoke set(String key, Object value) {
+        if (value == null) {
+            defaultContext.remove(key);
+        } else {
+            defaultContext.put(key, value);
+        }
+
+        return this;
     }
 
     public void setHttpServer(HttpServer httpServer) {
@@ -87,7 +100,7 @@ public class Yoke {
             @Override
             public void handle(final HttpServerRequest req) {
                 // the context map is shared with all middlewares
-                final YokeHttpServerRequest request = new YokeHttpServerRequest(req, defaultContext);
+                final YokeHttpServerRequest request = new YokeHttpServerRequest(req, defaultContext, engineMap);
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;

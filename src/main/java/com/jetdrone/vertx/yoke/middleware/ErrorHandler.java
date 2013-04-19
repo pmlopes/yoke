@@ -5,7 +5,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
@@ -71,23 +70,22 @@ public class ErrorHandler extends Middleware {
     }
 
     @Override
-    public void handle(HttpServerRequest request, Handler<Object> next) {
-        // inside middleware the original request has been wrapped with yoke's
-        // implementation
-        final YokeHttpServerRequest req = (YokeHttpServerRequest) request;
+    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
 
-        if (req.response().getStatusCode() < 400) {
-            req.response().setStatusCode(getErrorCode(req.get("error")));
+        YokeHttpServerResponse response = request.response();
+
+        if (response.getStatusCode() < 400) {
+            response.setStatusCode(getErrorCode(request.get("error")));
         }
 
-        if (req.get("error") == null) {
-            req.put("error", req.response().getStatusCode());
+        if (request.get("error") == null) {
+            request.put("error", response.getStatusCode());
         }
-        String errorMessage = getMessage(req.get("error"));
-        int errorCode = req.response().getStatusCode();
-        List<String> stackTrace = getStackTrace(req.get("error"));
+        String errorMessage = getMessage(request.get("error"));
+        int errorCode = response.getStatusCode();
+        List<String> stackTrace = getStackTrace(request.get("error"));
 
-        String accept = req.headers().get("accept");
+        String accept = request.headers().get("accept");
 
         if (accept == null) {
             accept = "text/plain";
@@ -101,9 +99,9 @@ public class ErrorHandler extends Middleware {
                 stack.append("</li>");
             }
 
-            req.response().putHeader("Content-Type", "text/html");
-            req.response().end(
-                    errorTemplate.replace("{title}", (String) req.get("title"))
+            response.putHeader("Content-Type", "text/html");
+            response.end(
+                    errorTemplate.replace("{title}", (String) request.get("title"))
                             .replace("{errorCode}", Integer.toString(errorCode))
                             .replace("{errorMessage}", errorMessage)
                             .replace("{stackTrace}", stack.toString()));
@@ -117,10 +115,10 @@ public class ErrorHandler extends Middleware {
                 }
                 jsonError.putArray("stack", stack);
             }
-            req.response().putHeader("Content-Type", "application/json");
-            req.response().end(jsonError.encode());
+            response.putHeader("Content-Type", "application/json");
+            response.end(jsonError.encode());
         } else {
-            req.response().putHeader("Content-Type", "text/plain");
+            response.putHeader("Content-Type", "text/plain");
 
             StringBuilder sb = new StringBuilder();
             sb.append("Error ");
@@ -134,7 +132,7 @@ public class ErrorHandler extends Middleware {
                 sb.append("\n");
             }
 
-            req.response().end(sb.toString());
+            response.end(sb.toString());
         }
     }
 }

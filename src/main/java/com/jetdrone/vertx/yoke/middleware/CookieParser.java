@@ -46,12 +46,8 @@ public class CookieParser extends Middleware {
     }
 
     @Override
-    public void handle(HttpServerRequest request, Handler<Object> next) {
-        // inside middleware the original request has been wrapped with yoke's
-        // implementation
-        final YokeHttpServerRequest req = (YokeHttpServerRequest) request;
-
-        String cookieHeader = req.headers().get("cookie");
+    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+        String cookieHeader = request.headers().get("cookie");
 
         if (cookieHeader != null) {
             Set<Cookie> cookies = CookieDecoder.decode(cookieHeader);
@@ -72,7 +68,7 @@ public class CookieParser extends Middleware {
                 }
             }
 
-            req.cookies(cookies);
+            request.cookies(cookies);
         }
 
         next.handle(null);

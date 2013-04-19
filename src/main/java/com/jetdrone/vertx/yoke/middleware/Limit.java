@@ -2,7 +2,6 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
 public class Limit extends Middleware {
 
@@ -13,7 +12,7 @@ public class Limit extends Middleware {
     }
 
     @Override
-    public void handle(final HttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         // inside middleware the original request has been wrapped with yoke's
         // implementation
         final YokeHttpServerRequest req = (YokeHttpServerRequest) request;

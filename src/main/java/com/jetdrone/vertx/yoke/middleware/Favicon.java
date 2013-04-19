@@ -4,7 +4,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -72,7 +71,7 @@ public class Favicon extends Middleware {
 
 
     @Override
-    public void handle(final HttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         if ("/favicon.ico".equals(request.path())) {
             for (Map.Entry<String, Object> header : icon.headers.entrySet()) {
                 request.response().putHeader(header.getKey(), header.getValue());

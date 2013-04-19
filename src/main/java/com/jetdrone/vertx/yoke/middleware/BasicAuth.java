@@ -2,7 +2,6 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -40,16 +39,13 @@ public class BasicAuth extends Middleware {
     }
 
     @Override
-    public void handle(final HttpServerRequest request, final Handler<Object> next) {
-        // inside middleware the original request has been wrapped with yoke's
-        // implementation
-        final YokeHttpServerRequest req = (YokeHttpServerRequest) request;
-
-        String authorization = req.headers().get("authorization");
+    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+        String authorization = request.headers().get("authorization");
 
         if (authorization == null) {
-            req.response().putHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
-            req.response().setStatusCode(401);
+            YokeHttpServerResponse response = request.response();
+            response.putHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
+            response.setStatusCode(401);
             next.handle("No authorization token");
         } else {
             String[] parts = authorization.split(" ");
@@ -65,11 +61,12 @@ public class BasicAuth extends Middleware {
                     @Override
                     public void handle(Boolean valid) {
                         if (valid) {
-                            req.put("user", user);
+                            request.put("user", user);
                             next.handle(null);
                         } else {
-                            req.response().putHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
-                            req.response().setStatusCode(401);
+                            YokeHttpServerResponse response = request.response();
+                            response.putHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
+                            response.setStatusCode(401);
                             next.handle("No authorization token");
                         }
                     }

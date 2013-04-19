@@ -17,7 +17,7 @@ public class Vhost extends Middleware {
         this.regex = Pattern.compile("^" + hostname.replaceAll("\\.", "\\\\.").replaceAll("[*]", "(.*?)") + "$", Pattern.CASE_INSENSITIVE);
     }
     @Override
-    public void handle(final HttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         Map<String, String> headers = request.headers();
         String host = headers.get("host");
         if (host == null) {

@@ -1,6 +1,8 @@
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.Engine;
 import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerResponse;
@@ -8,15 +10,48 @@ import org.vertx.java.core.http.HttpServerResponse;
 import java.util.Map;
 
 public class YokeHttpServerResponse implements HttpServerResponse {
-    // the original response
+    // the original request
     private final HttpServerResponse response;
+    // the context
+    private final Map<String, Object> renderContext;
+    // engine map
+    private final Map<String, Engine> renderEngines;
+
     // extra handlers
     private Handler<Void> headersHandler;
     private boolean headersHandlerTriggered;
     private Handler<Void> endHandler;
 
-    public YokeHttpServerResponse(HttpServerResponse response) {
+    public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> renderContext, Map<String, Engine> renderEngines) {
         this.response = response;
+        this.renderContext = renderContext;
+        this.renderEngines = renderEngines;
+    }
+
+    public void render(final String template, final Handler<Object> next) {
+        int sep = template.lastIndexOf('.');
+        if (sep != -1) {
+            String extension = template.substring(sep + 1);
+
+            Engine renderEngine = renderEngines.get(extension);
+
+            if (renderEngine == null) {
+                next.handle("No engine registered for extension: " + extension);
+            } else {
+                renderEngine.render(template, renderContext, new AsyncResultHandler<Buffer>() {
+                    @Override
+                    public void handle(AsyncResult<Buffer> asyncResult) {
+                        if (asyncResult.failed()) {
+                            next.handle(asyncResult.cause());
+                        } else {
+                            end(asyncResult.result());
+                        }
+                    }
+                });
+            }
+        } else {
+            next.handle("Cannot determine the extension of the template");
+        }
     }
 
     void headersHandler(Handler<Void> handler) {

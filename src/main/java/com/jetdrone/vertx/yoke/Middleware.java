@@ -1,8 +1,8 @@
 package com.jetdrone.vertx.yoke;
 
+import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
 
 public abstract class Middleware {
 
@@ -16,5 +16,5 @@ public abstract class Middleware {
         return false;
     }
 
-    public abstract void handle(final HttpServerRequest request, final Handler<Object> next);
+    public abstract void handle(final YokeHttpServerRequest request, final Handler<Object> next);
 }
