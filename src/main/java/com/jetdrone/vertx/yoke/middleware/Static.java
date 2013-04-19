@@ -96,7 +96,7 @@ public class Static extends Middleware {
         }
     }
 
-    private void sendDirectory(final YokeHttpServerRequest request, final String dir, final FileProps props, final Handler<Object> next) {
+    private void sendDirectory(final YokeHttpServerRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
         fileSystem.readDir(dir, new AsyncResultHandler<String[]>() {
@@ -219,6 +219,16 @@ public class Static extends Middleware {
             next.handle(null);
         } else {
             final String file = root + request.path();
+
+            if (!includeHidden) {
+                int idx = file.lastIndexOf('/');
+                String name = file.substring(idx + 1);
+                if (name.length() > 0 && name.charAt(0) == '.') {
+                    next.handle(null);
+                    return;
+                }
+            }
+
             final FileSystem fileSystem = vertx.fileSystem();
 
             fileSystem.exists(file, new AsyncResultHandler<Boolean>() {
@@ -246,7 +256,7 @@ public class Static extends Middleware {
                                                     request.response().setStatusCode(304);
                                                     request.response().end();
                                                 } else {
-                                                    sendDirectory(request, file, props.result(), next);
+                                                    sendDirectory(request, file, next);
                                                 }
                                             } else {
                                                 // we are not listing directories

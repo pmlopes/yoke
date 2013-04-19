@@ -20,6 +20,93 @@ public class BodyParser extends Middleware {
 
     private final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
 
+    private void parseJson(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
+        try {
+            String jsonString = buffer.toString("UTF-8");
+            if (jsonString.length() > 0) {
+                switch (jsonString.charAt(0)) {
+                    case '{':
+                        request.setBody(new JsonObject(jsonString));
+                        next.handle(null);
+                        break;
+                    case '[':
+                        request.setBody(new JsonArray(jsonString));
+                        next.handle(null);
+                        break;
+                    default:
+                        next.handle(400);
+                }
+            } else {
+                next.handle(400);
+            }
+        } catch (DecodeException ex) {
+            next.handle(ex);
+        }
+    }
+
+    private void parseMap(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString("UTF-8"));
+        request.setBody(queryStringDecoder.parameters());
+        next.handle(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void parseMultipart(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
+        HttpPostRequestDecoder decoder = null;
+        try {
+            HttpRequest nettyReq = request.nettyRequest();
+            decoder = new HttpPostRequestDecoder(factory, nettyReq);
+
+            decoder.offer(new DefaultHttpContent(buffer.getByteBuf()));
+            decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT);
+
+            for (InterfaceHttpData data : decoder.getBodyHttpDatas()) {
+                switch (data.getHttpDataType()) {
+                    case Attribute:
+                        if (request.body() == null) {
+                            request.setBody(new HashMap<String, Object>());
+                        }
+                        final Attribute attribute = (Attribute) data;
+                        final Map<String, Object> mapBody = request.mapBody();
+
+                        Object value = mapBody.get(attribute.getName());
+                        if (value == null) {
+                            mapBody.put(attribute.getName(), attribute.getValue());
+                        } else {
+                            if (value instanceof List) {
+                                ((List<String>) value).add(attribute.getValue());
+                            } else {
+                                List<String> l = new ArrayList<>();
+                                l.add((String) value);
+                                l.add(attribute.getValue());
+                                mapBody.put(attribute.getName(), l);
+                            }
+                        }
+                        break;
+                    case FileUpload:
+                        if (request.files() == null) {
+                            request.setFiles(new HashMap<String, FileUpload>());
+                        }
+                        FileUpload fileUpload = (FileUpload) data;
+                        request.files().put(fileUpload.getName(), fileUpload);
+                        break;
+                    default:
+                        System.err.println(data);
+                }
+            }
+
+            next.handle(null);
+            // clean up
+            decoder.cleanFiles();
+        } catch (ErrorDataDecoderException | NotEnoughDataDecoderException | IncompatibleDataDecoderException | IOException e) {
+            // clean up
+            if (decoder != null) {
+                decoder.cleanFiles();
+            }
+            next.handle(e);
+        }
+    }
+
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         final String method = request.method();
@@ -55,85 +142,11 @@ public class BodyParser extends Middleware {
                     @Override
                     public void handle(Void _void) {
                         if (contentType.contains("application/json")) {
-                            try {
-                                String jsonString = buffer.toString("UTF-8");
-                                if (jsonString.length() > 0) {
-                                    switch (jsonString.charAt(0)) {
-                                        case '{':
-                                            request.setBody(new JsonObject(jsonString));
-                                            next.handle(null);
-                                            break;
-                                        case '[':
-                                            request.setBody(new JsonArray(jsonString));
-                                            next.handle(null);
-                                            break;
-                                        default:
-                                            next.handle(400);
-                                    }
-                                } else {
-                                    next.handle(400);
-                                }
-                            } catch (DecodeException ex) {
-                                next.handle(ex);
-                            }
+                            parseJson(request, buffer, next);
                         } else if (contentType.contains("application/x-www-form-urlencoded")) {
-                            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString("UTF-8"));
-                            request.setBody(queryStringDecoder.parameters());
-                            next.handle(null);
+                            parseMap(request, buffer, next);
                         } else if (contentType.contains("multipart/form-data")) {
-                            HttpPostRequestDecoder decoder = null;
-                            try {
-                                HttpRequest nettyReq = request.nettyRequest();
-                                decoder = new HttpPostRequestDecoder(factory, nettyReq);
-
-                                decoder.offer(new DefaultHttpContent(buffer.getByteBuf()));
-                                decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT);
-
-                                for (InterfaceHttpData data : decoder.getBodyHttpDatas()) {
-                                    switch (data.getHttpDataType()) {
-                                        case Attribute:
-                                            if (request.body() == null) {
-                                                request.setBody(new HashMap<String, Object>());
-                                            }
-                                            final Attribute attribute = (Attribute) data;
-                                            final Map<String, Object> mapBody = request.mapBody();
-
-                                            Object value = mapBody.get(attribute.getName());
-                                            if (value == null) {
-                                                mapBody.put(attribute.getName(), attribute.getValue());
-                                            } else {
-                                                if (value instanceof List) {
-                                                    ((List<String>) value).add(attribute.getValue());
-                                                } else {
-                                                    List<String> l = new ArrayList<>();
-                                                    l.add((String) value);
-                                                    l.add(attribute.getValue());
-                                                    mapBody.put(attribute.getName(), l);
-                                                }
-                                            }
-                                            break;
-                                        case FileUpload:
-                                            if (request.files() == null) {
-                                                request.setFiles(new HashMap<String, FileUpload>());
-                                            }
-                                            FileUpload fileUpload = (FileUpload) data;
-                                            request.files().put(fileUpload.getName(), fileUpload);
-                                            break;
-                                        default:
-                                            System.err.println(data);
-                                    }
-                                }
-
-                                next.handle(null);
-                                // clean up
-                                decoder.cleanFiles();
-                            } catch (ErrorDataDecoderException | NotEnoughDataDecoderException | IncompatibleDataDecoderException | IOException e) {
-                                // clean up
-                                if (decoder != null) {
-                                    decoder.cleanFiles();
-                                }
-                                next.handle(e);
-                            }
+                            parseMultipart(request, buffer, next);
                         } else {
                             next.handle(null);
                         }

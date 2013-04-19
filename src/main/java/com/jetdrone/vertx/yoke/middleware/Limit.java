@@ -13,14 +13,10 @@ public class Limit extends Middleware {
 
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
-        // inside middleware the original request has been wrapped with yoke's
-        // implementation
-        final YokeHttpServerRequest req = (YokeHttpServerRequest) request;
+        if (request.hasBody()) {
+            request.setBodyLengthLimit(limit);
 
-        if (req.hasBody()) {
-            req.setBodyLengthLimit(limit);
-
-            long len = req.contentLength();
+            long len = request.contentLength();
             // limit by content-length
             if (len > limit) {
                 next.handle(413);

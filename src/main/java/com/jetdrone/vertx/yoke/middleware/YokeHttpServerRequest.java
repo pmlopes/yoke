@@ -111,6 +111,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     /**
      * The request setBody and eventually a parsed version of it in json or map
      */
+    @SuppressWarnings("unchecked")
     public Map<String, Object> mapBody() {
         if (body != null && body instanceof Map) {
             return (Map<String, Object>) body;

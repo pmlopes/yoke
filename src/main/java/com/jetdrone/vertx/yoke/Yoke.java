@@ -54,9 +54,9 @@ public class Yoke {
         }
     }
 
-    private List<MountedMiddleware> middlewareList = new ArrayList<>();
+    private final List<MountedMiddleware> middlewareList = new ArrayList<>();
     private Middleware errorHandler;
-    private Map<String, Engine> engineMap = new HashMap<>();
+    private final Map<String, Engine> engineMap = new HashMap<>();
 
     /**
      * Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is

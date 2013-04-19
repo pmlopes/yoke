@@ -10,15 +10,15 @@ import java.util.regex.Pattern;
 
 public class Router extends Middleware {
 
-    private List<PatternBinding> getBindings = new ArrayList<>();
-    private List<PatternBinding> putBindings = new ArrayList<>();
-    private List<PatternBinding> postBindings = new ArrayList<>();
-    private List<PatternBinding> deleteBindings = new ArrayList<>();
-    private List<PatternBinding> optionsBindings = new ArrayList<>();
-    private List<PatternBinding> headBindings = new ArrayList<>();
-    private List<PatternBinding> traceBindings = new ArrayList<>();
-    private List<PatternBinding> connectBindings = new ArrayList<>();
-    private List<PatternBinding> patchBindings = new ArrayList<>();
+    private final List<PatternBinding> getBindings = new ArrayList<>();
+    private final List<PatternBinding> putBindings = new ArrayList<>();
+    private final List<PatternBinding> postBindings = new ArrayList<>();
+    private final List<PatternBinding> deleteBindings = new ArrayList<>();
+    private final List<PatternBinding> optionsBindings = new ArrayList<>();
+    private final List<PatternBinding> headBindings = new ArrayList<>();
+    private final List<PatternBinding> traceBindings = new ArrayList<>();
+    private final List<PatternBinding> connectBindings = new ArrayList<>();
+    private final List<PatternBinding> patchBindings = new ArrayList<>();
 
     private Middleware noMatchHandler;
 

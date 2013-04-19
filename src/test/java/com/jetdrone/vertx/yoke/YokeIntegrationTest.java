@@ -33,10 +33,10 @@ public class YokeIntegrationTest extends TestVerticle {
         });
     }
 
-    @Test
-    public void testLib() {
-        Yoke yoke = new Yoke(vertx);
-        yoke.use(new Static("/home/plopes", 0));
-        yoke.listen(8181);
-    }
+//    @Test
+//    public void testLib() {
+//        Yoke yoke = new Yoke(vertx);
+//        yoke.use(new Static("/home/plopes", 0, true, false));
+//        yoke.listen(8181);
+//    }
 }

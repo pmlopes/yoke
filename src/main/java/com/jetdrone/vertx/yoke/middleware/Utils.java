@@ -1,34 +1,36 @@
 package com.jetdrone.vertx.yoke.middleware;
 
-class Utils {
+final class Utils {
 
-    private static final String base64code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    // no instantiation
+    private Utils () {}
 
-    static byte[] zeroPad(int length, byte[] bytes) {
-        byte[] padded = new byte[length]; // initialized to zero by JVM
+    private static final String BASE64ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    private static byte[] zeroPad(final int length, final byte[] bytes) {
+        final byte[] padded = new byte[length];
         System.arraycopy(bytes, 0, padded, 0, bytes.length);
         return padded;
     }
 
-    public static String base64(byte[] stringArray) {
+    public static String base64(final byte[] stringArray) {
 
-        StringBuilder encoded = new StringBuilder();
+        final StringBuilder encoded = new StringBuilder();
 
         // determine how many padding bytes to add to the output
-        int paddingCount = (3 - (stringArray.length % 3)) % 3;
+        final int paddingCount = (3 - (stringArray.length % 3)) % 3;
         // add any necessary padding to the input
-        stringArray = zeroPad(stringArray.length + paddingCount, stringArray);
+        final byte[] paddedArray = zeroPad(stringArray.length + paddingCount, stringArray);
         // process 3 bytes at a time, churning out 4 output bytes
-        // worry about CRLF insertions later
-        for (int i = 0; i < stringArray.length; i += 3) {
-            int j = ((stringArray[i] & 0xff) << 16) +
-                    ((stringArray[i + 1] & 0xff) << 8) +
-                    (stringArray[i + 2] & 0xff);
+        for (int i = 0; i < paddedArray.length; i += 3) {
+            final int j = ((paddedArray[i] & 0xff) << 16) +
+                    ((paddedArray[i + 1] & 0xff) << 8) +
+                    (paddedArray[i + 2] & 0xff);
 
-            encoded.append(base64code.charAt((j >> 18) & 0x3f));
-            encoded.append(base64code.charAt((j >> 12) & 0x3f));
-            encoded.append(base64code.charAt((j >> 6) & 0x3f));
-            encoded.append(base64code.charAt(j & 0x3f));
+            encoded.append(BASE64ALPHA.charAt((j >> 18) & 0x3f));
+            encoded.append(BASE64ALPHA.charAt((j >> 12) & 0x3f));
+            encoded.append(BASE64ALPHA.charAt((j >> 6) & 0x3f));
+            encoded.append(BASE64ALPHA.charAt(j & 0x3f));
         }
 
         encoded.setLength(encoded.length() - paddingCount);
