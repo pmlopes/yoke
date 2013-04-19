@@ -111,8 +111,6 @@ public class Static extends Middleware {
                         normalizedDir += "/";
                     }
 
-                    System.out.println(normalizedDir);
-
                     String file;
                     StringBuilder files = new StringBuilder("<ul id=\"files\">");
 
