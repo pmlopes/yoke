@@ -1,25 +1,71 @@
 <html>
 <head>
-  <title>Yoke - middleware for Vert.x</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <link rel="stylesheet" href="style.css">
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script src="docs.js"></script>
+    <title>Yoke - middleware for Vert.x</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="docs.js"></script>
 </head>
 <body>
-  <div id="content">
+<div id="content">
     <h1>Yoke</h1>
+
     <div id="module.exports" class="comment">
-      <h2></h2>
-      <div class="description">
-        <h2>Middleware</h2>
+        <h2></h2>
 
-        <p>Description.</p>
+        <div class="description">
+            <h2>BasicAuth</h2>
 
-        <pre><code>code</code></pre>
-      </div>
+            <p>Enfore basic authentication by providing a <code>BasicAuth.AuthHandler</code> interface,
+                which must return <code>true</code> in order to gain access. Alternatively an fixed
+                username, password is provided. The middleware Populates <code>request.user</code>.</p>
+
+            <ul class="tags">
+                <li><em>String</em> username</li>
+                <li><em>String</em> password</li>
+            </ul>
+            <pre><code>new BasicAuth("username", "password")</code></pre>
+
+            <ul class="tags">
+                <li><em>String</em> username</li>
+                <li><em>String</em> password</li>
+                <li><em>String</em> realm</li>
+            </ul>
+            <pre><code>new BasicAuth("username", "password", "Authentication Required")</code></pre>
+
+            <ul class="tags">
+                <li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
+            </ul>
+            <pre><code>new BasicAuth(new BasicAuth.AuthHandler() {
+  @Override
+  public void handle(String username, String password, Handler&lt;Boolean&gt; result) {
+    if ("username".equals(username) && "password".equals("password")) {
+      result.handle(true);
+    } else {
+      result.handle(false);
+    }
+  }
+});</code></pre>
+
+            <ul class="tags">
+                <li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
+                <li><em>String</em> realm</li>
+            </ul>
+            <pre><code>new BasicAuth(new BasicAuth.AuthHandler() {
+  @Override
+  public void handle(String username, String password, Handler&lt;Boolean&gt; result) {
+    if ("username".equals(username) && "password".equals("password")) {
+      result.handle(true);
+    } else {
+      result.handle(false);
+    }
+  }
+}, "Authentication required");</code></pre>
+        </div>
     </div>
-    <ul id="menu"><li><a href="#module.exports"></a></li></ul>
-  </div>
+    <ul id="menu">
+        <li><a href="#module.exports"></a></li>
+    </ul>
+</div>
 </body>
 </html>
