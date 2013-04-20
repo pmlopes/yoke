@@ -19,7 +19,7 @@
 yoke.use(new Favicon());
 yoke.use(new Static("webroot"));
 yoke.use(new Router() {{
-  all("/hello", new Handler<HttpServerRequest>() {
+  all("/hello", new Handler&lt;HttpServerRequest&gt;() {
     @Override
     public void handle(HttpServerRequest request) {
       request.response().end("Hello World!");
@@ -31,7 +31,27 @@ yoke.listen(3000);</code></pre>
 
             <h2>Installation</h2>
 
-            <pre><code>$ npm install connect</code></pre>
+            <p>Vert.x 2 module:</p>
+            <pre><code>com.jetdrone~yoke~1.0.0-SNAPSHOT</code></pre>
+
+            <p>Maven artifact:</p>
+            <pre><code><dependency>
+                <groupId>com.jetdrone</groupId>
+                <artifactId>yoke</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency></code></pre>
+
+            <h2>API</h2>
+
+            <ul>
+              <li><a href="com.jetdrone.vertx.yoke.Yoke.html">com.jetdrone.vertx.yoke.Yoke</a> The Framework main class</li>
+              <li><a href="com.jetdrone.vertx.yoke.MimeType.html">com.jetdrone.vertx.yoke.MimeType</a> Mime-Types utils</li>
+              <li><a href="com.jetdrone.vertx.yoke.Middleware.html">com.jetdrone.vertx.yoke.Middleware</a> Abstract class that all midleware extends</li>
+              <li><a href="com.jetdrone.vertx.yoke.Engine.html">com.jetdrone.vertx.yoke.Engine</a> Abstract class that future render engines extend</li>
+              <li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest</a> Implementation of HttpServerRequest with some extra helper fields</li>
+              <li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse</a> Implementation of HttpServerResponse with suport for render engines</li>
+            </ul>
 
             <h2>Middleware</h2>
 
