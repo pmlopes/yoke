@@ -9,17 +9,37 @@
 <body>
 <div id="content">
     <h1>Yoke</h1>
+
     <div id="module.exports" class="comment">
         <h2></h2>
+
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>BodyParser</h2>
 
-            <p>Description.</p>
+            <p>Parse request bodies, supports <em>application/json</em>,<br/> <em>application/x-www-form-urlencoded</em>,
+                and <em>multipart/form-data</em>.</p>
 
-            <pre><code>code</code></pre>
+            <p>Once data has been parsed the result is visible in the field <code>body</code> of the request. To help
+            there are 3 helper getters for this field:</p>
+
+            <ul>
+                <li><code>bodyJson()</code> returns <code>JsonObject</code></li>
+                <li><code>bodyMap()</code> returns <code>Map</code></li>
+                <li><code>bodyBuffer()</code> returns <code>Buffer</code></li>
+            </ul>
+
+            <p>If the content type was <em>multipart/form-data</em> and there were uploaded files the files are:</p>
+
+            <ul>
+                <li><code>files()</code> returns <code>Map&lt;String, UploadFile&gt;</code></li>
+            </ul>
+
+            <pre><code>new BodyParser()</code></pre>
         </div>
     </div>
-    <ul id="menu"><li><a href="#module.exports"></a></li></ul>
+    <ul id="menu">
+        <li><a href="#module.exports"></a></li>
+    </ul>
 </div>
 </body>
 </html>
