@@ -9,17 +9,34 @@
 <body>
 <div id="content">
     <h1>Yoke</h1>
+
     <div id="module.exports" class="comment">
         <h2></h2>
+
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>CookieParser</h2>
 
-            <p>Description.</p>
+            <p>Parse request cookies both signed or plain.</p>
 
-            <pre><code>code</code></pre>
+            <p>Once data has been parsed the result is visible in the field <code>cookies</code> of the request.</p>
+
+            <ul>
+                <li><code>cookies()</code> returns <code>Map&lt;Cookie&gt;</code></li>
+            </ul>
+
+            <pre><code>new CookieParser()</code></pre>
+
+            <p>If a cooke value starts with <em>s:</em> it means that it is a signed cookie. In this case the value
+            is expected to be <em>s:&lt;cookie&gt;.&lt;signature&gt;</em>. The signature is <em>HMAC + SHA256</em>.</p>
+
+            <p>When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.</p>
+
+            <pre><code>new CookieParser("secret")</code></pre>
         </div>
     </div>
-    <ul id="menu"><li><a href="#module.exports"></a></li></ul>
+    <ul id="menu">
+        <li><a href="#module.exports"></a></li>
+    </ul>
 </div>
 </body>
 </html>
