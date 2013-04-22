@@ -1,83 +1,118 @@
 package com.jetdrone.vertx.kitcms;
 
-import com.jetdrone.vertx.kit.BaseVerticle;
-import com.jetdrone.vertx.kit.KitRequest;
+import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.middleware.BasicAuth;
-import com.jetdrone.vertx.yoke.middleware.ErrorHandler;
+import com.jetdrone.vertx.yoke.middleware.*;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
+import org.vertx.java.platform.Verticle;
 
-public class KitCMS extends BaseVerticle {
+public class KitCMS extends Verticle {
     @Override
-    public void start() throws Exception {
-        init(vertx);
-        final Config config = new Config(getContainer().getConfig());
-        final Logger logger = getContainer().getLogger();
-        final Middleware middleware = new Middleware(this, config);
+    public void start() {
+        final Config config = new Config(container.config());
+        final Logger logger = container.logger();
+        final EventBus eb = vertx.eventBus();
 
         // deploy redis module
-        container.deployModule("com.jetdrone~mod-redis-io~1.1.0-SNAPSHOT", config.getRedisConfig(), new Handler<String>() {
+        container.deployModule("com.jetdrone~mod-redis-io~1.1.0-SNAPSHOT", config.getRedisConfig());
+
+        final Yoke yoke = new Yoke(vertx);
+        // register jMustache render engine
+        yoke.engine("mustache", new MustacheEngine());
+
+        // install the pretty error handler middleware
+        yoke.use(new ErrorHandler(true));
+        // install the favicon middleware
+        yoke.use(new Favicon());
+        // install custom middleware to identify the domain
+        yoke.use(new com.jetdrone.vertx.yoke.Middleware() {
             @Override
-            public void handle(String event) {
-                System.out.println(event);
-            }
-        });
-
-        HttpServer server = vertx.createHttpServer();
-
-        // add admin routes
-        AdminRouter.install(this, middleware);
-
-        route.allWithRegEx("\\/static\\/.*", new Handler<HttpServerRequest>() {
-            @Override
-            public void handle(final HttpServerRequest request) {
-                final KitRequest kit = new KitRequest(request);
-                resource(kit);
-            }
-        });
-        
-
-        route.noMatch(new Handler<HttpServerRequest>() {
-            @Override
-            public void handle(final HttpServerRequest request) {
-                final KitRequest kit = new KitRequest(request);
-
-                System.out.println("no match!" + request.uri);
-                middleware.domain(kit, new Handler<Void>() {
-                    @Override
-                    public void handle(Void _void) {
-                        final Config.Domain domain = (Config.Domain) kit.context.get("domain");
-
-                        String url = request.uri != null ? request.uri : "/";
-
-                        // remove any trailing slashes
-                        while(url.length() > 1 && "/".equals(url.substring(url.length() - 1))) {
-                            url = url.substring(0, url.length() - 1);
-                        }
-                        url = url.toLowerCase();
-
-                        // make sure url starts with a forward slash
-                        if (!"/".equals(url.substring(0, 1))) {
-                            request.response.statusCode = 404;
-                            request.response.end();
-                            return;
-                        }
-
-                        // Hand the url off to our renderizer
-                        // TODO: render
-                        request.response.end(url);
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+                String host = request.headers().get("host");
+                if (host == null) {
+                    // there is no host header
+                    next.handle(400);
+                } else {
+                    if (host.indexOf(':') != -1) {
+                        host = host.substring(0, host.indexOf(':'));
                     }
-                });
+
+                    Config.Domain found = null;
+
+                    for (Config.Domain domain : config.domains) {
+                        if (domain.pattern.matcher(host).find()) {
+                            found = domain;
+                            break;
+                        }
+                    }
+
+                    if (found == null) {
+                        // still no host found even with header present
+                        next.handle(404);
+                    } else {
+                        request.put("domain", found);
+                        next.handle(null);
+                    }
+                }
             }
         });
+        // install the static file server
+        yoke.use("/static", new Static("public"));
+        // install the BasicAuth middleware
+        // TODO: get it from config
+        yoke.use("/admin", new BasicAuth("foo", "bar"));
+        // install router for admin requests
+        yoke.use(new Router() {{
+            get("/admin", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
 
-        // routing config
-        server.requestHandler(route);
+                    JsonObject keys = new JsonObject();
+                    keys.putString("command", "keys");
+                    keys.putString("pattern", domain.namespace + "&*");
+                    eb.send(Config.REDIS_ADDRESS, keys, new Handler<Message<JsonObject>>() {
+                        @Override
+                        public void handle(Message<JsonObject> msg) {
+                            if (!"ok".equals(msg.body().getString("status"))) {
+                                next.handle(msg.body().getString("message"));
+                            } else {
+                                request.put("keys", msg.body().getArray("value").toArray());
+                                request.response().render("/com/jetdrone/vertx/kitcms/views/admin.mustache", next);
+                            }
+                        }
+                    });
+                }
+            });
+            get("/admin/keys", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
 
-        server.listen(config.serverPort, config.serverAddress);
+                    JsonObject keys = new JsonObject();
+                    keys.putString("command", "keys");
+                    keys.putString("pattern", domain.namespace + "&*");
+                    eb.send(Config.REDIS_ADDRESS, keys, new Handler<Message<JsonObject>>() {
+                        @Override
+                        public void handle(Message<JsonObject> msg) {
+
+                            if (!"ok".equals(msg.body().getString("status"))) {
+                                next.handle(msg.body().getString("message"));
+                            } else {
+                                request.response().putHeader("Content-Type", "application/json");
+                                request.response().end(msg.body().getArray("value").encode());
+                            }
+                        }
+                    });
+                }
+            });
+        }});
+
+        yoke.listen(config.serverPort, config.serverAddress);
         logger.info("Vert.x Server listening on " + config.serverAddress + ":" + config.serverPort);
     }
 }

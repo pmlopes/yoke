@@ -1,3 +1,5 @@
+import org.vertx.java.core.AsyncResult
+import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.core.Handler
 import org.vertx.java.platform.PlatformLocator
 import org.vertx.java.platform.impl.ModuleClassLoader
@@ -134,12 +136,12 @@ test {
 }
 
 task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
-  ModuleClassLoader.reverseLoadOrder = false
+  ModuleClassLoader.loadWithPlatformCL = false
   def pm = PlatformLocator.factory.createPlatformManager()
   def latch = new CountDownLatch(1)
-  pm.deployModule(moduleName, null, 1, new Handler<String>() {
-    public void handle(String deploymentID) {
-      if (deploymentID != null) {
+  pm.deployModule(moduleName, null, 1, new AsyncResultHandler<String>() {
+    public void handle(AsyncResult<String> asyncResult) {
+      if (asyncResult.succeeded()) {
         println "CTRL-C to stop server"
       } else {
         println "Failed to deploy module"

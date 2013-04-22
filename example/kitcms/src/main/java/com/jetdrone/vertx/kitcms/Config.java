@@ -3,10 +3,6 @@ package com.jetdrone.vertx.kitcms;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Config {
@@ -74,7 +70,7 @@ public class Config {
         if (domains != null) {
             this.domains = new Domain[domains.size()];
             for (int i = 0; i < domains.size(); i++) {
-                JsonObject domain = (JsonObject) domains.get(i);
+                JsonObject domain = domains.get(i);
                 String name = domain.getString("name");
                 String namespace = domain.getString("namespace");
                 String user = domain.getString("user", adminUser);

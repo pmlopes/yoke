@@ -131,6 +131,7 @@ public class Yoke {
      * @param engine The implementation of the engine
      */
     public Yoke engine(String extension, Engine engine) {
+        engine.setVertx(vertx);
         engineMap.put(extension, engine);
         return this;
     }
