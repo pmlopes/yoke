@@ -8,6 +8,8 @@ $(function(){
 function highlight(java) {
   return java
     // special case to not mess with css class
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
     .replace(/\bclass\s+/g, '<span class="keyword">$1</span>')
     .replace(/\/\/(.*)/gm, '<span class="comment">//$1</span>')
     .replace(/(".*?")/gm, '<span class="string">$1</span>')
