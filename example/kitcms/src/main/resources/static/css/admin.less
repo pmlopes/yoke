@@ -1,0 +1,150 @@
+body {
+	font-family: 'Droid Sans', sans-serif;
+	color: #333;
+	background: #ddd;
+}
+
+::-webkit-scrollbar {
+	width:10px;
+	height:10px;
+	background-color:#fff;
+	box-shadow: inset 1px 1px 0 rgba(0,0,0,.1),inset -1px -1px 0 rgba(0,0,0,.07);
+
+	&:hover{
+		background-color:#eee;
+	}
+}
+
+::-webkit-resizer{
+	-webkit-border-radius:4px;
+	background-color:#666;
+}
+
+::-webkit-scrollbar-thumb {
+	min-height:0.8em;
+	min-width:0.8em;
+	background-color: rgba(0, 0, 0, .2);
+	box-shadow: inset 1px 1px 0 rgba(0,0,0,.1),inset -1px -1px 0 rgba(0,0,0,.07);
+
+	&:hover{
+		background-color: #bbb;
+	}
+
+	&:active{
+		background-color:#888;
+	}
+}
+
+#content {	
+	min-height: 300px;
+	height: 100%;
+	background: #fff;
+}
+#keys {
+	float: left;
+	width: 270px;
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	li {
+		padding: 4px 5px 4px 5px;
+
+		white-space: -moz-pre-wrap !important;  /* Mozilla, since 1999 */
+		white-space: -pre-wrap;      /* Opera 4-6 */
+		white-space: -o-pre-wrap;    /* Opera 7 */
+		white-space: pre-wrap;       /* css-3 */
+		word-wrap: break-word;       /* Internet Explorer 5.5+ */
+		word-break: break-all;
+		white-space: normal;
+
+		border-bottom: 2px dotted #f7f7f7;
+
+		cursor: pointer;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+		&:hover {
+			background: #ddd;
+		}
+
+		&.selected {
+			background: #6c6c6c;
+			color: #fff;
+		}
+
+		&.changed {
+			font-weight: bold;
+		}
+	}
+}
+
+#controls {
+	float: left;
+	width: 30px;
+	height: 100%;
+	background: #6c6c6c;
+
+	a {
+		display: block;
+		width: 30px;
+		height: 30px;		
+
+		color: #aaa;
+		font-size: 20px;
+		line-height: 30px;
+		text-align: center;
+		text-decoration: none;
+
+		outline: none;	
+	}
+
+	a.active {
+		color: #fff;
+		text-shadow: 2px 2px 1px #333;
+
+		&:hover, &.hover {
+			font-size: 24px;
+		}
+	}
+
+	.separator {
+		height: 15px;
+	}
+
+	.file-upload {
+		position: relative;
+		overflow: hidden;
+
+		input {
+			line-height: 30px;
+			font-size: 24px;
+			width: 30px;
+			height: 30px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			cursor: pointer;
+			opacity: 0;
+		}
+	}
+}
+
+#editor {
+	margin-left: 300px;	
+	height: 100%;
+}
+
+.CodeMirror-scroll {
+	height: 100%; 
+	overflow-y: auto; 
+	overflow-x: auto;
+}
