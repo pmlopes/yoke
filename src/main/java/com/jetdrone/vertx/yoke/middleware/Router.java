@@ -20,8 +20,6 @@ public class Router extends Middleware {
     private final List<PatternBinding> connectBindings = new ArrayList<>();
     private final List<PatternBinding> patchBindings = new ArrayList<>();
 
-    private Middleware noMatchHandler;
-
     @Override
     public void handle(YokeHttpServerRequest request, Handler<Object> next) {
 
@@ -560,30 +558,6 @@ public class Router extends Middleware {
         return this;
     }
 
-    /**
-     * Specify a middleware that will be called when no other handlers match.
-     * If this middleware is not specified default behaviour is to return a 404
-     * @param handler
-     */
-    public Router noMatch(Middleware handler) {
-        noMatchHandler = handler;
-        return this;
-    }
-
-    /**
-     * Specify a middleware that will be called when no other handlers match.
-     * If this middleware is not specified default behaviour is to return a 404
-     * @param handler
-     */
-    public Router noMatch(final Handler<HttpServerRequest> handler) {
-        return noMatch(new Middleware() {
-            @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
-                handler.handle(request);
-            }
-        });
-    }
-
     private void addPattern(String input, Middleware handler, List<PatternBinding> bindings) {
         // We need to search for any :<token name> tokens in the String and replace them with named capture groups
         Matcher m =  Pattern.compile(":([A-Za-z][A-Za-z0-9_]*)").matcher(input);
@@ -629,11 +603,8 @@ public class Router extends Middleware {
                 return;
             }
         }
-        if (noMatchHandler != null) {
-            noMatchHandler.handle(request, next);
-        } else {
-            next.handle(null);
-        }
+
+        next.handle(null);
     }
 
     private static class PatternBinding {
