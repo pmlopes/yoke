@@ -21,12 +21,12 @@ The Vert.x module id is: `com.jetdrone~yoke~1.0.0-SNAPSHOT`
 
 You can get the jar file using maven with the following configuration:
 
-`<dependency>
-  <groupId>com.jetdrone</groupId>
-  <artifactId&gt;yoke</artifactId>
-  <version&gt;1.0.0-SNAPSHOT</version>
-  <scope>provided</scope>
-</dependency>`
+    <dependency>
+      <groupId>com.jetdrone</groupId>
+      <artifactId>yoke</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
 
 The scope is provided because you should include the module from your Vert.x application to avoid having duplicated jars
 in the server classpath.
