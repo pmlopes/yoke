@@ -12,11 +12,14 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>Timeout</h2>
 
-            <p>Description.</p>
+            <p>Times out the request in <code>ms</code>, defaulting to <code>5000</code>.</p>
 
-            <pre><code>code</code></pre>
+            <p>The timeout error is passed to <code>next.handle(408)</code> so that you may customize the response
+                behaviour.</p>
+
+            <pre><code>new Timeout()</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>

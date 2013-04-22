@@ -12,11 +12,29 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>Router</h2>
 
-            <p>Description.</p>
+            <p>Route request by path or regular expression. All <em>HTTP</em> verbs are available:</p>
 
-            <pre><code>code</code></pre>
+            <ul>
+                <li><code>GET</code></li>
+                <li><code>PUT</code></li>
+                <li><code>POST</code></li>
+                <li><code>DELETE</code></li>
+                <li><code>OPTIONS</code></li>
+                <li><code>HEAD</code></li>
+                <li><code>TRACE</code></li>
+                <li><code>CONNECT</code></li>
+                <li><code>PATCH</code></li>
+            </ul>
+
+            <pre><code>new Router() {{
+  get("/hello", new Handler&lt;HttpServerRequest&gt;() {
+    public void handle(HttpServerRequest request) {
+      request.response().end("Hello World!");
+    }
+  });
+}}</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>

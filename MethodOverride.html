@@ -12,11 +12,17 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>MethodOverride</h2>
 
-            <p>Description.</p>
+            <p>Pass an optional <code>key</code> to use when checking for a method override, othewise defaults to
+                <em>_method</em> or the header <em>x-http-method-override</em>.
+                The original method is available via <code>req.originalMethod</code>.</p>
 
-            <pre><code>code</code></pre>
+            <ul>
+                <li><em>String</em> key </li>
+            </ul>
+
+            <pre><code>new MethodOverride()</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>

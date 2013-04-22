@@ -12,11 +12,18 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>Limit</h2>
 
-            <p>Description.</p>
+            <p>Limits the request body to a specific amount of bytes. If the request body contains more bytes than
+            the allowed limit an <em>413</em> error is sent back to the client.</p>
 
-            <pre><code>code</code></pre>
+            <h2>Options</h2>
+
+            <ul>
+                <li><code>bytes</code>  max amount of bytes allowed in the request body</li>
+            </ul>
+
+            <pre><code>new Limit(1024)</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>

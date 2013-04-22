@@ -12,11 +12,25 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>Favicon</h2>
 
-            <p>Description.</p>
+            <p>By default serves the Yoke favicon, or the favicon<br />located by the given <code>path</code>.</p>
 
-            <pre><code>code</code></pre>
+            <h2>Options</h2>
+
+            <ul>
+                <li><code>path</code>  the location of your favicon file</li>
+                <li><code>maxAge</code>  cache-control max-age directive, defaulting to 1 day</li>
+            </ul>
+
+            <p>Using Yoke favicon and default max-age:</p>
+            <pre><code>new Favicon()</code></pre>
+
+            <p>Using your favicon and default max-age:</p>
+            <pre><code>new Favicon("favicon.ico")</code></pre>
+
+            <p>Using your favicon and custom max-age:</p>
+            <pre><code>new Favicon("favicon.ico", 1000)</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>

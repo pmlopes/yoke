@@ -12,11 +12,19 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>ErrorHandler</h2>
 
-            <p>Description.</p>
+            <p>Creates pretty print error pages in <em>html</em>, <em>text</em> or <em>json</em> depending on
+                the <em>accept</em> header from the client.</p>
 
-            <pre><code>code</code></pre>
+            <p>Parameters:</p>
+
+            <ul>
+                <li><pre><code>boolean</code></pre> include stack trace. Useful in development mode but probably
+                you don't want it in production.</li>
+            </ul>
+
+            <pre><code>new ErrorHandler(true)</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>

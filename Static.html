@@ -12,11 +12,21 @@
     <div id="module.exports" class="comment">
         <h2></h2>
         <div class="description">
-            <h2>Middleware</h2>
+            <h2>Static</h2>
 
-            <p>Description.</p>
+            <p>Static file server with the given <code>root</code> path. Optionaly will also generate index pages
+            for directory listings.</p>
 
-            <pre><code>code</code></pre>
+            <h2>Options</h2>
+
+            <ul>
+                <li><code>root</code> the root location of the static files in the file system</li>
+                <li><code>maxAge</code> cache-control max-age directive</li>
+                <li><code>directoryListing</code> generate index pages for directories</li>
+                <li><code>includeHidden</code> in the directory listing show dot files</li>
+            </ul>
+
+            <pre><code>new Limit("webroot", 0, true, false)</code></pre>
         </div>
     </div>
     <ul id="menu"><li><a href="#module.exports"></a></li></ul>
