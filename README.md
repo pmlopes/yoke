@@ -42,3 +42,8 @@ In the site there are simple examples and basic documentation of the implemented
 ## Inspiration
 
 This project was inspired by [Connect](http://www.senchalabs.org/connect/).
+
+
+## License
+
+This project is released under the Apache License 2.0 as included in the root of the project.
