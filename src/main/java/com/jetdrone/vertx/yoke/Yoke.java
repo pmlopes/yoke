@@ -26,7 +26,6 @@ import java.util.Map;
 public class Yoke {
 
     private final Vertx vertx;
-    private HttpServer server;
 
     private final Map<String, Object> defaultContext = new HashMap<>();
 
@@ -154,20 +153,12 @@ public class Yoke {
     }
 
     /**
-     * Set an already existing Vert.x HttpServer
-     * @param httpServer HttpServer
-     */
-    public void setHttpServer(HttpServer httpServer) {
-        this.server = httpServer;
-    }
-
-    /**
      * Starts the server listening at a given port bind to all available interfaces.
      *
      * @param port the server TCP port
-     * @return HttpServer
+     * @return Yoke
      */
-    public HttpServer listen(int port) {
+    public Yoke listen(int port) {
         return listen(port, "0.0.0.0");
     }
 
@@ -175,13 +166,22 @@ public class Yoke {
      * Starts the server listening at a given port and given address.
      *
      * @param port the server TCP port
-     * @return HttpServer
+     * @return Yoke
      */
-    public HttpServer listen(int port, String address) {
-        if (server == null) {
-            server = vertx.createHttpServer();
-        }
+    public Yoke listen(int port, String address) {
+        HttpServer server = vertx.createHttpServer();
 
+        listen(server);
+
+        server.listen(port, address);
+        return this;
+    }
+
+    /**
+     * Starts listening at a already created server.
+     * @return Yoke
+     */
+    public Yoke listen(HttpServer server) {
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(final HttpServerRequest req) {
@@ -226,7 +226,6 @@ public class Yoke {
             }
         });
 
-        server.listen(port, address);
-        return server;
+        return this;
     }
 }

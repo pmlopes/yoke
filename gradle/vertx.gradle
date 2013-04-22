@@ -136,7 +136,7 @@ test {
 }
 
 task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
-//  ModuleClassLoader.reverseLoadOrder = false
+  ModuleClassLoader.loadWithPlatformCL = false
   def pm = PlatformLocator.factory.createPlatformManager()
   def latch = new CountDownLatch(1)
   pm.deployModule(moduleName, null, 1, new AsyncResultHandler<String>() {
