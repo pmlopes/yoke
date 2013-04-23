@@ -4,17 +4,24 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.*;
+import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Verticle;
 
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class KitCMS extends Verticle {
+
     @Override
     public void start() {
         final Config config = new Config(container.config());
@@ -201,7 +208,96 @@ public class KitCMS extends Verticle {
                     });
                 }
             });
-            // TODO: import/export
+            get("/admin/export", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
+
+                    db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
+                        @Override
+                        public void handle(AsyncResult<JsonArray> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult.cause());
+                            } else {
+                                // need to iterate all json array elements and get from redis
+                                Iterator it = new Iterator(asyncResult.result());
+
+                                final JsonArray buffer = new JsonArray();
+
+                                it.forEach(new Iterator.Async() {
+                                    @Override
+                                    public void handle(Object o, final Iterator itNext) {
+                                        if (o != null) {
+                                            final String key = (String) o;
+                                            db.get(domain.namespace, key, new AsyncResultHandler<String>() {
+                                                @Override
+                                                public void handle(AsyncResult<String> asyncResult) {
+                                                    if (asyncResult.failed()) {
+                                                        next.handle(asyncResult.cause());
+                                                    } else {
+                                                        JsonObject json = new JsonObject();
+                                                        json.putString("key", key);
+                                                        json.putString("value", asyncResult.result());
+                                                        buffer.addObject(json);
+
+                                                        itNext.next();
+                                                    }
+                                                }
+                                            });
+                                        } else {
+                                            YokeHttpServerResponse response = request.response();
+
+                                            String filename = System.currentTimeMillis() + "_export.kit";
+
+                                            response.putHeader("Content-Type", "application/json");
+                                            response.putHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+                                            response.end(buffer.encode());
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+            post("/admin/import", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
+
+                    FileUpload file = request.files().get("file");
+                    try {
+                        Iterator it = new Iterator(new JsonArray(new String(file.get())));
+                        it.forEach(new Iterator.Async() {
+                            @Override
+                            public void handle(Object o, final Iterator itNext) {
+                                if (o != null) {
+                                    final JsonObject json = (JsonObject) o;
+                                    db.set(domain.namespace, json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
+                                        @Override
+                                        public void handle(AsyncResult<Void> asyncResult) {
+                                            if (asyncResult.failed()) {
+                                                next.handle(asyncResult.cause());
+                                            } else {
+                                                itNext.next();
+                                            }
+                                        }
+                                    });
+                                } else {
+                                    YokeHttpServerResponse response = request.response();
+
+                                    response.putHeader("Location", "/admin");
+                                    response.setStatusCode(302);
+                                    response.setStatusMessage("Redirecting to /admin");
+                                    response.end();
+                                }
+                            }
+                        });
+                    } catch (IOException ioex) {
+                        next.handle(ioex);
+                    }
+                }
+            });
         }});
 
         // if the request fall through it is a view to render from the db
