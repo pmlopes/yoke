@@ -58,7 +58,7 @@ public class Favicon extends Middleware {
             String iconPath;
 
             if (path == null) {
-                iconPath = Favicon.class.getResource("favicon.ico").getPath();
+                iconPath = Utils.urlToPath(Favicon.class.getResource("favicon.ico"));
             } else {
                 iconPath = path;
             }

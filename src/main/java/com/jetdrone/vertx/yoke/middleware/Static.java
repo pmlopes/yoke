@@ -53,7 +53,7 @@ public class Static extends Middleware {
     public void setVertx(Vertx vertx) {
         try {
             super.setVertx(vertx);
-            Buffer buf = vertx.fileSystem().readFileSync(getClass().getResource("directory.html").getPath());
+            Buffer buf = vertx.fileSystem().readFileSync(Utils.urlToPath(getClass().getResource("directory.html")));
             directoryTemplate = buf.toString("UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -1,5 +1,10 @@
 package com.jetdrone.vertx.yoke.middleware;
 
+import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+
 final class Utils {
 
     // no instantiation
@@ -35,5 +40,15 @@ final class Utils {
 
         encoded.setLength(encoded.length() - paddingCount);
         return encoded.toString();
+    }
+
+    public static String urlToPath(URL url) {
+        try {
+            // something like /c:/foo%20bar/baz.jpg
+            String path = URLDecoder.decode(url.getPath(), "UTF-8");
+            return new File(path).getPath();
+        } catch (UnsupportedEncodingException ueex) {
+            throw new RuntimeException(ueex);
+        }
     }
 }
