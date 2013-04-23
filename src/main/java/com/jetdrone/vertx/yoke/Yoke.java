@@ -6,6 +6,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.HttpServerResponse;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,12 +207,14 @@ public class Yoke {
                                     handle(null);
                                 }
                             } else {
+                                HttpServerResponse response = request.response();
                                 // reached the end and no handler was able to answer the request
-                                request.response().setStatusCode(404);
+                                response.setStatusCode(404);
+                                response.setStatusMessage(HttpResponseStatus.valueOf(404).reasonPhrase());
                                 if (errorHandler != null) {
                                     errorHandler.handle(request, null);
                                 } else {
-                                    request.response().end(HttpResponseStatus.valueOf(404).reasonPhrase());
+                                    response.end(HttpResponseStatus.valueOf(404).reasonPhrase());
                                 }
                             }
                         } else {
@@ -219,7 +222,10 @@ public class Yoke {
                             if (errorHandler != null) {
                                 errorHandler.handle(request, null);
                             } else {
-                                request.response().end(HttpResponseStatus.valueOf(500).reasonPhrase());
+                                HttpServerResponse response = request.response();
+                                response.setStatusCode(500);
+                                response.setStatusMessage(HttpResponseStatus.valueOf(500).reasonPhrase());
+                                response.end(HttpResponseStatus.valueOf(500).reasonPhrase());
                             }
                         }
                     }

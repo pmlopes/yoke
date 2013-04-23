@@ -34,7 +34,7 @@ public class MimeType {
         loadFile(MimeType.class.getResourceAsStream("mimex.types"));
     }
 
-    public static String getMime(String file) {
+    public static String getMime(String file, String defaultMimeType) {
         int sep = file.lastIndexOf('.');
         if (sep != -1) {
             String extension = file.substring(sep + 1, file.length());
@@ -46,7 +46,11 @@ public class MimeType {
             }
         }
 
-        return "text/plain";
+        return defaultMimeType;
+    }
+
+    public static String getMime(String file) {
+        return getMime(file, "text/plain");
     }
 
     public static String getCharset(String mime, String fallback) {

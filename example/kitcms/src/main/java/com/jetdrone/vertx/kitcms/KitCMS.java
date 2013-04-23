@@ -1,14 +1,18 @@
 package com.jetdrone.vertx.kitcms;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.*;
+import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Verticle;
+
+import java.util.Map;
 
 public class KitCMS extends Verticle {
     @Override
@@ -19,6 +23,9 @@ public class KitCMS extends Verticle {
 
         // deploy redis module
         container.deployModule("com.jetdrone~mod-redis-io~1.1.0-SNAPSHOT", config.getRedisConfig());
+
+        // db access
+        final Db db = new Db(eb, Config.REDIS_ADDRESS);
 
         final Yoke yoke = new Yoke(vertx);
         // register jMustache render engine
@@ -61,10 +68,14 @@ public class KitCMS extends Verticle {
             }
         });
         // install the static file server
-        yoke.use("/static", new Static("public"));
+        // note that since we are mounting under /static the root for the static middleware
+        // will always be prefixed with /static
+        yoke.use("/static", new Static("."));
         // install the BasicAuth middleware
         // TODO: get it from config
         yoke.use("/admin", new BasicAuth("foo", "bar"));
+        // install body parser for /admin requests
+        yoke.use("/admin", new BodyParser());
         // install router for admin requests
         yoke.use(new Router() {{
             get("/admin", new Middleware() {
@@ -72,17 +83,14 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
                     final Config.Domain domain = (Config.Domain) request.get("domain");
 
-                    JsonObject keys = new JsonObject();
-                    keys.putString("command", "keys");
-                    keys.putString("pattern", domain.namespace + "&*");
-                    eb.send(Config.REDIS_ADDRESS, keys, new Handler<Message<JsonObject>>() {
+                    db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
                         @Override
-                        public void handle(Message<JsonObject> msg) {
-                            if (!"ok".equals(msg.body().getString("status"))) {
-                                next.handle(msg.body().getString("message"));
+                        public void handle(AsyncResult<JsonArray> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult.cause());
                             } else {
-                                request.put("keys", msg.body().getArray("value").toArray());
-                                request.response().render("/com/jetdrone/vertx/kitcms/views/admin.mustache", next);
+                                request.put("keys", asyncResult.result().toArray());
+                                request.response().render("com/jetdrone/vertx/kitcms/views/admin.mustache", next);
                             }
                         }
                     });
@@ -93,24 +101,134 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
                     final Config.Domain domain = (Config.Domain) request.get("domain");
 
-                    JsonObject keys = new JsonObject();
-                    keys.putString("command", "keys");
-                    keys.putString("pattern", domain.namespace + "&*");
-                    eb.send(Config.REDIS_ADDRESS, keys, new Handler<Message<JsonObject>>() {
+                    db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
                         @Override
-                        public void handle(Message<JsonObject> msg) {
-
-                            if (!"ok".equals(msg.body().getString("status"))) {
-                                next.handle(msg.body().getString("message"));
+                        public void handle(AsyncResult<JsonArray> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult.cause());
                             } else {
                                 request.response().putHeader("Content-Type", "application/json");
-                                request.response().end(msg.body().getArray("value").encode());
+                                request.response().end(asyncResult.result().encode());
                             }
                         }
                     });
                 }
             });
+            get("/admin/get", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
+                    String key = request.params().get("key");
+
+                    if (key == null) {
+                        request.response().end("Missing key");
+                        return;
+                    }
+
+                    db.get(domain.namespace, key, new AsyncResultHandler<String>() {
+                        @Override
+                        public void handle(AsyncResult<String> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult.cause());
+                            } else {
+                                request.response().putHeader("Content-Type", "application/json");
+                                // TODO: escape
+                                request.response().end("\"" + asyncResult.result() + "\"");
+                            }
+                        }
+                    });
+                }
+            });
+            post("/admin/set", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
+
+                    Map<String, String> body = request.mapBody();
+
+                    String key = body.get("key");
+                    String value = body.get("value");
+
+                    if (key == null) {
+                        request.response().end("Missing key");
+                        return;
+                    }
+
+                    // TODO: if there are files get them...
+
+                    if (value == null) {
+                        request.response().end("Missing value");
+                        return;
+                    }
+
+                    db.set(domain.namespace, key, value, new AsyncResultHandler<Void>() {
+                        @Override
+                        public void handle(AsyncResult<Void> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult.cause());
+                            } else {
+                                request.response().putHeader("Content-Type", "application/json");
+                                request.response().end("\"OK\"");
+                            }
+                        }
+                    });
+                }
+            });
+            post("/admin/unset", new Middleware() {
+                @Override
+                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                    final Config.Domain domain = (Config.Domain) request.get("domain");
+
+                    Map<String, String> body = request.mapBody();
+
+                    String key = body.get("key");
+
+                    if (key == null) {
+                        request.response().end("Missing key");
+                        return;
+                    }
+
+                    db.unset(domain.namespace, key, new AsyncResultHandler<Void>() {
+                        @Override
+                        public void handle(AsyncResult<Void> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult.cause());
+                            } else {
+                                request.response().putHeader("Content-Type", "application/json");
+                                request.response().end("\"OK\"");
+                            }
+                        }
+                    });
+                }
+            });
+            // TODO: import/export
         }});
+
+        // if the request fall through it is a view to render from the db
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                final Config.Domain domain = (Config.Domain) request.get("domain");
+                final String file = request.path().toLowerCase();
+
+                db.get(domain.namespace, file, new AsyncResultHandler<String>() {
+                    @Override
+                    public void handle(AsyncResult<String> asyncResult) {
+                        if (asyncResult.failed()) {
+                            next.handle(asyncResult.cause());
+                        } else {
+                            if (asyncResult.result() == null) {
+                                // if nothing is found on the database proceed with the chain
+                                next.handle(null);
+                            } else {
+                                request.response().putHeader("Content-Type", MimeType.getMime(file, "text/html"));
+                                request.response().end(asyncResult.result());
+                            }
+                        }
+                    }
+                });
+            }
+        });
 
         yoke.listen(config.serverPort, config.serverAddress);
         logger.info("Vert.x Server listening on " + config.serverAddress + ":" + config.serverPort);

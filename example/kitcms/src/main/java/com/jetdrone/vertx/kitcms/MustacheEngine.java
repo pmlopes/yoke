@@ -1,8 +1,8 @@
 package com.jetdrone.vertx.kitcms;
 
 import com.jetdrone.vertx.yoke.Engine;
-import com.jetdrone.vertx.yoke.mustache.Mustache;
-import com.jetdrone.vertx.yoke.mustache.Template;
+import com.jetdrone.vertx.kitcms.mustache.Mustache;
+import com.jetdrone.vertx.kitcms.mustache.Template;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.buffer.Buffer;
@@ -22,28 +22,8 @@ public class MustacheEngine extends Engine {
                     final Template tmpl = Mustache.compiler().compile(asyncResult.result().toString("UTF-8"));
                     final Buffer out = new Buffer(tmpl.execute(context));
 
-                    //TODO: make proper error handling here
-                    AsyncResult<Buffer> result = new AsyncResult<Buffer>() {
-                        @Override
-                        public Buffer result() {
-                            return out;
-                        }
-
-                        @Override
-                        public Throwable cause() {
-                            return null;
-                        }
-
-                        @Override
-                        public boolean succeeded() {
-                            return true;
-                        }
-
-                        @Override
-                        public boolean failed() {
-                            return false;
-                        }
-                    };
+                    //TODO: make proper error handling
+                    next.handle(new FutureAsyncResult<>(null, out));
                 }
             }
         });

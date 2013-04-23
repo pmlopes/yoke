@@ -111,22 +111,15 @@ $(function() {
 		// Flag as saving
 		busy = true;
 
-        $.ajax('/admin/set', {
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({key: key, value: value}),
-            success: function() {
-			    current.removeClass('changed');
-			    changed = false;
-			    $('#save').removeClass('active');
-			    $('#reload').removeClass('active');
-			    busy = false;
-		    },
-		    error: function(a, b, c) {
-		        console.log(a, b, c);
-    			connectionError();
-	    		busy = false;
-		    }
+		$.post('/admin/set', {key: key, value: value}, function() {
+			current.removeClass('changed');
+			changed = false;
+			$('#save').removeClass('active');
+			$('#reload').removeClass('active');
+			busy = false;
+		}).error(function() {
+			connectionError();
+			busy = false;
 		});
 	}
 

@@ -1,7 +1,7 @@
 //
 // $Id$
 
-package com.jetdrone.vertx.yoke.mustache;
+package com.jetdrone.vertx.kitcms.mustache;
 
 /**
  * An exception thrown if we encounter an error while parsing a template.

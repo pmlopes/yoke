@@ -45,8 +45,19 @@ public class BodyParser extends Middleware {
     }
 
     private void parseMap(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString("UTF-8"));
-        request.setBody(queryStringDecoder.parameters());
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString("UTF-8"), false);
+        Map<String, String> params;
+        Map<String, List<String>> prms = queryStringDecoder.parameters();
+        if (prms.isEmpty()) {
+            params = new HashMap<>();
+        } else {
+            params = new HashMap<>(prms.size());
+            for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
+                params.put(entry.getKey(), entry.getValue().get(0));
+            }
+        }
+
+        request.setBody(params);
         next.handle(null);
     }
 
@@ -64,23 +75,15 @@ public class BodyParser extends Middleware {
                 switch (data.getHttpDataType()) {
                     case Attribute:
                         if (request.body() == null) {
-                            request.setBody(new HashMap<String, Object>());
+                            request.setBody(new HashMap<String, String>());
                         }
                         final Attribute attribute = (Attribute) data;
-                        final Map<String, Object> mapBody = request.mapBody();
+                        final Map<String, String> mapBody = request.mapBody();
 
-                        Object value = mapBody.get(attribute.getName());
+                        String value = mapBody.get(attribute.getName());
+                        // if there is more than 1 only the first is considered
                         if (value == null) {
                             mapBody.put(attribute.getName(), attribute.getValue());
-                        } else {
-                            if (value instanceof List) {
-                                ((List<String>) value).add(attribute.getValue());
-                            } else {
-                                List<String> l = new ArrayList<>();
-                                l.add((String) value);
-                                l.add(attribute.getValue());
-                                mapBody.put(attribute.getName(), l);
-                            }
                         }
                         break;
                     case FileUpload:

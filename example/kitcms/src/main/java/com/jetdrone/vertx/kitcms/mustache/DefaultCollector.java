@@ -1,7 +1,7 @@
 //
 // $Id$
 
-package com.jetdrone.vertx.yoke.mustache;
+package com.jetdrone.vertx.kitcms.mustache;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

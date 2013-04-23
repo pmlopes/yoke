@@ -2,7 +2,7 @@
 // JMustache - A Java implementation of the Mustache templating language
 // http://github.com/samskivert/jmustache/blob/master/LICENSE
 
-package com.jetdrone.vertx.yoke.mustache;
+package com.jetdrone.vertx.kitcms.mustache;
 
 import java.io.IOException;
 import java.io.StringWriter;
