@@ -38,6 +38,20 @@ Please visit:  [yoke](http://pmlopes.github.io/yoke/)
 
 In the site there are simple examples and basic documentation of the implemented middleware.
 
+## Example Application
+
+Under the directory example you will find a Naive implementation of a CMS application using Redis as a database backend.
+The example shows how to use the following middleware:
+
+* Favicon
+* ErrorHandler
+* Router
+* BodyParser
+* Static
+* BasicAuth
+
+And how to add custom middleware in the route to add extra information to the request.
+
 
 ## Inspiration
 
