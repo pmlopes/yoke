@@ -82,7 +82,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     public void redirect(int status, String url) {
         response.setStatusCode(status);
         response.setStatusMessage(HttpResponseStatus.valueOf(status).reasonPhrase());
-        putHeader("location", url);
+        response.putHeader("location", url);
         end();
     }
 
