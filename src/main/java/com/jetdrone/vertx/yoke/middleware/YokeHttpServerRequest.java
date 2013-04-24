@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Engine;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpRequest;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
@@ -192,6 +193,10 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
             return ((DefaultHttpServerRequest) request).nettyRequest();
         }
         return null;
+    }
+
+    HttpVersion protocolVersion() {
+        return nettyRequest().getProtocolVersion();
     }
 
     /**
