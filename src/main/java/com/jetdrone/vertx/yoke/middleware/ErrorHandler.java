@@ -77,7 +77,7 @@ public class ErrorHandler extends Middleware {
     public void setVertx(Vertx vertx) {
         try {
             super.setVertx(vertx);
-            Buffer buf = vertx.fileSystem().readFileSync(getClass().getResource("error.html").getPath());
+            Buffer buf = vertx.fileSystem().readFileSync(Utils.urlToPath(getClass().getResource("error.html")));
             errorTemplate = buf.toString("UTF-8");
         } catch (Exception e) {
             throw new RuntimeException(e);
