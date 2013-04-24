@@ -19,6 +19,13 @@ import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 
+/**
+ * Abstract class that needs to be implemented when creating a new middleware piece.
+ * The class provides access to the Vertx object and by default is not marked as a error handler middleware.
+ *
+ * If there is a need to create a new error handler middleware the isErrorHandler method should be overridden to
+ * return true.
+ */
 public abstract class Middleware {
 
     protected Vertx vertx;
@@ -31,5 +38,12 @@ public abstract class Middleware {
         return false;
     }
 
+    /**
+     * Handles a request.
+     *
+     * @param request A YokeHttpServerRequest which in practice is a extended HttpServerRequest
+     * @param next The callback to inform that the next middleware in the chain should be used. A value different from
+     *             null represents an error and in that case the error handler middleware will be executed.
+     */
     public abstract void handle(final YokeHttpServerRequest request, final Handler<Object> next);
 }

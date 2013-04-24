@@ -22,6 +22,9 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Basic MimeType support inspired by the Apache Http Server project.
+ */
 public class MimeType {
 
     private static final Map<String, String> mimes = new HashMap<>();
@@ -49,6 +52,14 @@ public class MimeType {
         loadFile(MimeType.class.getResourceAsStream("mimex.types"));
     }
 
+    /**
+     * Returns a mime type string by parsing the file extension of a file string. If the extension is not found or
+     * unknown the default value is returned.
+     *
+     * @param file - path to a file with extension
+     * @param defaultMimeType - what to return if not found
+     * @return mime type string
+     */
     public static String getMime(String file, String defaultMimeType) {
         int sep = file.lastIndexOf('.');
         if (sep != -1) {
@@ -64,10 +75,25 @@ public class MimeType {
         return defaultMimeType;
     }
 
+    /**
+     * Gets the mime type string for a file with fallback to text/plain
+     *
+     * @see MimeType#getMime(String, String)
+     * @param file - path to a file with extension
+     * @return mime type string
+     */
     public static String getMime(String file) {
         return getMime(file, "text/plain");
     }
 
+    /**
+     * Gets the default charset for a file.
+     * for now all mime types that start with text returns UTF-8 otherwise the fallback.
+     *
+     * @param mime the mime type to query
+     * @param fallback if not found returns fallback
+     * @return charset string
+     */
     public static String getCharset(String mime, String fallback) {
         if (mime.startsWith("text")) {
             return "UTF-8";
@@ -76,6 +102,13 @@ public class MimeType {
         return fallback;
     }
 
+    /**
+     * Gets the default charset for a file with default fallback null
+     *
+     * @see MimeType#getCharset(String, String)
+     * @param mime the mime type to query
+     * @return charset string
+     */
     public static String getCharset(String mime) {
         return getCharset(mime, null);
     }
