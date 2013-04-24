@@ -282,7 +282,8 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @Override
     public HttpServerRequest bodyHandler(Handler<Buffer> bodyHandler) {
-        return request.bodyHandler(bodyHandler);
+        request.bodyHandler(bodyHandler);
+        return this;
     }
 
     /**
@@ -290,7 +291,8 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @Override
     public HttpServerRequest dataHandler(Handler<Buffer> handler) {
-        return request.dataHandler(handler);
+        request.dataHandler(handler);
+        return this;
     }
 
     /**
@@ -298,7 +300,8 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @Override
     public HttpServerRequest pause() {
-        return request.pause();
+        request.pause();
+        return this;
     }
 
     /**
@@ -306,7 +309,8 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @Override
     public HttpServerRequest resume() {
-        return request.resume();
+        request.resume();
+        return this;
     }
 
     /**
@@ -314,7 +318,8 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @Override
     public HttpServerRequest endHandler(Handler<Void> endHandler) {
-        return request.endHandler(endHandler);
+        request.endHandler(endHandler);
+        return this;
     }
 
     /**
@@ -322,6 +327,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @Override
     public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
-        return request.exceptionHandler(handler);
+        request.exceptionHandler(handler);
+        return this;
     }
 }

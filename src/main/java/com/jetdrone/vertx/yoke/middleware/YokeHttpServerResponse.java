@@ -133,7 +133,8 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse setStatusCode(int statusCode) {
-        return response.setStatusCode(statusCode);
+        response.setStatusCode(statusCode);
+        return this;
     }
 
     @Override
@@ -143,12 +144,14 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse setStatusMessage(String statusMessage) {
-        return response.setStatusMessage(statusMessage);
+        response.setStatusMessage(statusMessage);
+        return this;
     }
 
     @Override
     public HttpServerResponse setChunked(boolean chunked) {
-        return response.setChunked(chunked);
+        response.setChunked(chunked);
+        return this;
     }
 
     @Override
@@ -163,7 +166,8 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse putHeader(String name, Object value) {
-        return response.putHeader(name, value);
+        response.putHeader(name, value);
+        return this;
     }
 
     @Override
@@ -173,23 +177,27 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse putTrailer(String name, Object value) {
-        return response.putTrailer(name, value);
+        response.putTrailer(name, value);
+        return this;
     }
 
     @Override
     public HttpServerResponse closeHandler(Handler<Void> handler) {
-        return response.closeHandler(handler);
+        response.closeHandler(handler);
+        return this;
     }
 
     @Override
     public HttpServerResponse write(Buffer chunk) {
         triggerHeadersHandler();
-        return response.write(chunk);
+        response.write(chunk);
+        return this;
     }
 
     @Override
     public HttpServerResponse setWriteQueueMaxSize(int maxSize) {
-        return response.setWriteQueueMaxSize(maxSize);
+        response.setWriteQueueMaxSize(maxSize);
+        return this;
     }
 
     @Override
@@ -199,19 +207,22 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse drainHandler(Handler<Void> handler) {
-        return response.drainHandler(handler);
+        response.drainHandler(handler);
+        return this;
     }
 
     @Override
     public HttpServerResponse write(String chunk, String enc) {
         triggerHeadersHandler();
-        return response.write(chunk, enc);
+        response.write(chunk, enc);
+        return this;
     }
 
     @Override
     public HttpServerResponse write(String chunk) {
         triggerHeadersHandler();
-        return response.write(chunk);
+        response.write(chunk);
+        return this;
     }
 
     @Override
@@ -253,7 +264,8 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     @Override
     public HttpServerResponse sendFile(String filename) {
         triggerHeadersHandler();
-        return response.sendFile(filename);
+        response.sendFile(filename);
+        return this;
     }
 
     @Override
@@ -263,6 +275,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse exceptionHandler(Handler<Throwable> handler) {
-        return response.exceptionHandler(handler);
+        response.exceptionHandler(handler);
+        return this;
     }
 }
