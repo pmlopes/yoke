@@ -17,7 +17,7 @@ public class Config {
             this.namespace = namespace;
             // Make "*" match expand match and limit range of match
             // Case insensitive matching
-            pattern = Pattern.compile("^(" + name.replaceAll("\\*", ".*") + ")$", Pattern.CASE_INSENSITIVE);
+            pattern = Pattern.compile("^(" + name.replaceAll("\\.", "\\.").replaceAll("\\*", ".*") + ")$", Pattern.CASE_INSENSITIVE);
         }
     }
 

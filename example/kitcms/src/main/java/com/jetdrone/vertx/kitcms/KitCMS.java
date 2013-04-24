@@ -8,7 +8,6 @@ import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -16,9 +15,7 @@ import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Verticle;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Map;
-import java.util.TimeZone;
 
 public class KitCMS extends Verticle {
 
@@ -161,8 +158,6 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    // TODO: if there are files get them...
-
                     if (value == null) {
                         request.response().end("Missing value");
                         return;
@@ -220,14 +215,13 @@ public class KitCMS extends Verticle {
                                 next.handle(asyncResult.cause());
                             } else {
                                 // need to iterate all json array elements and get from redis
-                                Iterator it = new Iterator(asyncResult.result());
+                                new AsyncIterator<Object>(asyncResult.result()) {
 
-                                final JsonArray buffer = new JsonArray();
+                                    final JsonArray buffer = new JsonArray();
 
-                                it.forEach(new Iterator.Async() {
                                     @Override
-                                    public void handle(Object o, final Iterator itNext) {
-                                        if (o != null) {
+                                    public void handle(Object o) {
+                                        if (!isEnd()) {
                                             final String key = (String) o;
                                             db.get(domain.namespace, key, new AsyncResultHandler<String>() {
                                                 @Override
@@ -240,7 +234,7 @@ public class KitCMS extends Verticle {
                                                         json.putString("value", asyncResult.result());
                                                         buffer.addObject(json);
 
-                                                        itNext.next();
+                                                        next();
                                                     }
                                                 }
                                             });
@@ -254,7 +248,7 @@ public class KitCMS extends Verticle {
                                             response.end(buffer.encode());
                                         }
                                     }
-                                });
+                                };
                             }
                         }
                     });
@@ -267,11 +261,10 @@ public class KitCMS extends Verticle {
 
                     FileUpload file = request.files().get("file");
                     try {
-                        Iterator it = new Iterator(new JsonArray(new String(file.get())));
-                        it.forEach(new Iterator.Async() {
+                        new AsyncIterator<Object>(new JsonArray(new String(file.get()))) {
                             @Override
-                            public void handle(Object o, final Iterator itNext) {
-                                if (o != null) {
+                            public void handle(Object o) {
+                                if (!isEnd()) {
                                     final JsonObject json = (JsonObject) o;
                                     db.set(domain.namespace, json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
                                         @Override
@@ -279,7 +272,7 @@ public class KitCMS extends Verticle {
                                             if (asyncResult.failed()) {
                                                 next.handle(asyncResult.cause());
                                             } else {
-                                                itNext.next();
+                                                next();
                                             }
                                         }
                                     });
@@ -287,7 +280,7 @@ public class KitCMS extends Verticle {
                                     request.response().redirect("/admin");
                                 }
                             }
-                        });
+                        };
                     } catch (IOException ioex) {
                         next.handle(ioex);
                     }

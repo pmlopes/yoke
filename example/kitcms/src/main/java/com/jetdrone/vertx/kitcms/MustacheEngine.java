@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.kitcms;
 
+import com.jetdrone.vertx.kitcms.mustache.MustacheException;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.kitcms.mustache.Mustache;
 import com.jetdrone.vertx.kitcms.mustache.Template;
@@ -20,10 +21,12 @@ public class MustacheEngine extends Engine {
                     next.handle(asyncResult);
                 } else {
                     final Template tmpl = Mustache.compiler().compile(asyncResult.result().toString("UTF-8"));
-                    final Buffer out = new Buffer(tmpl.execute(context));
-
-                    //TODO: make proper error handling
-                    next.handle(new FutureAsyncResult<>(null, out));
+                    try {
+                        final Buffer out = new Buffer(tmpl.execute(context));
+                        next.handle(new FutureAsyncResult<>(null, out));
+                    } catch (MustacheException me) {
+                        next.handle(new FutureAsyncResult<Buffer>(me, null));
+                    }
                 }
             }
         });

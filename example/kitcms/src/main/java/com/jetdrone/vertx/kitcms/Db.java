@@ -7,9 +7,6 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Db {
 
     final EventBus eb;
@@ -91,9 +88,5 @@ public class Db {
                 }
             }
         });
-    }
-
-    public void clear() {
-
     }
 }
