@@ -24,6 +24,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
+import org.vertx.java.core.json.JsonArray;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -111,7 +112,6 @@ public class Static extends Middleware {
         }
     }
 
-    // TODO: serve plain/text and json
     private void sendDirectory(final YokeHttpServerRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
@@ -121,59 +121,96 @@ public class Static extends Middleware {
                 if (asyncResult.failed()) {
                     next.handle(asyncResult.cause());
                 } else {
+                    String accept = request.headers().get("accept");
 
-                    String normalizedDir = dir.substring(root.length());
-                    if (!normalizedDir.endsWith("/")) {
-                        normalizedDir += "/";
+                    if (accept == null) {
+                        accept = "text/plain";
                     }
 
-                    String file;
-                    StringBuilder files = new StringBuilder("<ul id=\"files\">");
-
-                    for (String s : asyncResult.result()) {
-                        file = s.substring(s.lastIndexOf('/') + 1);
-                        // skip dot files
-                        if (!includeHidden && file.charAt(0) == '.') {
-                            continue;
+                    if (accept.contains("html")) {
+                        String normalizedDir = dir.substring(root.length());
+                        if (!normalizedDir.endsWith("/")) {
+                            normalizedDir += "/";
                         }
-                        files.append("<li><a href=\"");
-                        files.append(normalizedDir);
-                        files.append(file);
-                        files.append("\" title=\"");
-                        files.append(file);
-                        files.append("\">");
-                        files.append(file);
-                        files.append("</a></li>");
-                    }
 
-                    files.append("</ul>");
+                        String file;
+                        StringBuilder files = new StringBuilder("<ul id=\"files\">");
 
-                    StringBuilder directory = new StringBuilder();
-                    // define access to root
-                    directory.append("<a href=\"/\">/</a> ");
-
-                    StringBuilder expandingPath = new StringBuilder();
-                    String[] dirParts = normalizedDir.split("/");
-                    for (int i = 1; i < dirParts.length; i++) {
-                        // dynamic expansion
-                        expandingPath.append("/");
-                        expandingPath.append(dirParts[i]);
-                        // anchor building
-                        if (i > 1) {
-                            directory.append(" / ");
+                        for (String s : asyncResult.result()) {
+                            file = s.substring(s.lastIndexOf('/') + 1);
+                            // skip dot files
+                            if (!includeHidden && file.charAt(0) == '.') {
+                                continue;
+                            }
+                            files.append("<li><a href=\"");
+                            files.append(normalizedDir);
+                            files.append(file);
+                            files.append("\" title=\"");
+                            files.append(file);
+                            files.append("\">");
+                            files.append(file);
+                            files.append("</a></li>");
                         }
-                        directory.append("<a href=\"");
-                        directory.append(expandingPath.toString());
-                        directory.append("\">");
-                        directory.append(dirParts[i]);
-                        directory.append("</a>");
-                    }
 
-                    request.response().putHeader("Content-Type", "text/html");
-                    request.response().end(
-                            directoryTemplate.replace("{title}", (String) request.get("title")).replace("{directory}", normalizedDir)
-                                    .replace("{linked-path}", directory.toString())
-                                    .replace("{files}", files.toString()));
+                        files.append("</ul>");
+
+                        StringBuilder directory = new StringBuilder();
+                        // define access to root
+                        directory.append("<a href=\"/\">/</a> ");
+
+                        StringBuilder expandingPath = new StringBuilder();
+                        String[] dirParts = normalizedDir.split("/");
+                        for (int i = 1; i < dirParts.length; i++) {
+                            // dynamic expansion
+                            expandingPath.append("/");
+                            expandingPath.append(dirParts[i]);
+                            // anchor building
+                            if (i > 1) {
+                                directory.append(" / ");
+                            }
+                            directory.append("<a href=\"");
+                            directory.append(expandingPath.toString());
+                            directory.append("\">");
+                            directory.append(dirParts[i]);
+                            directory.append("</a>");
+                        }
+
+                        request.response().putHeader("Content-Type", "text/html");
+                        request.response().end(
+                                directoryTemplate.replace("{title}", (String) request.get("title")).replace("{directory}", normalizedDir)
+                                        .replace("{linked-path}", directory.toString())
+                                        .replace("{files}", files.toString()));
+                    } else if (accept.contains("json")) {
+                        String file;
+                        JsonArray json = new JsonArray();
+
+                        for (String s : asyncResult.result()) {
+                            file = s.substring(s.lastIndexOf('/') + 1);
+                            // skip dot files
+                            if (!includeHidden && file.charAt(0) == '.') {
+                                continue;
+                            }
+                            json.addString(file);
+                        }
+
+                        request.response().end(json);
+                    } else {
+                        String file;
+                        StringBuilder buffer = new StringBuilder();
+
+                        for (String s : asyncResult.result()) {
+                            file = s.substring(s.lastIndexOf('/') + 1);
+                            // skip dot files
+                            if (!includeHidden && file.charAt(0) == '.') {
+                                continue;
+                            }
+                            buffer.append(file);
+                            buffer.append('\n');
+                        }
+
+                        request.response().putHeader("content-type", "text/plain");
+                        request.response().end(buffer.toString());
+                    }
                 }
             }
         });
