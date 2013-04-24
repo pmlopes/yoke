@@ -59,7 +59,7 @@ public class BasicAuth extends Middleware {
 
         if (authorization == null) {
             YokeHttpServerResponse response = request.response();
-            response.putHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
+            response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
             response.setStatusCode(401);
             next.handle("No authorization token");
         } else {
@@ -80,7 +80,7 @@ public class BasicAuth extends Middleware {
                             next.handle(null);
                         } else {
                             YokeHttpServerResponse response = request.response();
-                            response.putHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
+                            response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
                             response.setStatusCode(401);
                             next.handle("No authorization token");
                         }
@@ -88,5 +88,9 @@ public class BasicAuth extends Middleware {
                 });
             }
         }
+    }
+    
+    public String getRealm(YokeHttpServerRequest request) {
+        return realm;
     }
 }
