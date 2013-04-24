@@ -34,7 +34,8 @@ public class KitCMS extends Verticle {
         final Yoke yoke = new Yoke(vertx);
         // register jMustache render engine
         yoke.engine("mustache", new MustacheEngine());
-
+        // log the requests
+        yoke.use(new Logger(logger));
         // install the pretty error handler middleware
         yoke.use(new ErrorHandler(true));
         // install the favicon middleware

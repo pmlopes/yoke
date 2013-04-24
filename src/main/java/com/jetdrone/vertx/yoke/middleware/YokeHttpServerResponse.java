@@ -26,6 +26,8 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class YokeHttpServerResponse implements HttpServerResponse {
@@ -37,9 +39,9 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     private final Map<String, Engine> renderEngines;
 
     // extra handlers
-    private Handler<Void> headersHandler;
+    private List<Handler<Void>> headersHandler;
     private boolean headersHandlerTriggered;
-    private Handler<Void> endHandler;
+    private List<Handler<Void>> endHandler;
 
     public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> renderContext, Map<String, Engine> renderEngines) {
         this.response = response;
@@ -90,37 +92,50 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         if (json.isArray()) {
             JsonArray jsonArray = json.asArray();
             response.putHeader("content-type", "application/json");
-            triggerHeadersHandler();
+            triggerHeadersHandlers();
             response.end(jsonArray.encode());
-            if (endHandler != null) {
-                endHandler.handle(null);
-            }
+            triggerEndHandlers();
         } else if (json.isObject()) {
             JsonObject jsonObject = json.asObject();
             response.putHeader("content-type", "application/json");
-            triggerHeadersHandler();
+            triggerHeadersHandlers();
             response.end(jsonObject.encode());
-            if (endHandler != null) {
-                endHandler.handle(null);
-            }
+            triggerEndHandlers();
         }
     }
 
     // private extensions
 
     void headersHandler(Handler<Void> handler) {
-        this.headersHandler = handler;
-        headersHandlerTriggered = false;
+        if (!headersHandlerTriggered) {
+            if (headersHandler == null) {
+                headersHandler = new ArrayList<>();
+            }
+            headersHandler.add(handler);
+        }
     }
 
     void endHandler(Handler<Void> handler) {
-        this.endHandler = handler;
+        if (endHandler == null) {
+            endHandler = new ArrayList<>();
+        }
+        endHandler.add(handler);
     }
 
-    private void triggerHeadersHandler() {
+    private void triggerHeadersHandlers() {
         if (headersHandler != null && !headersHandlerTriggered) {
             headersHandlerTriggered = true;
-            headersHandler.handle(null);
+            for (Handler<Void> handler : headersHandler) {
+                handler.handle(null);
+            }
+        }
+    }
+
+    private void triggerEndHandlers() {
+        if (endHandler != null) {
+            for (Handler<Void> handler : endHandler) {
+                handler.handle(null);
+            }
         }
     }
 
@@ -189,7 +204,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(Buffer chunk) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.write(chunk);
         return this;
     }
@@ -213,57 +228,49 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(String chunk, String enc) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.write(chunk, enc);
         return this;
     }
 
     @Override
     public HttpServerResponse write(String chunk) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.write(chunk);
         return this;
     }
 
     @Override
     public void end(String chunk) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.end(chunk);
-        if (endHandler != null) {
-            endHandler.handle(null);
-        }
+        triggerEndHandlers();
     }
 
     @Override
     public void end(String chunk, String enc) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.end(chunk, enc);
-        if (endHandler != null) {
-            endHandler.handle(null);
-        }
+        triggerEndHandlers();
     }
 
     @Override
     public void end(Buffer chunk) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.end(chunk);
-        if (endHandler != null) {
-            endHandler.handle(null);
-        }
+        triggerEndHandlers();
     }
 
     @Override
     public void end() {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.end();
-        if (endHandler != null) {
-            endHandler.handle(null);
-        }
+        triggerEndHandlers();
     }
 
     @Override
     public HttpServerResponse sendFile(String filename) {
-        triggerHeadersHandler();
+        triggerHeadersHandlers();
         response.sendFile(filename);
         return this;
     }
