@@ -22,6 +22,9 @@ import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonElement;
+import org.vertx.java.core.json.JsonObject;
 
 import java.util.Map;
 
@@ -81,6 +84,26 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         response.setStatusMessage(HttpResponseStatus.valueOf(status).reasonPhrase());
         putHeader("location", url);
         end();
+    }
+
+    public void end(JsonElement json) {
+        if (json.isArray()) {
+            JsonArray jsonArray = json.asArray();
+            response.putHeader("content-type", "application/json");
+            triggerHeadersHandler();
+            response.end(jsonArray.encode());
+            if (endHandler != null) {
+                endHandler.handle(null);
+            }
+        } else if (json.isObject()) {
+            JsonObject jsonObject = json.asObject();
+            response.putHeader("content-type", "application/json");
+            triggerHeadersHandler();
+            response.end(jsonObject.encode());
+            if (endHandler != null) {
+                endHandler.handle(null);
+            }
+        }
     }
 
     // private extensions
