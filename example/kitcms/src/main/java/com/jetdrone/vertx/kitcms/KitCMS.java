@@ -284,12 +284,7 @@ public class KitCMS extends Verticle {
                                         }
                                     });
                                 } else {
-                                    YokeHttpServerResponse response = request.response();
-
-                                    response.putHeader("Location", "/admin");
-                                    response.setStatusCode(302);
-                                    response.setStatusMessage("Redirecting to /admin");
-                                    response.end();
+                                    request.response().redirect("/admin");
                                 }
                             }
                         });

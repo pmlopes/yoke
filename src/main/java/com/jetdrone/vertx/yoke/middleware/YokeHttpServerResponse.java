@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -43,6 +44,8 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         this.renderEngines = renderEngines;
     }
 
+    // extension to default interface
+
     public void render(final String template, final Handler<Object> next) {
         int sep = template.lastIndexOf('.');
         if (sep != -1) {
@@ -69,6 +72,19 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         }
     }
 
+    public void redirect(String url) {
+        redirect(302, url);
+    }
+
+    public void redirect(int status, String url) {
+        response.setStatusCode(status);
+        response.setStatusMessage(HttpResponseStatus.valueOf(status).reasonPhrase());
+        putHeader("location", url);
+        end();
+    }
+
+    // private extensions
+
     void headersHandler(Handler<Void> handler) {
         this.headersHandler = handler;
         headersHandlerTriggered = false;
@@ -84,6 +100,8 @@ public class YokeHttpServerResponse implements HttpServerResponse {
             headersHandler.handle(null);
         }
     }
+
+    // interface implementation
 
     @Override
     public int getStatusCode() {
