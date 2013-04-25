@@ -21,11 +21,8 @@ import java.util.Set;
 
 public class GYokeHttpServerRequest extends YokeHttpServerRequest {
 
-    private final GYokeHttpServerResponse response;
-
     public GYokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context, Map<String, Engine> engines) {
-        super(request, context);
-        response = new GYokeHttpServerResponse(request.response(), context, engines);
+        super(request, context, new GYokeHttpServerResponse(request.response(), context, engines));
     }
 
     public String getOriginalMethod() {
@@ -93,7 +90,7 @@ public class GYokeHttpServerRequest extends YokeHttpServerRequest {
     }
 
     public GYokeHttpServerResponse getResponse() {
-        return response;
+        return (GYokeHttpServerResponse) response();
     }
 
     public Map<String, String> getHeaders() {
