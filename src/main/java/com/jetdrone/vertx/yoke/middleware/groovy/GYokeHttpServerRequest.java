@@ -1,6 +1,7 @@
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.middleware.groovy;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
 import groovy.lang.Closure;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpRequest;

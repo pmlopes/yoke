@@ -43,7 +43,8 @@ public class Yoke {
 
     private final Vertx vertx;
 
-    private final Map<String, Object> defaultContext = new HashMap<>();
+    protected final Map<String, Object> defaultContext = new HashMap<>();
+    protected final Map<String, Engine> engineMap = new HashMap<>();
 
     /**
      * Creates a Yoke instance.
@@ -71,7 +72,6 @@ public class Yoke {
 
     private final List<MountedMiddleware> middlewareList = new ArrayList<>();
     private Middleware errorHandler;
-    private final Map<String, Engine> engineMap = new HashMap<>();
 
     /**
      * Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is
@@ -195,6 +195,16 @@ public class Yoke {
     }
 
     /**
+     * For other language bindings this method can be override.
+     * @param request The Vertx HttpServerRequest
+     * @return an Implementation of YokeHttpServerRequest
+     */
+    protected YokeHttpServerRequest wrapHttpServerRequest(HttpServerRequest request) {
+        // the context map is shared with all middlewares
+        return new YokeHttpServerRequest(request, defaultContext, engineMap);
+    }
+
+    /**
      * Starts listening at a already created server.
      * @return Yoke
      */
@@ -202,8 +212,7 @@ public class Yoke {
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(final HttpServerRequest req) {
-                // the context map is shared with all middlewares
-                final YokeHttpServerRequest request = new YokeHttpServerRequest(req, defaultContext, engineMap);
+                final YokeHttpServerRequest request = wrapHttpServerRequest(req);
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;

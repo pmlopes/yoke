@@ -16,10 +16,10 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.groovy.GYokeHttpServerRequest;
 import groovy.lang.Closure;
 import org.vertx.groovy.core.Vertx;
 import org.vertx.groovy.core.http.HttpServer;
-import org.vertx.groovy.core.http.impl.DefaultHttpServerRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
@@ -35,6 +35,12 @@ public class GYoke extends Yoke {
      */
     public GYoke(Vertx vertx) {
         super(vertx.toJavaVertx());
+    }
+
+    @Override
+    protected GYokeHttpServerRequest wrapHttpServerRequest(HttpServerRequest request) {
+        // the context map is shared with all middlewares
+        return new GYokeHttpServerRequest(request, defaultContext, engineMap);
     }
 
     /**
@@ -56,7 +62,7 @@ public class GYoke extends Yoke {
             use(route, new Handler<HttpServerRequest>() {
                 @Override
                 public void handle(HttpServerRequest request) {
-                    handler.call(new DefaultHttpServerRequest(request));
+                    handler.call(request);
                 }
             });
 
@@ -67,7 +73,7 @@ public class GYoke extends Yoke {
             use(route, new Middleware() {
                 @Override
                 public void handle(YokeHttpServerRequest request, Handler<Object> next) {
-                    handler.call(new DefaultHttpServerRequest(request), next);
+                    handler.call(request, next);
                 }
             });
 
@@ -84,7 +90,8 @@ public class GYoke extends Yoke {
      * @param handler The Handler to add
      */
     public GYoke use(Closure handler) {
-        return this.use("/", handler);
+        this.use("/", handler);
+        return this;
     }
 
     /**

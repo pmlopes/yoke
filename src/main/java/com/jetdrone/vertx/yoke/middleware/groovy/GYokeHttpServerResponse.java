@@ -1,6 +1,7 @@
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.middleware.groovy;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse;
 import groovy.lang.Closure;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerResponse;
