@@ -132,9 +132,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         }
     }
 
-    // private extensions
-
-    void headersHandler(Handler<Void> handler) {
+    public void headersHandler(Handler<Void> handler) {
         if (!headersHandlerTriggered) {
             if (headersHandler == null) {
                 headersHandler = new ArrayList<>();
@@ -143,7 +141,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         }
     }
 
-    void endHandler(Handler<Void> handler) {
+    public void endHandler(Handler<Void> handler) {
         if (endHandler == null) {
             endHandler = new ArrayList<>();
         }
