@@ -1,0 +1,4 @@
+{
+  "main": "KitCMS.groovy",
+  "includes": "com.jetdrone~yoke~1.0.0-SNAPSHOT"
+}
