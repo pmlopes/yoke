@@ -55,11 +55,11 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
         this.response = new YokeHttpServerResponse(request.response(), this, engines);
     }
 
-    protected YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context) {
+    protected YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context, YokeHttpServerResponse response) {
         super(context);
         this.request = request;
         this.method = request.method();
-        this.response = null;
+        this.response = response;
     }
 
     /**
