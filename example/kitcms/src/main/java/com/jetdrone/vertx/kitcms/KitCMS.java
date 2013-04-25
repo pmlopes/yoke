@@ -3,6 +3,7 @@ package com.jetdrone.vertx.kitcms;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine;
 import com.jetdrone.vertx.yoke.middleware.*;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.AsyncResult;
@@ -31,7 +32,7 @@ public class KitCMS extends Verticle {
 
         final Yoke yoke = new Yoke(vertx);
         // register jMustache render engine
-        yoke.engine("mustache", new MustacheEngine());
+        yoke.engine("html", new StringPlaceholderEngine());
         // log the requests
         yoke.use(new Logger(container.logger()));
         // install the pretty error handler middleware
@@ -92,8 +93,19 @@ public class KitCMS extends Verticle {
                             if (asyncResult.failed()) {
                                 next.handle(asyncResult.cause());
                             } else {
-                                request.put("keys", asyncResult.result().toArray());
-                                request.response().render("com/jetdrone/vertx/kitcms/views/admin.mustache", next);
+                                StringBuilder keys = new StringBuilder();
+                                JsonArray json = asyncResult.result();
+
+                                for (int i = 0; i < json.size(); i++) {
+                                    keys.append("<li data-value=\"");
+                                    keys.append(json.get(i));
+                                    keys.append("\">");
+                                    keys.append(json.get(i));
+                                    keys.append("</li>");
+                                }
+
+                                request.put("keys", keys);
+                                request.response().render("com/jetdrone/vertx/kitcms/views/admin.html", next);
                             }
                         }
                     });
