@@ -55,7 +55,7 @@ public class BasicAuth extends Middleware {
 
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
-        String authorization = request.headers().get("authorization");
+        String authorization = request.getHeader("authorization");
 
         if (authorization == null) {
             YokeHttpServerResponse response = request.response();

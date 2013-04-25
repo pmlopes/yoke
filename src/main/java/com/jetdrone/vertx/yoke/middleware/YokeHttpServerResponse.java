@@ -77,6 +77,34 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         }
     }
 
+    /**
+     * Allow getting headers in a generified way.
+     *
+     * @param name The key to get
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R getHeader(String name) {
+        return (R) headers().get(name);
+    }
+
+    /**
+     * Allow getting headers in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    public <R> R getHeader(String name, R defaultValue) {
+        if (headers().containsKey(name)) {
+            return getHeader(name);
+        } else {
+            return defaultValue;
+        }
+    }
+
     public void redirect(String url) {
         redirect(302, url);
     }

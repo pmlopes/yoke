@@ -54,7 +54,7 @@ public class MethodOverride extends Middleware {
                 }
             }
         } else {
-            String xHttpMethodOverride = request.headers().get("x-http-setMethod-override");
+            String xHttpMethodOverride = request.getHeader("x-http-setMethod-override");
 
             if (xHttpMethodOverride != null) {
                 request.setMethod(xHttpMethodOverride);

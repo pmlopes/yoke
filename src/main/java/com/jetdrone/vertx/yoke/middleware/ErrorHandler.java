@@ -100,11 +100,7 @@ public class ErrorHandler extends Middleware {
         int errorCode = response.getStatusCode();
         List<String> stackTrace = getStackTrace(request.get("error"));
 
-        String accept = request.headers().get("accept");
-
-        if (accept == null) {
-            accept = "text/plain";
-        }
+        String accept = request.getHeader("accept", "text/plain");
 
         if (accept.contains("html")) {
             StringBuilder stack = new StringBuilder();

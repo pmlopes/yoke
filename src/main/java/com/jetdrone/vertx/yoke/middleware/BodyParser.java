@@ -21,7 +21,9 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.LastHttpContent;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.*;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.*;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.IncompatibleDataDecoderException;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.NotEnoughDataDecoderException;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.DecodeException;
@@ -29,7 +31,9 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BodyParser extends Middleware {
 
@@ -133,7 +137,7 @@ public class BodyParser extends Middleware {
         if ("GET".equals(method) || "HEAD".equals(method)) {
             next.handle(null);
         } else {
-            final String contentType = request.headers().get("content-type");
+            final String contentType = request.getHeader("content-type");
 
             if (contentType != null) {
 

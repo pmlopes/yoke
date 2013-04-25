@@ -15,8 +15,8 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.MimeType;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -121,11 +121,7 @@ public class Static extends Middleware {
                 if (asyncResult.failed()) {
                     next.handle(asyncResult.cause());
                 } else {
-                    String accept = request.headers().get("accept");
-
-                    if (accept == null) {
-                        accept = "text/plain";
-                    }
+                    String accept = request.getHeader("accept", "text/plain");
 
                     if (accept.contains("html")) {
                         String normalizedDir = dir.substring(root.length());
@@ -222,11 +218,11 @@ public class Static extends Middleware {
         boolean notModified = true;
 
         // fields
-        String modifiedSince = request.headers().get("if-modified-since");
-        String noneMatch = request.headers().get("if-none-match");
+        String modifiedSince = request.getHeader("if-modified-since");
+        String noneMatch = request.getHeader("if-none-match");
         String[] noneMatchTokens = null;
-        String lastModified = (String) request.response().headers().get("last-modified");
-        String etag = (String) request.response().headers().get("etag");
+        String lastModified = request.response().getHeader("last-modified");
+        String etag = request.response().getHeader("etag");
 
         // unconditional request
         if (modifiedSince == null && noneMatch == null) {

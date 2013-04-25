@@ -59,12 +59,12 @@ public class Logger extends Middleware {
     private void log(YokeHttpServerRequest request, long start) {
         int contentLength = 0;
         if (immediate) {
-            Object obj = request.headers().get("content-length");
+            Object obj = request.getHeader("content-length");
             if (obj != null) {
                 contentLength = Integer.parseInt(obj.toString());
             }
         } else {
-            Object obj = request.response().headers().get("content-length");
+            Object obj = request.response().getHeader("content-length");
             if (obj != null) {
                 contentLength = Integer.parseInt(obj.toString());
             }
@@ -75,8 +75,8 @@ public class Logger extends Middleware {
 
         switch (format) {
             case DEFAULT:
-                Object referrer = request.headers().get("referrer");
-                Object userAgent = request.headers().get("user-agent");
+                Object referrer = request.getHeader("referrer", "");
+                Object userAgent = request.getHeader("user-agent", "");
 
                 message = String.format("%s - - [%s] \"%s %s %s\" %d %d \"%s\" \"%s\"",
                         request.remoteAddress().getHostString(),
@@ -86,8 +86,8 @@ public class Logger extends Middleware {
                         request.protocolVersion(),
                         status,
                         contentLength,
-                        referrer == null ? "" : referrer,
-                        userAgent == null ? "" : userAgent);
+                        referrer,
+                        userAgent);
                 break;
             case SHORT:
                 message = String.format("%s - %s %s %s %d %d - %d ms",
