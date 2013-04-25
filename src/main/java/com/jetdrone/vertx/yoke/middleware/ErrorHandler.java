@@ -43,7 +43,17 @@ public class ErrorHandler extends Middleware {
 
     private String getMessage(Object error) {
         if (error instanceof Throwable) {
-            return ((Throwable) error).getMessage();
+            String message = ((Throwable) error).getMessage();
+
+            if (message == null) {
+                message = "";
+            }
+
+            if (fullStack) {
+                return error.getClass().getName() + ": " + message;
+            } else {
+                return message;
+            }
         } else if (error instanceof String) {
             return (String) error;
         } else if (error instanceof Integer) {

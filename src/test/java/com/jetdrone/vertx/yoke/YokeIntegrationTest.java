@@ -33,6 +33,27 @@ public class YokeIntegrationTest extends TestVerticle {
         });
     }
 
+    @Test
+    public void testErrorHandler() {
+        Yoke yoke = new Yoke(vertx);
+        yoke.use(new ErrorHandler(true));
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+                next.handle(new Exception());
+            }
+        });
+        yoke.listen(8181);
+
+        vertx.createHttpClient().setPort(8181).getNow("/",new Handler<HttpClientResponse>() {
+            @Override
+            public void handle(HttpClientResponse resp) {
+                assertEquals(500, resp.statusCode());
+                testComplete();
+            }
+        });
+    }
+
 //    @Test
 //    public void testLib() {
 //        Yoke yoke = new Yoke(vertx);
