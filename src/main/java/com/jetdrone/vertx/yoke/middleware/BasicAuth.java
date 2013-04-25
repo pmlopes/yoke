@@ -89,7 +89,13 @@ public class BasicAuth extends Middleware {
             }
         }
     }
-    
+
+    /**
+     * The usecase is a multitenant app where I want different realms for paths like /foo/homepage and /bar/homepage.
+     *
+     * @param request http request
+     * @return String with the realm name
+     */
     public String getRealm(YokeHttpServerRequest request) {
         return realm;
     }
