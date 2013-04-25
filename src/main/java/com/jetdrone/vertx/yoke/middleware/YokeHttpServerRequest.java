@@ -55,11 +55,39 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
         this.response = new YokeHttpServerResponse(request.response(), this, engines);
     }
 
-    YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context) {
+    protected YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context) {
         super(context);
         this.request = request;
         this.method = request.method();
         this.response = null;
+    }
+
+    /**
+     * Allow getting properties in a generified way.
+     *
+     * @param name The key to get
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R get(String name) {
+        return (R) super.get(name);
+    }
+
+    /**
+     * Allow getting properties in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    public <R> R get(String name, R defaultValue) {
+        if (containsKey(name)) {
+            return get(name);
+        } else {
+            return defaultValue;
+        }
     }
 
     /**
@@ -201,7 +229,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
         return null;
     }
 
-    HttpVersion protocolVersion() {
+    public HttpVersion protocolVersion() {
         return nettyRequest().getProtocolVersion();
     }
 
