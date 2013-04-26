@@ -110,9 +110,9 @@ public class Logger extends Middleware {
         }
 
         if (status >= 500) {
-            logger.error(message);
+            logger.fatal(message);
         } else if (status >= 400) {
-            logger.warn(message);
+            logger.error(message);
         } else if (status >= 300) {
             logger.warn(message);
         } else {

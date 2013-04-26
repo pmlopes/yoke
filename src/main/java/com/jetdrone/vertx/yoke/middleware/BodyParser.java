@@ -41,7 +41,7 @@ public class BodyParser extends Middleware {
 
     private void parseJson(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
-            String jsonString = buffer.toString("UTF-8");
+            String jsonString = buffer.toString();
             if (jsonString.length() > 0) {
                 switch (jsonString.charAt(0)) {
                     case '{':
@@ -64,7 +64,7 @@ public class BodyParser extends Middleware {
     }
 
     private void parseMap(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString("UTF-8"), false);
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString(), false);
         Map<String, String> params;
         Map<String, List<String>> prms = queryStringDecoder.parameters();
         if (prms.isEmpty()) {

@@ -70,15 +70,11 @@ public class Favicon extends Middleware {
     public void setVertx(Vertx vertx) {
         try {
             super.setVertx(vertx);
-            String iconPath;
-
             if (path == null) {
-                iconPath = Utils.urlToPath(Favicon.class.getResource("favicon.ico"));
+                icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {
-                iconPath = path;
+                icon = new Icon(vertx.fileSystem().readFileSync(path));
             }
-
-            icon = new Icon(vertx.fileSystem().readFileSync(iconPath));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

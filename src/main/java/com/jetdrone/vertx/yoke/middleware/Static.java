@@ -20,8 +20,6 @@ import com.jetdrone.vertx.yoke.MimeType;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.json.JsonArray;
@@ -35,7 +33,7 @@ import java.util.TimeZone;
 public class Static extends Middleware {
 
     static final SimpleDateFormat ISODATE;
-    private String directoryTemplate;
+    private final String directoryTemplate;
 
     static {
         ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
@@ -55,6 +53,7 @@ public class Static extends Middleware {
         this.maxAge = maxAge;
         this.includeHidden = includeHidden;
         this.directoryListing = directoryListing;
+        this.directoryTemplate = Utils.readResourceToBuffer(getClass(), "directory.html").toString();
     }
 
     public Static(String root,long maxAge) {
@@ -63,17 +62,6 @@ public class Static extends Middleware {
 
     public Static(String root) {
         this(root, 86400000, false, false);
-    }
-
-    @Override
-    public void setVertx(Vertx vertx) {
-        try {
-            super.setVertx(vertx);
-            Buffer buf = vertx.fileSystem().readFileSync(Utils.urlToPath(getClass().getResource("directory.html")));
-            directoryTemplate = buf.toString("UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void writeHeaders(final YokeHttpServerRequest request, final FileProps props) {

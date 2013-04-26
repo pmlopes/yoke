@@ -18,8 +18,6 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
@@ -30,10 +28,11 @@ import java.util.List;
 public class ErrorHandler extends Middleware {
 
     private final boolean fullStack;
-    private String errorTemplate;
+    private final String errorTemplate;
 
     public ErrorHandler(boolean fullStack) {
         this.fullStack = fullStack;
+        errorTemplate = Utils.readResourceToBuffer(getClass(), "error.html").toString();
     }
 
     @Override
@@ -80,17 +79,6 @@ public class ErrorHandler extends Middleware {
             return stackTrace;
         } else {
             return Collections.emptyList();
-        }
-    }
-
-    @Override
-    public void setVertx(Vertx vertx) {
-        try {
-            super.setVertx(vertx);
-            Buffer buf = vertx.fileSystem().readFileSync(Utils.urlToPath(getClass().getResource("error.html")));
-            errorTemplate = buf.toString("UTF-8");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 

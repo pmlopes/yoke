@@ -6,9 +6,9 @@ def yoke = new GYoke(vertx)
 
 yoke.engine('html', new GroovyTemplateEngine())
 
-yoke.use(new ErrorHandler(true))
+yoke.chain(new ErrorHandler(true))
 
-yoke.use {request, next ->
+yoke.chain {request, next ->
     request.put('session', [id: '1'])
     request.response.render 'template.html', next
 }

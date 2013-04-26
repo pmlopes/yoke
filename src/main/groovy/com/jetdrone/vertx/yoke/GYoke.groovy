@@ -72,7 +72,7 @@ public class GYoke {
      * @param route The route prefix for the middleware
      * @param middleware The middleware add to the chain
      */
-    public GYoke use(String route, Closure closure) {
+    public GYoke chain(String route, Closure closure) {
         jYoke.use(route, new Middleware() {
             @Override
             void handle(YokeHttpServerRequest request, Handler<Object> next) {
@@ -94,8 +94,32 @@ public class GYoke {
      * @see Yoke#use(String, Middleware)
      * @param middleware The middleware add to the chain
      */
-    public GYoke use(Closure closure) {
-        return use("/", closure);
+    public GYoke chain(Closure closure) {
+        return chain("/", closure);
+    }
+
+    /**
+     * Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is
+     * treated differently and only the last error handler is kept.
+     *
+     * You might want to add a middleware that is only supposed to run on a specific route (path prefix).
+     * In this case if the request path does not match the prefix the middleware is skipped automatically.
+     *
+     * @param route The route prefix for the middleware
+     * @param middleware The middleware add to the chain
+     */
+    public GYoke chain(String route, Middleware middleware) {
+        jYoke.use(route, middleware);
+        this;
+    }
+
+    /**
+     * Adds a middleware to the chain with the prefix "/".
+     * @see Yoke#use(String, Middleware)
+     * @param middleware The middleware add to the chain
+     */
+    public GYoke chain(Middleware middleware) {
+        return chain("/", middleware);
     }
 
     /**

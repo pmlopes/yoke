@@ -4,7 +4,6 @@ import com.jetdrone.vertx.yoke.middleware.*;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
@@ -15,9 +14,9 @@ public class YokeIntegrationTest extends TestVerticle {
     public void testResponseTime() {
         Yoke yoke = new Yoke(vertx);
         yoke.use(new ResponseTime());
-        yoke.use(new Handler<HttpServerRequest>() {
+        yoke.use(new Handler<YokeHttpServerRequest>() {
             @Override
-            public void handle(HttpServerRequest request) {
+            public void handle(YokeHttpServerRequest request) {
                 request.response().end();
             }
         });

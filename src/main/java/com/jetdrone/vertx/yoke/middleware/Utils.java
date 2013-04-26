@@ -15,8 +15,9 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import java.io.File;
-import java.io.UnsupportedEncodingException;
+import org.vertx.java.core.buffer.Buffer;
+
+import java.io.*;
 import java.net.URL;
 import java.net.URLDecoder;
 
@@ -57,13 +58,24 @@ final class Utils {
         return encoded.toString();
     }
 
-    public static String urlToPath(URL url) {
+    /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    public static Buffer readResourceToBuffer(Class clazz, String resource) {
         try {
-            // something like /c:/foo%20bar/baz.jpg
-            String path = URLDecoder.decode(url.getPath(), "UTF-8");
-            return new File(path).getPath();
-        } catch (UnsupportedEncodingException ueex) {
-            throw new RuntimeException(ueex);
+            Buffer buffer = new Buffer(0);
+
+            try (Reader r = new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8")) {
+                int read;
+                char[] data = new char[4096];
+                while ((read = r.read(data, 0, data.length)) != -1) {
+                    buffer.appendString(new String(data, 0, read));
+                }
+            }
+
+            return buffer;
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
         }
     }
 }

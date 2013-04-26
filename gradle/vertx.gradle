@@ -99,7 +99,7 @@ sourceSets {
 }
 
 task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module into the local mods directory' ) {
-  into "mods/$moduleName"
+  into "build/mods/$moduleName"
   from compileJava
   from 'src/main/resources'
   into( 'lib' ) {
@@ -119,14 +119,6 @@ artifacts {
   archives modZip
 }
 
-task cleanModsDir(type: Delete) {
-  delete 'mods'
-}
-
-clean {
-  dependsOn cleanModsDir
-}
-
 test {
   dependsOn copyMod
 
@@ -137,10 +129,13 @@ test {
   testLogging.showStandardStreams = true
 
   testLogging { exceptionFormat "full" }
+
+  systemProperty 'vertx.loadWithPlatformCL', "false"
+  systemProperty 'vertx.mods', "build/mods"
 }
 
 task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
-  ModuleClassLoader.loadWithPlatformCL = false
+  setSysProps()
   def pm = PlatformLocator.factory.createPlatformManager()
   def latch = new CountDownLatch(1)
   pm.deployModule(moduleName, null, 1, new AsyncResultHandler<String>() {
@@ -159,6 +154,7 @@ task runMod(dependsOn: copyMod, description: 'Run the module using all the build
 
 task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module dependencies for the module into the nested mods directory') << {
   if (pullInDeps == 'true') {
+    setSysProps()
     def pm = PlatformLocator.factory.createPlatformManager()
     println "Pulling in dependencies for module $moduleName. Please wait"
     if (pm.pullInDependencies(moduleName)) {
@@ -167,6 +163,11 @@ task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module depende
       println "Failed to pull in dependencies"
     }
   }
+}
+
+def setSysProps() {
+  System.setProperty("vertx.mods", "build/mods")
+  System.setProperty("vertx.loadWithPlatformCL", "false");
 }
 
 def loadProperties(String sourceFileName) {
