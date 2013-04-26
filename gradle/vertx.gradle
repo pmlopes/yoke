@@ -156,12 +156,21 @@ task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module depende
   if (pullInDeps == 'true') {
     setSysProps()
     def pm = PlatformLocator.factory.createPlatformManager()
+    def latch = new CountDownLatch(1)
     println "Pulling in dependencies for module $moduleName. Please wait"
-    if (pm.pullInDependencies(moduleName)) {
-      println "Dependencies pulled into mods directory of module"
-    } else {
-      println "Failed to pull in dependencies"
-    }
+    pm.pullInDependencies(moduleName, new AsyncResultHandler<Void>() {
+      public void handle(AsyncResult<Void> asyncResult) {
+        if (asyncResult.succeeded()) {
+          println "Dependencies pulled in successfully"
+          latch.countDown()
+        } else {
+          println "Failed to pull in dependencies"
+          asyncResult.cause().printStackTrace()
+          latch.countDown()
+        }
+      }
+    })
+    latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
   }
 }
 
