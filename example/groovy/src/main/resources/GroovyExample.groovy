@@ -1,16 +1,16 @@
-import com.jetdrone.vertx.yoke.*
 import com.jetdrone.vertx.yoke.middleware.*
+import com.jetdrone.vertx.yoke.GYoke
+import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
 
 def yoke = new GYoke(vertx)
 
+yoke.engine('html', new GroovyTemplateEngine())
+
 yoke.use(new ErrorHandler(true))
 
-yoke.use() { request, next ->
-    if (request.path() == '/hello') {
-        request.response().end('Hi there!')
-    } else {
-        next.handle('You did not say hello! /hello')
-    }
+yoke.use {request, next ->
+    request.put('session', [id: '1'])
+    request.response.render 'template.html', next
 }
 
 yoke.listen(8080)

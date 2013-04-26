@@ -15,7 +15,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Engine;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
@@ -30,16 +29,17 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class YokeHttpServerRequest extends HashMap<String, Object> implements HttpServerRequest {
+public class YokeHttpServerRequest implements HttpServerRequest {
 
     // the original request
     private final HttpServerRequest request;
-    // the original response
+    // the wrapped response
     private final YokeHttpServerResponse response;
+    // the request context
+    private final Map<String, Object> context;
 
     // we can overrride the setMethod
     private String method;
@@ -48,15 +48,8 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     private Map<String, FileUpload> files;
     private Set<Cookie> cookies;
 
-    public YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context, Map<String, Engine> engines) {
-        super(context);
-        this.request = request;
-        this.method = request.method();
-        this.response = new YokeHttpServerResponse(request.response(), this, engines);
-    }
-
-    protected YokeHttpServerRequest(HttpServerRequest request, Map<String, Object> context, YokeHttpServerResponse response) {
-        super(context);
+    public YokeHttpServerRequest(HttpServerRequest request, YokeHttpServerResponse response, Map<String, Object> context) {
+        this.context = context;
         this.request = request;
         this.method = request.method();
         this.response = response;
@@ -71,7 +64,7 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      */
     @SuppressWarnings("unchecked")
     public <R> R get(String name) {
-        return (R) super.get(name);
+        return (R) context.get(name);
     }
 
     /**
@@ -83,11 +76,24 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
      * @return The found object
      */
     public <R> R get(String name, R defaultValue) {
-        if (containsKey(name)) {
+        if (context.containsKey(name)) {
             return get(name);
         } else {
             return defaultValue;
         }
+    }
+
+    /**
+     * Allows putting a value into the context
+     *
+     * @param name the key to store
+     * @param value the value to store
+     * @param <R> the type of the previous value if present
+     * @return the previous value or null
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R put(String name, Object value) {
+        return (R) context.put(name, value);
     }
 
     /**
@@ -396,5 +402,94 @@ public class YokeHttpServerRequest extends HashMap<String, Object> implements Ht
     public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
         request.exceptionHandler(handler);
         return this;
+    }
+
+    // JavaBean like accessors helpers for other language bindings such as Groovy
+
+    public String getMethod() {
+        return method();
+    }
+
+    public String getUri() {
+        return uri();
+    }
+
+    public String getPath() {
+        return path();
+    }
+
+    public String getQuery() {
+        return query();
+    }
+
+    public YokeHttpServerResponse getResponse() {
+        return response();
+    }
+
+    public Map<String, String> getHeaders() {
+        return headers();
+    }
+
+    public Map<String, String> getParams() {
+        return params();
+    }
+
+    public InetSocketAddress getRemoteAddress() {
+        return remoteAddress();
+    }
+
+    public X509Certificate[] getPeerCertificateChain() throws SSLPeerUnverifiedException {
+        return peerCertificateChain();
+    }
+
+    public URI getAbsoluteURI() {
+        return absoluteURI();
+    }
+
+    public String getOriginalMethod() {
+        return originalMethod();
+    }
+
+    public long getBodyLengthLimit() {
+        return bodyLengthLimit();
+    }
+
+    public long getContentLength() {
+        return contentLength();
+    }
+
+    public Object getBody() {
+        return body();
+    }
+
+    public JsonObject getJsonBody() {
+        return jsonBody();
+    }
+    public Map<String, String> getMapBody() {
+        return mapBody();
+    }
+
+    public Buffer getBufferBody() {
+        return bufferBody();
+    }
+
+    public Map<String, FileUpload> getFiles() {
+        return files();
+    }
+
+    public Set<Cookie> getCookies() {
+        return cookies();
+    }
+
+    public HttpServerRequest getVertxHttpServerRequest() {
+        return vertxHttpServerRequest();
+    }
+
+    public HttpRequest getNettyRequest() {
+        return nettyRequest();
+    }
+
+    public HttpVersion getProtocolVersion() {
+        return protocolVersion();
     }
 }

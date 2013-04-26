@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -23,10 +24,7 @@ import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Yoke is a chain executor of middleware for Vert.x 2.x.
@@ -39,12 +37,14 @@ import java.util.Map;
  *
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
-public class Yoke {
+public class Yoke implements HttpServerRequestWrapper {
 
     private final Vertx vertx;
 
-    protected final Map<String, Object> defaultContext = new HashMap<>();
-    protected final Map<String, Engine> engineMap = new HashMap<>();
+    private final Map<String, Object> defaultContext = new HashMap<>();
+    private final Map<String, Engine> engineMap = new HashMap<>();
+    // the request wrapper in use
+    private final HttpServerRequestWrapper requestWrapper;
 
     /**
      * Creates a Yoke instance.
@@ -56,7 +56,12 @@ public class Yoke {
      * @param vertx The Vertx instance
      */
     public Yoke(Vertx vertx) {
+        this(vertx, null);
+    }
+
+    public Yoke(Vertx vertx, HttpServerRequestWrapper requestWrapper) {
         this.vertx = vertx;
+        this.requestWrapper = requestWrapper == null ? this : requestWrapper;
         defaultContext.put("title", "Yoke");
     }
 
@@ -117,7 +122,7 @@ public class Yoke {
      * @param route The route prefix for the middleware
      * @param handler The Handler to add
      */
-    public Yoke use(String route, final Handler<HttpServerRequest> handler) {
+    public Yoke use(String route, final Handler<YokeHttpServerRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
             @Override
             public void handle(YokeHttpServerRequest request, Handler<Object> next) {
@@ -133,7 +138,7 @@ public class Yoke {
      * @see Yoke#use(String, Handler)
      * @param handler The Handler to add
      */
-    public Yoke use(Handler<HttpServerRequest> handler) {
+    public Yoke use(Handler<YokeHttpServerRequest> handler) {
         return use("/", handler);
     }
 
@@ -195,13 +200,12 @@ public class Yoke {
     }
 
     /**
-     * For other language bindings this method can be override.
-     * @param request The Vertx HttpServerRequest
-     * @return an Implementation of YokeHttpServerRequest
+     * Default implementation of the request wrapper
      */
-    protected YokeHttpServerRequest wrapHttpServerRequest(HttpServerRequest request) {
-        // the context map is shared with all middlewares
-        return new YokeHttpServerRequest(request, defaultContext, engineMap);
+    @Override
+    public YokeHttpServerRequest wrap(HttpServerRequest request, Map<String, Object> context, Map<String, Engine> engines) {
+        YokeHttpServerResponse response = new YokeHttpServerResponse(request.response(), context, engines);
+        return new YokeHttpServerRequest(request, response, context);
     }
 
     /**
@@ -212,7 +216,9 @@ public class Yoke {
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(final HttpServerRequest req) {
-                final YokeHttpServerRequest request = wrapHttpServerRequest(req);
+                // the context map is shared with all middlewares
+                final Map<String, Object> context = new HashMap<>(defaultContext);
+                final YokeHttpServerRequest request = requestWrapper.wrap(req, context, Collections.unmodifiableMap(engineMap));
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;

@@ -34,19 +34,19 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     // the original request
     private final HttpServerResponse response;
     // the context
-    private final Map<String, Object> renderContext;
+    private final Map<String, Object> context;
     // engine map
-    private final Map<String, Engine> renderEngines;
+    private final Map<String, Engine> engines;
 
     // extra handlers
     private List<Handler<Void>> headersHandler;
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
-    public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> renderContext, Map<String, Engine> renderEngines) {
+    public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         this.response = response;
-        this.renderContext = renderContext;
-        this.renderEngines = renderEngines;
+        this.context = context;
+        this.engines = engines;
     }
 
     // extension to default interface
@@ -56,18 +56,28 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         if (sep != -1) {
             String extension = template.substring(sep + 1);
 
-            Engine renderEngine = renderEngines.get(extension);
+            final Engine renderEngine = engines.get(extension);
 
             if (renderEngine == null) {
                 next.handle("No engine registered for extension: " + extension);
             } else {
-                renderEngine.render(template, renderContext, new AsyncResultHandler<Buffer>() {
+                renderEngine.exists(template, new Handler<Boolean>() {
                     @Override
-                    public void handle(AsyncResult<Buffer> asyncResult) {
-                        if (asyncResult.failed()) {
-                            next.handle(asyncResult.cause());
+                    public void handle(Boolean exists) {
+                        if (!exists) {
+                            next.handle(404);
                         } else {
-                            end(asyncResult.result());
+                            renderEngine.render(template, context, new AsyncResultHandler<Buffer>() {
+                                @Override
+                                public void handle(AsyncResult<Buffer> asyncResult) {
+                                    if (asyncResult.failed()) {
+                                        next.handle(asyncResult.cause());
+                                    } else {
+                                        putHeader("content-type", renderEngine.getContentType());
+                                        end(asyncResult.result());
+                                    }
+                                }
+                            });
                         }
                     }
                 });
@@ -75,6 +85,24 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         } else {
             next.handle("Cannot determine the extension of the template");
         }
+    }
+
+    public void render(final String template) {
+        render(template, new Handler<Object>() {
+            @Override
+            public void handle(Object error) {
+                if (error != null) {
+                    if (error instanceof Integer) {
+                        setStatusCode((Integer) error);
+                        setStatusMessage(HttpResponseStatus.valueOf((Integer) error).reasonPhrase());
+                    } else {
+                        setStatusCode(500);
+                        setStatusMessage(HttpResponseStatus.valueOf(500).reasonPhrase());
+                    }
+                    end();
+                }
+            }
+        });
     }
 
     /**
@@ -310,5 +338,19 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     public HttpServerResponse exceptionHandler(Handler<Throwable> handler) {
         response.exceptionHandler(handler);
         return this;
+    }
+
+    // JavaBean accessors
+
+    public Map<String, Object> getHeaders() {
+        return headers();
+    }
+
+    public Map<String, Object> getTrailers() {
+        return trailers();
+    }
+
+    public boolean isWriteQueueFull() {
+        return writeQueueFull();
     }
 }

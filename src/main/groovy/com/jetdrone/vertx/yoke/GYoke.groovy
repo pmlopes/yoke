@@ -18,7 +18,10 @@ package com.jetdrone.vertx.yoke
 import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest
 import org.vertx.java.core.Handler
 import org.vertx.java.core.Vertx
+import org.vertx.java.core.http.HttpServerRequest
 import org.vertx.java.core.http.HttpServer
+
+import com.jetdrone.vertx.yoke.middleware.GYokeHttpServerResponse
 
 import org.vertx.groovy.core.Vertx as GVertx
 import org.vertx.groovy.core.http.HttpServer as GHttpServer
@@ -50,7 +53,13 @@ public class GYoke {
      */
     public GYoke(GVertx vertx) {
         this.vertx = vertx.toJavaVertx();
-        jYoke = new Yoke(this.vertx);
+        jYoke = new Yoke(this.vertx, new HttpServerRequestWrapper() {
+            @Override
+            YokeHttpServerRequest wrap(HttpServerRequest request, Map<String, Object> context, Map<String, Engine> engines) {
+                GYokeHttpServerResponse response = new GYokeHttpServerResponse(request.response(), context, engines);
+                return new YokeHttpServerRequest(request, response, context);
+            }
+        });
     }
 
     /**

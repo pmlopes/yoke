@@ -24,39 +24,7 @@ import java.util.*;
 
 public class StringPlaceholderEngine extends Engine {
 
-    private static class EngineAsyncResult implements AsyncResult<Buffer> {
-
-        private final Buffer buffer;
-        private final Throwable throwable;
-
-        EngineAsyncResult(Throwable throwable, Buffer buffer) {
-            this.throwable = throwable;
-            this.buffer = buffer;
-        }
-
-        @Override
-        public Buffer result() {
-            return buffer;
-        }
-
-        @Override
-        public Throwable cause() {
-            return throwable;
-        }
-
-        @Override
-        public boolean succeeded() {
-            return throwable == null;
-        }
-
-        @Override
-        public boolean failed() {
-            return throwable != null;
-        }
-    }
-
     private static final String placeholderPrefix = "${";
-    private static final String valueSeparator = null;
     private static final String placeholderSuffix = "}";
     private static final boolean ignoreUnresolvablePlaceholders = true;
 
@@ -78,22 +46,19 @@ public class StringPlaceholderEngine extends Engine {
      * ignored.
      */
     @Override
-    public void render(final String template, final Map<String, Object> context,
-                       final AsyncResultHandler<Buffer> next) {
+    public void render(final String template, final Map<String, Object> context, final AsyncResultHandler<Buffer> next) {
         // load the template from the filesystem
-        vertx.fileSystem().readFile(template, new AsyncResultHandler<Buffer>() {
+        loadTemplate(template, new AsyncResultHandler<String>() {
             @Override
-            public void handle(AsyncResult<Buffer> asyncResult) {
+            public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(asyncResult);
+                    next.handle(new Engine.EngineAsyncResult<Buffer>(asyncResult.cause(), null));
                 } else {
-                    String template = asyncResult.result().toString("UTF-8");
-
                     try {
-                        next.handle(new EngineAsyncResult(null,
-                                new Buffer(parseStringValue(template, context, new HashSet<String>()))));
+                        next.handle(new Engine.EngineAsyncResult<>(null,
+                                new Buffer(parseStringValue(asyncResult.result(), context, new HashSet<String>()))));
                     } catch (IllegalArgumentException iae) {
-                        next.handle(new EngineAsyncResult(iae, null));
+                        next.handle(new EngineAsyncResult<Buffer>(iae, null));
                     }
                 }
             }
@@ -118,17 +83,7 @@ public class StringPlaceholderEngine extends Engine {
 
                 // Now obtain the value for the fully resolved key...
                 Object propVal = context.get(placeholder);
-                if (propVal == null && valueSeparator != null) {
-                    int separatorIndex = placeholder.indexOf(valueSeparator);
-                    if (separatorIndex != -1) {
-                        String actualPlaceholder = placeholder.substring(0, separatorIndex);
-                        String defaultValue = placeholder.substring(separatorIndex + valueSeparator.length());
-                        propVal = context.get(actualPlaceholder);
-                        if (propVal == null) {
-                            propVal = defaultValue;
-                        }
-                    }
-                }
+
                 if (propVal != null) {
                     // Recursive invocation, parsing placeholders contained in the
                     // previously resolved placeholder value.
