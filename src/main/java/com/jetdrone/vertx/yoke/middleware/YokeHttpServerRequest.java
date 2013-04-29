@@ -249,6 +249,15 @@ public class YokeHttpServerRequest implements HttpServerRequest {
         this.cookies = cookies;
     }
 
+    void setSessionId(String sessionId) {
+        // TODO: store it
+    }
+
+    public String sessionId() {
+        // TODO: get it
+        // TODO: proper getter
+        return null;
+    }
     /**
      * Return the real request
      */
