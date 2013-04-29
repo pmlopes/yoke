@@ -18,8 +18,6 @@ package com.jetdrone.vertx.yoke.middleware;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.io.*;
-import java.net.URL;
-import java.net.URLDecoder;
 
 final class Utils {
 
@@ -65,11 +63,17 @@ final class Utils {
         try {
             Buffer buffer = new Buffer(0);
 
-            try (Reader r = new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8")) {
+            try (InputStream in = clazz.getResourceAsStream(resource)) {
                 int read;
-                char[] data = new char[4096];
-                while ((read = r.read(data, 0, data.length)) != -1) {
-                    buffer.appendString(new String(data, 0, read));
+                byte[] data = new byte[4096];
+                while ((read = in.read(data, 0, data.length)) != -1) {
+                    if (read == data.length) {
+                        buffer.appendBytes(data);
+                    } else {
+                        byte[] slice = new byte[read];
+                        System.arraycopy(data, 0, slice, 0, slice.length);
+                        buffer.appendBytes(slice);
+                    }
                 }
             }
 
