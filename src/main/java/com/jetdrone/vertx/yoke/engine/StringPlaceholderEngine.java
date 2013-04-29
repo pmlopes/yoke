@@ -16,13 +16,14 @@
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.util.*;
 
-public class StringPlaceholderEngine extends Engine {
+public class StringPlaceholderEngine extends Engine<String> {
 
     private static final String placeholderPrefix = "${";
     private static final String placeholderSuffix = "}";
@@ -52,17 +53,24 @@ public class StringPlaceholderEngine extends Engine {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new Engine.EngineAsyncResult<Buffer>(asyncResult.cause(), null));
+                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
                 } else {
                     try {
-                        next.handle(new Engine.EngineAsyncResult<>(null,
-                                new Buffer(parseStringValue(asyncResult.result(), context, new HashSet<String>()))));
+                        next.handle(new YokeAsyncResult<>(new Buffer(parseStringValue(asyncResult.result(), context, new HashSet<String>()))));
                     } catch (IllegalArgumentException iae) {
-                        next.handle(new EngineAsyncResult<Buffer>(iae, null));
+                        next.handle(new YokeAsyncResult<Buffer>(iae));
                     }
                 }
             }
         });
+    }
+
+    /**
+     * This is a simple engine there is no compilation step
+     */
+    @Override
+    public void compile(String buffer, AsyncResultHandler<String> handler) {
+        handler.handle(new YokeAsyncResult<>(buffer));
     }
 
     private static String parseStringValue(String template, Map<String, Object> context,

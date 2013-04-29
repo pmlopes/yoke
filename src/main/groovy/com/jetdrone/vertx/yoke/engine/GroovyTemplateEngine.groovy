@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.engine
 
 import com.jetdrone.vertx.yoke.Engine
+import com.jetdrone.vertx.yoke.util.YokeAsyncResult
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.text.TemplateEngine
@@ -24,25 +25,31 @@ import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.core.buffer.Buffer
 
-public class GroovyTemplateEngine extends Engine {
+public class GroovyTemplateEngine extends Engine<Template> {
 
     private TemplateEngine engine = new SimpleTemplateEngine()
 
     @Override
+    void compile(String buffer, AsyncResultHandler<Template> handler) {
+        try {
+            handler.handle(new YokeAsyncResult<Template>(engine.createTemplate(buffer)))
+        } catch (CompilationFailedException | ClassNotFoundException | IOException ex) {
+            handler.handle(new YokeAsyncResult<Template>(ex))
+        }
+    }
+
+    @Override
     public void render(final String file, final Map<String, Object> context, final AsyncResultHandler<Buffer> next) {
-        loadTemplate(file, new AsyncResultHandler<String>() {
+        loadTemplate(file, new AsyncResultHandler<Template>() {
             @Override
-            public void handle(AsyncResult<String> asyncResult) {
+            public void handle(AsyncResult<Template> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new Engine.EngineAsyncResult<Buffer>(asyncResult.cause(), null))
+                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()))
                 } else {
                     try {
-                        Template template = engine.createTemplate(asyncResult.result())
-                        // TODO: if not null then cache it
+                        final Buffer buffer = new Buffer(0)
 
-                        final Buffer buffer = new Buffer(0);
-
-                        template.make(context).writeTo(new Writer() {
+                        asyncResult.result().make(context).writeTo(new Writer() {
                             @Override
                             void write(char[] cbuf, int off, int len) throws IOException {
                                 buffer.appendString(new String(cbuf, off, len))
@@ -59,10 +66,10 @@ public class GroovyTemplateEngine extends Engine {
                             }
                         })
 
-                        next.handle(new Engine.EngineAsyncResult(null, buffer));
+                        next.handle(new YokeAsyncResult(buffer))
 
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
-                        next.handle(new Engine.EngineAsyncResult<Buffer>(ex, null))
+                        next.handle(new YokeAsyncResult<Buffer>(ex))
                     }
                 }
             }
