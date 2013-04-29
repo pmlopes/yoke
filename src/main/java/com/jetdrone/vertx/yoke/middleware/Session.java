@@ -9,6 +9,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 
 public class Session extends Middleware {
 
@@ -89,9 +90,12 @@ public class Session extends Middleware {
     }
 
     private Cookie getSessionCookie(YokeHttpServerRequest request) {
-        for (Cookie c : request.cookies()) {
-            if (name.equals(c.getName())) {
-                return c;
+        Set<Cookie> cookies = request.cookies();
+        if (cookies != null) {
+            for (Cookie c : cookies) {
+                if (name.equals(c.getName())) {
+                    return c;
+                }
             }
         }
         return null;

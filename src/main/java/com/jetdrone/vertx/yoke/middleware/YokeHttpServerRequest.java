@@ -47,6 +47,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     private Object body;
     private Map<String, FileUpload> files;
     private Set<Cookie> cookies;
+    private String sessionId;
 
     public YokeHttpServerRequest(HttpServerRequest request, YokeHttpServerResponse response, Map<String, Object> context) {
         this.context = context;
@@ -250,14 +251,17 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     }
 
     void setSessionId(String sessionId) {
-        // TODO: store it
+        this.sessionId = sessionId;
     }
 
     public String sessionId() {
-        // TODO: get it
-        // TODO: proper getter
-        return null;
+        return sessionId;
     }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
     /**
      * Return the real request
      */
