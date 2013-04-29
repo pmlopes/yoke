@@ -19,7 +19,7 @@ public class Session extends Middleware {
     final String name = "yoke.sess";
     final String path = "/";
     final Boolean httpOnly = true;
-    final long maxAge = 0;
+    final long maxAge = 60 * 60 * 1000;
 
     public Session(String secret) {
         try {
