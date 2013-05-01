@@ -37,7 +37,7 @@ import java.util.*;
  *
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
-public class Yoke implements HttpServerRequestWrapper {
+public class Yoke implements HttpServerRequestWrapper, Handler<HttpServerRequest> {
 
     private final Vertx vertx;
 
@@ -213,56 +213,62 @@ public class Yoke implements HttpServerRequestWrapper {
      * @return Yoke
      */
     public Yoke listen(HttpServer server) {
-        server.requestHandler(new Handler<HttpServerRequest>() {
+        server.requestHandler(this);
+        return this;
+    }
+
+    @Override
+    public void handle(final HttpServerRequest req) {
+        // the context map is shared with all middlewares
+        final Map<String, Object> context = new HashMap<>(defaultContext);
+        final YokeHttpServerRequest request = requestWrapper.wrap(req, context, Collections.unmodifiableMap(engineMap));
+
+        new Handler<Object>() {
+            int currentMiddleware = -1;
             @Override
-            public void handle(final HttpServerRequest req) {
-                // the context map is shared with all middlewares
-                final Map<String, Object> context = new HashMap<>(defaultContext);
-                final YokeHttpServerRequest request = requestWrapper.wrap(req, context, Collections.unmodifiableMap(engineMap));
+            public void handle(Object error) {
+                if (error == null) {
+                    currentMiddleware++;
+                    if (currentMiddleware < middlewareList.size()) {
+                        MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
 
-                new Handler<Object>() {
-                    int currentMiddleware = -1;
-                    @Override
-                    public void handle(Object error) {
-                        if (error == null) {
-                            currentMiddleware++;
-                            if (currentMiddleware < middlewareList.size()) {
-                                MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
-
-                                if (request.path().startsWith(mountedMiddleware.mount)) {
-                                    Middleware middlewareItem = mountedMiddleware.middleware;
-                                    middlewareItem.handle(request, this);
-                                } else {
-                                    // the middleware was not mounted on this uri, skip to the next entry
-                                    handle(null);
-                                }
-                            } else {
-                                HttpServerResponse response = request.response();
-                                // reached the end and no handler was able to answer the request
-                                response.setStatusCode(404);
-                                response.setStatusMessage(HttpResponseStatus.valueOf(404).reasonPhrase());
-                                if (errorHandler != null) {
-                                    errorHandler.handle(request, null);
-                                } else {
-                                    response.end(HttpResponseStatus.valueOf(404).reasonPhrase());
-                                }
-                            }
+                        if (request.path().startsWith(mountedMiddleware.mount)) {
+                            Middleware middlewareItem = mountedMiddleware.middleware;
+                            middlewareItem.handle(request, this);
                         } else {
-                            request.put("error", error);
-                            if (errorHandler != null) {
-                                errorHandler.handle(request, null);
-                            } else {
-                                HttpServerResponse response = request.response();
-                                response.setStatusCode(500);
-                                response.setStatusMessage(HttpResponseStatus.valueOf(500).reasonPhrase());
-                                response.end(HttpResponseStatus.valueOf(500).reasonPhrase());
-                            }
+                            // the middleware was not mounted on this uri, skip to the next entry
+                            handle(null);
+                        }
+                    } else {
+                        HttpServerResponse response = request.response();
+                        // reached the end and no handler was able to answer the request
+                        response.setStatusCode(404);
+                        response.setStatusMessage(HttpResponseStatus.valueOf(404).reasonPhrase());
+                        if (errorHandler != null) {
+                            errorHandler.handle(request, null);
+                        } else {
+                            response.end(HttpResponseStatus.valueOf(404).reasonPhrase());
                         }
                     }
-                }.handle(null);
+                } else {
+                    request.put("error", error);
+                    if (errorHandler != null) {
+                        errorHandler.handle(request, null);
+                    } else {
+                        HttpServerResponse response = request.response();
+                        if (error instanceof Integer) {
+                            int code = (Integer) error;
+                            response.setStatusCode(code);
+                            response.setStatusMessage(HttpResponseStatus.valueOf(code).reasonPhrase());
+                            response.end(HttpResponseStatus.valueOf(code).reasonPhrase());
+                        } else {
+                            response.setStatusCode(500);
+                            response.setStatusMessage(HttpResponseStatus.valueOf(500).reasonPhrase());
+                            response.end(HttpResponseStatus.valueOf(500).reasonPhrase());
+                        }
+                    }
+                }
             }
-        });
-
-        return this;
+        }.handle(null);
     }
 }

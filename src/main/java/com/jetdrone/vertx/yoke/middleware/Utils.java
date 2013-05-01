@@ -19,7 +19,7 @@ import org.vertx.java.core.buffer.Buffer;
 
 import java.io.*;
 
-final class Utils {
+public final class Utils {
 
     // no instantiation
     private Utils () {}
