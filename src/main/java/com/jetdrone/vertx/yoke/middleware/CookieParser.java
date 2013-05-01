@@ -29,18 +29,25 @@ import java.util.Set;
 public class CookieParser extends Middleware {
 
     private final Mac hmacSHA256;
+    private final String ignoreName;
 
-    public CookieParser(String secret) {
+    public CookieParser(String secret, String ignoreName) {
         try {
             hmacSHA256 = Mac.getInstance("HmacSHA256");
             hmacSHA256.init(new SecretKeySpec(secret.getBytes(), hmacSHA256.getAlgorithm()));
+            this.ignoreName = ignoreName;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }
 
+    public CookieParser(String secret) {
+        this(secret, null);
+    }
+
     public CookieParser() {
         hmacSHA256 = null;
+        ignoreName = "yoke.sess";
     }
 
     @Override
@@ -52,6 +59,11 @@ public class CookieParser extends Middleware {
 
             if (hmacSHA256 != null) {
                 for (Cookie cookie : cookies) {
+                    // skip
+                    if (ignoreName != null && ignoreName.equals(cookie.getName())) {
+                        continue;
+                    }
+
                     String value = cookie.getValue();
                     if (value != null) {
                         if (value.startsWith("s:")) {

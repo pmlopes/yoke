@@ -16,14 +16,17 @@ public class Session extends Middleware {
 
     private final Mac hmacSHA256;
 
-    // TODO: this needs to be configured
-    final String name = "yoke.sess";
-    final String path = "/";
-    final Boolean httpOnly = true;
-    final long maxAge = 60 * 60 * 1000;
+    private final String name;
+    private final String path;
+    private final Boolean httpOnly;
+    private final long maxAge;
 
-    public Session(String secret) {
+    public Session(String name, String path, boolean httpOnly, long maxAge, String secret) {
         try {
+            this.name = name;
+            this.path = path;
+            this.httpOnly = httpOnly;
+            this.maxAge = maxAge;
             hmacSHA256 = Mac.getInstance("HmacSHA256");
             hmacSHA256.init(new SecretKeySpec(secret.getBytes(), hmacSHA256.getAlgorithm()));
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
@@ -31,11 +34,27 @@ public class Session extends Middleware {
         }
     }
 
+    public Session(String path, boolean httpOnly, long maxAge, String secret) {
+        this("yoke.sess", path, httpOnly, maxAge, secret);
+    }
+
+    public Session(boolean httpOnly, long maxAge, String secret) {
+        this("yoke.sess", "/", httpOnly, maxAge, secret);
+    }
+
+    public Session(long maxAge, String secret) {
+        this("yoke.sess", "/", true, maxAge, secret);
+    }
+
+    public Session(String secret) {
+        this("yoke.sess", "/", true, 60 * 60 * 1000, secret);
+    }
+
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         // default session
         final Cookie cookie = new DefaultCookie(name, "");
-        cookie.setPath("/");
+        cookie.setPath(path);
         cookie.setHttpOnly(httpOnly);
         cookie.setMaxAge(maxAge);
 
@@ -82,6 +101,11 @@ public class Session extends Middleware {
                         response.putHeader("set-cookie", ServerCookieEncoder.encode(cookie));
                     }
                 } else {
+                    // only send secure cookies over https
+                    if (cookie.isSecure() && !request.isSecure()) {
+                        return;
+                    }
+
                     // compare hashes, no need to set-cookie if unchanged
                     if (originalHash != crc16(sessionId)) {
                         // modified session
