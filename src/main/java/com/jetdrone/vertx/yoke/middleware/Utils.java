@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import org.vertx.java.core.buffer.Buffer;
 
+import javax.crypto.Mac;
 import java.io.*;
 
 public final class Utils {
@@ -82,4 +83,24 @@ public final class Utils {
             throw new RuntimeException(ioe);
         }
     }
+
+    public static String sign(String val, Mac hmacSHA256) {
+        hmacSHA256.reset();
+        return val + "." + base64(hmacSHA256.doFinal(val.getBytes()));
+    }
+
+    public static String unsign(String val, Mac hmacSHA256) {
+        int idx = val.lastIndexOf('.');
+
+        if (idx == -1) {
+            return null;
+        }
+
+        String str = val.substring(0, idx);
+        if (val.equals(sign(str, hmacSHA256))) {
+            return str;
+        }
+        return null;
+    }
+
 }

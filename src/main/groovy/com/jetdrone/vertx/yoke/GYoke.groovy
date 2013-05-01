@@ -56,9 +56,9 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
         this.vertx = vertx.toJavaVertx();
         jYoke = new Yoke(this.vertx, new HttpServerRequestWrapper() {
             @Override
-            YokeHttpServerRequest wrap(HttpServerRequest request, Map<String, Object> context, Map<String, Engine> engines) {
+            YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines) {
                 GYokeHttpServerResponse response = new GYokeHttpServerResponse(request.response(), context, engines);
-                return new YokeHttpServerRequest(request, response, context);
+                return new YokeHttpServerRequest(request, response, secure, context);
             }
         });
     }

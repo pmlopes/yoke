@@ -19,8 +19,10 @@ import com.jetdrone.vertx.yoke.Yoke;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.vertx.java.core.*;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.http.ServerWebSocket;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -33,10 +35,17 @@ import java.util.Map;
 public class YokeTester extends Yoke {
 
     private final Vertx vertx;
+    private final HttpServer fakeServer = new FakeHttpServer();
 
-    public YokeTester(Vertx vertx) {
+    public YokeTester(Vertx vertx, boolean fakeSSL) {
         super(vertx);
         this.vertx = vertx;
+        fakeServer.setSSL(fakeSSL);
+        listen(fakeServer);
+    }
+
+    public YokeTester(Vertx vertx) {
+        this(vertx, false);
     }
 
     public void request(final String method, final String url, final Handler<Response> handler) {
@@ -54,7 +63,7 @@ public class YokeTester extends Yoke {
             final Response response = new Response(vertx, handler);
 
             // start yoke
-            handle(new HttpServerRequest() {
+            fakeServer.requestHandler().handle(new HttpServerRequest() {
 
                 MultiMap params = null;
 
@@ -154,6 +163,214 @@ public class YokeTester extends Yoke {
             });
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private static class FakeHttpServer implements HttpServer {
+
+        Handler<HttpServerRequest> requestHandler;
+        boolean ssl = false;
+
+        @Override
+        public HttpServer requestHandler(Handler<HttpServerRequest> requestHandler) {
+            this.requestHandler = requestHandler;
+            return this;
+        }
+
+        @Override
+        public Handler<HttpServerRequest> requestHandler() {
+            return requestHandler;
+        }
+
+        @Override
+        public HttpServer websocketHandler(Handler<ServerWebSocket> wsHandler) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Handler<ServerWebSocket> websocketHandler() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer listen(int port) {
+            return this;
+        }
+
+        @Override
+        public HttpServer listen(int port, Handler<AsyncResult<HttpServer>> listenHandler) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer listen(int port, String host) {
+            return this;
+        }
+
+        @Override
+        public HttpServer listen(int port, String host, Handler<AsyncResult<HttpServer>> listenHandler) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void close() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void close(Handler<AsyncResult<Void>> doneHandler) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setClientAuthRequired(boolean required) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isClientAuthRequired() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setSSL(boolean ssl) {
+            this.ssl = ssl;
+            return this;
+        }
+
+        @Override
+        public boolean isSSL() {
+            return ssl;
+        }
+
+        @Override
+        public HttpServer setKeyStorePath(String path) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getKeyStorePath() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setKeyStorePassword(String pwd) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getKeyStorePassword() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setTrustStorePath(String path) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getTrustStorePath() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setTrustStorePassword(String pwd) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String getTrustStorePassword() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setAcceptBacklog(int backlog) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getAcceptBacklog() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setTCPNoDelay(boolean tcpNoDelay) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setSendBufferSize(int size) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setReceiveBufferSize(int size) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setTCPKeepAlive(boolean keepAlive) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setReuseAddress(boolean reuse) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setSoLinger(int linger) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setTrafficClass(int trafficClass) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setUsePooledBuffers(boolean pooledBuffers) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isTCPNoDelay() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getSendBufferSize() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getReceiveBufferSize() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isTCPKeepAlive() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isReuseAddress() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getSoLinger() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getTrafficClass() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isUsePooledBuffers() {
+            throw new UnsupportedOperationException();
         }
     }
 }

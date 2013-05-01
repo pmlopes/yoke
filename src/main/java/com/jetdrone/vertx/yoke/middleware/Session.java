@@ -3,6 +3,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.DefaultCookie;
+import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.vertx.java.core.Handler;
 
 import javax.crypto.Mac;
@@ -45,16 +46,21 @@ public class Session extends Middleware {
         }
 
         // find the raw cookie
-        Cookie rawCookie = getSessionCookie(request);
+        final Cookie rawCookie = getSessionCookie(request);
+
         int hash = 0;
 
         if (rawCookie != null) {
-            String unsigned = unsign(rawCookie.getValue());
-            if (unsigned != null) {
-                hash = crc16(unsigned);
-                request.setSessionId(unsigned);
-                // update the response cookie
-                cookie.setValue(unsigned);
+            String value = rawCookie.getValue();
+            // session cookies must be signed
+            if (value.startsWith("s:")) {
+                String unsigned = Utils.unsign(value.substring(2), hmacSHA256);
+                if (unsigned != null) {
+                    hash = crc16(unsigned);
+                    request.setSessionId(unsigned);
+                    // update the response cookie
+                    cookie.setValue(unsigned);
+                }
             }
         }
 
@@ -65,22 +71,24 @@ public class Session extends Middleware {
         response.headersHandler(new Handler<Void>() {
             @Override
             public void handle(Void done) {
-                String sessionId = request.sessionId();
+                String sessionId = request.getSessionId();
 
                 // removed
                 if (sessionId == null) {
-                    cookie.setMaxAge(0);
-                    // TODO: first get and see if it is a Set and add
-                    response.putHeader("set-cookie", cookie.toString());
+                    if (rawCookie != null) {
+                        cookie.setValue("");
+                        cookie.setMaxAge(0);
+                        // TODO: first get and see if it is a Set and add
+                        response.putHeader("set-cookie", ServerCookieEncoder.encode(cookie));
+                    }
                 } else {
                     // compare hashes, no need to set-cookie if unchanged
                     if (originalHash != crc16(sessionId)) {
                         // modified session
-
-                        String val = "s:" + sign(sessionId);
+                        String val = "s:" + Utils.sign(sessionId, hmacSHA256);
                         cookie.setValue(val);
                         // TODO: first get and see if it is a Set and add
-                        response.putHeader("set-cookie", cookie.toString());
+                        response.putHeader("set-cookie", ServerCookieEncoder.encode(cookie));
                     }
                 }
             }
@@ -97,19 +105,6 @@ public class Session extends Middleware {
                     return c;
                 }
             }
-        }
-        return null;
-    }
-
-    private String sign(String val) {
-        hmacSHA256.reset();
-        return val + "." + Utils.base64(hmacSHA256.doFinal(val.getBytes()));
-    }
-
-    private String unsign(String val) {
-        String str = val.substring(0, val.lastIndexOf('.'));
-        if (val.equals(sign(str))) {
-            return str;
         }
         return null;
     }

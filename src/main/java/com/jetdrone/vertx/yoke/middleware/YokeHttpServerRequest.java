@@ -42,8 +42,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     // the request context
     private final Map<String, Object> context;
     // is this request secure
-    // TODO: get me right
-    private final boolean secure = false;
+    private final boolean secure;
 
     // we can overrride the setMethod
     private String method;
@@ -53,11 +52,12 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     private Set<Cookie> cookies;
     private String sessionId;
 
-    public YokeHttpServerRequest(HttpServerRequest request, YokeHttpServerResponse response, Map<String, Object> context) {
+    public YokeHttpServerRequest(HttpServerRequest request, YokeHttpServerResponse response, boolean secure, Map<String, Object> context) {
         this.context = context;
         this.request = request;
         this.method = request.method();
         this.response = response;
+        this.secure = secure;
     }
 
     /**
@@ -256,10 +256,6 @@ public class YokeHttpServerRequest implements HttpServerRequest {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
-    }
-
-    public String sessionId() {
-        return sessionId;
     }
 
     public String getSessionId() {
