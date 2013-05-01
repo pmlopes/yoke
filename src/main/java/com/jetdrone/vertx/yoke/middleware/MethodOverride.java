@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.Map;
@@ -38,13 +39,11 @@ public class MethodOverride extends Middleware {
         final Object body = request.body();
 
         if (request.hasBody() && body != null) {
-            if (body instanceof Map) {
-                Object method = ((Map) body).get(key);
+            if (body instanceof MultiMap) {
+                String method = ((MultiMap) body).get(key);
                 if (method != null) {
-                    if (method instanceof String) {
-                        ((Map) body).remove(key);
-                        request.setMethod((String) method);
-                    }
+                    ((MultiMap) body).remove(key);
+                    request.setMethod(method);
                 }
             } else if (body instanceof JsonObject) {
                 String method = ((JsonObject) body).getString(key);
