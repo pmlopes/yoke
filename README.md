@@ -2,6 +2,9 @@
 
 Yoke is a middleware framework for Vert.x, shipping with over 12 bundled middleware.
 
+[![Build Status](https://travis-ci.org/pmlopes/yoke.png?branch=master)](https://travis-ci.org/pmlopes/yoke)
+
+
 
 ## Instalation
 
