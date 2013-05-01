@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
+import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;

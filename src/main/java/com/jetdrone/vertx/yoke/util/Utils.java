@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.util;
 
 import org.vertx.java.core.buffer.Buffer;
 
 import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public final class Utils {
 
@@ -84,12 +87,33 @@ public final class Utils {
         }
     }
 
-    public static String sign(String val, Mac hmacSHA256) {
-        hmacSHA256.reset();
-        return val + "." + base64(hmacSHA256.doFinal(val.getBytes()));
+    /**
+     * Creates a new HmacSHA256 Message Authentication Code
+     * @param secret The secret key used to create signatures
+     * @return Mac implementation
+     */
+    public static Mac newHmacSHA256(String secret) {
+        try {
+            Mac hmacSHA256 = Mac.getInstance("HmacSHA256");
+            hmacSHA256.init(new SecretKeySpec(secret.getBytes(), hmacSHA256.getAlgorithm()));
+            return hmacSHA256;
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static String unsign(String val, Mac hmacSHA256) {
+    /**
+     * Signs a String value with a given MAC
+     */
+    public static String sign(String val, Mac mac) {
+        mac.reset();
+        return val + "." + base64(mac.doFinal(val.getBytes()));
+    }
+
+    /**
+     * Returns the original value is the signature is correct. Null otherwise.
+     */
+    public static String unsign(String val, Mac mac) {
         int idx = val.lastIndexOf('.');
 
         if (idx == -1) {
@@ -97,10 +121,9 @@ public final class Utils {
         }
 
         String str = val.substring(0, idx);
-        if (val.equals(sign(str, hmacSHA256))) {
+        if (val.equals(sign(str, mac))) {
             return str;
         }
         return null;
     }
-
 }

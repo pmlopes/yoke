@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.util.Utils;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.DefaultCookie;
 import io.netty.handler.codec.http.ServerCookieEncoder;
@@ -21,33 +22,28 @@ public class Session extends Middleware {
     private final Boolean httpOnly;
     private final long maxAge;
 
-    public Session(String name, String path, boolean httpOnly, long maxAge, String secret) {
-        try {
-            this.name = name;
-            this.path = path;
-            this.httpOnly = httpOnly;
-            this.maxAge = maxAge;
-            hmacSHA256 = Mac.getInstance("HmacSHA256");
-            hmacSHA256.init(new SecretKeySpec(secret.getBytes(), hmacSHA256.getAlgorithm()));
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+    public Session(String name, String path, boolean httpOnly, long maxAge, Mac mac) {
+        this.name = name;
+        this.path = path;
+        this.httpOnly = httpOnly;
+        this.maxAge = maxAge;
+        hmacSHA256 = mac;
     }
 
-    public Session(String path, boolean httpOnly, long maxAge, String secret) {
-        this("yoke.sess", path, httpOnly, maxAge, secret);
+    public Session(String path, boolean httpOnly, long maxAge, Mac mac) {
+        this("yoke.sess", path, httpOnly, maxAge, mac);
     }
 
-    public Session(boolean httpOnly, long maxAge, String secret) {
-        this("yoke.sess", "/", httpOnly, maxAge, secret);
+    public Session(boolean httpOnly, long maxAge, Mac mac) {
+        this("yoke.sess", "/", httpOnly, maxAge, mac);
     }
 
-    public Session(long maxAge, String secret) {
-        this("yoke.sess", "/", true, maxAge, secret);
+    public Session(long maxAge, Mac mac) {
+        this("yoke.sess", "/", true, maxAge, mac);
     }
 
-    public Session(String secret) {
-        this("yoke.sess", "/", true, 60 * 60 * 1000, secret);
+    public Session(Mac mac) {
+        this("yoke.sess", "/", true, 60 * 60 * 1000, mac);
     }
 
     @Override

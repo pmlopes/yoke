@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;

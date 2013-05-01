@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.util.Utils;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
 import org.vertx.java.core.Handler;
@@ -29,25 +30,20 @@ import java.util.Set;
 public class CookieParser extends Middleware {
 
     private final Mac hmacSHA256;
+    // TODO: remove this
     private final String ignoreName;
 
-    public CookieParser(String secret, String ignoreName) {
-        try {
-            hmacSHA256 = Mac.getInstance("HmacSHA256");
-            hmacSHA256.init(new SecretKeySpec(secret.getBytes(), hmacSHA256.getAlgorithm()));
-            this.ignoreName = ignoreName;
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+    public CookieParser(Mac mac, String ignoreName) {
+        this.hmacSHA256 = mac;
+        this.ignoreName = ignoreName;
     }
 
-    public CookieParser(String secret) {
-        this(secret, null);
+    public CookieParser(Mac mac) {
+        this(mac, "yoke.sess");
     }
 
     public CookieParser() {
-        hmacSHA256 = null;
-        ignoreName = "yoke.sess";
+        this(null);
     }
 
     @Override
