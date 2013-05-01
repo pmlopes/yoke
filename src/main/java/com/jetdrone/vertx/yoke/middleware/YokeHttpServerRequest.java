@@ -201,9 +201,9 @@ public class YokeHttpServerRequest implements HttpServerRequest {
      * The request setBody and eventually a parsed version of it in json or map
      */
     @SuppressWarnings("unchecked")
-    public Map<String, String> mapBody() {
-        if (body != null && body instanceof Map) {
-            return (Map<String, String>) body;
+    public MultiMap mapBody() {
+        if (body != null && body instanceof MultiMap) {
+            return (MultiMap) body;
         }
         return null;
     }
@@ -486,7 +486,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     public JsonObject getJsonBody() {
         return jsonBody();
     }
-    public Map<String, String> getMapBody() {
+    public MultiMap getMapBody() {
         return mapBody();
     }
 

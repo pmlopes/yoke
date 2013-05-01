@@ -24,7 +24,9 @@ import io.netty.handler.codec.http.multipart.*;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.IncompatibleDataDecoderException;
 import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.NotEnoughDataDecoderException;
+import org.vertx.java.core.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.DecodeException;
 import org.vertx.java.core.json.JsonArray;
@@ -65,14 +67,13 @@ public class BodyParser extends Middleware {
 
     private void parseMap(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString(), false);
-        Map<String, String> params;
+
         Map<String, List<String>> prms = queryStringDecoder.parameters();
-        if (prms.isEmpty()) {
-            params = new HashMap<>();
-        } else {
-            params = new HashMap<>(prms.size());
+        MultiMap params = new CaseInsensitiveMultiMap();
+
+        if (!prms.isEmpty()) {
             for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
-                params.put(entry.getKey(), entry.getValue().get(0));
+                params.add(entry.getKey(), entry.getValue());
             }
         }
 
@@ -94,16 +95,11 @@ public class BodyParser extends Middleware {
                 switch (data.getHttpDataType()) {
                     case Attribute:
                         if (request.body() == null) {
-                            request.setBody(new HashMap<String, String>());
+                            request.setBody(new CaseInsensitiveMultiMap());
                         }
                         final Attribute attribute = (Attribute) data;
-                        final Map<String, String> mapBody = request.mapBody();
-
-                        String value = mapBody.get(attribute.getName());
-                        // if there is more than 1 only the first is considered
-                        if (value == null) {
-                            mapBody.put(attribute.getName(), attribute.getValue());
-                        }
+                        final MultiMap mapBody = request.mapBody();
+                        mapBody.add(attribute.getName(), attribute.getValue());
                         break;
                     case FileUpload:
                         if (request.files() == null) {
