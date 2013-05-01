@@ -1,11 +1,12 @@
 package com.jetdrone.vertx.yoke.middleware
 
 import com.jetdrone.vertx.yoke.Middleware
+import groovy.transform.CompileStatic
 import org.vertx.java.core.Handler
 
 import java.util.regex.Pattern
 
-public class GRouter extends Middleware {
+@CompileStatic public class GRouter extends Middleware {
 
     private final Router jRouter = new Router()
 

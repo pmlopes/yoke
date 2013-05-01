@@ -28,7 +28,7 @@ import java.util.Map;
 public class Favicon extends Middleware {
 
     private class Icon {
-        private final Map<String, Object> headers;
+        private final Map<String, String> headers;
         private final Buffer body;
 
         Icon(Buffer buffer) {
@@ -36,7 +36,7 @@ public class Favicon extends Middleware {
             body = buffer;
 
             headers.put("content-type", "image/x-icon");
-            headers.put("content-length", buffer.length());
+            headers.put("content-length", Integer.toString(buffer.length()));
 
             try {
                 MessageDigest md = MessageDigest.getInstance("MD5");
@@ -84,9 +84,7 @@ public class Favicon extends Middleware {
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         if ("/favicon.ico".equals(request.path())) {
-            for (Map.Entry<String, Object> header : icon.headers.entrySet()) {
-                request.response().putHeader(header.getKey(), header.getValue());
-            }
+            request.response().headers().set(icon.headers);
             request.response().end(icon.body);
         } else {
             next.handle(null);

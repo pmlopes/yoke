@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.impl.DefaultHttpServerRequest;
@@ -121,7 +122,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
      * @return The found object
      */
     public <R> R getHeader(String name, R defaultValue) {
-        if (headers().containsKey(name)) {
+        if (headers().contains(name)) {
             return getHeader(name);
         } else {
             return defaultValue;
@@ -163,8 +164,8 @@ public class YokeHttpServerRequest implements HttpServerRequest {
      * @return true if content-length or transfer-encoding is present
      */
     public boolean hasBody() {
-        Map<String, String> headers = headers();
-        return headers.containsKey("transfer-encoding") || headers.containsKey("content-length");
+        MultiMap headers = headers();
+        return headers.contains("transfer-encoding") || headers.contains("content-length");
     }
 
     /**
@@ -334,7 +335,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
      * @see org.vertx.java.core.http.HttpServerRequest#headers()
      */
     @Override
-    public Map<String, String> headers() {
+    public MultiMap headers() {
         return request.headers();
     }
 
@@ -342,7 +343,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
      * @see org.vertx.java.core.http.HttpServerRequest#params()
      */
     @Override
-    public Map<String, String> params() {
+    public MultiMap params() {
         return request.params();
     }
 
@@ -446,11 +447,11 @@ public class YokeHttpServerRequest implements HttpServerRequest {
         return response();
     }
 
-    public Map<String, String> getHeaders() {
+    public MultiMap getHeaders() {
         return headers();
     }
 
-    public Map<String, String> getParams() {
+    public MultiMap getParams() {
         return params();
     }
 

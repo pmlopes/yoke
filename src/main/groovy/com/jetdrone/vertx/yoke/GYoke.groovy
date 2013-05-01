@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke
 
 import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest
+import groovy.transform.CompileStatic
 import org.vertx.java.core.Handler
 import org.vertx.java.core.Vertx
 import org.vertx.java.core.http.HttpServerRequest
@@ -37,7 +38,7 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
  *
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
-public class GYoke {
+@CompileStatic public class GYoke {
 
     private final Yoke jYoke;
     private final Vertx vertx;

@@ -33,8 +33,7 @@ public class Vhost extends Middleware {
     }
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
-        Map<String, String> headers = request.headers();
-        String host = headers.get("host");
+        String host = request.getHeader("host");
         if (host == null) {
             next.handle(null);
         } else {

@@ -16,10 +16,11 @@
 package com.jetdrone.vertx.yoke.middleware
 
 import com.jetdrone.vertx.yoke.Engine
+import groovy.transform.CompileStatic
 import org.vertx.java.core.http.HttpServerResponse
 import org.vertx.groovy.core.buffer.Buffer;
 
-public class GYokeHttpServerResponse extends YokeHttpServerResponse {
+@CompileStatic public class GYokeHttpServerResponse extends YokeHttpServerResponse {
 
     GYokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         super(response, context, engines)

@@ -66,7 +66,7 @@ public class GroovyTemplateEngine extends Engine<Template> {
                             }
                         })
 
-                        next.handle(new YokeAsyncResult(buffer))
+                        next.handle(new YokeAsyncResult<Buffer>(buffer))
 
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
                         next.handle(new YokeAsyncResult<Buffer>(ex))

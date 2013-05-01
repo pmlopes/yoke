@@ -71,7 +71,7 @@ public class Session extends Middleware {
                 if (sessionId == null) {
                     cookie.setMaxAge(0);
                     // TODO: first get and see if it is a Set and add
-                    response.putHeader("set-cookie", cookie);
+                    response.putHeader("set-cookie", cookie.toString());
                 } else {
                     // compare hashes, no need to set-cookie if unchanged
                     if (originalHash != crc16(sessionId)) {
@@ -80,7 +80,7 @@ public class Session extends Middleware {
                         String val = "s:" + sign(sessionId);
                         cookie.setValue(val);
                         // TODO: first get and see if it is a Set and add
-                        response.putHeader("set-cookie", cookie);
+                        response.putHeader("set-cookie", cookie.toString());
                     }
                 }
             }

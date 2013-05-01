@@ -20,6 +20,7 @@ import com.jetdrone.vertx.yoke.MimeType;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.json.JsonArray;
@@ -27,7 +28,6 @@ import org.vertx.java.core.json.JsonArray;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class Static extends Middleware {
@@ -66,22 +66,22 @@ public class Static extends Middleware {
 
     private void writeHeaders(final YokeHttpServerRequest request, final FileProps props) {
 
-        Map<String, Object> headers = request.response().headers();
+        MultiMap headers = request.response().headers();
 
-        if (!headers.containsKey("etag")) {
-            headers.put("etag", "\"" + props.size() + "-" + props.lastModifiedTime().getTime() + "\"");
+        if (!headers.contains("etag")) {
+            headers.set("etag", "\"" + props.size() + "-" + props.lastModifiedTime().getTime() + "\"");
         }
 
-        if (!headers.containsKey("date")) {
-            headers.put("date", ISODATE.format(new Date()));
+        if (!headers.contains("date")) {
+            headers.set("date", ISODATE.format(new Date()));
         }
 
-        if (!headers.containsKey("cache-control")) {
-            headers.put("cache-control", "public, max-age=" + maxAge / 1000);
+        if (!headers.contains("cache-control")) {
+            headers.set("cache-control", "public, max-age=" + maxAge / 1000);
         }
 
-        if (!headers.containsKey("last-modified")) {
-            headers.put("last-modified", ISODATE.format(props.lastModifiedTime()));
+        if (!headers.contains("last-modified")) {
+            headers.set("last-modified", ISODATE.format(props.lastModifiedTime()));
         }
     }
 
@@ -90,7 +90,7 @@ public class Static extends Middleware {
         String contentType = MimeType.getMime(file);
         String charset = MimeType.getCharset(contentType);
         request.response().putHeader("content-type",contentType + (charset != null ? "; charset=" + charset : ""));
-        request.response().putHeader("Content-Length", props.size());
+        request.response().putHeader("Content-Length", Long.toString(props.size()));
 
         // head support
         if ("HEAD".equals(request.method())) {

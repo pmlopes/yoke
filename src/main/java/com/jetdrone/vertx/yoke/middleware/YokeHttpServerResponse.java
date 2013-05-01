@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonArray;
@@ -126,7 +127,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
      * @return The found object
      */
     public <R> R getHeader(String name, R defaultValue) {
-        if (headers().containsKey(name)) {
+        if (headers().contains(name)) {
             return getHeader(name);
         } else {
             return defaultValue;
@@ -229,24 +230,36 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     }
 
     @Override
-    public Map<String, Object> headers() {
+    public MultiMap headers() {
         return response.headers();
     }
 
     @Override
-    public HttpServerResponse putHeader(String name, Object value) {
+    public HttpServerResponse putHeader(String name, String value) {
         response.putHeader(name, value);
         return this;
     }
 
     @Override
-    public Map<String, Object> trailers() {
+    public HttpServerResponse putHeader(String name, Iterable<String> values) {
+        response.putHeader(name, values);
+        return this;
+    }
+
+    @Override
+    public MultiMap trailers() {
         return response.trailers();
     }
 
     @Override
-    public HttpServerResponse putTrailer(String name, Object value) {
+    public HttpServerResponse putTrailer(String name, String value) {
         response.putTrailer(name, value);
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse putTrailer(String name, Iterable<String> values) {
+        response.putTrailer(name, values);
         return this;
     }
 
@@ -342,11 +355,11 @@ public class YokeHttpServerResponse implements HttpServerResponse {
 
     // JavaBean accessors
 
-    public Map<String, Object> getHeaders() {
+    public MultiMap getHeaders() {
         return headers();
     }
 
-    public Map<String, Object> getTrailers() {
+    public MultiMap getTrailers() {
         return trailers();
     }
 
