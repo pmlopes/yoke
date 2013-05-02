@@ -64,8 +64,8 @@ public class ErrorHandler extends Middleware {
     }
 
     private int getErrorCode(Object error) {
-        if (error instanceof Integer) {
-            return (Integer) error;
+        if (error instanceof Number) {
+            return ((Number) error).intValue();
         } else {
             return 500;
         }

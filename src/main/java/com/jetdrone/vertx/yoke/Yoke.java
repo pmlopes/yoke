@@ -256,15 +256,19 @@ public class Yoke implements HttpServerRequestWrapper {
                                 errorHandler.handle(request, null);
                             } else {
                                 HttpServerResponse response = request.response();
-                                // default error code
-                                int errorCode = 500;
+
+                                int errorCode;
                                 // if the error was set on the response use it
                                 if (response.getStatusCode() >= 400) {
                                     errorCode = response.getStatusCode();
-                                }
-                                // if it was set as the error object use it
-                                if (error instanceof Integer) {
-                                    errorCode = (Integer) error;
+                                } else {
+                                    // if it was set as the error object use it
+                                    if (error instanceof Number) {
+                                        errorCode = ((Number) error).intValue();
+                                    } else {
+                                        // default error code
+                                        errorCode = 500;
+                                    }
                                 }
 
                                 response.setStatusCode(errorCode);
