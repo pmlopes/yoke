@@ -22,7 +22,7 @@ public class Session extends TestVerticle {
     public void testSession() {
         final Mac hmac = Utils.newHmacSHA256("keyboard.cat");
         final YokeTester yoke = new YokeTester(vertx);
-        yoke.use(new CookieParser());
+        yoke.use(new CookieParser(hmac));
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Session(hmac));
         yoke.use(new Router() {{
             get("/", new Handler<YokeHttpServerRequest>() {

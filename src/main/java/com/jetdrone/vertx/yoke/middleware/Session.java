@@ -1,16 +1,24 @@
+/*
+ * Copyright 2011-2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.util.Utils;
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.DefaultCookie;
-import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.vertx.java.core.Handler;
 
 import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
 public class Session extends Middleware {
@@ -49,7 +57,7 @@ public class Session extends Middleware {
     @Override
     public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
         // default session
-        final Cookie cookie = new DefaultCookie(name, "");
+        final YokeCookie cookie = new YokeCookie(name, hmacSHA256);
         cookie.setPath(path);
         cookie.setHttpOnly(httpOnly);
         cookie.setMaxAge(maxAge);
@@ -60,21 +68,18 @@ public class Session extends Middleware {
             return;
         }
 
-        // find the raw cookie
-        final Cookie rawCookie = getSessionCookie(request);
+        // find the session cookie
+        final YokeCookie sessionCookie = getSessionCookie(request);
 
         int hash = 0;
 
-        if (rawCookie != null) {
-            String value = rawCookie.getValue();
+        if (sessionCookie != null) {
             // session cookies must be signed
-            if (value.startsWith("s:")) {
-                String unsigned = Utils.unsign(value.substring(2), hmacSHA256);
+            if (sessionCookie.isSigned()) {
+                String unsigned = sessionCookie.getUnsignedValue();
                 if (unsigned != null) {
                     hash = crc16(unsigned);
                     request.setSessionId(unsigned);
-                    // update the response cookie
-                    cookie.setValue(unsigned);
                 }
             }
         }
@@ -90,11 +95,10 @@ public class Session extends Middleware {
 
                 // removed
                 if (sessionId == null) {
-                    if (rawCookie != null) {
+                    if (sessionCookie != null) {
                         cookie.setValue("");
                         cookie.setMaxAge(0);
-                        // TODO: first get and see if it is a Set and add
-                        response.putHeader("set-cookie", ServerCookieEncoder.encode(cookie));
+                        response.addCookie(cookie);
                     }
                 } else {
                     // only send secure cookies over https
@@ -105,10 +109,9 @@ public class Session extends Middleware {
                     // compare hashes, no need to set-cookie if unchanged
                     if (originalHash != crc16(sessionId)) {
                         // modified session
-                        String val = "s:" + Utils.sign(sessionId, hmacSHA256);
-                        cookie.setValue(val);
-                        // TODO: first get and see if it is a Set and add
-                        response.putHeader("set-cookie", ServerCookieEncoder.encode(cookie));
+                        cookie.setValue(sessionId);
+                        cookie.sign();
+                        response.addCookie(cookie);
                     }
                 }
             }
@@ -117,10 +120,10 @@ public class Session extends Middleware {
         next.handle(null);
     }
 
-    private Cookie getSessionCookie(YokeHttpServerRequest request) {
-        Set<Cookie> cookies = request.cookies();
+    private YokeCookie getSessionCookie(YokeHttpServerRequest request) {
+        Set<YokeCookie> cookies = request.cookies();
         if (cookies != null) {
-            for (Cookie c : cookies) {
+            for (YokeCookie c : cookies) {
                 if (name.equals(c.getName())) {
                     return c;
                 }

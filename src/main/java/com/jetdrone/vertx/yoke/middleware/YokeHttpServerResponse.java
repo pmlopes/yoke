@@ -16,7 +16,9 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.ServerCookieEncoder;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -27,9 +29,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class YokeHttpServerResponse implements HttpServerResponse {
     // the original request
@@ -38,6 +38,8 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     private final Map<String, Object> context;
     // engine map
     private final Map<String, Engine> engines;
+    // response cookies
+    private Set<Cookie> cookies;
 
     // extra handlers
     private List<Handler<Void>> headersHandler;
@@ -161,6 +163,14 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         }
     }
 
+    public YokeHttpServerResponse addCookie(Cookie cookie) {
+        if (cookies == null) {
+            cookies = new TreeSet<>();
+        }
+        cookies.add(cookie);
+        return this;
+    }
+
     public void headersHandler(Handler<Void> handler) {
         if (!headersHandlerTriggered) {
             if (headersHandler == null) {
@@ -182,6 +192,10 @@ public class YokeHttpServerResponse implements HttpServerResponse {
             headersHandlerTriggered = true;
             for (Handler<Void> handler : headersHandler) {
                 handler.handle(null);
+            }
+            // convert the cookies set to the right header
+            if (cookies != null) {
+                response.putHeader("set-cookie", ServerCookieEncoder.encode(cookies));
             }
         }
     }

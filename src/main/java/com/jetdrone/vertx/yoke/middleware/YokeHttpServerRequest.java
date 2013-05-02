@@ -49,7 +49,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     private long bodyLengthLimit = -1;
     private Object body;
     private Map<String, FileUpload> files;
-    private Set<Cookie> cookies;
+    private Set<YokeCookie> cookies;
     private String sessionId;
 
     public YokeHttpServerRequest(HttpServerRequest request, YokeHttpServerResponse response, boolean secure, Map<String, Object> context) {
@@ -243,14 +243,14 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     /**
      * Cookies
      */
-    public Set<Cookie> cookies() {
+    public Set<YokeCookie> cookies() {
         return cookies;
     }
 
     /**
      * Cookies
      */
-    void setCookies(Set<Cookie> cookies) {
+    void setCookies(Set<YokeCookie> cookies) {
         this.cookies = cookies;
     }
 
@@ -494,7 +494,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
         return files();
     }
 
-    public Set<Cookie> getCookies() {
+    public Set<YokeCookie> getCookies() {
         return cookies();
     }
 

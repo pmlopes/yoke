@@ -16,30 +16,20 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.util.Utils;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
 import org.vertx.java.core.Handler;
 
 import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class CookieParser extends Middleware {
 
     private final Mac hmacSHA256;
-    // TODO: remove this
-    private final String ignoreName;
 
-    public CookieParser(Mac mac, String ignoreName) {
-        this.hmacSHA256 = mac;
-        this.ignoreName = ignoreName;
-    }
-
-    public CookieParser(Mac mac) {
-        this(mac, "yoke.sess");
+    public CookieParser(Mac hmacSHA256) {
+        this.hmacSHA256 = hmacSHA256;
     }
 
     public CookieParser() {
@@ -51,27 +41,19 @@ public class CookieParser extends Middleware {
         String cookieHeader = request.getHeader("cookie");
 
         if (cookieHeader != null) {
-            Set<Cookie> cookies = CookieDecoder.decode(cookieHeader);
+            Set<Cookie> nettyCookies = CookieDecoder.decode(cookieHeader);
+            Set<YokeCookie> cookies = new TreeSet<>();
 
-            if (hmacSHA256 != null) {
-                for (Cookie cookie : cookies) {
-                    // skip
-                    if (ignoreName != null && ignoreName.equals(cookie.getName())) {
-                        continue;
-                    }
-
-                    String value = cookie.getValue();
-                    if (value != null) {
-                        if (value.startsWith("s:")) {
-                            String unsignedValue = Utils.unsign(value.substring(2), hmacSHA256);
-                            if (unsignedValue == null) {
-                                next.handle(400);
-                                return;
-                            }
-                            cookie.setValue(unsignedValue);
-                        }
-                    }
+            for (Cookie cookie : nettyCookies) {
+                YokeCookie yokeCookie = new YokeCookie(cookie, hmacSHA256);
+                String value = yokeCookie.getUnsignedValue();
+                // value cannot be null in a cookie if the signature is mismatch then this value will be null
+                // in that case the cookie has been tampered
+                if (value == null) {
+                    next.handle(400);
+                    return;
                 }
+                cookies.add(yokeCookie);
             }
 
             request.setCookies(cookies);
