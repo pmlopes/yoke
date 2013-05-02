@@ -12,8 +12,6 @@ router.get('/hello', function (req) {
 yoke.use(function (req, next) {
     next(401);
 });
-// add the EJS render engine
-yoke.engine('ejs', new EJSEngine());
 
 // start server
 yoke.listen(8080);
