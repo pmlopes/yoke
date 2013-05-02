@@ -95,14 +95,23 @@ public class YokeHttpServerResponse implements HttpServerResponse {
             @Override
             public void handle(Object error) {
                 if (error != null) {
-                    if (error instanceof Integer) {
-                        setStatusCode((Integer) error);
-                        setStatusMessage(HttpResponseStatus.valueOf((Integer) error).reasonPhrase());
+                    int errorCode;
+                    // if the error was set on the response use it
+                    if (getStatusCode() >= 400) {
+                        errorCode = getStatusCode();
                     } else {
-                        setStatusCode(500);
-                        setStatusMessage(HttpResponseStatus.valueOf(500).reasonPhrase());
+                        // if it was set as the error object use it
+                        if (error instanceof Number) {
+                            errorCode = ((Number) error).intValue();
+                        } else {
+                            // default error code
+                            errorCode = 500;
+                        }
                     }
-                    end();
+
+                    setStatusCode(errorCode);
+                    setStatusMessage(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
+                    end(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
                 }
             }
         });
