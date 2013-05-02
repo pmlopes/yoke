@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.kitcms;
 
+import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
@@ -25,9 +26,9 @@ public class Db {
             @Override
             public void handle(Message<JsonObject> msg) {
                 if (!"ok".equals(msg.body().getString("status"))) {
-                    handler.handle(new FutureAsyncResult<String>(new Throwable(msg.body().getString("message")), null));
+                    handler.handle(new YokeAsyncResult<String>(new Throwable(msg.body().getString("message")), null));
                 } else {
-                    handler.handle(new FutureAsyncResult<>(null, msg.body().getString("value")));
+                    handler.handle(new YokeAsyncResult<>(null, msg.body().getString("value")));
                 }
             }
         });
@@ -42,9 +43,9 @@ public class Db {
             @Override
             public void handle(Message<JsonObject> msg) {
                 if (!"ok".equals(msg.body().getString("status"))) {
-                    handler.handle(new FutureAsyncResult<Void>(new Throwable(msg.body().getString("message")), null));
+                    handler.handle(new YokeAsyncResult<Void>(new Throwable(msg.body().getString("message")), null));
                 } else {
-                    handler.handle(new FutureAsyncResult<Void>(null, null));
+                    handler.handle(new YokeAsyncResult<Void>(null, null));
                 }
             }
         });
@@ -58,9 +59,9 @@ public class Db {
             @Override
             public void handle(Message<JsonObject> msg) {
                 if (!"ok".equals(msg.body().getString("status"))) {
-                    handler.handle(new FutureAsyncResult<Void>(new Throwable(msg.body().getString("message")), null));
+                    handler.handle(new YokeAsyncResult<Void>(new Throwable(msg.body().getString("message")), null));
                 } else {
-                    handler.handle(new FutureAsyncResult<Void>(null, null));
+                    handler.handle(new YokeAsyncResult<Void>(null, null));
                 }
             }
         });
@@ -74,7 +75,7 @@ public class Db {
             @Override
             public void handle(Message<JsonObject> msg) {
                 if (!"ok".equals(msg.body().getString("status"))) {
-                    handler.handle(new FutureAsyncResult<JsonArray>(new Throwable(msg.body().getString("message")), null));
+                    handler.handle(new YokeAsyncResult<JsonArray>(new Throwable(msg.body().getString("message")), null));
                 } else {
                     JsonArray redisKeys = msg.body().getArray("value");
                     JsonArray keys = new JsonArray();
@@ -84,7 +85,7 @@ public class Db {
                         String key = redisKeys.get(i);
                         keys.add(key.substring(len));
                     }
-                    handler.handle(new FutureAsyncResult<>(null, keys));
+                    handler.handle(new YokeAsyncResult<>(null, keys));
                 }
             }
         });
