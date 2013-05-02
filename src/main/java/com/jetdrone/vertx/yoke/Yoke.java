@@ -221,7 +221,7 @@ public class Yoke implements HttpServerRequestWrapper {
             public void handle(HttpServerRequest req) {
                 // the context map is shared with all middlewares
                 final Map<String, Object> context = new HashMap<>(defaultContext);
-                final YokeHttpServerRequest request = requestWrapper.wrap(req, secure, context, Collections.unmodifiableMap(engineMap));
+                final YokeHttpServerRequest request = requestWrapper.wrap(req, secure, context, engineMap);
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;
