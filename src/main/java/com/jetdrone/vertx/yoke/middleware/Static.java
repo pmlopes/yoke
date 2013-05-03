@@ -33,13 +33,8 @@ import java.util.TimeZone;
 
 public class Static extends Middleware {
 
-    static final SimpleDateFormat ISODATE;
+    private final SimpleDateFormat ISODATE;
     private final String directoryTemplate;
-
-    static {
-        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
-        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
 
     private final String root;
     private final long maxAge;
@@ -55,6 +50,9 @@ public class Static extends Middleware {
         this.includeHidden = includeHidden;
         this.directoryListing = directoryListing;
         this.directoryTemplate = Utils.readResourceToBuffer(getClass(), "directory.html").toString();
+
+        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
+        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     public Static(String root,long maxAge) {
