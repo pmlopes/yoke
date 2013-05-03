@@ -101,3 +101,5 @@ def configurePom(def pom) {
     }
   }
 }
+
+[compileJava]*.options*.compilerArgs = ['-Xlint:all']

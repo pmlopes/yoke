@@ -30,5 +30,5 @@ public interface HttpServerRequestWrapper {
      * @param engines the current list of render engines (this is an unmodifiable map)
      * @return an Implementation of YokeHttpServerRequest
      */
-    YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines);
+    YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines);
 }

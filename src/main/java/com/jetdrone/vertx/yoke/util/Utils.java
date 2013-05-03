@@ -63,7 +63,7 @@ public final class Utils {
     /**
      * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
      */
-    public static Buffer readResourceToBuffer(Class clazz, String resource) {
+    public static Buffer readResourceToBuffer(Class<?> clazz, String resource) {
         try {
             Buffer buffer = new Buffer(0);
 

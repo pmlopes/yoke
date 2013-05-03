@@ -42,7 +42,7 @@ public class Yoke implements HttpServerRequestWrapper {
     private final Vertx vertx;
 
     private final Map<String, Object> defaultContext = new HashMap<>();
-    private final Map<String, Engine> engineMap = new HashMap<>();
+    private final Map<String, Engine<?>> engineMap = new HashMap<>();
     // the request wrapper in use
     private final HttpServerRequestWrapper requestWrapper;
 
@@ -151,7 +151,7 @@ public class Yoke implements HttpServerRequestWrapper {
      * @param extension The file extension for this template engine e.g.: .jsp
      * @param engine The implementation of the engine
      */
-    public Yoke engine(String extension, Engine engine) {
+    public Yoke engine(String extension, Engine<?> engine) {
         engine.setVertx(vertx);
         engineMap.put(extension, engine);
         return this;
@@ -203,7 +203,7 @@ public class Yoke implements HttpServerRequestWrapper {
      * Default implementation of the request wrapper
      */
     @Override
-    public YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines) {
+    public YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
         YokeHttpServerResponse response = new YokeHttpServerResponse(request.response(), context, engines);
         return new YokeHttpServerRequest(request, response, secure, context);
     }

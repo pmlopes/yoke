@@ -1,6 +1,6 @@
-var Yoke = require('com/jetdrone/vertx/yoke/Yoke');
-var Router = require('com/jetdrone/vertx/yoke/middleware/Router');
-var EJSEngine = require('com/jetdrone/vertx/yoke/engine/EJSEngine');
+var Yoke = require('yokejs/Yoke');
+var Router = require('yokejs/middleware/Router');
+var EJSEngine = require('yokejs/engine/EJSEngine');
 
 var yoke = new Yoke();
 var router = new Router();

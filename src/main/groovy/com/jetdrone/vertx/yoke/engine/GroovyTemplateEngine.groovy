@@ -25,37 +25,36 @@ import org.codehaus.groovy.control.CompilationFailedException
 import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.core.Handler
-import org.vertx.java.core.buffer.Buffer
 
 @CompileStatic public class GroovyTemplateEngine extends Engine {
 
     private TemplateEngine engine = new SimpleTemplateEngine()
 
     @Override
-    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
+    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> next) {
         // verify if the file is still fresh in the cache
         isFresh(filename, new Handler<Boolean>() {
             @Override
             public void handle(Boolean fresh) {
                 if (fresh) {
                     try {
-                        Buffer result = internalRender(compile(filename), context)
-                        next.handle(new YokeAsyncResult<Buffer>(null, result))
+                        String result = internalRender(compile(filename), context)
+                        next.handle(new YokeAsyncResult<String>(null, result))
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
-                        next.handle(new YokeAsyncResult<Buffer>(ex))
+                        next.handle(new YokeAsyncResult<String>(ex))
                     }
                 } else {
-                    load(filename, new AsyncResultHandler<Buffer>() {
+                    load(filename, new AsyncResultHandler<String>() {
                         @Override
-                        public void handle(final AsyncResult<Buffer> asyncResult) {
+                        public void handle(final AsyncResult<String> asyncResult) {
                             if (asyncResult.failed()) {
-                                next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                                next.handle(asyncResult)
                             } else {
                                 try {
-                                    Buffer result = internalRender(compile(filename), context)
-                                    next.handle(new YokeAsyncResult<Buffer>(null, result))
+                                    String result = internalRender(compile(filename), context)
+                                    next.handle(new YokeAsyncResult<String>(null, result))
                                 } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
-                                    next.handle(new YokeAsyncResult<Buffer>(ex))
+                                    next.handle(new YokeAsyncResult<String>(ex))
                                 }
                             }
                         }
@@ -70,20 +69,20 @@ import org.vertx.java.core.buffer.Buffer
 
         if (template == null) {
             // real compile
-            template = engine.createTemplate(getFileFromCache(filename).toString())
+            template = engine.createTemplate(getFileFromCache(filename))
             putTemplateToCache(filename, template)
         }
 
         return template
     }
 
-    private static Buffer internalRender(Template template, final Map<String, Object> context) {
-        final Buffer buffer = new Buffer(0)
+    private static String internalRender(Template template, final Map<String, Object> context) {
+        final StringBuilder buffer = new StringBuilder()
 
         template.make(context).writeTo(new Writer() {
             @Override
             void write(char[] cbuf, int off, int len) throws IOException {
-                buffer.appendString(new String(cbuf, off, len))
+                buffer.append(cbuf, off, len)
             }
 
             @Override
@@ -97,6 +96,6 @@ import org.vertx.java.core.buffer.Buffer
             }
         })
 
-        return buffer
+        return buffer.toString()
     }
 }

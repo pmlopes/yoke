@@ -48,30 +48,30 @@ public class StringPlaceholderEngine extends Engine<String> {
      * ignored.
      */
     @Override
-    public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
+    public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<String>> handler) {
         // verify if the file is still fresh in the cache
         isFresh(file, new Handler<Boolean>() {
             @Override
             public void handle(Boolean fresh) {
                 if (fresh) {
-                    String template = getFileFromCache(file).toString();
+                    String template = getFileFromCache(file);
                     try {
-                        handler.handle(new YokeAsyncResult<>(new Buffer(parseStringValue(template, context, new HashSet<String>()))));
+                        handler.handle(new YokeAsyncResult<>(parseStringValue(template, context, new HashSet<String>())));
                     } catch (IllegalArgumentException iae) {
-                        handler.handle(new YokeAsyncResult<Buffer>(iae));
+                        handler.handle(new YokeAsyncResult<String>(iae));
                     }
                 } else {
-                    load(file, new AsyncResultHandler<Buffer>() {
+                    load(file, new AsyncResultHandler<String>() {
                         @Override
-                        public void handle(final AsyncResult<Buffer> asyncResult) {
+                        public void handle(final AsyncResult<String> asyncResult) {
                             if (asyncResult.failed()) {
-                                handler.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                                handler.handle(asyncResult);
                             } else {
-                                String template = asyncResult.result().toString();
+                                String template = asyncResult.result();
                                 try {
-                                    handler.handle(new YokeAsyncResult<>(new Buffer(parseStringValue(template, context, new HashSet<String>()))));
+                                    handler.handle(new YokeAsyncResult<>(parseStringValue(template, context, new HashSet<String>())));
                                 } catch (IllegalArgumentException iae) {
-                                    handler.handle(new YokeAsyncResult<Buffer>(iae));
+                                    handler.handle(new YokeAsyncResult<String>(iae));
                                 }
                             }
                         }
@@ -81,8 +81,7 @@ public class StringPlaceholderEngine extends Engine<String> {
         });
     }
 
-    private static String parseStringValue(String template, Map<String, Object> context,
-                                           Set<String> visitedPlaceholders) {
+    private static String parseStringValue(String template, Map<String, Object> context, Set<String> visitedPlaceholders) {
         StringBuilder buf = new StringBuilder(template);
 
         int startIndex = template.indexOf(placeholderPrefix);

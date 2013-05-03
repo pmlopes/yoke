@@ -38,7 +38,7 @@ public abstract class Engine<T> {
     protected Vertx vertx;
     private String contentType = "text/html;charset=UTF-8";
 
-    private final LRUCache<Buffer, T> cache = new LRUCache<>(1024);
+    private final LRUCache<String, T> cache = new LRUCache<>(1024);
 
     protected void setVertx(Vertx vertx) {
         this.vertx = vertx;
@@ -82,7 +82,7 @@ public abstract class Engine<T> {
                 if (asyncResult.failed()) {
                     next.handle(false);
                 } else {
-                    LRUCache.CacheEntry<Buffer, T> cacheEntry = cache.get(filename);
+                    LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
                     final Date lastModified = asyncResult.result().lastModifiedTime();
 
                     if (cacheEntry == null) {
@@ -101,14 +101,14 @@ public abstract class Engine<T> {
         });
     }
 
-    public void load(final String filename, final Handler<AsyncResult<Buffer>> next) {
+    public void load(final String filename, final Handler<AsyncResult<String>> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
         fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
             @Override
             public void handle(AsyncResult<FileProps> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                    next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
                 } else {
                     final Date lastModified = asyncResult.result().lastModifiedTime();
                     // load from the file system
@@ -116,12 +116,12 @@ public abstract class Engine<T> {
                         @Override
                         public void handle(AsyncResult<Buffer> asyncResult) {
                             if (asyncResult.failed()) {
-                                next.handle(asyncResult);
+                                next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
                             } else {
                                 // cache the result
-                                Buffer result = asyncResult.result();
-                                cache.put(filename, new LRUCache.CacheEntry<Buffer, T>(lastModified, result));
-                                next.handle(asyncResult);
+                                String result = asyncResult.result().toString();
+                                cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, result));
+                                next.handle(new YokeAsyncResult<String>(null, result));
                             }
                         }
                     });
@@ -133,7 +133,7 @@ public abstract class Engine<T> {
     /**
      * Gets the content of the file from cache this is a synchronous operation since there is no blocking or I/O
      */
-    public Buffer getFileFromCache(String filename) {
+    public String getFileFromCache(String filename) {
         return cache.get(filename).raw;
     }
 
@@ -165,5 +165,5 @@ public abstract class Engine<T> {
      * @param context - Map with key values that might get substituted in the template
      * @param handler - The future result handler with a Buffer in case of success
      */
-    public abstract void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler);
+    public abstract void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> handler);
 }

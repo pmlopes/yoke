@@ -37,7 +37,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     // the context
     private final Map<String, Object> context;
     // engine map
-    private final Map<String, Engine> engines;
+    private final Map<String, Engine<?>> engines;
     // response cookies
     private Set<Cookie> cookies;
 
@@ -46,7 +46,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
-    public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
+    public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
         this.response = response;
         this.context = context;
         this.engines = engines;
@@ -59,7 +59,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         if (sep != -1) {
             String extension = template.substring(sep + 1);
 
-            final Engine renderEngine = engines.get(extension);
+            final Engine<?> renderEngine = engines.get(extension);
 
             if (renderEngine == null) {
                 next.handle("No engine registered for extension: " + extension);
@@ -70,9 +70,9 @@ public class YokeHttpServerResponse implements HttpServerResponse {
                         if (!exists) {
                             next.handle(404);
                         } else {
-                            renderEngine.render(template, context, new AsyncResultHandler<Buffer>() {
+                            renderEngine.render(template, context, new AsyncResultHandler<String>() {
                                 @Override
-                                public void handle(AsyncResult<Buffer> asyncResult) {
+                                public void handle(AsyncResult<String> asyncResult) {
                                     if (asyncResult.failed()) {
                                         next.handle(asyncResult.cause());
                                     } else {

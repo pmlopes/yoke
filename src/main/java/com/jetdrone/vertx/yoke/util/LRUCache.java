@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public class LRUCache<R, C> extends LinkedHashMap<String, LRUCache.CacheEntry<R, C>> {
 
+    private static final long serialVersionUID = 1l;
+
     /**
      * Generic cache entry.
      */
