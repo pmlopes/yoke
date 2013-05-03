@@ -15,6 +15,7 @@
  */
 package com.jetdrone.vertx.yoke;
 
+import com.jetdrone.vertx.yoke.util.LRUCache;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -25,7 +26,6 @@ import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -37,6 +37,8 @@ public abstract class Engine<T> {
 
     protected Vertx vertx;
     private String contentType = "text/html;charset=UTF-8";
+
+    private final LRUCache<Buffer, T> cache = new LRUCache<>(1024);
 
     protected void setVertx(Vertx vertx) {
         this.vertx = vertx;
@@ -50,51 +52,10 @@ public abstract class Engine<T> {
         return contentType;
     }
 
-    /**
-     * Generic cache entry.
-     * @param <T>
-     */
-    public static class FileCacheEntry<T> {
-
-        public final long lastModified;
-        public final T body;
-
-        FileCacheEntry(Date lastModified, T body) {
-            this.lastModified = lastModified.getTime();
-            this.body = body;
-        }
-
-        public boolean isFresh(Date newDate) {
-            return newDate.getTime() <= lastModified;
-        }
-    }
-
-    private class LruCache<T> extends LinkedHashMap<String, FileCacheEntry<T>> {
-        private final int maxEntries;
-
-        public LruCache(final int maxEntries) {
-            super(maxEntries + 1, 1.0f, true);
-            this.maxEntries = maxEntries;
-        }
-
-        @Override
-        protected boolean removeEldestEntry(final Map.Entry<String, FileCacheEntry<T>> eldest) {
-            return super.size() > maxEntries;
-        }
-    }
-
-    private final LruCache<T> cache = new LruCache<>(1024);
-
-    /**
-     * Verifies if a file exists in the file system, exceptions are handled as not exists
-     *
-     * @param file File to look for
-     * @param next next asynchronous handler
-     */
-    public void exists(final String file, final Handler<Boolean> next) {
+    public void exists(String filename, final Handler<Boolean> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
-        fileSystem.exists(file, new AsyncResultHandler<Boolean>() {
+        fileSystem.exists(filename, new AsyncResultHandler<Boolean>() {
             @Override
             public void handle(AsyncResult<Boolean> asyncResult) {
                 if (asyncResult.failed()) {
@@ -107,69 +68,102 @@ public abstract class Engine<T> {
     }
 
     /**
-     * Loads a file from the filesystem into a string.
+     * Verifies if a file in the filesystem is still fresh against the cache. Errors are treated as not fresh.
      *
-     * @param file File to load
-     * @param next asynchronous handler
+     * @param filename File to look for
+     * @param next next asynchronous handler
      */
-    public void loadTemplate(final String file, final AsyncResultHandler<T> next) {
+    public void isFresh(final String filename, final Handler<Boolean> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
-        fileSystem.props(file, new AsyncResultHandler<FileProps>() {
+        fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
             @Override
             public void handle(AsyncResult<FileProps> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<T>(asyncResult.cause()));
+                    next.handle(false);
                 } else {
-                    FileCacheEntry<T> cacheEntry = cache.get(file);
+                    LRUCache.CacheEntry<Buffer, T> cacheEntry = cache.get(filename);
                     final Date lastModified = asyncResult.result().lastModifiedTime();
 
-                    if (cacheEntry != null && cacheEntry.isFresh(lastModified)) {
-                        next.handle(new YokeAsyncResult<>(cacheEntry.body));
+                    if (cacheEntry == null) {
+                        next.handle(false);
                     } else {
-                        // purge the cache
-                        cache.remove(file);
-                        // load from the file system
-                        fileSystem.readFile(file, new AsyncResultHandler<Buffer>() {
-                            @Override
-                            public void handle(AsyncResult<Buffer> asyncResult) {
-                                if (asyncResult.failed()) {
-                                    next.handle(new YokeAsyncResult<T>(asyncResult.cause()));
-                                } else {
-                                    compile(asyncResult.result().toString(), new AsyncResultHandler<T>() {
-                                        @Override
-                                        public void handle(AsyncResult<T> asyncResult) {
-                                            if (asyncResult.succeeded()) {
-                                                // save to the cache
-                                                cache.put(file, new FileCacheEntry<>(lastModified, asyncResult.result()));
-                                                next.handle(new YokeAsyncResult<>(asyncResult.result()));
-                                            } else {
-                                                next.handle(new YokeAsyncResult<T>(asyncResult.cause()));
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
+                        if (cacheEntry.isFresh(lastModified)) {
+                            next.handle(true);
+                        } else {
+                            // not fresh anymore, purge it
+                            cache.remove(filename);
+                            next.handle(false);
+                        }
                     }
                 }
             }
         });
     }
 
+    public void load(final String filename, final Handler<AsyncResult<Buffer>> next) {
+        final FileSystem fileSystem = vertx.fileSystem();
+
+        fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
+            @Override
+            public void handle(AsyncResult<FileProps> asyncResult) {
+                if (asyncResult.failed()) {
+                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                } else {
+                    final Date lastModified = asyncResult.result().lastModifiedTime();
+                    // load from the file system
+                    fileSystem.readFile(filename, new AsyncResultHandler<Buffer>() {
+                        @Override
+                        public void handle(AsyncResult<Buffer> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(asyncResult);
+                            } else {
+                                // cache the result
+                                Buffer result = asyncResult.result();
+                                cache.put(filename, new LRUCache.CacheEntry<Buffer, T>(lastModified, result));
+                                next.handle(asyncResult);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     /**
-     * Required method to implement. Compile the template so it can be cached.
-     * @param buffer a string containing the whole content of the file
-     * @param handler The asynchronous result handler
+     * Gets the content of the file from cache this is a synchronous operation since there is no blocking or I/O
      */
-    public abstract void compile(final String buffer, final AsyncResultHandler<T> handler);
+    public Buffer getFileFromCache(String filename) {
+        return cache.get(filename).raw;
+    }
+
+    /**
+     * Gets the compiled value from cache this is a synchronous operation since there is no blocking or I/O
+     */
+    public T getTemplateFromCache(String filename) {
+        return cache.get(filename).compiled;
+    }
+
+    /**
+     * Gets the compiled value from cache this is a synchronous operation since there is no blocking or I/O
+     */
+    public void putTemplateToCache(String filename, T template) {
+        cache.putCompiled(filename, template);
+    }
+
+    /**
+     * Removes an entry from cache
+     */
+    public void removeFromCache(String filename) {
+        cache.remove(filename);
+    }
 
     /**
      * The required to implement method.
      *
-     * @param template - String representing the file path to the template
+     * @param filename - String representing the file path to the template
      * @param context - Map with key values that might get substituted in the template
-     * @param asyncResultHandler - The future result handler with a Buffer in case of success
+     * @param handler - The future result handler with a Buffer in case of success
      */
-    public abstract void render(final String template, final Map<String, Object> context, final AsyncResultHandler<Buffer> asyncResultHandler);
+    public abstract void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler);
 }

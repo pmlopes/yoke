@@ -20,59 +20,83 @@ import com.jetdrone.vertx.yoke.util.YokeAsyncResult
 import groovy.text.SimpleTemplateEngine
 import groovy.text.Template
 import groovy.text.TemplateEngine
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.AsyncResultHandler
+import org.vertx.java.core.Handler
 import org.vertx.java.core.buffer.Buffer
 
-public class GroovyTemplateEngine extends Engine<Template> {
+@CompileStatic public class GroovyTemplateEngine extends Engine {
 
     private TemplateEngine engine = new SimpleTemplateEngine()
 
     @Override
-    void compile(String buffer, AsyncResultHandler<Template> handler) {
-        try {
-            handler.handle(new YokeAsyncResult<Template>(engine.createTemplate(buffer)))
-        } catch (CompilationFailedException | ClassNotFoundException | IOException ex) {
-            handler.handle(new YokeAsyncResult<Template>(ex))
-        }
-    }
-
-    @Override
-    public void render(final String file, final Map<String, Object> context, final AsyncResultHandler<Buffer> next) {
-        loadTemplate(file, new AsyncResultHandler<Template>() {
+    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
+        // verify if the file is still fresh in the cache
+        isFresh(filename, new Handler<Boolean>() {
             @Override
-            public void handle(AsyncResult<Template> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()))
-                } else {
+            public void handle(Boolean fresh) {
+                if (fresh) {
                     try {
-                        final Buffer buffer = new Buffer(0)
-
-                        asyncResult.result().make(context).writeTo(new Writer() {
-                            @Override
-                            void write(char[] cbuf, int off, int len) throws IOException {
-                                buffer.appendString(new String(cbuf, off, len))
-                            }
-
-                            @Override
-                            void flush() throws IOException {
-                                // noop
-                            }
-
-                            @Override
-                            void close() throws IOException {
-                                // noop
-                            }
-                        })
-
-                        next.handle(new YokeAsyncResult<Buffer>(buffer))
-
+                        Buffer result = internalRender(compile(filename), context)
+                        next.handle(new YokeAsyncResult<Buffer>(null, result))
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
                         next.handle(new YokeAsyncResult<Buffer>(ex))
                     }
+                } else {
+                    load(filename, new AsyncResultHandler<Buffer>() {
+                        @Override
+                        public void handle(final AsyncResult<Buffer> asyncResult) {
+                            if (asyncResult.failed()) {
+                                next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                            } else {
+                                try {
+                                    Buffer result = internalRender(compile(filename), context)
+                                    next.handle(new YokeAsyncResult<Buffer>(null, result))
+                                } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
+                                    next.handle(new YokeAsyncResult<Buffer>(ex))
+                                }
+                            }
+                        }
+                    });
                 }
             }
         });
+    }
+
+    private Template compile(String filename) {
+        Template template = (Template) getTemplateFromCache(filename)
+
+        if (template == null) {
+            // real compile
+            template = engine.createTemplate(getFileFromCache(filename).toString())
+            putTemplateToCache(filename, template)
+        }
+
+        return template
+    }
+
+    private static Buffer internalRender(Template template, final Map<String, Object> context) {
+        final Buffer buffer = new Buffer(0)
+
+        template.make(context).writeTo(new Writer() {
+            @Override
+            void write(char[] cbuf, int off, int len) throws IOException {
+                buffer.appendString(new String(cbuf, off, len))
+            }
+
+            @Override
+            void flush() throws IOException {
+                // noop
+            }
+
+            @Override
+            void close() throws IOException {
+                // noop
+            }
+        })
+
+        return buffer
     }
 }

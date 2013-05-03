@@ -19,6 +19,7 @@ import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.util.*;
@@ -47,30 +48,37 @@ public class StringPlaceholderEngine extends Engine<String> {
      * ignored.
      */
     @Override
-    public void render(final String template, final Map<String, Object> context, final AsyncResultHandler<Buffer> next) {
-        // load the template from the filesystem
-        loadTemplate(template, new AsyncResultHandler<String>() {
+    public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
+        // verify if the file is still fresh in the cache
+        isFresh(file, new Handler<Boolean>() {
             @Override
-            public void handle(AsyncResult<String> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
-                } else {
+            public void handle(Boolean fresh) {
+                if (fresh) {
+                    String template = getFileFromCache(file).toString();
                     try {
-                        next.handle(new YokeAsyncResult<>(new Buffer(parseStringValue(asyncResult.result(), context, new HashSet<String>()))));
+                        handler.handle(new YokeAsyncResult<>(new Buffer(parseStringValue(template, context, new HashSet<String>()))));
                     } catch (IllegalArgumentException iae) {
-                        next.handle(new YokeAsyncResult<Buffer>(iae));
+                        handler.handle(new YokeAsyncResult<Buffer>(iae));
                     }
+                } else {
+                    load(file, new AsyncResultHandler<Buffer>() {
+                        @Override
+                        public void handle(final AsyncResult<Buffer> asyncResult) {
+                            if (asyncResult.failed()) {
+                                handler.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                            } else {
+                                String template = asyncResult.result().toString();
+                                try {
+                                    handler.handle(new YokeAsyncResult<>(new Buffer(parseStringValue(template, context, new HashSet<String>()))));
+                                } catch (IllegalArgumentException iae) {
+                                    handler.handle(new YokeAsyncResult<Buffer>(iae));
+                                }
+                            }
+                        }
+                    });
                 }
             }
         });
-    }
-
-    /**
-     * This is a simple engine there is no compilation step
-     */
-    @Override
-    public void compile(String buffer, AsyncResultHandler<String> handler) {
-        handler.handle(new YokeAsyncResult<>(buffer));
     }
 
     private static String parseStringValue(String template, Map<String, Object> context,
