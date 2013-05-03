@@ -15,14 +15,13 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.HttpVersion;
 import org.vertx.java.core.http.impl.DefaultHttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
 
@@ -280,8 +279,9 @@ public class YokeHttpServerRequest implements HttpServerRequest {
         return null;
     }
 
-    public HttpVersion protocolVersion() {
-        return nettyRequest().getProtocolVersion();
+    @Override
+    public HttpVersion version() {
+        return request.version();
     }
 
     /**
@@ -506,7 +506,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
         return nettyRequest();
     }
 
-    public HttpVersion getProtocolVersion() {
-        return protocolVersion();
+    public HttpVersion getVersion() {
+        return version();
     }
 }

@@ -19,10 +19,7 @@ import com.jetdrone.vertx.yoke.Yoke;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.vertx.java.core.*;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.http.ServerWebSocket;
+import org.vertx.java.core.http.*;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -66,6 +63,11 @@ public class YokeTester extends Yoke {
             fakeServer.requestHandler().handle(new HttpServerRequest() {
 
                 MultiMap params = null;
+
+                @Override
+                public HttpVersion version() {
+                    return HttpVersion.HTTP_1_1;
+                }
 
                 @Override
                 public String method() {

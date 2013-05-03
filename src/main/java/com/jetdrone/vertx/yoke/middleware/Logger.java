@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.http.HttpVersion;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,12 +25,7 @@ import java.util.TimeZone;
 
 public class Logger extends Middleware {
 
-    static final SimpleDateFormat ISODATE;
-
-    static {
-        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
-        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
-    }
+    private final SimpleDateFormat ISODATE;
 
     public enum Format {
         DEFAULT,
@@ -45,6 +41,9 @@ public class Logger extends Middleware {
         this.immediate = immediate;
         this.format = format;
         this.logger = logger;
+
+        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
+        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     public Logger(Format format, org.vertx.java.core.logging.Logger logger) {
@@ -55,6 +54,15 @@ public class Logger extends Middleware {
         this(false, Format.DEFAULT, logger);
     }
 
+    private String getVersionString(HttpVersion version) {
+        switch (version) {
+            case HTTP_1_1:
+                return "HTTP/1.1";
+            case HTTP_1_0:
+                return "HTTP/1.0";
+        }
+        return null;
+    }
 
     private void log(YokeHttpServerRequest request, long start) {
         int contentLength = 0;
@@ -83,7 +91,7 @@ public class Logger extends Middleware {
                         ISODATE.format(new Date(start)),
                         request.method(),
                         request.uri(),
-                        request.protocolVersion(),
+                        getVersionString(request.version()),
                         status,
                         contentLength,
                         referrer,
@@ -94,7 +102,7 @@ public class Logger extends Middleware {
                         request.remoteAddress().getHostString(),
                         request.method(),
                         request.uri(),
-                        request.protocolVersion(),
+                        getVersionString(request.version()),
                         status,
                         contentLength,
                         (System.currentTimeMillis() - start));
