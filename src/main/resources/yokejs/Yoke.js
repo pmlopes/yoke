@@ -29,6 +29,9 @@ JSYoke.prototype.use = function (route, callback) {
     if (callback instanceof com.jetdrone.vertx.yoke.Middleware) {
         // in this case pass it directly to the jYoke
         this.jYoke.use(route, callback);
+    } else if (typeof callback === 'object' && callback.jMiddleware !== undefined) {
+        // this is a special case when base middleware (Java) is extended to be more fluent with JavaScript
+        this.jYoke.use(route, callback.jMiddleware);
     } else if (typeof callback === 'function') {
         // wrap the function into a Middleware Java class
         var middleware = {
