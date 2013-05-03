@@ -121,7 +121,7 @@ public abstract class Engine<T> {
                                 // cache the result
                                 String result = asyncResult.result().toString();
                                 cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, result));
-                                next.handle(new YokeAsyncResult<String>(null, result));
+                                next.handle(new YokeAsyncResult<>(result));
                             }
                         }
                     });

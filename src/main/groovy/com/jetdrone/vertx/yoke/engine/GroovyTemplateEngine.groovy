@@ -39,7 +39,7 @@ import org.vertx.java.core.Handler
                 if (fresh) {
                     try {
                         String result = internalRender(compile(filename), context)
-                        next.handle(new YokeAsyncResult<String>(null, result))
+                        next.handle(new YokeAsyncResult<String>(result))
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
                         next.handle(new YokeAsyncResult<String>(ex))
                     }
@@ -52,7 +52,7 @@ import org.vertx.java.core.Handler
                             } else {
                                 try {
                                     String result = internalRender(compile(filename), context)
-                                    next.handle(new YokeAsyncResult<String>(null, result))
+                                    next.handle(new YokeAsyncResult<String>(result))
                                 } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
                                     next.handle(new YokeAsyncResult<String>(ex))
                                 }

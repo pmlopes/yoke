@@ -26,17 +26,33 @@ function wrapAsyncResult(ex, result) {
     return new com.jetdrone.vertx.yoke.util.YokeAsyncResult(ex, result);
 }
 
+function wrapMap(map) {
+    var result = null;
+
+    if (map !== null) {
+        var it = map.entrySet().iterator();
+        result = {};
+        while (it.hasNext()) {
+            var item = it.next();
+            result[item.getKey()] = item.getValue();
+        }
+    }
+
+    return result;
+}
+
 // real engine
 
-function EJSEngine() {
+function MicroTemplateEngine() {
     var self = this;
     this.jEngine = new com.jetdrone.vertx.yoke.Engine({
         render: function (filename, context, handler) {
             self.jEngine.isFresh(filename, wrapHandler(function (fresh) {
                 if (fresh) {
                     var template = self.jEngine.getFileFromCache(filename);
+
                     try {
-                        handler.handle(wrapAsyncResult(null, template));
+                        handler.handle(wrapAsyncResult(null, self.render(template, wrapMap(context))));
                     } catch (e) {
                         handler.handle(wrapAsyncResult(e, null));
                     }
@@ -46,8 +62,9 @@ function EJSEngine() {
                             handler.handle(wrapAsyncResult(asyncResult.cause()));
                         } else {
                             var template = asyncResult.result();
+
                             try {
-                                handler.handle(wrapAsyncResult(null, template));
+                                handler.handle(wrapAsyncResult(null, self.render(template, wrapMap(context))));
                             } catch (e) {
                                 handler.handle(wrapAsyncResult(e, null));
                             }
@@ -59,4 +76,27 @@ function EJSEngine() {
     });
 }
 
-module.exports = EJSEngine;
+MicroTemplateEngine.prototype.render = function (str, data) {
+    // compile the template to a JS function
+    var fn = new Function("obj",
+            "var p=[],print=function(){p.push.apply(p,arguments);};" +
+
+                // Introduce the data as local variables using with(){}
+                "with(obj){p.push('" +
+
+                // Convert the template into pure JavaScript
+                str
+                    .replace(/[\r\t\n]/g, " ")
+                    .split("<%").join("\t")
+                    .replace(/((^|%>)[^\t]*)'/g, "$1\r")
+                    .replace(/\t=(.*?)%>/g, "',$1,'")
+                    .split("\t").join("');")
+                    .split("%>").join("p.push('")
+                    .split("\r").join("\\'")
+                + "');}return p.join('');");
+
+    // Provide some basic currying to the user
+    return fn(data);
+};
+
+module.exports = MicroTemplateEngine;

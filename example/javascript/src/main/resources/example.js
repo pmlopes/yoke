@@ -1,13 +1,14 @@
 var Yoke = require('yokejs/Yoke');
 var Router = require('yokejs/middleware/Router');
-var EJSEngine = require('yokejs/engine/EJSEngine');
+var MicroTemplateEngine = require('yokejs/engine/MicroTemplateEngine');
 
 var yoke = new Yoke();
 var router = new Router();
 
 yoke.use(router);
 router.get('/hello', function (req) {
-    req.response().render('/home/plopes/Projects/oss/yoke/example/javascript/src/main/resources/template.ejs');
+    req.put('name', 'World');
+    req.response().render('/home/plopes/Projects/oss/yoke/example/javascript/src/main/resources/template.html');
 });
 // all other resources are forbidden
 yoke.use(function (req, next) {
@@ -15,7 +16,7 @@ yoke.use(function (req, next) {
 });
 
 // engines
-yoke.engine('ejs', new EJSEngine());
+yoke.engine('html', new MicroTemplateEngine());
 
 // start server
 yoke.listen(8080);

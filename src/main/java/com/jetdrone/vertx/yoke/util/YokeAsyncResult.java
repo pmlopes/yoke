@@ -6,8 +6,19 @@ public class YokeAsyncResult<T> implements AsyncResult<T> {
     final Throwable throwable;
     final T result;
 
-    public YokeAsyncResult(Throwable throwable, T result) {
-        this.throwable = throwable;
+    /**
+     * Used from scripting engines
+     */
+    public YokeAsyncResult(Object error, T result) {
+        if (error != null) {
+            if (error instanceof Throwable) {
+                this.throwable = (Throwable) error;
+            } else {
+                this.throwable = new Throwable(error.toString());
+            }
+        } else {
+            this.throwable = null;
+        }
         this.result = result;
     }
 
