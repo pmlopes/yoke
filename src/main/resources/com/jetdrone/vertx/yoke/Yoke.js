@@ -26,12 +26,12 @@ JSYoke.prototype.use = function (route, callback) {
     }
 
     // verify if the callback is already a middleware instance
-    if (callback.jMiddleware !== undefined) {
+    if (callback instanceof com.jetdrone.vertx.yoke.Middleware) {
         // in this case pass it directly to the jYoke
-        this.jYoke.use(route, callback.jMiddleware);
-    } else {
-        // enclose the callback inside a wrapped Middleware
-        this.jYoke.use(route, new com.jetdrone.vertx.yoke.Middleware({
+        this.jYoke.use(route, callback);
+    } else if (typeof callback === 'function') {
+        // wrap the function into a Middleware Java class
+        var middleware = {
             handle: function (request, next) {
                 callback(request, function (error) {
                     if (error === undefined) {
@@ -41,7 +41,10 @@ JSYoke.prototype.use = function (route, callback) {
                     }
                 });
             }
-        }));
+        };
+        this.jYoke.use(route, new com.jetdrone.vertx.yoke.Middleware(middleware));
+    } else {
+        throw new Error('callback should be a javascript function or Middleware java class');
     }
 
     return this;
