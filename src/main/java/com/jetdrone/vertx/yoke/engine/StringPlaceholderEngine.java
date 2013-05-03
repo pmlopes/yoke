@@ -18,9 +18,7 @@ package com.jetdrone.vertx.yoke.engine;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
 
 import java.util.*;
 
@@ -61,13 +59,13 @@ public class StringPlaceholderEngine extends Engine<String> {
                         handler.handle(new YokeAsyncResult<String>(iae));
                     }
                 } else {
-                    load(file, new AsyncResultHandler<String>() {
+                    loadToCache(file, new Handler<Throwable>() {
                         @Override
-                        public void handle(final AsyncResult<String> asyncResult) {
-                            if (asyncResult.failed()) {
-                                handler.handle(asyncResult);
+                        public void handle(final Throwable throwable) {
+                            if (throwable != null) {
+                                handler.handle(new YokeAsyncResult<String>(throwable));
                             } else {
-                                String template = asyncResult.result();
+                                String template = getFileFromCache(file);
                                 try {
                                     handler.handle(new YokeAsyncResult<>(parseStringValue(template, context, new HashSet<String>())));
                                 } catch (IllegalArgumentException iae) {

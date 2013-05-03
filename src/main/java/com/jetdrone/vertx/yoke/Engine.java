@@ -101,14 +101,14 @@ public abstract class Engine<T> {
         });
     }
 
-    public void load(final String filename, final Handler<AsyncResult<String>> next) {
+    public void loadToCache(final String filename, final Handler<Throwable> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
         fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
             @Override
             public void handle(AsyncResult<FileProps> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                    next.handle(asyncResult.cause());
                 } else {
                     final Date lastModified = asyncResult.result().lastModifiedTime();
                     // load from the file system
@@ -116,12 +116,12 @@ public abstract class Engine<T> {
                         @Override
                         public void handle(AsyncResult<Buffer> asyncResult) {
                             if (asyncResult.failed()) {
-                                next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                                next.handle(asyncResult.cause());
                             } else {
                                 // cache the result
                                 String result = asyncResult.result().toString();
                                 cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, result));
-                                next.handle(new YokeAsyncResult<>(result));
+                                next.handle(null);
                             }
                         }
                     });

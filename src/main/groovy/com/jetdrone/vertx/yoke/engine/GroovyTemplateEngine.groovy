@@ -23,7 +23,6 @@ import groovy.text.TemplateEngine
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.vertx.java.core.AsyncResult
-import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.core.Handler
 
 @CompileStatic public class GroovyTemplateEngine extends Engine {
@@ -44,11 +43,11 @@ import org.vertx.java.core.Handler
                         next.handle(new YokeAsyncResult<String>(ex))
                     }
                 } else {
-                    load(filename, new AsyncResultHandler<String>() {
+                    loadToCache(filename, new Handler<Throwable>() {
                         @Override
-                        public void handle(final AsyncResult<String> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult)
+                        public void handle(final Throwable throwable) {
+                            if (throwable != null) {
+                                next.handle(new YokeAsyncResult<String>(throwable))
                             } else {
                                 try {
                                     String result = internalRender(compile(filename), context)

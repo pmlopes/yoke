@@ -49,22 +49,20 @@ function MicroTemplateEngine() {
         render: function (filename, context, handler) {
             self.jEngine.isFresh(filename, wrapHandler(function (fresh) {
                 if (fresh) {
-                    var template = self.jEngine.getFileFromCache(filename);
-
                     try {
-                        handler.handle(wrapAsyncResult(null, self.render(template, wrapMap(context))));
+                        var result = self.render(self.compile(filename), context);
+                        handler.handle(wrapAsyncResult(null, result));
                     } catch (e) {
                         handler.handle(wrapAsyncResult(e, null));
                     }
                 } else {
-                    self.jEngine.load(filename, wrapHandler(function (asyncResult) {
-                        if (asyncResult.failed()) {
-                            handler.handle(wrapAsyncResult(asyncResult.cause()));
+                    self.jEngine.loadToCache(filename, wrapHandler(function (error) {
+                        if (error !== null) {
+                            handler.handle(wrapAsyncResult(error));
                         } else {
-                            var template = asyncResult.result();
-
                             try {
-                                handler.handle(wrapAsyncResult(null, self.render(template, wrapMap(context))));
+                                var result = self.render(self.compile(filename), context);
+                                handler.handle(wrapAsyncResult(null, result));
                             } catch (e) {
                                 handler.handle(wrapAsyncResult(e, null));
                             }
@@ -76,16 +74,21 @@ function MicroTemplateEngine() {
     });
 }
 
-MicroTemplateEngine.prototype.render = function (str, data) {
-    // compile the template to a JS function
-    var fn = new Function("obj",
+MicroTemplateEngine.prototype.compile = function (filename) {
+    var self = this;
+    var template = self.jEngine.getTemplateFromCache(filename);
+
+    if (template == null) {
+        // real compile
+        // compile the template to a JS function
+        template = new Function("obj",
             "var p=[],print=function(){p.push.apply(p,arguments);};" +
 
                 // Introduce the data as local variables using with(){}
                 "with(obj){p.push('" +
 
                 // Convert the template into pure JavaScript
-                str
+                self.jEngine.getFileFromCache(filename)
                     .replace(/[\r\t\n]/g, " ")
                     .split("<%").join("\t")
                     .replace(/((^|%>)[^\t]*)'/g, "$1\r")
@@ -95,8 +98,15 @@ MicroTemplateEngine.prototype.render = function (str, data) {
                     .split("\r").join("\\'")
                 + "');}return p.join('');");
 
-    // Provide some basic currying to the user
-    return fn(data);
+        // store it in the java layer
+        self.jEngine.putTemplateToCache(filename, template);
+    }
+
+    return template
+};
+
+MicroTemplateEngine.prototype.render = function (template, context) {
+    return template(wrapMap(context));
 };
 
 module.exports = MicroTemplateEngine;
