@@ -8,42 +8,44 @@ h1 {
   font-size: 60px;
 }
 
+h1 a {
+    text-decoration: none;
+    color: #000000;
+}
+
 h2 {
   font-weight: 200;
+}
+
+h2 a {
+    text-decoration: none;
+    color: #000000;
 }
 
 h3 {
   font-weight: bold;
 }
 
+h3 a {
+    text-decoration: none;
+    color: #000000;
+}
+
 a {
   color: #8a6343;
 }
 
-pre {
-  display: inline-block;
-  border: 1px solid #eee;
-  padding: 15px;
-  border-radius: 5px;
-  font: 13px Monaco, monospace;
-}
-
-.tags em {
-  font-weight: bold;
-  font-style: normal;
-}
-
-#menu {
+#TOC {
   position: fixed;
   top: 10px;
   right: 30px;
 }
 
-#menu li {
+#TOC li {
   list-style: none;
 }
 
-#menu li a {
+#TOC li a {
   display: block;
   text-decoration: none;
   padding: 5px 2px;
@@ -53,13 +55,8 @@ pre {
   -moz-transition: padding 200ms ease-out;
 }
 
-#menu li a:hover {
+#TOC li a:hover {
   padding-right: 15px;
 }
 
-code .comment { color: #a2a2a2 }
-code .init { color: #2F6FAD }
-code .string { color: #5890AD }
-code .keyword { color: #8A6343 }
-code .number { color: #2F6FAD }
-code .extra { color: #666666; font-style: italic }
+table.sourceCode { width: 70%; background-color: #f8f8f8; }
