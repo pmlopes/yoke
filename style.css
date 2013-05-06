@@ -63,12 +63,10 @@ a {
   padding: 5px 2px;
   border-bottom: 1px dotted #eee;
   text-align: right;
-  -webkit-transition: padding 200ms ease-out;
-  -moz-transition: padding 200ms ease-out;
 }
 
 #TOC li a:hover {
-  padding-right: 15px;
+  text-decoration: underline;
 }
 
 table.sourceCode { width: 70%; background-color: #f8f8f8; }
