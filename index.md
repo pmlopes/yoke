@@ -45,19 +45,19 @@ Maven artifact:
 
 ## Middleware
 
-* <a href="BasicAuth.html">BasicAuth</a> basic http authentication
-* <a href="BodyParser.html">BodyParser</a> extensible request body parser
-* <a href="CookieParser.html">CookieParser</a> cookie parser
-* <a href="ErrorHandler.html">ErrorHandler</a> flexible error handler
-* <a href="Favicon.html">Favicon</a> efficient favicon server (with default icon)
-* <a href="Limit.html">Limit</a> limit the bytesize of request bodies
-* <a href="MethodOverride.html">MethodOverride</a> faux HTTP method support
-* <a href="ResponseTime.html">ResponseTime</a> calculates response-time and exposes via x-response-time
-* <a href="Router.html">Router</a> flexible routing based on RouteMatcher
-* <a href="Static.html">Static</a> streaming static file server supporting directory listings
-* <a href="Timeout.html">Timeout</a> request timeouts
-* <a href="Vhost.html">Vhost</a> virtual host sub-domain mapping middleware
+* [BasicAuth](BasicAuth.html) basic http authentication
+* [BodyParser](BodyParser.html) extensible request body parser
+* [CookieParser](CookieParser.html) cookie parser
+* [ErrorHandler](ErrorHandler.html) flexible error handler
+* [Favicon](Favicon.html) efficient favicon server (with default icon)
+* [Limit](Limit.html) limit the bytesize of request bodies
+* [MethodOverride](MethodOverride.html) faux HTTP method support
+* [ResponseTime](ResponseTime.html) calculates response-time and exposes via x-response-time
+* [Router](Router.html) flexible routing based on RouteMatcher
+* [Static](Static.html) streaming static file server supporting directory listings
+* [Timeout](Timeout.html) request timeouts
+* [Vhost](Vhost.html) virtual host sub-domain mapping middleware
 
 ## Links
 
-* GitHub <a href="https://github.com/pmlopes/yoke">repository</a>
+* GitHub [repository](https://github.com/pmlopes/yoke)
