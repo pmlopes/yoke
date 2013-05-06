@@ -22,7 +22,6 @@ Yoke yoke = new Yoke(vertx)
 yoke.listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 ### Groovy
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.groovy}
@@ -55,6 +54,7 @@ yoke.use(router);
 yoke.listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 ## Installation
 
 Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
@@ -72,8 +72,6 @@ Maven artifact:
 
 
 ## API
-
-### Java
 
 * [com.jetdrone.vertx.yoke.Yoke](com.jetdrone.vertx.yoke.Yoke.html) The Framework main class
 * [com.jetdrone.vertx.yoke.MimeType](com.jetdrone.vertx.yoke.MimeType.html) Mime-Types utils
