@@ -40,35 +40,45 @@ code > span.er { font-weight: bold; }
 </ul>
 </div>
 <h1 id="yoke"><a href="#yoke">Yoke</a></h1>
-<p>Yoke is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>, shipping with over 12 bundled middleware.</p>
-<table class="sourceCode java numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
+<p>Yoke is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>, shipping with over 12 bundled middleware. As with Vert.x, Yoke tries to be a polyglot middleware framework, currently <em>Java</em>, <em>Groovy</em> and <em>JavaScript</em> are supported languages and can be used interchangeably like with other Vert.x components.</p>
+<h3 id="java"><a href="#java">Java</a></h3>
+<pre class="sourceCode java"><code class="sourceCode java">Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Favicon</span>())
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Static</span>(<span class="st">&quot;webroot&quot;</span>))
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>() {{
+    <span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">new</span> Handler&lt;HttpServerRequest&gt;() {
+      @Override
+      <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(HttpServerRequest request) {
+        request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+      }
+    });
+  }});
 
-yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Favicon</span>());
-yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Static</span>(<span class="st">&quot;webroot&quot;</span>));
-yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>() {{
-  <span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">new</span> Handler&lt;HttpServerRequest&gt;() {
-    @Override
-    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(HttpServerRequest request) {
-      request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+yoke.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre>
+<h3 id="groovy"><a href="#groovy">Groovy</a></h3>
+<pre class="groovy"><code>def yoke = new GYoke(vertx)
+  .chain(new Favicon())
+  .chain(new Static(&quot;webroot&quot;))
+  .chain(new GRouter() {{
+    all(&quot;/hello&quot;) { request -&gt;
+      request.response().end(&quot;Hello World!&quot;);
     }
-  });
-}});
+  }})
 
-yoke.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre></td></tr></table>
+yoke.listen(3000)</code></pre>
+<h3 id="javascript"><a href="#javascript">JavaScript</a></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> yoke = <span class="kw">new</span> Yoke()
+  .<span class="fu">use</span>(<span class="kw">new</span> Favicon())
+  .<span class="fu">use</span>(<span class="kw">new</span> Static(<span class="ch">&#39;webroot&#39;</span>));
+
+<span class="kw">var</span> router = <span class="kw">new</span> Router();
+
+<span class="kw">router</span>.<span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">function</span> (request) {
+  <span class="kw">request</span>.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+});
+
+<span class="kw">yoke</span>.<span class="fu">use</span>(router);
+<span class="kw">yoke</span>.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre>
 <h2 id="installation"><a href="#installation">Installation</a></h2>
 <p>Vert.x 2 module: <code>com.jetdrone~yoke~1.0.0-SNAPSHOT</code></p>
 <p>Maven artifact:</p>
@@ -79,6 +89,7 @@ yoke.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre><
   <span class="kw">&lt;scope&gt;</span>provided<span class="kw">&lt;/scope&gt;</span>
 <span class="kw">&lt;/dependency&gt;</span></code></pre>
 <h2 id="api"><a href="#api">API</a></h2>
+<h3 id="java-1"><a href="#java-1">Java</a></h3>
 <ul>
 <li><a href="com.jetdrone.vertx.yoke.Yoke.html">com.jetdrone.vertx.yoke.Yoke</a> The Framework main class</li>
 <li><a href="com.jetdrone.vertx.yoke.MimeType.html">com.jetdrone.vertx.yoke.MimeType</a> Mime-Types utils</li>

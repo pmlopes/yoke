@@ -1,21 +1,57 @@
 # Yoke
 
-Yoke is a middleware framework for [Vert.x](http://www.vertx.io), shipping with over 12 bundled middleware.
+Yoke is a middleware framework for [Vert.x](http://www.vertx.io), shipping with over 12 bundled middleware. As with
+Vert.x, Yoke tries to be a polyglot middleware framework, currently *Java*, *Groovy* and *JavaScript* are supported
+languages and can be used interchangeably like with other Vert.x components.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
-Yoke yoke = new Yoke(vertx);
+### Java
 
-yoke.use(new Favicon());
-yoke.use(new Static("webroot"));
-yoke.use(new Router() {{
-  all("/hello", new Handler<HttpServerRequest>() {
-    @Override
-    public void handle(HttpServerRequest request) {
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+Yoke yoke = new Yoke(vertx)
+  .use(new Favicon())
+  .use(new Static("webroot"))
+  .use(new Router() {{
+    all("/hello", new Handler<HttpServerRequest>() {
+      @Override
+      public void handle(HttpServerRequest request) {
+        request.response().end("Hello World!");
+      }
+    });
+  }});
+
+yoke.listen(3000);
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+### Groovy
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.groovy}
+def yoke = new GYoke(vertx)
+  .chain(new Favicon())
+  .chain(new Static("webroot"))
+  .chain(new GRouter() {{
+    all("/hello") { request ->
       request.response().end("Hello World!");
     }
-  });
-}});
+  }})
 
+yoke.listen(3000)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+### JavaScript
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
+var yoke = new Yoke()
+  .use(new Favicon())
+  .use(new Static('webroot'));
+
+var router = new Router();
+
+router.all("/hello", function (request) {
+  request.response().end("Hello World!");
+});
+
+yoke.use(router);
 yoke.listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -34,7 +70,10 @@ Maven artifact:
 </dependency>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
 ## API
+
+### Java
 
 * [com.jetdrone.vertx.yoke.Yoke](com.jetdrone.vertx.yoke.Yoke.html) The Framework main class
 * [com.jetdrone.vertx.yoke.MimeType](com.jetdrone.vertx.yoke.MimeType.html) Mime-Types utils
@@ -42,6 +81,7 @@ Maven artifact:
 * [com.jetdrone.vertx.yoke.Engine](com.jetdrone.vertx.yoke.Engine.html) Abstract class that future render engines extend
 * [com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest](com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest.html) Implementation of HttpServerRequest with some extra helper fields
 * [com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse](com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse.html) Implementation of HttpServerResponse with suport for render engines
+
 
 ## Middleware
 
@@ -57,6 +97,7 @@ Maven artifact:
 * [Static](Static.html) streaming static file server supporting directory listings
 * [Timeout](Timeout.html) request timeouts
 * [Vhost](Vhost.html) virtual host sub-domain mapping middleware
+
 
 ## Links
 

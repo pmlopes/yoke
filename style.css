@@ -3,6 +3,18 @@ body {
   font: 14px/1.6 "Helvetica Neue", Helvetica, sans-serif;
 }
 
+body p {
+    width: 70%;
+}
+
+body ul {
+    width: 70%;
+}
+
+body ol {
+    width: 70%;
+}
+
 h1 {
   margin: 0;
   font-size: 60px;
@@ -62,7 +74,7 @@ a {
 table.sourceCode { width: 70%; background-color: #f8f8f8; }
 pre.sourceCode { width: 70%; background-color: #f8f8f8; }
 
-li em {
+body li em {
     font-weight: bold;
     font-style: normal;
 }
