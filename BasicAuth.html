@@ -1,71 +1,81 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Yoke - middleware for Vert.x</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" href="style.css">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="docs.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Yoke: BasicAuth</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; }
+code > span.dt { color: #204a87; }
+code > span.dv { color: #0000cf; }
+code > span.bn { color: #0000cf; }
+code > span.fl { color: #0000cf; }
+code > span.ch { color: #4e9a06; }
+code > span.st { color: #4e9a06; }
+code > span.co { color: #8f5902; font-style: italic; }
+code > span.ot { color: #8f5902; }
+code > span.al { color: #ef2929; }
+code > span.fu { color: #000000; }
+code > span.er { font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 <body>
-<div id="content">
-    <h1>Yoke</h1>
-
-    <div id="module.exports" class="comment">
-        <h2></h2>
-
-        <div class="description">
-            <h2>BasicAuth</h2>
-
-            <p>Enfore basic authentication by providing a <code>BasicAuth.AuthHandler</code> interface,
-                which must return <code>true</code> in order to gain access. Alternatively an fixed
-                username, password is provided. The middleware Populates <code>request.user</code>.</p>
-
-            <ul class="tags">
-                <li><em>String</em> username</li>
-                <li><em>String</em> password</li>
-            </ul>
-            <pre><code>new BasicAuth("username", "password")</code></pre>
-
-            <ul class="tags">
-                <li><em>String</em> username</li>
-                <li><em>String</em> password</li>
-                <li><em>String</em> realm</li>
-            </ul>
-            <pre><code>new BasicAuth("username", "password", "Authentication Required")</code></pre>
-
-            <ul class="tags">
-                <li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
-            </ul>
-            <pre><code>new BasicAuth(new BasicAuth.AuthHandler() {
+<div id="TOC">
+<ul>
+<li><a href="#yoke">Yoke</a><ul>
+<li><a href="#basicauth">BasicAuth</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="yoke"><a href="#yoke">Yoke</a></h1>
+<h2 id="basicauth"><a href="#basicauth">BasicAuth</a></h2>
+<p>Enfore basic authentication by providing a <code>BasicAuth.AuthHandler</code> interface, which must return <code>true</code> in order to gain access. Alternatively an fixed username, password is provided. The middleware populates <code>request.user</code>.</p>
+<ul>
+<li><em>String</em> username</li>
+<li><em>String</em> password</li>
+</ul>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="st">&quot;username&quot;</span>, <span class="st">&quot;password&quot;</span>)</code></pre>
+<ul>
+<li><em>String</em> username</li>
+<li><em>String</em> password</li>
+<li><em>String</em> realm</li>
+</ul>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="st">&quot;username&quot;</span>, <span class="st">&quot;password&quot;</span>, <span class="st">&quot;Authentication Required&quot;</span>)</code></pre>
+<ul>
+<li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
+</ul>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="kw">new</span> BasicAuth.<span class="fu">AuthHandler</span>() {
   @Override
-  public void handle(String username, String password, Handler&lt;Boolean&gt; result) {
-    if ("username".equals(username) && "password".equals("password")) {
-      result.handle(true);
-    } else {
-      result.handle(false);
+  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(String username, String password, Handler&lt;Boolean&gt; result) {
+    <span class="kw">if</span> (<span class="st">&quot;username&quot;</span>.<span class="fu">equals</span>(username) &amp;&amp; <span class="st">&quot;password&quot;</span>.<span class="fu">equals</span>(<span class="st">&quot;password&quot;</span>)) {
+      result.<span class="fu">handle</span>(<span class="kw">true</span>);
+    } <span class="kw">else</span> {
+      result.<span class="fu">handle</span>(<span class="kw">false</span>);
     }
   }
 });</code></pre>
-
-            <ul class="tags">
-                <li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
-                <li><em>String</em> realm</li>
-            </ul>
-            <pre><code>new BasicAuth(new BasicAuth.AuthHandler() {
+<ul>
+<li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
+<li><em>String</em> realm</li>
+</ul>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="kw">new</span> BasicAuth.<span class="fu">AuthHandler</span>() {
   @Override
-  public void handle(String username, String password, Handler&lt;Boolean&gt; result) {
-    if ("username".equals(username) && "password".equals("password")) {
-      result.handle(true);
-    } else {
-      result.handle(false);
+  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(String username, String password, Handler&lt;Boolean&gt; result) {
+    <span class="kw">if</span> (<span class="st">&quot;username&quot;</span>.<span class="fu">equals</span>(username) &amp;&amp; <span class="st">&quot;password&quot;</span>.<span class="fu">equals</span>(<span class="st">&quot;password&quot;</span>)) {
+      result.<span class="fu">handle</span>(<span class="kw">true</span>);
+    } <span class="kw">else</span> {
+      result.<span class="fu">handle</span>(<span class="kw">false</span>);
     }
   }
-}, "Authentication required");</code></pre>
-        </div>
-    </div>
-    <ul id="menu">
-        <li><a href="#module.exports"></a></li>
-    </ul>
-</div>
+}, <span class="st">&quot;Authentication required&quot;</span>);</code></pre>
 </body>
 </html>

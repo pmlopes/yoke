@@ -60,3 +60,9 @@ a {
 }
 
 table.sourceCode { width: 70%; background-color: #f8f8f8; }
+pre.sourceCode { width: 70%; background-color: #f8f8f8; }
+
+li em {
+    font-weight: bold;
+    font-style: normal;
+}
