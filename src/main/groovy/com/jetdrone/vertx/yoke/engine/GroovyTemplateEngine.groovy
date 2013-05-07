@@ -23,6 +23,7 @@ import groovy.text.TemplateEngine
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.control.CompilationFailedException
 import org.vertx.java.core.AsyncResult
+import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.core.Handler
 
 @CompileStatic public class GroovyTemplateEngine extends Engine {
@@ -31,44 +32,29 @@ import org.vertx.java.core.Handler
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> next) {
-        // verify if the file is still fresh in the cache
-        isFresh(filename, new Handler<Boolean>() {
+        read(filename, new AsyncResultHandler<String>() {
             @Override
-            public void handle(Boolean fresh) {
-                if (fresh) {
+            public void handle(AsyncResult<String> asyncResult) {
+                if (asyncResult.failed()) {
+                    next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                } else {
                     try {
-                        String result = internalRender(compile(filename), context)
+                        String result = internalRender(compile(filename, asyncResult.result()), context)
                         next.handle(new YokeAsyncResult<String>(result))
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
                         next.handle(new YokeAsyncResult<String>(ex))
                     }
-                } else {
-                    loadToCache(filename, new Handler<Throwable>() {
-                        @Override
-                        public void handle(final Throwable throwable) {
-                            if (throwable != null) {
-                                next.handle(new YokeAsyncResult<String>(throwable))
-                            } else {
-                                try {
-                                    String result = internalRender(compile(filename), context)
-                                    next.handle(new YokeAsyncResult<String>(result))
-                                } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
-                                    next.handle(new YokeAsyncResult<String>(ex))
-                                }
-                            }
-                        }
-                    });
                 }
             }
         });
     }
 
-    private Template compile(String filename) {
+    private Template compile(String filename, String templateText) {
         Template template = (Template) getTemplateFromCache(filename)
 
         if (template == null) {
             // real compile
-            template = engine.createTemplate(getFileFromCache(filename))
+            template = engine.createTemplate(templateText)
             putTemplateToCache(filename, template)
         }
 

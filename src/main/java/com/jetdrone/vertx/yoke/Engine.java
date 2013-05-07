@@ -52,21 +52,6 @@ public abstract class Engine<T> {
         return contentType;
     }
 
-    public void exists(String filename, final Handler<Boolean> next) {
-        final FileSystem fileSystem = vertx.fileSystem();
-
-        fileSystem.exists(filename, new AsyncResultHandler<Boolean>() {
-            @Override
-            public void handle(AsyncResult<Boolean> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(false);
-                } else {
-                    next.handle(asyncResult.result());
-                }
-            }
-        });
-    }
-
     /**
      * Verifies if a file in the filesystem is still fresh against the cache. Errors are treated as not fresh.
      *
@@ -101,7 +86,7 @@ public abstract class Engine<T> {
         });
     }
 
-    public void loadToCache(final String filename, final Handler<Throwable> next) {
+    private void loadToCache(final String filename, final Handler<Throwable> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
         fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
@@ -131,9 +116,43 @@ public abstract class Engine<T> {
     }
 
     /**
+     * Loads a resource from the filesystem into a string.
+     *
+     * Verifies if the file last modified date is newer than on the cache
+     * if it is loads into a string
+     * returns the string or the cached value
+     */
+    public void read(final String filename, final AsyncResultHandler<String> handler) {
+        isFresh(filename, new Handler<Boolean>() {
+            @Override
+            public void handle(Boolean fresh) {
+                if (fresh) {
+                    String cachedValue = getFileFromCache(filename);
+                    if (cachedValue != null) {
+                        handler.handle(new YokeAsyncResult<>(null, cachedValue));
+                        return;
+                    }
+                }
+                // either fresh is false or cachedValue is null
+                loadToCache(filename, new Handler<Throwable>() {
+                    @Override
+                    public void handle(Throwable error) {
+                        if (error != null) {
+                            handler.handle(new YokeAsyncResult<String>(error, null));
+                            return;
+                        }
+                        // no error
+                        handler.handle(new YokeAsyncResult<>(null, getFileFromCache(filename)));
+                    }
+                });
+            }
+        });
+    }
+
+    /**
      * Gets the content of the file from cache this is a synchronous operation since there is no blocking or I/O
      */
-    public String getFileFromCache(String filename) {
+    private String getFileFromCache(String filename) {
         return cache.get(filename).raw;
     }
 

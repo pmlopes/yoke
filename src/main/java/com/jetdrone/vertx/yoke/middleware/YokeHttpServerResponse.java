@@ -64,23 +64,14 @@ public class YokeHttpServerResponse implements HttpServerResponse {
             if (renderEngine == null) {
                 next.handle("No engine registered for extension: " + extension);
             } else {
-                renderEngine.exists(template, new Handler<Boolean>() {
+                renderEngine.render(template, context, new AsyncResultHandler<String>() {
                     @Override
-                    public void handle(Boolean exists) {
-                        if (!exists) {
-                            next.handle(404);
+                    public void handle(AsyncResult<String> asyncResult) {
+                        if (asyncResult.failed()) {
+                            next.handle(asyncResult.cause());
                         } else {
-                            renderEngine.render(template, context, new AsyncResultHandler<String>() {
-                                @Override
-                                public void handle(AsyncResult<String> asyncResult) {
-                                    if (asyncResult.failed()) {
-                                        next.handle(asyncResult.cause());
-                                    } else {
-                                        putHeader("content-type", renderEngine.getContentType());
-                                        end(asyncResult.result());
-                                    }
-                                }
-                            });
+                            putHeader("content-type", renderEngine.getContentType());
+                            end(asyncResult.result());
                         }
                     }
                 });

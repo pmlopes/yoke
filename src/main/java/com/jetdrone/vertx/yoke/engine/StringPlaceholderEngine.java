@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke.engine;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 
 import java.util.*;
@@ -48,32 +49,17 @@ public class StringPlaceholderEngine extends Engine<String> {
     @Override
     public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<String>> handler) {
         // verify if the file is still fresh in the cache
-        isFresh(file, new Handler<Boolean>() {
+        read(file, new AsyncResultHandler<String>() {
             @Override
-            public void handle(Boolean fresh) {
-                if (fresh) {
-                    String template = getFileFromCache(file);
+            public void handle(AsyncResult<String> asyncResult) {
+                if (asyncResult.failed()) {
+                    handler.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                } else {
                     try {
-                        handler.handle(new YokeAsyncResult<>(parseStringValue(template, context, new HashSet<String>())));
+                        handler.handle(new YokeAsyncResult<>(parseStringValue(asyncResult.result(), context, new HashSet<String>())));
                     } catch (IllegalArgumentException iae) {
                         handler.handle(new YokeAsyncResult<String>(iae));
                     }
-                } else {
-                    loadToCache(file, new Handler<Throwable>() {
-                        @Override
-                        public void handle(final Throwable throwable) {
-                            if (throwable != null) {
-                                handler.handle(new YokeAsyncResult<String>(throwable));
-                            } else {
-                                String template = getFileFromCache(file);
-                                try {
-                                    handler.handle(new YokeAsyncResult<>(parseStringValue(template, context, new HashSet<String>())));
-                                } catch (IllegalArgumentException iae) {
-                                    handler.handle(new YokeAsyncResult<String>(iae));
-                                }
-                            }
-                        }
-                    });
                 }
             }
         });

@@ -47,34 +47,23 @@ function MicroTemplateEngine() {
     var self = this;
     this.jEngine = new com.jetdrone.vertx.yoke.Engine({
         render: function (filename, context, handler) {
-            self.jEngine.isFresh(filename, wrapHandler(function (fresh) {
-                if (fresh) {
+            self.jEngine.load(filename, wrapHandler(function (asyncResult) {
+                if (asyncResult.failed()) {
+                    handler.handle(wrapAsyncResult(asyncResult.cause()));
+                } else {
                     try {
-                        var result = self.render(self.compile(filename), context);
+                        var result = self.render(self.compile(filename, asyncResult.result()), context);
                         handler.handle(wrapAsyncResult(null, result));
                     } catch (e) {
                         handler.handle(wrapAsyncResult(e, null));
                     }
-                } else {
-                    self.jEngine.loadToCache(filename, wrapHandler(function (error) {
-                        if (error !== null) {
-                            handler.handle(wrapAsyncResult(error));
-                        } else {
-                            try {
-                                var result = self.render(self.compile(filename), context);
-                                handler.handle(wrapAsyncResult(null, result));
-                            } catch (e) {
-                                handler.handle(wrapAsyncResult(e, null));
-                            }
-                        }
-                    }));
                 }
             }));
         }
     });
 }
 
-MicroTemplateEngine.prototype.compile = function (filename) {
+MicroTemplateEngine.prototype.compile = function (filename, templateText) {
     var self = this;
     var template = self.jEngine.getTemplateFromCache(filename);
 
@@ -88,7 +77,7 @@ MicroTemplateEngine.prototype.compile = function (filename) {
                 "with(obj){p.push('" +
 
                 // Convert the template into pure JavaScript
-                self.jEngine.getFileFromCache(filename)
+                templateText
                     .replace(/[\r\t\n]/g, " ")
                     .split("<%").join("\t")
                     .replace(/((^|%>)[^\t]*)'/g, "$1\r")
