@@ -68,7 +68,7 @@ public class Favicon extends Middleware {
     }
 
     @Override
-    public void setVertx(Vertx vertx) {
+    public Middleware setVertx(Vertx vertx) {
         try {
             super.setVertx(vertx);
             if (path == null) {
@@ -79,6 +79,8 @@ public class Favicon extends Middleware {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+        return this;
     }
 
 
