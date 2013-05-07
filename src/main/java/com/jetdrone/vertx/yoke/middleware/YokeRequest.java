@@ -32,12 +32,12 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-public class YokeHttpServerRequest implements HttpServerRequest {
+public class YokeRequest implements HttpServerRequest {
 
     // the original request
     private final HttpServerRequest request;
     // the wrapped response
-    private final YokeHttpServerResponse response;
+    private final YokeResponse response;
     // the request context
     private final Map<String, Object> context;
     // is this request secure
@@ -51,7 +51,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
     private Set<YokeCookie> cookies;
     private String sessionId;
 
-    public YokeHttpServerRequest(HttpServerRequest request, YokeHttpServerResponse response, boolean secure, Map<String, Object> context) {
+    public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context) {
         this.context = context;
         this.request = request;
         this.method = request.method();
@@ -323,7 +323,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
      * @see org.vertx.java.core.http.HttpServerRequest#response()
      */
     @Override
-    public YokeHttpServerResponse response() {
+    public YokeResponse response() {
         return response;
     }
 
@@ -439,7 +439,7 @@ public class YokeHttpServerRequest implements HttpServerRequest {
         return query();
     }
 
-    public YokeHttpServerResponse getResponse() {
+    public YokeResponse getResponse() {
         return response();
     }
 

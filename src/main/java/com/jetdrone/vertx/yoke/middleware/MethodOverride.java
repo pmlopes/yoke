@@ -20,8 +20,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.Map;
-
 public class MethodOverride extends Middleware {
 
     private final String key;
@@ -35,7 +33,7 @@ public class MethodOverride extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         final Object body = request.body();
 
         if (request.hasBody() && body != null) {

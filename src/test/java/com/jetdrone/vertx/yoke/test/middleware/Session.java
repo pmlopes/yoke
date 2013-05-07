@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.middleware.CookieParser;
 import com.jetdrone.vertx.yoke.middleware.Router;
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import com.jetdrone.vertx.yoke.util.Utils;
@@ -25,22 +25,22 @@ public class Session extends TestVerticle {
         yoke.use(new CookieParser(hmac));
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Session(hmac));
         yoke.use(new Router() {{
-            get("/", new Handler<YokeHttpServerRequest>() {
+            get("/", new Handler<YokeRequest>() {
                 @Override
-                public void handle(YokeHttpServerRequest request) {
+                public void handle(YokeRequest request) {
                     request.response().end();
                 }
             });
-            get("/new", new Handler<YokeHttpServerRequest>() {
+            get("/new", new Handler<YokeRequest>() {
                 @Override
-                public void handle(YokeHttpServerRequest request) {
+                public void handle(YokeRequest request) {
                     request.setSessionId("1");
                     request.response().end();
                 }
             });
-            get("/delete", new Handler<YokeHttpServerRequest>() {
+            get("/delete", new Handler<YokeRequest>() {
                 @Override
-                public void handle(YokeHttpServerRequest request) {
+                public void handle(YokeRequest request) {
                     request.setSessionId(null);
                     request.response().end();
                 }

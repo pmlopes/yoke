@@ -42,7 +42,7 @@ public class KitCMS extends Verticle {
         // install custom middleware to identify the domain
         yoke.use(new com.jetdrone.vertx.yoke.Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 String host = request.getHeader("host");
                 if (host == null) {
                     // there is no host header
@@ -84,7 +84,7 @@ public class KitCMS extends Verticle {
         yoke.use(new Router() {{
             get("/admin", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
                     db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
@@ -113,7 +113,7 @@ public class KitCMS extends Verticle {
             });
             get("/admin/keys", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
                     db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
@@ -131,7 +131,7 @@ public class KitCMS extends Verticle {
             });
             get("/admin/get", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
                     String key = request.params().get("key");
 
@@ -156,7 +156,7 @@ public class KitCMS extends Verticle {
             });
             post("/admin/set", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
                     Map<String, String> body = request.mapBody();
@@ -189,7 +189,7 @@ public class KitCMS extends Verticle {
             });
             post("/admin/unset", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
                     Map<String, String> body = request.mapBody();
@@ -216,7 +216,7 @@ public class KitCMS extends Verticle {
             });
             get("/admin/export", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
                     db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
@@ -250,7 +250,7 @@ public class KitCMS extends Verticle {
                                                 }
                                             });
                                         } else {
-                                            YokeHttpServerResponse response = request.response();
+                                            YokeResponse response = request.response();
 
                                             String filename = System.currentTimeMillis() + "_export.kit";
 
@@ -267,7 +267,7 @@ public class KitCMS extends Verticle {
             });
             post("/admin/import", new Middleware() {
                 @Override
-                public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+                public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
                     FileUpload file = request.files().get("file");
@@ -302,7 +302,7 @@ public class KitCMS extends Verticle {
         // if the request fall through it is a view to render from the db
         yoke.use(new Middleware() {
             @Override
-            public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+            public void handle(final YokeRequest request, final Handler<Object> next) {
                 final Config.Domain domain = request.get("domain");
                 final String file = request.path().toLowerCase();
 

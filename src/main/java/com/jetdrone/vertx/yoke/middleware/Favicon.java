@@ -85,7 +85,7 @@ public class Favicon extends Middleware {
 
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         if ("/favicon.ico".equals(request.path())) {
             request.response().headers().set(icon.headers);
             request.response().end(icon.body);

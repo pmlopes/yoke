@@ -27,7 +27,7 @@ public class Limit extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         if (request.hasBody()) {
             request.setBodyLengthLimit(limit);
 

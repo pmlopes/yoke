@@ -19,7 +19,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 public class Vhost extends Middleware {
@@ -32,7 +31,7 @@ public class Vhost extends Middleware {
         this.regex = Pattern.compile("^" + hostname.replaceAll("\\.", "\\\\.").replaceAll("[*]", "(.*?)") + "$", Pattern.CASE_INSENSITIVE);
     }
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         String host = request.getHeader("host");
         if (host == null) {
             next.handle(null);

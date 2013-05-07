@@ -35,7 +35,7 @@ public class Router extends Middleware {
     private final List<PatternBinding> patchBindings = new ArrayList<>();
 
     @Override
-    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+    public void handle(YokeRequest request, Handler<Object> next) {
 
         switch (request.method()) {
             case "GET":
@@ -83,10 +83,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router get(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router get(String pattern, final Handler<YokeRequest> handler) {
         return get(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -107,10 +107,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router put(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router put(String pattern, final Handler<YokeRequest> handler) {
         return put(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -131,10 +131,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router post(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router post(String pattern, final Handler<YokeRequest> handler) {
         return post(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -155,10 +155,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router delete(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router delete(String pattern, final Handler<YokeRequest> handler) {
         return delete(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -179,10 +179,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router options(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router options(String pattern, final Handler<YokeRequest> handler) {
         return options(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -203,10 +203,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router head(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router head(String pattern, final Handler<YokeRequest> handler) {
         return head(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -227,10 +227,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router trace(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router trace(String pattern, final Handler<YokeRequest> handler) {
         return trace(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -251,10 +251,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router connect(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router connect(String pattern, final Handler<YokeRequest> handler) {
         return connect(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -275,10 +275,10 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router patch(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router patch(String pattern, final Handler<YokeRequest> handler) {
         return patch(pattern, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -307,7 +307,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router all(String pattern, final Handler<YokeHttpServerRequest> handler) {
+    public Router all(String pattern, final Handler<YokeRequest> handler) {
         get(pattern, handler);
         put(pattern, handler);
         post(pattern, handler);
@@ -335,10 +335,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router get(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router get(Pattern regex, final Handler<YokeRequest> handler) {
         return get(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -359,10 +359,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router put(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router put(Pattern regex, final Handler<YokeRequest> handler) {
         return put(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -383,10 +383,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router post(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router post(Pattern regex, final Handler<YokeRequest> handler) {
         return post(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -407,10 +407,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router delete(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router delete(Pattern regex, final Handler<YokeRequest> handler) {
         return delete(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -431,10 +431,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router options(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router options(Pattern regex, final Handler<YokeRequest> handler) {
         return options(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -455,10 +455,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router head(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router head(Pattern regex, final Handler<YokeRequest> handler) {
         return head(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -479,10 +479,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router trace(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router trace(Pattern regex, final Handler<YokeRequest> handler) {
         return trace(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -503,10 +503,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router connect(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router connect(Pattern regex, final Handler<YokeRequest> handler) {
         return connect(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -527,10 +527,10 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router patch(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router patch(Pattern regex, final Handler<YokeRequest> handler) {
         return patch(regex, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         });
@@ -559,7 +559,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router all(Pattern regex, final Handler<YokeHttpServerRequest> handler) {
+    public Router all(Pattern regex, final Handler<YokeRequest> handler) {
         get(regex, handler);
         put(regex, handler);
         post(regex, handler);
@@ -596,7 +596,7 @@ public class Router extends Middleware {
         bindings.add(binding);
     }
 
-    private void route(YokeHttpServerRequest request, Handler<Object> next, List<PatternBinding> bindings) {
+    private void route(YokeRequest request, Handler<Object> next, List<PatternBinding> bindings) {
         for (PatternBinding binding: bindings) {
             Matcher m = binding.pattern.matcher(request.path());
             if (m.matches()) {

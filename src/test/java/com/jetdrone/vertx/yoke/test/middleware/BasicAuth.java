@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class BasicAuth extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth("Aladdin", "open sesame"));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 request.response().end();
             }
         });

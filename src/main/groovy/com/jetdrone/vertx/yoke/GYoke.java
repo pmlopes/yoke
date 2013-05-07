@@ -15,12 +15,11 @@
  */
 package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.GYokeResponse;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import groovy.lang.Closure;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
-
-import com.jetdrone.vertx.yoke.middleware.GYokeHttpServerResponse;
 
 import org.vertx.groovy.core.Vertx;
 import org.vertx.groovy.core.http.HttpServer;
@@ -54,11 +53,11 @@ public class GYoke {
      */
     public GYoke(Vertx vertx) {
         this.vertx = vertx.toJavaVertx();
-        jYoke = new Yoke(this.vertx, new HttpServerRequestWrapper() {
+        jYoke = new Yoke(this.vertx, new RequestWrapper() {
             @Override
-            public YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
-                GYokeHttpServerResponse response = new GYokeHttpServerResponse(request.response(), context, engines);
-                return new YokeHttpServerRequest(request, response, secure, context);
+            public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
+                GYokeResponse response = new GYokeResponse(request.response(), context, engines);
+                return new YokeRequest(request, response, secure, context);
             }
         });
     }
@@ -76,7 +75,7 @@ public class GYoke {
     public GYoke use(String route, final Closure closure) {
         jYoke.use(route, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 int params = closure.getMaximumNumberOfParameters();
                 if (params == 1) {
                     closure.call(request);
@@ -126,7 +125,7 @@ public class GYoke {
     /**
      * Adds a Render Engine to the library. Render Engines are Template engines you
      * might want to use to speed the development of your application. Once they are
-     * registered you can use the method render in the YokeHttpServerResponse to
+     * registered you can use the method render in the YokeResponse to
      * render a template.
      *
      * @param extension The file extension for this template engine e.g.: .jsp

@@ -55,7 +55,7 @@ public class Session extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         // default session
         final YokeCookie cookie = new YokeCookie(name, hmacSHA256);
         cookie.setPath(path);
@@ -85,7 +85,7 @@ public class Session extends Middleware {
         }
 
         final int originalHash = hash;
-        final YokeHttpServerResponse response = request.response();
+        final YokeResponse response = request.response();
 
         // call us when headers are being set for the response
         response.headersHandler(new Handler<Void>() {
@@ -120,7 +120,7 @@ public class Session extends Middleware {
         next.handle(null);
     }
 
-    private YokeCookie getSessionCookie(YokeHttpServerRequest request) {
+    private YokeCookie getSessionCookie(YokeRequest request) {
         Set<YokeCookie> cookies = request.cookies();
         if (cookies != null) {
             for (YokeCookie c : cookies) {

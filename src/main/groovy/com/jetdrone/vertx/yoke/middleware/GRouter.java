@@ -11,14 +11,14 @@ public class GRouter extends Middleware {
     private final Router jRouter = new Router();
 
     @Override
-    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+    public void handle(YokeRequest request, Handler<Object> next) {
         jRouter.handle(request, next);
     }
 
     private static Middleware wrapClosure(final Closure closure) {
         return new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 int params = closure.getMaximumNumberOfParameters();
                 if (params == 1) {
                     closure.call(request);

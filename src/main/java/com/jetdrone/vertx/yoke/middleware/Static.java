@@ -63,7 +63,7 @@ public class Static extends Middleware {
         this(root, 86400000, false, false);
     }
 
-    private void writeHeaders(final YokeHttpServerRequest request, final FileProps props) {
+    private void writeHeaders(final YokeRequest request, final FileProps props) {
 
         MultiMap headers = request.response().headers();
 
@@ -84,7 +84,7 @@ public class Static extends Middleware {
         }
     }
 
-    private void sendFile(final YokeHttpServerRequest request, final String file, final FileProps props) {
+    private void sendFile(final YokeRequest request, final String file, final FileProps props) {
         // write content type
         String contentType = MimeType.getMime(file);
         String charset = MimeType.getCharset(contentType);
@@ -99,7 +99,7 @@ public class Static extends Middleware {
         }
     }
 
-    private void sendDirectory(final YokeHttpServerRequest request, final String dir, final Handler<Object> next) {
+    private void sendDirectory(final YokeRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
         fileSystem.readDir(dir, new AsyncResultHandler<String[]>() {
@@ -199,7 +199,7 @@ public class Static extends Middleware {
         });
     }
 
-    private boolean isFresh(final YokeHttpServerRequest request) {
+    private boolean isFresh(final YokeRequest request) {
         // defaults
         boolean etagMatches = true;
         boolean notModified = true;
@@ -248,7 +248,7 @@ public class Static extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         if (!"GET".equals(request.method()) && !"HEAD".equals(request.method())) {
             next.handle(null);
         } else {

@@ -66,8 +66,8 @@ Maven artifact:
 * [com.jetdrone.vertx.yoke.MimeType](com.jetdrone.vertx.yoke.MimeType.html) Mime-Types utils
 * [com.jetdrone.vertx.yoke.Middleware](com.jetdrone.vertx.yoke.Middleware.html) Abstract class that all midleware extends
 * [com.jetdrone.vertx.yoke.Engine](com.jetdrone.vertx.yoke.Engine.html) Abstract class that future render engines extend
-* [com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest](com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest.html) Implementation of HttpServerRequest with some extra helper fields
-* [com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse](com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse.html) Implementation of HttpServerResponse with suport for render engines
+* [com.jetdrone.vertx.yoke.middleware.YokeRequest](com.jetdrone.vertx.yoke.middleware.YokeRequest.html) Implementation of HttpServerRequest with some extra helper fields
+* [com.jetdrone.vertx.yoke.middleware.YokeResponse](com.jetdrone.vertx.yoke.middleware.YokeResponse.html) Implementation of HttpServerResponse with suport for render engines
 
 
 ## Middleware

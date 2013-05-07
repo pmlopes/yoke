@@ -84,9 +84,9 @@ public class ErrorHandler extends Middleware {
     }
 
     @Override
-    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+    public void handle(YokeRequest request, Handler<Object> next) {
 
-        YokeHttpServerResponse response = request.response();
+        YokeResponse response = request.response();
 
         if (response.getStatusCode() < 400) {
             response.setStatusCode(getErrorCode(request.get("error")));

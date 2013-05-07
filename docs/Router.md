@@ -16,8 +16,8 @@ Route request by path or regular expression. All *HTTP* verbs are available:
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
 new Router() {{
-  get("/hello", new Handler<YokeHttpServerRequest>() {
-    public void handle(YokeHttpServerRequest request) {
+  get("/hello", new Handler<YokeRequest>() {
+    public void handle(YokeRequest request) {
       request.response().end("Hello World!");
     }
   });

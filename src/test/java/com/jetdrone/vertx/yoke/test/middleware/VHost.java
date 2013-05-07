@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.middleware.Vhost;
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
@@ -25,9 +25,9 @@ public class VHost extends TestVerticle {
                 testComplete();
             }
         }));
-        yoke.use(new Handler<YokeHttpServerRequest>() {
+        yoke.use(new Handler<YokeRequest>() {
             @Override
-            public void handle(YokeHttpServerRequest request) {
+            public void handle(YokeRequest request) {
                 request.response().end();
                 fail();
             }

@@ -54,11 +54,11 @@ public class BasicAuth extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         String authorization = request.getHeader("authorization");
 
         if (authorization == null) {
-            YokeHttpServerResponse response = request.response();
+            YokeResponse response = request.response();
             response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
             response.setStatusCode(401);
             next.handle("No authorization token");
@@ -79,7 +79,7 @@ public class BasicAuth extends Middleware {
                             request.put("user", user);
                             next.handle(null);
                         } else {
-                            YokeHttpServerResponse response = request.response();
+                            YokeResponse response = request.response();
                             response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
                             response.setStatusCode(401);
                             next.handle("No authorization token");
@@ -96,7 +96,7 @@ public class BasicAuth extends Middleware {
      * @param request http request
      * @return String with the realm name
      */
-    public String getRealm(YokeHttpServerRequest request) {
+    public String getRealm(YokeRequest request) {
         return realm;
     }
 }

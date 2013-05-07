@@ -64,7 +64,7 @@ public class Logger extends Middleware {
         return null;
     }
 
-    private void log(YokeHttpServerRequest request, long start) {
+    private void log(YokeRequest request, long start) {
         int contentLength = 0;
         if (immediate) {
             Object obj = request.getHeader("content-length");
@@ -129,7 +129,7 @@ public class Logger extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, Handler<Object> next) {
+    public void handle(final YokeRequest request, Handler<Object> next) {
         final long start = System.currentTimeMillis();
 
         if (immediate) {

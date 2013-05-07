@@ -37,7 +37,7 @@ public class CookieParser extends Middleware {
     }
 
     @Override
-    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+    public void handle(YokeRequest request, Handler<Object> next) {
         String cookieHeader = request.getHeader("cookie");
 
         if (cookieHeader != null) {

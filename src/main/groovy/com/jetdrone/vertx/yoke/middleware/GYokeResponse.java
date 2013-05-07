@@ -21,13 +21,13 @@ import org.vertx.groovy.core.buffer.Buffer;
 
 import java.util.Map;
 
-public class GYokeHttpServerResponse extends YokeHttpServerResponse {
+public class GYokeResponse extends YokeResponse {
 
-    public GYokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
+    public GYokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
         super(response, context, engines);
     }
 
-    public GYokeHttpServerResponse write(Buffer buffer) {
+    public GYokeResponse write(Buffer buffer) {
         write(buffer.toJavaBuffer());
         return this;
     }
@@ -36,11 +36,11 @@ public class GYokeHttpServerResponse extends YokeHttpServerResponse {
         end(buffer.toJavaBuffer());
     }
 
-    public GYokeHttpServerResponse leftShift(Buffer buffer) {
+    public GYokeResponse leftShift(Buffer buffer) {
         return write(buffer);
     }
 
-    public GYokeHttpServerResponse leftShift(String s) {
+    public GYokeResponse leftShift(String s) {
         write(s);
         return this;
     }

@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
@@ -22,9 +22,9 @@ public class BodyParser extends TestVerticle {
 
         YokeTester yoke = new YokeTester(vertx);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
-        yoke.use(new Handler<YokeHttpServerRequest>() {
+        yoke.use(new Handler<YokeRequest>() {
             @Override
-            public void handle(YokeHttpServerRequest request) {
+            public void handle(YokeRequest request) {
                 assertNotNull(request.jsonBody());
                 assertEquals(request.jsonBody().encode(), json.encode());
                 request.response().end();
@@ -52,9 +52,9 @@ public class BodyParser extends TestVerticle {
 
         YokeTester yoke = new YokeTester(vertx);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
-        yoke.use(new Handler<YokeHttpServerRequest>() {
+        yoke.use(new Handler<YokeRequest>() {
             @Override
-            public void handle(YokeHttpServerRequest request) {
+            public void handle(YokeRequest request) {
                 assertNotNull(request.mapBody());
                 MultiMap body = request.mapBody();
                 assertEquals("value", body.get("param"));

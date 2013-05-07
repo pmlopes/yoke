@@ -20,10 +20,10 @@ import org.vertx.java.core.Handler;
 
 public class ResponseTime extends Middleware {
     @Override
-    public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+    public void handle(YokeRequest request, Handler<Object> next) {
 
         final long start = System.currentTimeMillis();
-        final YokeHttpServerResponse response = request.response();
+        final YokeResponse response = request.response();
 
         response.headersHandler(new Handler<Void>() {
             @Override

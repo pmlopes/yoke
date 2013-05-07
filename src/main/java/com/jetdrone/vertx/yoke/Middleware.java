@@ -15,7 +15,7 @@
  */
 package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 
@@ -42,9 +42,9 @@ public abstract class Middleware {
     /**
      * Handles a request.
      *
-     * @param request A YokeHttpServerRequest which in practice is a extended HttpServerRequest
+     * @param request A YokeRequest which in practice is a extended HttpServerRequest
      * @param next The callback to inform that the next middleware in the chain should be used. A value different from
      *             null represents an error and in that case the error handler middleware will be executed.
      */
-    public abstract void handle(final YokeHttpServerRequest request, final Handler<Object> next);
+    public abstract void handle(final YokeRequest request, final Handler<Object> next);
 }

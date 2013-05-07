@@ -15,8 +15,8 @@
  */
 package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -37,14 +37,14 @@ import java.util.*;
  *
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
-public class Yoke implements HttpServerRequestWrapper {
+public class Yoke implements RequestWrapper {
 
     private final Vertx vertx;
 
     private final Map<String, Object> defaultContext = new HashMap<>();
     private final Map<String, Engine<?>> engineMap = new HashMap<>();
     // the request wrapper in use
-    private final HttpServerRequestWrapper requestWrapper;
+    private final RequestWrapper requestWrapper;
 
     /**
      * Creates a Yoke instance.
@@ -59,7 +59,7 @@ public class Yoke implements HttpServerRequestWrapper {
         this(vertx, null);
     }
 
-    public Yoke(Vertx vertx, HttpServerRequestWrapper requestWrapper) {
+    public Yoke(Vertx vertx, RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.requestWrapper = requestWrapper == null ? this : requestWrapper;
         defaultContext.put("title", "Yoke");
@@ -122,10 +122,10 @@ public class Yoke implements HttpServerRequestWrapper {
      * @param route The route prefix for the middleware
      * @param handler The Handler to add
      */
-    public Yoke use(String route, final Handler<YokeHttpServerRequest> handler) {
+    public Yoke use(String route, final Handler<YokeRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
             @Override
-            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+            public void handle(YokeRequest request, Handler<Object> next) {
                 handler.handle(request);
             }
         }));
@@ -138,14 +138,14 @@ public class Yoke implements HttpServerRequestWrapper {
      * @see Yoke#use(String, Handler)
      * @param handler The Handler to add
      */
-    public Yoke use(Handler<YokeHttpServerRequest> handler) {
+    public Yoke use(Handler<YokeRequest> handler) {
         return use("/", handler);
     }
 
     /**
      * Adds a Render Engine to the library. Render Engines are Template engines you
      * might want to use to speed the development of your application. Once they are
-     * registered you can use the method render in the YokeHttpServerResponse to
+     * registered you can use the method render in the YokeResponse to
      * render a template.
      *
      * @param extension The file extension for this template engine e.g.: .jsp
@@ -203,9 +203,9 @@ public class Yoke implements HttpServerRequestWrapper {
      * Default implementation of the request wrapper
      */
     @Override
-    public YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
-        YokeHttpServerResponse response = new YokeHttpServerResponse(request.response(), context, engines);
-        return new YokeHttpServerRequest(request, response, secure, context);
+    public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
+        YokeResponse response = new YokeResponse(request.response(), context, engines);
+        return new YokeRequest(request, response, secure, context);
     }
 
     /**
@@ -221,7 +221,7 @@ public class Yoke implements HttpServerRequestWrapper {
             public void handle(HttpServerRequest req) {
                 // the context map is shared with all middlewares
                 final Map<String, Object> context = new HashMap<>(defaultContext);
-                final YokeHttpServerRequest request = requestWrapper.wrap(req, secure, context, engineMap);
+                final YokeRequest request = requestWrapper.wrap(req, secure, context, engineMap);
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;

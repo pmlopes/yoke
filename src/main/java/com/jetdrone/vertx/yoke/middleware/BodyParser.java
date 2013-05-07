@@ -41,7 +41,7 @@ public class BodyParser extends Middleware {
 
     private final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
 
-    private void parseJson(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
+    private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
             String jsonString = buffer.toString();
             if (jsonString.length() > 0) {
@@ -65,7 +65,7 @@ public class BodyParser extends Middleware {
         }
     }
 
-    private void parseMap(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
+    private void parseMap(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString(), false);
 
         Map<String, List<String>> prms = queryStringDecoder.parameters();
@@ -82,7 +82,7 @@ public class BodyParser extends Middleware {
     }
 
     @SuppressWarnings("unchecked")
-    private void parseMultipart(final YokeHttpServerRequest request, final Buffer buffer, final Handler<Object> next) {
+    private void parseMultipart(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         HttpPostRequestDecoder decoder = null;
         try {
             HttpRequest nettyReq = request.nettyRequest();
@@ -126,7 +126,7 @@ public class BodyParser extends Middleware {
     }
 
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
         final String method = request.method();
 
         // GET and HEAD have no setBody

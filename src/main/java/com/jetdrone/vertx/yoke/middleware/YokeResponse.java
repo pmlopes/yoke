@@ -31,7 +31,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.util.*;
 
-public class YokeHttpServerResponse implements HttpServerResponse {
+public class YokeResponse implements HttpServerResponse {
     // the original request
     private final HttpServerResponse response;
     // the context
@@ -46,7 +46,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
-    public YokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
+    public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
         this.response = response;
         this.context = context;
         this.engines = engines;
@@ -163,7 +163,7 @@ public class YokeHttpServerResponse implements HttpServerResponse {
         }
     }
 
-    public YokeHttpServerResponse addCookie(Cookie cookie) {
+    public YokeResponse addCookie(Cookie cookie) {
         if (cookies == null) {
             cookies = new TreeSet<>();
         }

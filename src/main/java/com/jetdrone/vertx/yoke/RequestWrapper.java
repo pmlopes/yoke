@@ -15,12 +15,12 @@
  */
 package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.http.HttpServerRequest;
 
 import java.util.Map;
 
-public interface HttpServerRequestWrapper {
+public interface RequestWrapper {
 
     /**
      * For other language bindings this method can be override.
@@ -28,7 +28,7 @@ public interface HttpServerRequestWrapper {
      * @param secure Is the server SSL?
      * @param context The shared context between request and response
      * @param engines the current list of render engines (this is an unmodifiable map)
-     * @return an Implementation of YokeHttpServerRequest
+     * @return an Implementation of YokeRequest
      */
-    YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines);
+    YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines);
 }

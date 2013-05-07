@@ -30,8 +30,8 @@ public class Timeout extends Middleware {
         this(5000);
     }
     @Override
-    public void handle(final YokeHttpServerRequest request, final Handler<Object> next) {
-        final YokeHttpServerResponse response = request.response();
+    public void handle(final YokeRequest request, final Handler<Object> next) {
+        final YokeResponse response = request.response();
 
         final long timerId = vertx.setTimer(timeout, new Handler<Long>() {
             @Override

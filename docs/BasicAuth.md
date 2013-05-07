@@ -73,7 +73,7 @@ Defines the property ```user``` in the request context.
 When there is a need to support several realms under the same server, you can override the the ```getRealm``` method.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
-public String getRealm(YokeHttpServerRequest request) {
+public String getRealm(YokeRequest request) {
   // do something with the request to generate the valid realm name
   return "Authentication is required to access this resource";
 }
