@@ -4,7 +4,9 @@
 
 Parse request cookies both signed or plain.
 
-Once data has been parsed the result is visible in the field <code>cookies</code> of the request.
+## Usage
+
+Once data has been parsed the result is visible in the field ```cookies``` of the request.
 
 * ```cookies()``` returns ```Map<YokeCookie>```
 
@@ -17,6 +19,8 @@ If a cooke value starts with *s:* it means that it is a signed cookie. In this c
 
 When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.
 
+* *hmacsha512* hmac+sha512 MAC
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
-new CookieParser("secret")
+new CookieParser(hmacsha512)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

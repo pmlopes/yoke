@@ -22,8 +22,8 @@ import javax.xml.bind.DatatypeConverter;
 
 public class BasicAuth extends Middleware {
 
-    public abstract static class AuthHandler {
-        public abstract void handle(String username, String password, Handler<Boolean> result);
+    public interface AuthHandler {
+        void handle(String username, String password, Handler<Boolean> result);
     }
 
     private final String realm;

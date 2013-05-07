@@ -1,10 +1,10 @@
-# Yoke
+# [Yoke](/)
 
 ## Favicon
 
 By default serves the Yoke favicon, or the favicon located by the given ```path```.
 
-### Options
+## Usage
 
 * *String* ```path``` the location of your favicon file
 * *long* ```maxAge``` cache-control max-age directive, defaulting to 1 day
