@@ -2,23 +2,17 @@ import com.jetdrone.vertx.yoke.middleware.*
 import com.jetdrone.vertx.yoke.GYoke
 import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
 
-def yoke = new GYoke(vertx)
-
-yoke.engine('html', new GroovyTemplateEngine())
-
-yoke.chain(new ErrorHandler(true))
-yoke.chain(new GRouter() {{
-    get("/hello") { request ->
+new GYoke(vertx)
+  .engine('html', new GroovyTemplateEngine())
+  .use(new ErrorHandler(true))
+  .use(new GRouter()
+    .get("/hello") { request ->
         request.response.end "Hello World!"
     }
-    get("/template") { request ->
+    .get("/template") { request, next ->
         request.put('session', [id: '1'])
-        request.response.render 'template.html'
-    }
-}})
-
-yoke.chain {request ->
+        request.response.render 'template.html', next
+    })
+  .use {request ->
     request.response.end "maybe you should go to /hello or /template!"
-}
-
-yoke.listen(8080)
+  }.listen(8080)

@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jetdrone.vertx.yoke
+package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest
-import groovy.transform.CompileStatic
-import org.vertx.java.core.Handler
-import org.vertx.java.core.Vertx
-import org.vertx.java.core.http.HttpServerRequest
-import org.vertx.java.core.http.HttpServer
+import com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest;
+import groovy.lang.Closure;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.http.HttpServerRequest;
 
-import com.jetdrone.vertx.yoke.middleware.GYokeHttpServerResponse
+import com.jetdrone.vertx.yoke.middleware.GYokeHttpServerResponse;
 
-import org.vertx.groovy.core.Vertx as GVertx
-import org.vertx.groovy.core.http.HttpServer as GHttpServer
+import org.vertx.groovy.core.Vertx;
+import org.vertx.groovy.core.http.HttpServer;
+
+import java.util.Map;
 
 /**
  * Yoke is a chain executor of middleware for Vert.x 2.x.
@@ -38,10 +38,10 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
  *
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
-@CompileStatic public class GYoke {
+public class GYoke {
 
     private final Yoke jYoke;
-    private final Vertx vertx;
+    private final org.vertx.java.core.Vertx vertx;
 
     /**
      * Creates a Yoke instance.
@@ -52,11 +52,11 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(GVertx vertx) {
+    public GYoke(Vertx vertx) {
         this.vertx = vertx.toJavaVertx();
         jYoke = new Yoke(this.vertx, new HttpServerRequestWrapper() {
             @Override
-            YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines) {
+            public YokeHttpServerRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
                 GYokeHttpServerResponse response = new GYokeHttpServerResponse(request.response(), context, engines);
                 return new YokeHttpServerRequest(request, response, secure, context);
             }
@@ -71,32 +71,32 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      * In this case if the request path does not match the prefix the middleware is skipped automatically.
      *
      * @param route The route prefix for the middleware
-     * @param middleware The middleware add to the chain
+     * @param closure The closure add to the chain
      */
-    public GYoke chain(String route, Closure closure) {
+    public GYoke use(String route, final Closure closure) {
         jYoke.use(route, new Middleware() {
             @Override
-            void handle(YokeHttpServerRequest request, Handler<Object> next) {
-                int params = closure.maximumNumberOfParameters
+            public void handle(YokeHttpServerRequest request, Handler<Object> next) {
+                int params = closure.getMaximumNumberOfParameters();
                 if (params == 1) {
                     closure.call(request);
                 } else if (params == 2) {
                     closure.call(request, next);
                 } else {
-                    throw new RuntimeException('Cannot infer the closure signature, should be: request [, next]')
+                    throw new RuntimeException("Cannot infer the closure signature, should be: request [, next]");
                 }
             }
         });
-        this;
+        return this;
     }
 
     /**
      * Adds a middleware to the chain with the prefix "/".
      * @see Yoke#use(String, Middleware)
-     * @param middleware The middleware add to the chain
+     * @param closure The closure add to the chain
      */
-    public GYoke chain(Closure closure) {
-        return chain("/", closure);
+    public GYoke use(Closure closure) {
+        return use("/", closure);
     }
 
     /**
@@ -109,9 +109,9 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      * @param route The route prefix for the middleware
      * @param middleware The middleware add to the chain
      */
-    public GYoke chain(String route, Middleware middleware) {
+    public GYoke use(String route, Middleware middleware) {
         jYoke.use(route, middleware);
-        this;
+        return this;
     }
 
     /**
@@ -119,8 +119,8 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      * @see Yoke#use(String, Middleware)
      * @param middleware The middleware add to the chain
      */
-    public GYoke chain(Middleware middleware) {
-        return chain("/", middleware);
+    public GYoke use(Middleware middleware) {
+        return use("/", middleware);
     }
 
     /**
@@ -134,7 +134,7 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      */
     public GYoke engine(String extension, Engine engine) {
         jYoke.engine(extension, engine);
-        this;
+        return this;
     }
 
     /**
@@ -146,7 +146,7 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      */
     public GYoke set(String key, Object value) {
         jYoke.set(key, value);
-        this;
+        return this;
     }
 
     /**
@@ -167,21 +167,21 @@ import org.vertx.groovy.core.http.HttpServer as GHttpServer
      */
     public GYoke listen(int port, String address) {
         // create the server
-        HttpServer server = vertx.createHttpServer();
+        org.vertx.java.core.http.HttpServer server = vertx.createHttpServer();
         // setup the request handler
         jYoke.listen(server);
         // start listening
         server.listen(port, address);
-        this;
+        return this;
     }
 
     /**
      * Starts listening at a already created server.
      * @return Yoke
      */
-    public GYoke listen(GHttpServer gserver) {
-        HttpServer server = gserver.toJavaServer();
+    public GYoke listen(HttpServer gserver) {
+        org.vertx.java.core.http.HttpServer server = gserver.toJavaServer();
         jYoke.listen(server);
-        this;
+        return this;
     }
 }

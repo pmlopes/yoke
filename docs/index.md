@@ -6,52 +6,41 @@ languages and can be used interchangeably like with other Vert.x components.
 
 ### Java
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 Yoke yoke = new Yoke(vertx)
   .use(new Favicon())
   .use(new Static("webroot"))
-  .use(new Router() {{
-    all("/hello", new Handler<HttpServerRequest>() {
+  .use(new Router()
+    .all("/hello", new Handler<HttpServerRequest>() {
       @Override
       public void handle(HttpServerRequest request) {
         request.response().end("Hello World!");
       }
-    });
-  }});
-
-yoke.listen(3000);
+    })).listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### Groovy
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.groovy}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
 def yoke = new GYoke(vertx)
-  .chain(new Favicon())
-  .chain(new Static("webroot"))
-  .chain(new GRouter() {{
-    all("/hello") { request ->
+  .use(new Favicon())
+  .use(new Static("webroot"))
+  .use(new GRouter()
+    .all("/hello") { request ->
       request.response().end("Hello World!");
-    }
-  }})
-
-yoke.listen(3000)
+    }).listen(3000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ### JavaScript
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines}
 var yoke = new Yoke()
   .use(new Favicon())
-  .use(new Static('webroot'));
-
-var router = new Router();
-
-router.all("/hello", function (request) {
-  request.response().end("Hello World!");
-});
-
-yoke.use(router);
-yoke.listen(3000);
+  .use(new Static('webroot'))
+  .use(new Router()
+    .all("/hello", function (request) {
+      request.response().end('Hello World!');
+    })).listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 

@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jetdrone.vertx.yoke.middleware
+package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Engine
-import groovy.transform.CompileStatic
-import org.vertx.java.core.http.HttpServerResponse
+import com.jetdrone.vertx.yoke.Engine;
+import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.groovy.core.buffer.Buffer;
 
-@CompileStatic public class GYokeHttpServerResponse extends YokeHttpServerResponse {
+import java.util.Map;
 
-    GYokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
-        super(response, context, engines)
+public class GYokeHttpServerResponse extends YokeHttpServerResponse {
+
+    public GYokeHttpServerResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
+        super(response, context, engines);
     }
 
     public GYokeHttpServerResponse write(Buffer buffer) {
         write(buffer.toJavaBuffer());
-        this;
+        return this;
     }
 
     public void end(Buffer buffer) {
@@ -36,11 +37,11 @@ import org.vertx.groovy.core.buffer.Buffer;
     }
 
     public GYokeHttpServerResponse leftShift(Buffer buffer) {
-        write(buffer);
+        return write(buffer);
     }
 
     public GYokeHttpServerResponse leftShift(String s) {
         write(s);
-        this;
+        return this;
     }
 }
