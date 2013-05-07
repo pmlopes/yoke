@@ -1,85 +1,121 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Yoke - middleware for Vert.x</title>
-      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-      <link rel="stylesheet" href="style.css">
-      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-      <script src="docs.js"></script>
-  </head>
-  <body>
-    <div id="content">
-      <h1>Yoke</h1>
-        <div id="" class="comment">
-          <h2></h2>
-          <div class="description">
-            <p>Yoke is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>,<br />shipping with over 12 bundled middleware.</p>
-            <pre><code>Yoke yoke = new Yoke(vertx);
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Yoke: index</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; }
+code > span.dt { color: #204a87; }
+code > span.dv { color: #0000cf; }
+code > span.bn { color: #0000cf; }
+code > span.fl { color: #0000cf; }
+code > span.ch { color: #4e9a06; }
+code > span.st { color: #4e9a06; }
+code > span.co { color: #8f5902; font-style: italic; }
+code > span.ot { color: #8f5902; }
+code > span.al { color: #ef2929; }
+code > span.fu { color: #000000; }
+code > span.er { font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#yoke">Yoke</a><ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#api">API</a></li>
+<li><a href="#middleware">Middleware</a></li>
+<li><a href="#links">Links</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="yoke"><a href="#yoke">Yoke</a></h1>
+<p>Yoke is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>, shipping with over 12 bundled middleware. As with Vert.x, Yoke tries to be a polyglot middleware framework, currently <em>Java</em>, <em>Groovy</em> and <em>JavaScript</em> are supported languages and can be used interchangeably like with other Vert.x components.</p>
+<h3 id="java"><a href="#java">Java</a></h3>
+<pre class="sourceCode java"><code class="sourceCode java">Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Favicon</span>())
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Static</span>(<span class="st">&quot;webroot&quot;</span>))
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>() {{
+    <span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">new</span> Handler&lt;HttpServerRequest&gt;() {
+      @Override
+      <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(HttpServerRequest request) {
+        request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+      }
+    });
+  }});
 
-yoke.use(new Favicon());
-yoke.use(new Static("webroot"));
-yoke.use(new Router() {{
-  all("/hello", new Handler&lt;HttpServerRequest&gt;() {
-    @Override
-    public void handle(HttpServerRequest request) {
-      request.response().end("Hello World!");
+yoke.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre>
+<h3 id="groovy"><a href="#groovy">Groovy</a></h3>
+<pre class="groovy"><code>def yoke = new GYoke(vertx)
+  .chain(new Favicon())
+  .chain(new Static(&quot;webroot&quot;))
+  .chain(new GRouter() {{
+    all(&quot;/hello&quot;) { request -&gt;
+      request.response().end(&quot;Hello World!&quot;);
     }
-  });
-}});
+  }})
 
-yoke.listen(3000);</code></pre>
+yoke.listen(3000)</code></pre>
+<h3 id="javascript"><a href="#javascript">JavaScript</a></h3>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> yoke = <span class="kw">new</span> Yoke()
+  .<span class="fu">use</span>(<span class="kw">new</span> Favicon())
+  .<span class="fu">use</span>(<span class="kw">new</span> Static(<span class="ch">&#39;webroot&#39;</span>));
 
-            <h2>Installation</h2>
+<span class="kw">var</span> router = <span class="kw">new</span> Router();
 
-            <p>Vert.x 2 module:</p>
-            <pre><code>com.jetdrone~yoke~1.0.0-SNAPSHOT</code></pre>
+<span class="kw">router</span>.<span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">function</span> (request) {
+  <span class="kw">request</span>.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+});
 
-            <p>Maven artifact:</p>
-            <pre><code>&lt;dependency&gt;
-  &lt;groupId&gt;com.jetdrone&lt;/groupId&gt;
-  &lt;artifactId&gt;yoke&lt;/artifactId&gt;
-  &lt;version&gt;1.0.0-SNAPSHOT&lt;/version&gt;
-  &lt;scope&gt;provided&lt;/scope&gt;
-&lt;/dependency&gt;</code></pre>
-
-            <h2>API</h2>
-
-            <ul>
-              <li><a href="com.jetdrone.vertx.yoke.Yoke.html">com.jetdrone.vertx.yoke.Yoke</a> The Framework main class</li>
-              <li><a href="com.jetdrone.vertx.yoke.MimeType.html">com.jetdrone.vertx.yoke.MimeType</a> Mime-Types utils</li>
-              <li><a href="com.jetdrone.vertx.yoke.Middleware.html">com.jetdrone.vertx.yoke.Middleware</a> Abstract class that all midleware extends</li>
-              <li><a href="com.jetdrone.vertx.yoke.Engine.html">com.jetdrone.vertx.yoke.Engine</a> Abstract class that future render engines extend</li>
-              <li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest</a> Implementation of HttpServerRequest with some extra helper fields</li>
-              <li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse</a> Implementation of HttpServerResponse with suport for render engines</li>
-            </ul>
-
-            <h2>Middleware</h2>
-
-            <ul>
-              <li><a href="BasicAuth.html">BasicAuth</a> basic http authentication</li>
-              <li><a href="BodyParser.html">BodyParser</a> extensible request body parser</li>
-              <li><a href="CookieParser.html">CookieParser</a> cookie parser</li>
-              <li><a href="ErrorHandler.html">ErrorHandler</a> flexible error handler</li>
-              <li><a href="Favicon.html">Favicon</a> efficient favicon server (with default icon)</li>
-              <li><a href="Limit.html">Limit</a> limit the bytesize of request bodies</li>
-              <li><a href="MethodOverride.html">MethodOverride</a> faux HTTP method support</li>
-              <li><a href="ResponseTime.html">ResponseTime</a> calculates response-time and exposes via x-response-time</li>
-              <li><a href="Router.html">Router</a> flexible routing based on RouteMatcher</li>
-              <li><a href="Static.html">Static</a> streaming static file server supporting directory listings</li>
-              <li><a href="Timeout.html">Timeout</a> request timeouts</li>
-              <li><a href="Vhost.html">Vhost</a> virtual host sub-domain mapping middleware</li>
-            </ul>
-
-            <h2>Links</h2>
-
-            <ul>
-              <li>GitHub <a href="https://github.com/pmlopes/yoke">repository</a></li>
-            </ul>
-          </div>
-        </div>
-    </div>
-    <ul id="menu">
-      <li><a href="#"></a></li>
-    </ul>
-  </body>
+<span class="kw">yoke</span>.<span class="fu">use</span>(router);
+<span class="kw">yoke</span>.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre>
+<h2 id="installation"><a href="#installation">Installation</a></h2>
+<p>Vert.x 2 module: <code>com.jetdrone~yoke~1.0.0-SNAPSHOT</code></p>
+<p>Maven artifact:</p>
+<pre class="sourceCode xml"><code class="sourceCode xml"><span class="kw">&lt;dependency&gt;</span>
+  <span class="kw">&lt;groupId&gt;</span>com.jetdrone<span class="kw">&lt;/groupId&gt;</span>
+  <span class="kw">&lt;artifactId&gt;</span>yoke<span class="kw">&lt;/artifactId&gt;</span>
+  <span class="kw">&lt;version&gt;</span>1.0.0-SNAPSHOT<span class="kw">&lt;/version&gt;</span>
+  <span class="kw">&lt;scope&gt;</span>provided<span class="kw">&lt;/scope&gt;</span>
+<span class="kw">&lt;/dependency&gt;</span></code></pre>
+<h2 id="api"><a href="#api">API</a></h2>
+<h3 id="java-1"><a href="#java-1">Java</a></h3>
+<ul>
+<li><a href="com.jetdrone.vertx.yoke.Yoke.html">com.jetdrone.vertx.yoke.Yoke</a> The Framework main class</li>
+<li><a href="com.jetdrone.vertx.yoke.MimeType.html">com.jetdrone.vertx.yoke.MimeType</a> Mime-Types utils</li>
+<li><a href="com.jetdrone.vertx.yoke.Middleware.html">com.jetdrone.vertx.yoke.Middleware</a> Abstract class that all midleware extends</li>
+<li><a href="com.jetdrone.vertx.yoke.Engine.html">com.jetdrone.vertx.yoke.Engine</a> Abstract class that future render engines extend</li>
+<li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest</a> Implementation of HttpServerRequest with some extra helper fields</li>
+<li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse</a> Implementation of HttpServerResponse with suport for render engines</li>
+</ul>
+<h2 id="middleware"><a href="#middleware">Middleware</a></h2>
+<ul>
+<li><a href="BasicAuth.html">BasicAuth</a> basic http authentication</li>
+<li><a href="BodyParser.html">BodyParser</a> extensible request body parser</li>
+<li><a href="CookieParser.html">CookieParser</a> cookie parser</li>
+<li><a href="ErrorHandler.html">ErrorHandler</a> flexible error handler</li>
+<li><a href="Favicon.html">Favicon</a> efficient favicon server (with default icon)</li>
+<li><a href="Limit.html">Limit</a> limit the bytesize of request bodies</li>
+<li><a href="MethodOverride.html">MethodOverride</a> faux HTTP method support</li>
+<li><a href="ResponseTime.html">ResponseTime</a> calculates response-time and exposes via x-response-time</li>
+<li><a href="Router.html">Router</a> flexible routing based on RouteMatcher</li>
+<li><a href="Static.html">Static</a> streaming static file server supporting directory listings</li>
+<li><a href="Timeout.html">Timeout</a> request timeouts</li>
+<li><a href="Vhost.html">Vhost</a> virtual host sub-domain mapping middleware</li>
+</ul>
+<h2 id="links"><a href="#links">Links</a></h2>
+<ul>
+<li>GitHub <a href="https://github.com/pmlopes/yoke">repository</a></li>
+</ul>
+</body>
 </html>

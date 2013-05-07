@@ -1,31 +1,47 @@
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <title>Yoke - middleware for Vert.x</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" href="style.css">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="docs.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Yoke: MethodOverride</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; }
+code > span.dt { color: #204a87; }
+code > span.dv { color: #0000cf; }
+code > span.bn { color: #0000cf; }
+code > span.fl { color: #0000cf; }
+code > span.ch { color: #4e9a06; }
+code > span.st { color: #4e9a06; }
+code > span.co { color: #8f5902; font-style: italic; }
+code > span.ot { color: #8f5902; }
+code > span.al { color: #ef2929; }
+code > span.fu { color: #000000; }
+code > span.er { font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 <body>
-<div id="content">
-    <h1>Yoke</h1>
-    <div id="module.exports" class="comment">
-        <h2></h2>
-        <div class="description">
-            <h2>MethodOverride</h2>
-
-            <p>Pass an optional <code>key</code> to use when checking for a method override, othewise defaults to
-                <em>_method</em> or the header <em>x-http-method-override</em>.
-                The original method is available via <code>req.originalMethod</code>.</p>
-
-            <ul>
-                <li><em>String</em> key </li>
-            </ul>
-
-            <pre><code>new MethodOverride()</code></pre>
-        </div>
-    </div>
-    <ul id="menu"><li><a href="#module.exports"></a></li></ul>
+<div id="TOC">
+<ul>
+<li><a href="#yoke">Yoke</a><ul>
+<li><a href="#methodoverride">MethodOverride</a></li>
+</ul></li>
+</ul>
 </div>
+<h1 id="yoke"><a href="#yoke">Yoke</a></h1>
+<h2 id="methodoverride"><a href="#methodoverride">MethodOverride</a></h2>
+<p>Pass an optional <code>key</code> to use when checking for a method override, othewise defaults to <em>_method</em> or the header <em>x-http-method-override</em>. The original method is available via <code>req.originalMethod</code>.</p>
+<ul>
+<li><em>String</em> key</li>
+</ul>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">MethodOverride</span>()</code></pre>
 </body>
 </html>
