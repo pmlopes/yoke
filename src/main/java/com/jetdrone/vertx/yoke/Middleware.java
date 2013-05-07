@@ -30,8 +30,9 @@ public abstract class Middleware {
 
     protected Vertx vertx;
 
-    public void setVertx(Vertx vertx) {
+    public Middleware setVertx(Vertx vertx) {
         this.vertx = vertx;
+        return this;
     }
 
     public boolean isErrorHandler() {
