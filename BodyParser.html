@@ -31,12 +31,15 @@ code > span.er { font-weight: bold; }
 <body>
 <div id="TOC">
 <ul>
-<li><a href="#yoke">Yoke</a><ul>
+<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
 <li><a href="#bodyparser">BodyParser</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#defines">Defines</a></li>
+<li><a href="#limitations">Limitations</a></li>
 </ul></li>
 </ul>
 </div>
-<h1 id="yoke"><a href="#yoke">Yoke</a></h1>
+<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
 <h2 id="bodyparser"><a href="#bodyparser">BodyParser</a></h2>
 <p>Parse request bodies, supports <em>application/json</em>, <em>application/x-www-form-urlencoded</em>, and <em>multipart/form-data</em>.</p>
 <p>Once data has been parsed the result is visible in the field <code>body</code> of the request. To help there are 3 helper getters for this field:</p>
@@ -49,6 +52,16 @@ code > span.er { font-weight: bold; }
 <ul>
 <li><code>files()</code> returns <code>Map&lt;String, UploadFile&gt;</code></li>
 </ul>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
 <pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BodyParser</span>()</code></pre>
+<h2 id="defines"><a href="#defines">Defines</a></h2>
+<p>Defines the variable <code>body</code> in the request. This variable is of type <code>Object</code> there are 3 helpers to cast the value to:</p>
+<ul>
+<li><em>JsonObject</em> <code>bodyJson()</code></li>
+<li><em>Map</em> <code>bodyMap()</code></li>
+<li><em>Buffer</em> <code>bodyBuffer()</code></li>
+</ul>
+<h2 id="limitations"><a href="#limitations">Limitations</a></h2>
+<p>Currently when parsing <em>multipart/form-data</em> if there are several files uploaded under the same name, only the last is preserved.</p>
 </body>
 </html>

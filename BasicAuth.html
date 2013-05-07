@@ -31,25 +31,32 @@ code > span.er { font-weight: bold; }
 <body>
 <div id="TOC">
 <ul>
-<li><a href="#yoke">Yoke</a><ul>
+<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
 <li><a href="#basicauth">BasicAuth</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#defines">Defines</a></li>
+<li><a href="#extensions">Extensions</a></li>
 </ul></li>
 </ul>
 </div>
-<h1 id="yoke"><a href="#yoke">Yoke</a></h1>
+<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
 <h2 id="basicauth"><a href="#basicauth">BasicAuth</a></h2>
 <p>Enfore basic authentication by providing a <code>BasicAuth.AuthHandler</code> interface, which must return <code>true</code> in order to gain access. Alternatively an fixed username, password is provided. The middleware populates <code>request.user</code>.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
+<h3 id="username-and-password"><a href="#username-and-password">Username and password</a></h3>
 <ul>
 <li><em>String</em> username</li>
 <li><em>String</em> password</li>
 </ul>
 <pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="st">&quot;username&quot;</span>, <span class="st">&quot;password&quot;</span>)</code></pre>
+<h3 id="username-password-and-realm-name"><a href="#username-password-and-realm-name">Username, password and realm name</a></h3>
 <ul>
 <li><em>String</em> username</li>
 <li><em>String</em> password</li>
 <li><em>String</em> realm</li>
 </ul>
 <pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="st">&quot;username&quot;</span>, <span class="st">&quot;password&quot;</span>, <span class="st">&quot;Authentication Required&quot;</span>)</code></pre>
+<h3 id="authentication-handler"><a href="#authentication-handler">Authentication handler</a></h3>
 <ul>
 <li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
 </ul>
@@ -63,6 +70,7 @@ code > span.er { font-weight: bold; }
     }
   }
 });</code></pre>
+<h3 id="authentication-handler-and-realm-name"><a href="#authentication-handler-and-realm-name">Authentication handler and realm name</a></h3>
 <ul>
 <li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
 <li><em>String</em> realm</li>
@@ -77,5 +85,13 @@ code > span.er { font-weight: bold; }
     }
   }
 }, <span class="st">&quot;Authentication required&quot;</span>);</code></pre>
+<h2 id="defines"><a href="#defines">Defines</a></h2>
+<p>Defines the property <code>user</code> in the request context.</p>
+<h2 id="extensions"><a href="#extensions">Extensions</a></h2>
+<p>When there is a need to support several realms under the same server, you can override the the <code>getRealm</code> method.</p>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> String <span class="fu">getRealm</span>(YokeHttpServerRequest request) {
+  <span class="co">// do something with the request to generate the valid realm name</span>
+  <span class="kw">return</span> <span class="st">&quot;Authentication is required to access this resource&quot;</span>;
+}</code></pre>
 </body>
 </html>

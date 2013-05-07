@@ -31,17 +31,24 @@ code > span.er { font-weight: bold; }
 <body>
 <div id="TOC">
 <ul>
-<li><a href="#yoke">Yoke</a><ul>
+<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
 <li><a href="#methodoverride">MethodOverride</a></li>
+<li><a href="#usage">Usage</a></li>
+<li><a href="#notes">Notes</a></li>
 </ul></li>
 </ul>
 </div>
-<h1 id="yoke"><a href="#yoke">Yoke</a></h1>
+<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
 <h2 id="methodoverride"><a href="#methodoverride">MethodOverride</a></h2>
 <p>Pass an optional <code>key</code> to use when checking for a method override, othewise defaults to <em>_method</em> or the header <em>x-http-method-override</em>. The original method is available via <code>req.originalMethod</code>.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">MethodOverride</span>()</code></pre>
+<p>Or with optional key name</p>
 <ul>
 <li><em>String</em> key</li>
 </ul>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">MethodOverride</span>()</code></pre>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">MethodOverride</span>(<span class="st">&quot;x_method&quot;</span>)</code></pre>
+<h2 id="notes"><a href="#notes">Notes</a></h2>
+<p>If the method override is sent in a <em>POST</em> then the <a href="BodyParser.html">BodyParser</a> middleware must be used and installed prior this one.</p>
 </body>
 </html>

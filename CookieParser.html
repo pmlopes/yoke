@@ -33,12 +33,14 @@ code > span.er { font-weight: bold; }
 <ul>
 <li><a href="#yoke">Yoke</a><ul>
 <li><a href="#cookieparser">CookieParser</a></li>
+<li><a href="#usage">Usage</a></li>
 </ul></li>
 </ul>
 </div>
 <h1 id="yoke"><a href="#yoke">Yoke</a></h1>
 <h2 id="cookieparser"><a href="#cookieparser">CookieParser</a></h2>
 <p>Parse request cookies both signed or plain.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
 <p>Once data has been parsed the result is visible in the field <code>cookies</code> of the request.</p>
 <ul>
 <li><code>cookies()</code> returns <code>Map&lt;YokeCookie&gt;</code></li>
@@ -46,6 +48,9 @@ code > span.er { font-weight: bold; }
 <pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">CookieParser</span>()</code></pre>
 <p>If a cooke value starts with <em>s:</em> it means that it is a signed cookie. In this case the value is expected to be <em>s:<cookie>.<signature></em>. The signature is <em>HMAC + SHA256</em>.</p>
 <p>When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.</p>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">CookieParser</span>(<span class="st">&quot;secret&quot;</span>)</code></pre>
+<ul>
+<li><em>hmacsha512</em> hmac+sha512 MAC</li>
+</ul>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">CookieParser</span>(hmacsha512)</code></pre>
 </body>
 </html>
