@@ -17,3 +17,6 @@ FILES =	index.html \
 	@sed -i 's/<title><\/title>/<title>Yoke: $(patsubst %.html,%,$@)<\/title>/g' $@
 
 all: $(FILES)
+
+clean:
+	@rm *.html
