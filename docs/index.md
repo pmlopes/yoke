@@ -9,7 +9,7 @@ of the box, *Java* bundles a simple *StringPlaceholderEngine*, *Groovy* bundles 
 bundles the *MicroTemplateEngine*.
 
 
-## Java
+### Java
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 Yoke yoke = new Yoke(vertx)
@@ -24,7 +24,7 @@ Yoke yoke = new Yoke(vertx)
     })).listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Groovy
+### Groovy
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
 def yoke = new GYoke(vertx)
@@ -36,7 +36,7 @@ def yoke = new GYoke(vertx)
     }).listen(3000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## JavaScript
+### JavaScript
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines}
 var yoke = new Yoke()
@@ -99,7 +99,7 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
 * [MicroTemplateEngine](MicroTemplateEngine.html) MicroTemplateEngine
 
 
-## 3rd-party middleware/engines
+## 3rd-party
 
 * [Google Closure templates](https://github.com/core9/vertx-yoke-engine-closure) Yoke templating engine for Google Closure templates
 
