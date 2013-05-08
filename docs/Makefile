@@ -25,6 +25,7 @@ ENGINES =	StringPlaceholderEngine.html \
 	@sed -i 's/<title><\/title>/<title>Yoke a middleware framework for Vert.x: $(patsubst %.html,%,$@)<\/title>/g' $@
 
 all: $(BASE) $(TUTORIALS)
+	@tar -czvf yoke-gradle-template.tar.gz yoke-gradle-template
 
 clean:
-	@rm *.html || true
+	@rm *.html yoke-gradle-template.tar.gz || true
