@@ -14,7 +14,7 @@ FILES =	index.html \
 
 %.html: %.md
 	@pandoc $< -s --highlight-style tango -c style.css --toc --toc-depth=2 -A footer.txt -o $@
-	@sed -i 's/<title><\/title>/<title>Yoke: $(patsubst %.html,%,$@)<\/title>/g' $@
+	@sed -i 's/<title><\/title>/<title>Yoke a middleware framework for Vert.x: $(patsubst %.html,%,$@)<\/title>/g' $@
 
 all: $(FILES)
 
