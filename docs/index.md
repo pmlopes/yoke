@@ -1,10 +1,15 @@
 # Yoke
 
-Yoke is a middleware framework for [Vert.x](http://www.vertx.io), shipping with over 12 bundled middleware. As with
+Yoke is a middleware framework for [Vert.x](http://www.vertx.io), shipping with over 14 bundled middleware. As with
 Vert.x, Yoke tries to be a polyglot middleware framework, currently *Java*, *Groovy* and *JavaScript* are supported
 languages and can be used interchangeably like with other Vert.x components.
 
-### Java
+Yoke also does templating with its abstract template engine that can be extended to support any format needed. Out
+of the box, *Java* bundles a simple *StringPlaceholderEngine*, *Groovy* bundles the *GroovyTemplate* and *JavaScript*
+bundles the *MicroTemplateEngine*.
+
+
+## Java
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 Yoke yoke = new Yoke(vertx)
@@ -19,7 +24,7 @@ Yoke yoke = new Yoke(vertx)
     })).listen(3000);
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### Groovy
+## Groovy
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
 def yoke = new GYoke(vertx)
@@ -31,7 +36,7 @@ def yoke = new GYoke(vertx)
     }).listen(3000)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-### JavaScript
+## JavaScript
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines}
 var yoke = new Yoke()
@@ -46,9 +51,11 @@ var yoke = new Yoke()
 
 ## Installation
 
+### Vert.x module
+
 Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
 
-Maven artifact:
+### Maven artifact
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.xml}
 <dependency>
@@ -60,14 +67,11 @@ Maven artifact:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-## API
+## Tutorials
 
-* [com.jetdrone.vertx.yoke.Yoke](com.jetdrone.vertx.yoke.Yoke.html) The Framework main class
-* [com.jetdrone.vertx.yoke.MimeType](com.jetdrone.vertx.yoke.MimeType.html) Mime-Types utils
-* [com.jetdrone.vertx.yoke.Middleware](com.jetdrone.vertx.yoke.Middleware.html) Abstract class that all midleware extends
-* [com.jetdrone.vertx.yoke.Engine](com.jetdrone.vertx.yoke.Engine.html) Abstract class that future render engines extend
-* [com.jetdrone.vertx.yoke.middleware.YokeRequest](com.jetdrone.vertx.yoke.middleware.YokeRequest.html) Implementation of HttpServerRequest with some extra helper fields
-* [com.jetdrone.vertx.yoke.middleware.YokeResponse](com.jetdrone.vertx.yoke.middleware.YokeResponse.html) Implementation of HttpServerResponse with suport for render engines
+* [Java](Java-Tutorial.html) Java Tutorials
+* [Groovy](Groovy-Tutorial.html) Groovy Tutorials
+* [JavaScript](JavaScript-Tutorial.html) JavaScript Tutorials
 
 
 ## Middleware
@@ -78,12 +82,26 @@ Maven artifact:
 * [ErrorHandler](ErrorHandler.html) flexible error handler
 * [Favicon](Favicon.html) efficient favicon server (with default icon)
 * [Limit](Limit.html) limit the bytesize of request bodies
+* [Logger](Logger.html) Access request logger
 * [MethodOverride](MethodOverride.html) faux HTTP method support
 * [ResponseTime](ResponseTime.html) calculates response-time and exposes via x-response-time
 * [Router](Router.html) flexible routing based on RouteMatcher
+* [Session](Session.html) Cookie session
 * [Static](Static.html) streaming static file server supporting directory listings
 * [Timeout](Timeout.html) request timeouts
 * [Vhost](Vhost.html) virtual host sub-domain mapping middleware
+
+
+## Engines
+
+* [StringPlaceholderEngine](StringPlaceholderEngine.html) StringPlaceholderEngine
+* [GroovyTemplate](GroovyTemplate.html) GroovyTemplate
+* [MicroTemplateEngine](MicroTemplateEngine.html) MicroTemplateEngine
+
+
+## 3rd-party middleware/engines
+
+* [Google Closure templates](https://github.com/core9/vertx-yoke-engine-closure) Yoke templating engine for Google Closure templates
 
 
 ## Links

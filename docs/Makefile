@@ -1,4 +1,4 @@
-FILES =	index.html \
+BASE =	index.html \
 		BasicAuth.html \
 		BodyParser.html \
 		CookieParser.html \
@@ -12,11 +12,19 @@ FILES =	index.html \
 		Timeout.html \
 		Vhost.html
 
+TUTORIALS =	Java-Tutorial.html \
+			Groovy-Tutorial.html \
+			JavaScript-Tutorial.html
+
+ENGINES =	StringPlaceholderEngine.html \
+			GroovyTemplate.html \
+			MicroTemplateEngine.html
+
 %.html: %.md
 	@pandoc $< -s --highlight-style tango -c style.css --toc --toc-depth=2 -A footer.txt -o $@
 	@sed -i 's/<title><\/title>/<title>Yoke a middleware framework for Vert.x: $(patsubst %.html,%,$@)<\/title>/g' $@
 
-all: $(FILES)
+all: $(BASE) $(TUTORIALS)
 
 clean:
-	@rm *.html
+	@rm *.html || true
