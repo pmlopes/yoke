@@ -89,9 +89,22 @@ code > span.er { font-weight: bold; }
 <p>Defines the property <code>user</code> in the request context.</p>
 <h2 id="extensions"><a href="#extensions">Extensions</a></h2>
 <p>When there is a need to support several realms under the same server, you can override the the <code>getRealm</code> method.</p>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> String <span class="fu">getRealm</span>(YokeHttpServerRequest request) {
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> String <span class="fu">getRealm</span>(YokeRequest request) {
   <span class="co">// do something with the request to generate the valid realm name</span>
   <span class="kw">return</span> <span class="st">&quot;Authentication is required to access this resource&quot;</span>;
 }</code></pre>
+<div id="footer">
+  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+</div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-3682522-6', 'github.io');
+  ga('send', 'pageview');
+
+</script>
 </body>
 </html>

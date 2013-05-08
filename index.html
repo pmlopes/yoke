@@ -42,43 +42,56 @@ code > span.er { font-weight: bold; }
 <h1 id="yoke"><a href="#yoke">Yoke</a></h1>
 <p>Yoke is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>, shipping with over 12 bundled middleware. As with Vert.x, Yoke tries to be a polyglot middleware framework, currently <em>Java</em>, <em>Groovy</em> and <em>JavaScript</em> are supported languages and can be used interchangeably like with other Vert.x components.</p>
 <h3 id="java"><a href="#java">Java</a></h3>
-<pre class="sourceCode java"><code class="sourceCode java">Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
+<table class="sourceCode java numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="sourceCode"><pre><code class="sourceCode java">Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
   .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Favicon</span>())
   .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Static</span>(<span class="st">&quot;webroot&quot;</span>))
-  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>() {{
-    <span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">new</span> Handler&lt;HttpServerRequest&gt;() {
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
+    .<span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">new</span> Handler&lt;HttpServerRequest&gt;() {
       @Override
       <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(HttpServerRequest request) {
         request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
       }
-    });
-  }});
-
-yoke.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre>
+    })).<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre></td></tr></table>
 <h3 id="groovy"><a href="#groovy">Groovy</a></h3>
-<pre class="groovy"><code>def yoke = new GYoke(vertx)
-  .chain(new Favicon())
-  .chain(new Static(&quot;webroot&quot;))
-  .chain(new GRouter() {{
-    all(&quot;/hello&quot;) { request -&gt;
-      request.response().end(&quot;Hello World!&quot;);
-    }
-  }})
-
-yoke.listen(3000)</code></pre>
+<table class="sourceCode boo numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="sourceCode"><pre><code class="sourceCode boo"><span class="kw">def</span> yoke = new GYoke(vertx)
+  .use(new Favicon())
+  .use(new Static(<span class="st">&quot;webroot&quot;</span>))
+  .use(new GRouter()
+    .all(<span class="st">&quot;/hello&quot;</span>) { request -&gt;
+      request.response().end(<span class="st">&quot;Hello World!&quot;</span>);
+    }).listen(<span class="dv">3000</span>)</code></pre></td></tr></table>
 <h3 id="javascript"><a href="#javascript">JavaScript</a></h3>
-<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> yoke = <span class="kw">new</span> Yoke()
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> yoke = <span class="kw">new</span> Yoke()
   .<span class="fu">use</span>(<span class="kw">new</span> Favicon())
-  .<span class="fu">use</span>(<span class="kw">new</span> Static(<span class="ch">&#39;webroot&#39;</span>));
-
-<span class="kw">var</span> router = <span class="kw">new</span> Router();
-
-<span class="kw">router</span>.<span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">function</span> (request) {
-  <span class="kw">request</span>.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
-});
-
-<span class="kw">yoke</span>.<span class="fu">use</span>(router);
-<span class="kw">yoke</span>.<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre>
+  .<span class="fu">use</span>(<span class="kw">new</span> Static(<span class="ch">&#39;webroot&#39;</span>))
+  .<span class="fu">use</span>(<span class="kw">new</span> Router()
+    .<span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>, <span class="kw">function</span> (request) {
+      <span class="kw">request</span>.<span class="fu">response</span>().<span class="fu">end</span>(<span class="ch">&#39;Hello World!&#39;</span>);
+    })).<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre></td></tr></table>
 <h2 id="installation"><a href="#installation">Installation</a></h2>
 <p>Vert.x 2 module: <code>com.jetdrone~yoke~1.0.0-SNAPSHOT</code></p>
 <p>Maven artifact:</p>
@@ -94,8 +107,8 @@ yoke.listen(3000)</code></pre>
 <li><a href="com.jetdrone.vertx.yoke.MimeType.html">com.jetdrone.vertx.yoke.MimeType</a> Mime-Types utils</li>
 <li><a href="com.jetdrone.vertx.yoke.Middleware.html">com.jetdrone.vertx.yoke.Middleware</a> Abstract class that all midleware extends</li>
 <li><a href="com.jetdrone.vertx.yoke.Engine.html">com.jetdrone.vertx.yoke.Engine</a> Abstract class that future render engines extend</li>
-<li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerRequest</a> Implementation of HttpServerRequest with some extra helper fields</li>
-<li><a href="com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse.html">com.jetdrone.vertx.yoke.middleware.YokeHttpServerResponse</a> Implementation of HttpServerResponse with suport for render engines</li>
+<li><a href="com.jetdrone.vertx.yoke.middleware.YokeRequest.html">com.jetdrone.vertx.yoke.middleware.YokeRequest</a> Implementation of HttpServerRequest with some extra helper fields</li>
+<li><a href="com.jetdrone.vertx.yoke.middleware.YokeResponse.html">com.jetdrone.vertx.yoke.middleware.YokeResponse</a> Implementation of HttpServerResponse with suport for render engines</li>
 </ul>
 <h2 id="middleware"><a href="#middleware">Middleware</a></h2>
 <ul>
@@ -116,5 +129,18 @@ yoke.listen(3000)</code></pre>
 <ul>
 <li>GitHub <a href="https://github.com/pmlopes/yoke">repository</a></li>
 </ul>
+<div id="footer">
+  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+</div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-3682522-6', 'github.io');
+  ga('send', 'pageview');
+
+</script>
 </body>
 </html>
