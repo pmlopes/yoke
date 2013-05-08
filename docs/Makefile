@@ -13,7 +13,7 @@ FILES =	index.html \
 		Vhost.html
 
 %.html: %.md
-	@pandoc $< -s --highlight-style tango -c style.css --toc --toc-depth=2 -o $@
+	@pandoc $< -s --highlight-style tango -c style.css --toc --toc-depth=2 -A footer.txt -o $@
 	@sed -i 's/<title><\/title>/<title>Yoke: $(patsubst %.html,%,$@)<\/title>/g' $@
 
 all: $(FILES)
