@@ -6,6 +6,26 @@
   <meta name="generator" content="pandoc" />
   <title>Yoke a middleware framework for Vert.x: JavaScript-Tutorial</title>
   <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; }
+code > span.dt { color: #204a87; }
+code > span.dv { color: #0000cf; }
+code > span.bn { color: #0000cf; }
+code > span.fl { color: #0000cf; }
+code > span.ch { color: #4e9a06; }
+code > span.st { color: #4e9a06; }
+code > span.co { color: #8f5902; font-style: italic; }
+code > span.ot { color: #8f5902; }
+code > span.al { color: #ef2929; }
+code > span.fu { color: #000000; }
+code > span.er { font-weight: bold; }
+  </style>
   <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 <body>
@@ -14,8 +34,9 @@
 <li><a href="#yoke"><a href="/">Yoke</a></a><ul>
 <li><a href="#javascript-tutorial">JavaScript Tutorial</a></li>
 <li><a href="#boostraping-a-project">Boostraping a Project</a></li>
-<li><a href="#creating-the-first-hello-world">Creating the first Hello World</a></li>
-<li><a href="#expose-a-rest-operation">Expose a REST operation</a></li>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#hello-world">Hello World</a></li>
+<li><a href="#rest">REST</a></li>
 <li><a href="#error-handling">Error Handling</a></li>
 <li><a href="#templates">Templates</a></li>
 </ul></li>
@@ -24,8 +45,100 @@
 <h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
 <h2 id="javascript-tutorial"><a href="#javascript-tutorial">JavaScript Tutorial</a></h2>
 <h2 id="boostraping-a-project"><a href="#boostraping-a-project">Boostraping a Project</a></h2>
-<h2 id="creating-the-first-hello-world"><a href="#creating-the-first-hello-world">Creating the first Hello World</a></h2>
-<h2 id="expose-a-rest-operation"><a href="#expose-a-rest-operation">Expose a REST operation</a></h2>
+<p>There are several options on creating projects for Java. In this tutorial the chosen method is using <a href="http://www.gradle.org/">Gradle</a>. The choice was made because there is no required installation of software (as long as you have <em>JDK &gt;= 1.7</em> installed in your system.</p>
+<p>It is assumed that the reader has basic knowledge of <em>git</em>, <em>shell</em> scripting and of course <em>Java</em>. You are not required to know <em>gradle</em> since we are using this template project.</p>
+<p>Start by downloading the <a href="yoke-gradle-template.tar.gz">yoke-gradle-template</a> to your local development work directory.</p>
+<pre><code>pmlopes@jetdrone:~/Projects$ curl http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
+pmlopes@jetdrone:~/Projects$</code></pre>
+<p>The extracted project lives under the directory <em>yoke-gradle-template</em> it should be expected to be renamed to a better suitable name describing the project to be implemented.</p>
+<pre><code>pmlopes@jetdrone:~/Projects$ mv yoke-gradle-template yoke-tutorial
+pmlopes@jetdrone:~/Projects$ cd yoke-tutorial
+pmlopes@jetdrone:~/Projects/yoke-tutorial$</code></pre>
+<h2 id="introduction"><a href="#introduction">Introduction</a></h2>
+<p>Yoke is a minimal and flexible Vert.x web application framework, providing a robust set of features for building single and multi-page, and hybrid web applications. Yoke provides a thin layer of features fundamental to any web application, without obscuring features that you know and love in Vert.x.</p>
+<p>Before you start, you need to understand the basic functionality under Yoke. Yoke is a chain executor, modelled in a way like the <a href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">chain-of-responsability pattern</a>. Yoke is responsible to execute all your processing objects, which from now on we call Middleware. Middleware makes it easier for software developers to perform specialized tasks, such as <em>HTTP Parsing</em>, <em>Authentication</em>, <em>Routing</em>, etc..., so they can focus on the specific purpose of their application.</p>
+<p>The API of Yoke is quite simple, in fact it consist only of 4 methods:</p>
+<ul>
+<li><code>use</code></li>
+<li><code>set</code></li>
+<li><code>engine</code></li>
+<li><code>listen</code></li>
+</ul>
+<h3 id="use"><a href="#use">use</a></h3>
+<p>You register middleware onto it using the <code>use</code> method, you might call the method with the following signatures:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.</span>
+<span class="co">// This middleware will run on every request path</span>
+use(<span class="kw">Function</span> middlewareImplementation);
+
+<span class="co">// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.</span>
+<span class="co">// This middleware will run only on requests which path starts with the route you specify. A tipical use case is when</span>
+<span class="co">// you want to do authentication on a specific route e.g.: all requests starting with /secure</span>
+use(<span class="kw">String</span> route, <span class="kw">Function</span> middlewareImplementation);</code></pre>
+<p>You can registeras many middleware as you want, but keep in mind that the order you used to register is the order that is used to process a request. In other words If you need to consume the request body of a request you need to use the <a href="BodyParser.html">BodyParser</a> middleware before the middleware you are implementing.</p>
+<p>The difference between the Middleware abstract class and the <a href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">chain-of-responsability pattern</a> is that you don't have to define the &quot;next&quot; on the middleware itself but yoke takes care of it. An implementation of Middleware requires you to implement the following function:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co"> * Handles a request.</span>
+<span class="co"> *</span>
+<span class="co"> * @param request A YokeRequest which in practice is a extended HttpServerRequest</span>
+<span class="co"> * @param next The callback to inform that the next middleware in the chain should be used. A value different from</span>
+<span class="co"> *             null represents an error and in that case the error handler middleware will be executed.</span>
+<span class="co"> */</span>
+<span class="kw">function</span> (request, next) {};</code></pre>
+<p>The <code>next</code> parameter is a <a href="http://en.wikipedia.org/wiki/Callback_%28computer_programming%29">callback</a>. The reason for using callbacks is to allow asynchronous execution of tasks. So in your code you can call <code>next(object)</code> in the end of your method, or if you need to wait for some asynchronous call then at that moment you can call the callback.</p>
+<p>The value you pass to the callback is an <em>Error</em>. It might feel strange that the callback accepts <em>Object</em> instead of <em>Exception</em> but the reason is that sometimes you might want to raise errors that do not require a full stack trace to be generated by the JVM. In those cases you just pass a <em>Number</em> which is interpreted as a <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes"><em>HTTP Error</em></a>. When a <em>String</em> is passed, then a generic <em>Internal Server Error</em> is raised. If your middleware completed successfuly then your error should be <em>null</em>.</p>
+<p>To signal the end of processing of a request, just don't call the callback handler anymore. To summarize, calling next informs Yoke to execute the next <em>Middleware</em> in the chain, if the handler contains anything other than <em>null</em> then an error middleware is executed skipping all the remaining middleware.</p>
+<h3 id="set"><a href="#set">set</a></h3>
+<p>Every YokeRequest contains a context. A context is just a Java <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a>. The context is how you can share data between middlewares and lives during the request lifetime. When a request arrives at Yoke the context is initialized with an empty Map and all the values you define on Yoke with the <code>set</code> method. Yoke always defines the key <em>title</em> with the value <em>Yoke</em>. You might want to override this by setting the title to your application name.</p>
+<h3 id="engine"><a href="#engine">engine</a></h3>
+<p>Yoke allows you to use template engines so you do not need to generate <em>HTML</em> by appending strings. You register an engine but registering it's extension and a class that extends the Engine abstract class. By default Yoke bundles a simple <em>GroovyTemplate</em> that allows you to use the powerful GroovyTemplate class as a html generator.</p>
+<p>Of course this is a very naive engine so you can add your own or use other ones provided by the community. If you need to implement one yourself all you need to implement is the following method:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">/**</span>
+<span class="co"> * The required to implement method.</span>
+<span class="co"> *</span>
+<span class="co"> * @param filename - String representing the file path to the template</span>
+<span class="co"> * @param context - Map with key values that might get substituted in the template</span>
+<span class="co"> * @param handler - The future result handler with a Buffer in case of success</span>
+<span class="co"> */</span>
+public <span class="kw">void</span> render(<span class="kw">String</span> filename, Map&lt;<span class="kw">String</span>, <span class="kw">Object</span>&gt; context, AsyncResultHandler&lt;<span class="kw">String</span>&gt; handler);</code></pre>
+<p>The context is passed from the request directly and in fact is the same Map that was described on the <code>set</code> method.</p>
+<p>To use the engines all you need to do is use the <code>render</code> method on the YokeResponse and pass the filename with the correct file extension used to register the engine.</p>
+<h3 id="listen"><a href="#listen">listen</a></h3>
+<p>With this method you start a server, either listening on a specific port, address + port, or on top of an existing Vert.x HttpServer.</p>
+<h2 id="hello-world"><a href="#hello-world">Hello World</a></h2>
+<p>At this moment you should understand the basic API of Yoke, and how it works so it is time to write your first <em>Hello World</em> example.</p>
+<p>Assuming you already bootstraped your project and are inside the working directory we are going to create the groovy script: <code>HelloWorldVerticle.js</code> under <code>src/main/resources</code>. At this moment you should have the file <code>src/main/resources/HelloWorldVerticle.js</code> in your file system.</p>
+<p>The reason we have a <em>Verticle</em> class is because Yoke does not forces you to use any special classes, you still code like you would on Vert.x. So we start by creating a Verticle the same way we would on any other Vert.x application:</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">console</span>.<span class="fu">log</span>(<span class="st">&quot;Nothing here!&quot;</span>);</code></pre></td></tr></table>
+<p>This is the bare minimal Verticle code you need to write. Of course this code does not do anything fancy, in fact it just do nothing. So lets make a <em>HTTP</em> web server that listens on port <em>8080</em>.</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> Yoke = require(<span class="ch">&#39;yokejs/Yoke&#39;</span>);
+
+<span class="kw">var</span> yoke = <span class="kw">new</span> Yoke();
+<span class="kw">yoke</span>.<span class="fu">listen</span>(<span class="dv">8080</span>);</code></pre></td></tr></table>
+<p>And you can quickly test your new Verticle by running:</p>
+<pre><code>pmlopes@jetdrone:~/Projects/yoke-tutorial$ ./gradlew runMod
+pmlopes@jetdrone:~/Projects/yoke-tutorial$</code></pre>
+<p>If you open a web browser and navigate to your localhost at port 8080 you will get a <em>404</em> <em>Not Found</em> error message. This is expected since you have a server running but no middleware is handling your requests. So lets install a handler for all request paths to respond with &quot;Hello World&quot;.</p>
+<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> Yoke = require(<span class="ch">&#39;yokejs/Yoke&#39;</span>);
+
+<span class="kw">var</span> yoke = <span class="kw">new</span> Yoke();
+<span class="kw">yoke</span>.<span class="fu">use</span>(<span class="kw">function</span> (req) {
+  <span class="kw">req</span>.<span class="fu">response</span>().<span class="fu">end</span>(<span class="ch">&#39;Hello World!&#39;</span>);
+});
+<span class="kw">yoke</span>.<span class="fu">listen</span>(<span class="dv">8080</span>);</code></pre></td></tr></table>
+<p>If you restart your verticle running the gradle command from before and reload your web browser you will see the text &quot;Hello World&quot; on it.</p>
+<h2 id="rest"><a href="#rest">REST</a></h2>
 <h2 id="error-handling"><a href="#error-handling">Error Handling</a></h2>
 <h2 id="templates"><a href="#templates">Templates</a></h2>
 <div id="footer">

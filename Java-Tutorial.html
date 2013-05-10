@@ -300,25 +300,25 @@ pmlopes@jetdrone:~/Projects/yoke-tutorial$</code></pre>
             request.<span class="fu">response</span>().<span class="fu">end</span>(response);
           }
         })
-        .<span class="fu">put</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .<span class="fu">put</span>(<span class="st">&quot;/resource/:id&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
           @Override
           <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
             JsonObject body = request.<span class="fu">jsonBody</span>();
-            Database.<span class="fu">update</span>(body);
+            Database.<span class="fu">update</span>(request.<span class="fu">params</span>().<span class="fu">get</span>(<span class="st">&quot;id&quot;</span>), body);
             request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="dv">204</span>);
           }
         })
-        .<span class="fu">get</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .<span class="fu">get</span>(<span class="st">&quot;/resource/:id&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
           @Override
           <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            JsonObject fromDb = Database.<span class="fu">get</span>();
+            JsonObject fromDb = Database.<span class="fu">get</span>(request.<span class="fu">params</span>().<span class="fu">get</span>(<span class="st">&quot;id&quot;</span>));
             request.<span class="fu">response</span>().<span class="fu">end</span>(fromDb);
           }
         })
-        .<span class="fu">delete</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .<span class="fu">delete</span>(<span class="st">&quot;/resource/:id&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
           @Override
           <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            Database.<span class="fu">delete</span>();
+            Database.<span class="fu">delete</span>(request.<span class="fu">params</span>().<span class="fu">get</span>(<span class="st">&quot;id&quot;</span>));
             request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="dv">204</span>);
           }
         }));
