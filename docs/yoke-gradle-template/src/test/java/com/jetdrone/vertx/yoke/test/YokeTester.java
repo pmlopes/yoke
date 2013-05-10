@@ -20,6 +20,7 @@ import io.netty.handler.codec.http.QueryStringDecoder;
 import org.vertx.java.core.*;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.*;
+import org.vertx.java.core.net.NetSocket;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -156,6 +157,10 @@ public class YokeTester extends Yoke {
                 public HttpServerRequest endHandler(Handler<Void> endHandler) {
                     endHandler.handle(null);
                     return this;
+                }
+                @Override
+                public NetSocket netSocket() {
+                    throw new UnsupportedOperationException("This mock does not support netSocket");
                 }
 
                 @Override

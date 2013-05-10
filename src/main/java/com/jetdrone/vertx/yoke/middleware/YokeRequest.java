@@ -24,6 +24,7 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
 import org.vertx.java.core.http.impl.DefaultHttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.net.NetSocket;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -376,6 +377,11 @@ public class YokeRequest implements HttpServerRequest {
         return this;
     }
 
+    @Override
+    public NetSocket netSocket() {
+        return request.netSocket();
+    }
+
     /**
      * @see org.vertx.java.core.http.HttpServerRequest#dataHandler(org.vertx.java.core.Handler)
      */
@@ -508,5 +514,9 @@ public class YokeRequest implements HttpServerRequest {
 
     public HttpVersion getVersion() {
         return version();
+    }
+
+    public NetSocket getNetSocket() {
+        return netSocket();
     }
 }
