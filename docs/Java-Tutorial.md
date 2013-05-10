@@ -143,6 +143,74 @@ Vert.x HttpServer.
 
 ## Hello World
 
+At this moment you should understand the basic API of Yoke, and how it works so it is time to write your first *Hello
+World* example.
+
+Assuming you already bootstraped your project and are inside the working directory we are going to create the class:
+```com.jetdrone.yoke.HelloWorldVerticle``` under ```src/main/java```. At this moment you should have the file
+```src/main/java/com/jetdrone/yoke/HelloWorldVerticle.java``` in your file system.
+
+The reason we have a *Verticle* class is because Yoke does not forces you to use any special classes, you still code
+like you would on Vert.x. So we start by creating a Verticle the same way we would on any other Vert.x application:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
+package com.jetdrone.vertx;
+
+import com.jetdrone.vertx.yoke.*;
+import com.jetdrone.vertx.yoke.middleware.*;
+
+import org.vertx.java.core.*;
+import org.vertx.java.platform.*;
+
+public class HelloWorldVerticle extends Verticle {
+
+  @Override
+  public void start() {
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This is the bare minimal Verticle code you need to write. Of course this code does not do anything fancy, in fact it
+just do nothing. So lets make a *HTTP* web server that listens on port *8080*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.listen(8080);
+  }
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+And you can quickly test your new Verticle by running:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pmlopes@jetdrone:~/Projects/yoke-tutorial$ ./gradlew runMod
+pmlopes@jetdrone:~/Projects/yoke-tutorial$
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you open a web browser and navigate to your localhost at port 8080 you will get a *404* *Not Found* error message.
+This is expected since you have a server running but no middleware is handling your requests. So lets install a handler
+for all request paths to respond with "Hello World".
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new Handler<YokeRequest>() {
+      @Override
+      public void handle(YokeRequest request) {
+        request.response().end("Hello World!");
+      }
+    yoke.listen(8080);
+  }
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you restart your verticle running the gradle command from before and reload your web browser you will see the text
+"Hello World" on it.
+
+
 ## REST
 
 ## Error Handling
