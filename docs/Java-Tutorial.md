@@ -202,6 +202,7 @@ for all request paths to respond with "Hello World".
       public void handle(YokeRequest request) {
         request.response().end("Hello World!");
       }
+    });
     yoke.listen(8080);
   }
 ...
@@ -213,6 +214,226 @@ If you restart your verticle running the gradle command from before and reload y
 
 ## REST
 
+At this point you already know about the basics of Yoke, so lets extend the example and make a REST web service. Our
+REST web service will listen on the path */resource*. Lets define a couple of functionality, when you *POST* a JSON
+document, the document will be stored in a database, if you *PUT* the document will be updated, if you *GET* then you
+retreive the document from the database and finally if you *DELETE* you delete the document from the database. Since
+Database handling is not the purpose of Yoke we will assume data is always available.
+
+Having to write code to handle all these *HTTP* verbs and paths would be to much boiler plate code. To help out Yoke
+has a [Router middleware](Router.html). So lets replace the *Hello World" handler and replace it with the router
+middleware. With this middleware we define the 4 actions *POST*, *PUT*, *GET* and *DELETE*.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new Router()
+        .post("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            // will implement this later...
+          }
+        })
+        .put("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            // will implement this later...
+          }
+        })
+        .get("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            // will implement this later...
+          }
+        })
+        .delete("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            // will implement this later...
+          }
+        }));
+    yoke.listen(8080);
+  }
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So your application can handle all those actions under */resource*. Lets fill the handlers to do something. Since we
+have no database in the code we assume there is a database abstraction that implements the actions. So our code would
+become:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new Router()
+        .post("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            JsonObject body = request.jsonBody();
+            String id = Database.store(body);
+            JsonObject response = new JsonObject().putString("id", id);
+            request.response().end(response);
+          }
+        })
+        .put("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            JsonObject body = request.jsonBody();
+            Database.update(body);
+            request.response().end(204);
+          }
+        })
+        .get("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            JsonObject fromDb = Database.get();
+            request.response().end(fromDb);
+          }
+        })
+        .delete("/resource", new Handler<YokeRequest>() {
+          @Override
+          public void handle(YokeRequest request) {
+            Database.delete();
+            request.response().end(204);
+          }
+        }));
+    yoke.listen(8080);
+  }
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Everything seems to be OK, however if you upload a json document nothing will show up on the body of your request. This
+is expected because no one has parsed the request body. You don't need to worry about it, Yoke has a Middleware that
+does that for you. You can install the [BodyParser](BodyParser.html) middleware easily. As it was described before, you
+can use as many middleware as you want but the order matters. This means that if you need to have the body parsed in
+your router middleware you are going to have to install the body parser before that, like this:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Handler<YokeRequest>() {
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So you now have a valid request body for your *POST* and *PUT*. This increases the developer productivity since you do
+not need to spend time implementing a HTTP body parser. However having this on could lead your application to be
+vulnerable to DoS attacks when someone would try to upload a json document bigger than your server memory. To be safer
+you can use the [Limit](Limit.html) middleware which defines a maximum allowed size for your uploads. Again if you want
+the application to be aware of the limit, this needs to be defined before the parser starts doing its work like this for
+an upload of a maximum size of 4kb (4096 bytes):
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new Limit(4096));
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Handler<YokeRequest>() {
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You can look to the list of provided middleware and add as you like and also look at the 3rd party list.
+
+
 ## Error Handling
 
+You have a working REST application but if an error occurs you need to handle it manually, however Yoke has a better way
+for you. There is the possibility to use [ErrorHandler](ErrorHandler.html) middleware to generate pretty errors, however
+by itself this is not enough, you need to inform Yoke you want it to handle the error for you. To do this we need to
+change out handlers to become middlewares, lets focus alone in the *POST* code, since the other code would be the same.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new Limit(4096));
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Middleware() {
+          @Override
+          public void handle(YokeRequest request, Handler<Object> next) {
+            try {
+              JsonObject body = request.jsonBody();
+              String id = Database.store(body);
+              JsonObject response = new JsonObject().putString("id", id);
+              request.response().end(response);
+            } catch (Exception e) {
+              next.handle(e);
+            }
+          }
+        })
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So if there was an error Yoke will handle it and generate an error message. By default it will be a ugly text string
+with the error name. To make it prettier lets use the error handler middleware.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.use(new ErrorHandler(true));
+    yoke.use(new Limit(4096));
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Middleware() {
+          @Override
+          public void handle(YokeRequest request, Handler<Object> next) {
+            try {
+              JsonObject body = request.jsonBody();
+              String id = Database.store(body);
+              JsonObject response = new JsonObject().putString("id", id);
+              request.response().end(response);
+            } catch (Exception e) {
+              next.handle(e);
+            }
+          }
+        })
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now your errors are pretty and include stack traces if present because you are creating an handler with 1st argument to
+true.
+
+
 ## Templates
+
+Not all applications are REST based and you might need to generate some HTML. It is not productive to inline the HTML in
+strings in your code and concatenate them at request time. Yoke ships with a simple engine but more can be added as
+explained before.
+
+So lets use the built in [StringPlaceholderEngine](StringPlaceholderEngine.html) and use the template:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hello ${name}!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+So in order to do this, you first need to register the engine:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
+...
+  public void start() {
+    Yoke yoke = new Yoke();
+    yoke.engine("tmpl", new StringPlaceholderEngine());
+    yoke.use(new ErrorHandler(true));
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+And now in your Middleware/Handler you only need to call the render method. In order to fill the property *name* that
+you can see in the template, you need to add it to the request context. As explained before the context is a Map and you
+can update it by invoking the ```put``` method in the request.
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+...
+@Override
+public void handle(YokeRequest request) {
+  request.put("name", "Yoke World");
+  request.response().render("mytemplate.tmpl");
+}
+...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
