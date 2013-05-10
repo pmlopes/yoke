@@ -4,15 +4,15 @@ body {
 }
 
 body p {
-    width: 70%;
+  width: 70%;
 }
 
 body ul {
-    width: 70%;
+  width: 70%;
 }
 
 body ol {
-    width: 70%;
+  width: 70%;
 }
 
 h1 {
@@ -21,8 +21,8 @@ h1 {
 }
 
 h1 a {
-    text-decoration: none;
-    color: #000000;
+  text-decoration: none;
+  color: #000000;
 }
 
 h2 {
@@ -30,8 +30,8 @@ h2 {
 }
 
 h2 a {
-    text-decoration: none;
-    color: #000000;
+  text-decoration: none;
+  color: #000000;
 }
 
 h3 {
@@ -39,8 +39,8 @@ h3 {
 }
 
 h3 a {
-    text-decoration: none;
-    color: #000000;
+  text-decoration: none;
+  color: #000000;
 }
 
 a {
@@ -51,6 +51,11 @@ a {
   position: fixed;
   top: 10px;
   right: 30px;
+}
+
+#TOC ul {
+  padding: 0;
+  width: 100%
 }
 
 #TOC li {
@@ -73,6 +78,6 @@ table.sourceCode { width: 70%; background-color: #f8f8f8; }
 pre.sourceCode { width: 70%; background-color: #f8f8f8; }
 
 body li em {
-    font-weight: bold;
-    font-style: normal;
+  font-weight: bold;
+  font-style: normal;
 }
