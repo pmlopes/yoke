@@ -21,3 +21,4 @@ test-tmp
 *.class
 mods
 docs/*.html
+docs/yoke-gradle-template.tar.gz
