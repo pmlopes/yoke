@@ -276,25 +276,25 @@ become:
             request.response().end(response);
           }
         })
-        .put("/resource", new Handler<YokeRequest>() {
+        .put("/resource/:id", new Handler<YokeRequest>() {
           @Override
           public void handle(YokeRequest request) {
             JsonObject body = request.jsonBody();
-            Database.update(body);
+            Database.update(request.params().get("id"), body);
             request.response().end(204);
           }
         })
-        .get("/resource", new Handler<YokeRequest>() {
+        .get("/resource/:id", new Handler<YokeRequest>() {
           @Override
           public void handle(YokeRequest request) {
-            JsonObject fromDb = Database.get();
+            JsonObject fromDb = Database.get(request.params().get("id"));
             request.response().end(fromDb);
           }
         })
-        .delete("/resource", new Handler<YokeRequest>() {
+        .delete("/resource/:id", new Handler<YokeRequest>() {
           @Override
           public void handle(YokeRequest request) {
-            Database.delete();
+            Database.delete(request.params().get("id"));
             request.response().end(204);
           }
         }));

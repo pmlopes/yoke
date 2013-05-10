@@ -107,3 +107,4 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
 ## Links
 
 * GitHub [repository](https://github.com/pmlopes/yoke)
+* [Vert.x](http://vertx.io)
