@@ -32,14 +32,11 @@ code > span.er { font-weight: bold; }
 <div id="TOC">
 <ul>
 <li><a href="#yoke">Yoke</a><ul>
-<li><a href="#java">Java</a></li>
-<li><a href="#groovy">Groovy</a></li>
-<li><a href="#javascript">JavaScript</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#tutorials">Tutorials</a></li>
 <li><a href="#middleware">Middleware</a></li>
 <li><a href="#engines">Engines</a></li>
-<li><a href="#rd-party-middlewareengines">3rd-party</a></li>
+<li><a href="#rd-party">3rd-party</a></li>
 <li><a href="#links">Links</a></li>
 </ul></li>
 </ul>
@@ -47,7 +44,7 @@ code > span.er { font-weight: bold; }
 <h1 id="yoke"><a href="#yoke">Yoke</a></h1>
 <p>Yoke is a middleware framework for <a href="http://www.vertx.io">Vert.x</a>, shipping with over 14 bundled middleware. As with Vert.x, Yoke tries to be a polyglot middleware framework, currently <em>Java</em>, <em>Groovy</em> and <em>JavaScript</em> are supported languages and can be used interchangeably like with other Vert.x components.</p>
 <p>Yoke also does templating with its abstract template engine that can be extended to support any format needed. Out of the box, <em>Java</em> bundles a simple <em>StringPlaceholderEngine</em>, <em>Groovy</em> bundles the <em>GroovyTemplate</em> and <em>JavaScript</em> bundles the <em>MicroTemplateEngine</em>.</p>
-<h2 id="java"><a href="#java">Java</a></h2>
+<h3 id="java"><a href="#java">Java</a></h3>
 <table class="sourceCode java numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -68,7 +65,7 @@ code > span.er { font-weight: bold; }
         request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
       }
     })).<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre></td></tr></table>
-<h2 id="groovy"><a href="#groovy">Groovy</a></h2>
+<h3 id="groovy"><a href="#groovy">Groovy</a></h3>
 <table class="sourceCode boo numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -83,7 +80,7 @@ code > span.er { font-weight: bold; }
     .all(<span class="st">&quot;/hello&quot;</span>) { request -&gt;
       request.response().end(<span class="st">&quot;Hello World!&quot;</span>);
     }).listen(<span class="dv">3000</span>)</code></pre></td></tr></table>
-<h2 id="javascript"><a href="#javascript">JavaScript</a></h2>
+<h3 id="javascript"><a href="#javascript">JavaScript</a></h3>
 <table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -137,7 +134,7 @@ code > span.er { font-weight: bold; }
 <li><a href="GroovyTemplate.html">GroovyTemplate</a> GroovyTemplate</li>
 <li><a href="MicroTemplateEngine.html">MicroTemplateEngine</a> MicroTemplateEngine</li>
 </ul>
-<h2 id="rd-party-middlewareengines"><a href="#rd-party-middlewareengines">3rd-party</a></h2>
+<h2 id="rd-party"><a href="#rd-party">3rd-party</a></h2>
 <ul>
 <li><a href="https://github.com/core9/vertx-yoke-engine-closure">Google Closure templates</a> Yoke templating engine for Google Closure templates</li>
 </ul>

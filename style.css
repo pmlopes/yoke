@@ -53,6 +53,11 @@ a {
   right: 30px;
 }
 
+#TOC ul {
+  padding: 0;
+  width: 100%
+}
+
 #TOC li {
   list-style: none;
 }
