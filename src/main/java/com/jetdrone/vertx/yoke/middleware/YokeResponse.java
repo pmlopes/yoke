@@ -19,6 +19,7 @@ import com.jetdrone.vertx.yoke.Engine;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
+import org.vertx.java.core.streams.Pump;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -28,6 +29,7 @@ import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.streams.ReadStream;
 
 import java.util.*;
 
@@ -161,6 +163,18 @@ public class YokeResponse implements HttpServerResponse {
             response.end(jsonObject.encode());
             triggerEndHandlers();
         }
+    }
+
+    public void end(ReadStream stream) {
+        triggerHeadersHandlers();
+        Pump.createPump(stream, response).start();
+        stream.endHandler(new Handler<Void>() {
+            @Override
+            public void handle(Void event) {
+                response.end();
+                triggerEndHandlers();
+            }
+        });
     }
 
     public YokeResponse addCookie(Cookie cookie) {
