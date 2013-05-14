@@ -16,8 +16,12 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.annotations.*;
 import org.vertx.java.core.Handler;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -631,5 +635,112 @@ public class Router extends Middleware {
             this.paramNames = paramNames;
             this.middleware = middleware;
         }
+    }
+
+    private static String getPath(Object o, Method m) {
+        // read the method one
+        Path p = m.getAnnotation(Path.class);
+        if (p != null) {
+            // method path is present
+            return p.value();
+        }
+
+        p = o.getClass().getAnnotation(Path.class);
+        if (p != null) {
+            // top level path is present
+            return p.value();
+        }
+        throw new RuntimeException("Cannot infer the path for this method");
+    }
+
+    private static Middleware wrap(final Object o, final Method m, final boolean simple) {
+        return new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                try {
+                    if (simple) {
+                        m.invoke(o, request);
+                    } else {
+                        m.invoke(o, request, next);
+                    }
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    e.printStackTrace();
+                    next.handle(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Builds a Router from an annotated Java Object
+     */
+    public static Router from(Object... objs) {
+
+        Router router = new Router();
+
+        for (Object o : objs) {
+            for (final Method m : o.getClass().getMethods()) {
+                Annotation[] annotations = m.getAnnotations();
+                // this method is not annotated
+                if (annotations == null) {
+                    continue;
+                }
+
+                Class[] paramTypes = m.getParameterTypes();
+                int type = 0;
+
+                if (paramTypes != null) {
+                    if (paramTypes.length == 1 && paramTypes[0].equals(YokeRequest.class)) {
+                        // single argument handler
+                        type = 1;
+                    }
+                    if (paramTypes.length == 2 && paramTypes[0].equals(YokeRequest.class) && paramTypes[0].equals(Handler.class)) {
+                        // double argument handler
+                        type = 2;
+                    }
+                }
+
+                if (type == 0) {
+                    continue;
+                }
+
+                String path = getPath(o, m);
+
+                for (Annotation a : annotations) {
+                    if (a instanceof GET) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof PUT) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof POST) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof DELETE) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof OPTIONS) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof HEAD) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof TRACE) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof PATCH) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof CONNECT) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                    if (a instanceof ALL) {
+                        router.get(path, wrap(o, m, type == 1));
+                    }
+                }
+            }
+        }
+
+        return router;
     }
 }
