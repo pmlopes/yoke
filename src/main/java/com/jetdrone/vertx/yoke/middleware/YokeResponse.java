@@ -165,7 +165,7 @@ public class YokeResponse implements HttpServerResponse {
         }
     }
 
-    public void end(ReadStream stream) {
+    public void end(ReadStream<?> stream) {
         triggerHeadersHandlers();
         Pump.createPump(stream, response).start();
         stream.endHandler(new Handler<Void>() {

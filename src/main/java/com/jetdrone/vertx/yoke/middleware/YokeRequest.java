@@ -15,14 +15,12 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
-import org.vertx.java.core.http.impl.DefaultHttpServerRequest;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.net.NetSocket;
 
@@ -48,7 +46,7 @@ public class YokeRequest implements HttpServerRequest {
     private String method;
     private long bodyLengthLimit = -1;
     private Object body;
-    private Map<String, FileUpload> files;
+    private Map<String, HttpServerFileUpload> files;
     private Set<YokeCookie> cookies;
     private String sessionId;
 
@@ -200,17 +198,6 @@ public class YokeRequest implements HttpServerRequest {
     /**
      * The request setBody and eventually a parsed version of it in json or map
      */
-    @SuppressWarnings("unchecked")
-    public MultiMap mapBody() {
-        if (body != null && body instanceof MultiMap) {
-            return (MultiMap) body;
-        }
-        return null;
-    }
-
-    /**
-     * The request setBody and eventually a parsed version of it in json or map
-     */
     public Buffer bufferBody() {
         if (body != null && body instanceof Buffer) {
             return (Buffer) body;
@@ -229,14 +216,14 @@ public class YokeRequest implements HttpServerRequest {
     /**
      * The uploaded setFiles
      */
-    public Map<String, FileUpload> files() {
+    public Map<String, HttpServerFileUpload> files() {
         return files;
     }
 
     /**
      * The uploaded setFiles
      */
-    void setFiles(Map<String, FileUpload> files) {
+    void setFiles(Map<String, HttpServerFileUpload> files) {
         this.files = files;
     }
 
@@ -273,12 +260,12 @@ public class YokeRequest implements HttpServerRequest {
         return request;
     }
 
-    public HttpRequest nettyRequest() {
-        if (request instanceof DefaultHttpServerRequest) {
-            return ((DefaultHttpServerRequest) request).nettyRequest();
-        }
-        return null;
-    }
+//    public HttpRequest nettyRequest() {
+//        if (request instanceof DefaultHttpServerRequest) {
+//            return ((DefaultHttpServerRequest) request).nettyRequest();
+//        }
+//        return null;
+//    }
 
     @Override
     public HttpVersion version() {
@@ -380,6 +367,16 @@ public class YokeRequest implements HttpServerRequest {
     @Override
     public NetSocket netSocket() {
         return request.netSocket();
+    }
+
+    @Override
+    public HttpServerRequest uploadHandler(Handler<HttpServerFileUpload> uploadHandler) {
+        return request.uploadHandler(uploadHandler);
+    }
+
+    @Override
+    public Map<String, String> formAttributes() {
+        return request.formAttributes();
     }
 
     /**
@@ -488,15 +485,11 @@ public class YokeRequest implements HttpServerRequest {
     public JsonObject getJsonBody() {
         return jsonBody();
     }
-    public MultiMap getMapBody() {
-        return mapBody();
-    }
-
     public Buffer getBufferBody() {
         return bufferBody();
     }
 
-    public Map<String, FileUpload> getFiles() {
+    public Map<String, HttpServerFileUpload> getFiles() {
         return files();
     }
 
@@ -508,9 +501,9 @@ public class YokeRequest implements HttpServerRequest {
         return vertxHttpServerRequest();
     }
 
-    public HttpRequest getNettyRequest() {
-        return nettyRequest();
-    }
+//    public HttpRequest getNettyRequest() {
+//        return nettyRequest();
+//    }
 
     public HttpVersion getVersion() {
         return version();
@@ -518,5 +511,9 @@ public class YokeRequest implements HttpServerRequest {
 
     public NetSocket getNetSocket() {
         return netSocket();
+    }
+
+    public Map<String, String> getFormAttributes() {
+        return formAttributes();
     }
 }

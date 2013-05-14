@@ -16,30 +16,16 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import io.netty.handler.codec.http.DefaultHttpContent;
-import io.netty.handler.codec.http.HttpRequest;
-import io.netty.handler.codec.http.LastHttpContent;
-import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.multipart.*;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.ErrorDataDecoderException;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.IncompatibleDataDecoderException;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder.NotEnoughDataDecoderException;
-import org.vertx.java.core.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.json.DecodeException;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class BodyParser extends Middleware {
-
-    private final HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
 
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
@@ -65,66 +51,6 @@ public class BodyParser extends Middleware {
         }
     }
 
-    private void parseMap(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
-        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(buffer.toString(), false);
-
-        Map<String, List<String>> prms = queryStringDecoder.parameters();
-        MultiMap params = new CaseInsensitiveMultiMap();
-
-        if (!prms.isEmpty()) {
-            for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
-                params.add(entry.getKey(), entry.getValue());
-            }
-        }
-
-        request.setBody(params);
-        next.handle(null);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void parseMultipart(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
-        HttpPostRequestDecoder decoder = null;
-        try {
-            HttpRequest nettyReq = request.nettyRequest();
-            decoder = new HttpPostRequestDecoder(factory, nettyReq);
-
-            decoder.offer(new DefaultHttpContent(buffer.getByteBuf()));
-            decoder.offer(LastHttpContent.EMPTY_LAST_CONTENT);
-
-            for (InterfaceHttpData data : decoder.getBodyHttpDatas()) {
-                switch (data.getHttpDataType()) {
-                    case Attribute:
-                        if (request.body() == null) {
-                            request.setBody(new CaseInsensitiveMultiMap());
-                        }
-                        final Attribute attribute = (Attribute) data;
-                        final MultiMap mapBody = request.mapBody();
-                        mapBody.add(attribute.getName(), attribute.getValue());
-                        break;
-                    case FileUpload:
-                        if (request.files() == null) {
-                            request.setFiles(new HashMap<String, FileUpload>());
-                        }
-                        FileUpload fileUpload = (FileUpload) data;
-                        request.files().put(fileUpload.getName(), fileUpload);
-                        break;
-                    default:
-                        System.err.println(data);
-                }
-            }
-
-            next.handle(null);
-            // clean up
-            decoder.cleanFiles();
-        } catch (ErrorDataDecoderException | NotEnoughDataDecoderException | IncompatibleDataDecoderException | IOException e) {
-            // clean up
-            if (decoder != null) {
-                decoder.cleanFiles();
-            }
-            next.handle(e);
-        }
-    }
-
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
         final String method = request.method();
@@ -137,21 +63,45 @@ public class BodyParser extends Middleware {
 
             if (contentType != null) {
 
-                final Buffer buffer = new Buffer(0);
+                final boolean isJSON = contentType.contains("application/json");
+                final boolean isMULTIPART = contentType.contains("multipart/form-data");
+                final boolean isURLENCODEC = contentType.contains("application/x-www-form-urlencoded");
+                final Buffer buffer = (!isMULTIPART && !isURLENCODEC) ? new Buffer(0) : null;
+
+
+                if (isMULTIPART) {
+                    request.uploadHandler(new Handler<HttpServerFileUpload>() {
+                        @Override
+                        public void handle(final HttpServerFileUpload fileUpload) {
+                            if (request.files() == null) {
+                                request.setFiles(new HashMap<String, HttpServerFileUpload>());
+                            }
+                            request.files().put(fileUpload.name(), fileUpload);
+                        }
+                    });
+                }
 
                 request.dataHandler(new Handler<Buffer>() {
+                    long size = 0;
+                    long limit = request.bodyLengthLimit();
+
                     @Override
                     public void handle(Buffer event) {
-                        if (request.bodyLengthLimit() != -1) {
-                            if (buffer.length() < request.bodyLengthLimit()) {
-                                buffer.appendBuffer(event);
+                        if (limit != -1) {
+                            size += event.length();
+                            if (size < limit) {
+                                if (!isMULTIPART && !isURLENCODEC) {
+                                    buffer.appendBuffer(event);
+                                }
                             } else {
                                 request.dataHandler(null);
                                 request.endHandler(null);
                                 next.handle(413);
                             }
                         } else {
-                            buffer.appendBuffer(event);
+                            if (!isMULTIPART && !isURLENCODEC) {
+                                buffer.appendBuffer(event);
+                            }
                         }
                     }
                 });
@@ -159,12 +109,8 @@ public class BodyParser extends Middleware {
                 request.endHandler(new Handler<Void>() {
                     @Override
                     public void handle(Void _void) {
-                        if (contentType.contains("application/json")) {
+                        if (isJSON) {
                             parseJson(request, buffer, next);
-                        } else if (contentType.contains("application/x-www-form-urlencoded")) {
-                            parseMap(request, buffer, next);
-                        } else if (contentType.contains("multipart/form-data")) {
-                            parseMultipart(request, buffer, next);
                         } else {
                             next.handle(null);
                         }

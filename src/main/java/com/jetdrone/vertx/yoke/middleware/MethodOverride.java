@@ -17,8 +17,9 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonObject;
+
+import java.util.Map;
 
 public class MethodOverride extends Middleware {
 
@@ -34,30 +35,34 @@ public class MethodOverride extends Middleware {
 
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
-        final Object body = request.body();
+        final Map<String, String> urlEncoded = request.formAttributes();
 
-        if (request.hasBody() && body != null) {
-            if (body instanceof MultiMap) {
-                String method = ((MultiMap) body).get(key);
-                if (method != null) {
-                    ((MultiMap) body).remove(key);
-                    request.setMethod(method);
-                }
-            } else if (body instanceof JsonObject) {
-                String method = ((JsonObject) body).getString(key);
-                if (method != null) {
-                    ((JsonObject) body).removeField(key);
-                    request.setMethod(method);
-                }
-            }
-        } else {
-            String xHttpMethodOverride = request.getHeader("x-http-setMethod-override");
-
-            if (xHttpMethodOverride != null) {
-                request.setMethod(xHttpMethodOverride);
+        if (urlEncoded != null) {
+            String method = urlEncoded.get(key);
+            if (method != null) {
+                urlEncoded.remove(key);
+                request.setMethod(method);
+                next.handle(null);
+                return;
             }
         }
 
-        next.handle(null);
+        final JsonObject json = request.jsonBody();
+        if (json != null) {
+            String method = json.getString(key);
+            if (method != null) {
+                json.removeField(key);
+                request.setMethod(method);
+                next.handle(null);
+                return;
+            }
+        }
+
+        String xHttpMethodOverride = request.getHeader("x-http-setMethod-override");
+
+        if (xHttpMethodOverride != null) {
+            request.setMethod(xHttpMethodOverride);
+            next.handle(null);
+        }
     }
 }
