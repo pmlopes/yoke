@@ -86,7 +86,12 @@ public class StringPlaceholderEngine extends Engine<String> {
                 if (propVal != null) {
                     // Recursive invocation, parsing placeholders contained in the
                     // previously resolved placeholder value.
-                    String propValStr = propVal.toString();
+                    String propValStr;
+                    if (propVal instanceof Function) {
+                        propValStr = ((Function) propVal).exec(context);
+                    } else {
+                        propValStr = propVal.toString();
+                    }
                     propValStr = parseStringValue(propValStr, context, visitedPlaceholders);
                     buf.replace(startIndex, endIndex + placeholderSuffix.length(), propValStr);
 
