@@ -26,7 +26,7 @@ Yoke yoke = new Yoke(vertx)
 
 ### Groovy
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 def yoke = new GYoke(vertx)
   .use(new Favicon())
   .use(new Static("webroot"))

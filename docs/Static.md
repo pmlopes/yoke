@@ -12,5 +12,5 @@ Static file server with the given ```root``` path. Optionaly will also generate 
 * ```includeHidden``` in the directory listing show dot files
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
-new Limit("webroot", 0, true, false)
+new Static("webroot", 0, true, false)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -27,6 +27,7 @@ import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +65,7 @@ public class YokeTester extends Yoke {
             fakeServer.requestHandler().handle(new HttpServerRequest() {
 
                 MultiMap params = null;
+                Map<String, String> attributes = null;
 
                 @Override
                 public HttpVersion version() {
@@ -161,6 +163,28 @@ public class YokeTester extends Yoke {
                 @Override
                 public NetSocket netSocket() {
                     throw new UnsupportedOperationException("This mock does not support netSocket");
+                }
+
+                @Override
+                public HttpServerRequest uploadHandler(Handler<HttpServerFileUpload> uploadHandler) {
+                    throw new UnsupportedOperationException("This mock does not support uploadHandler");
+                }
+
+                @Override
+                public Map<String, String> formAttributes() {
+                    if (attributes == null) {
+                        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(body.toString(), false);
+
+                        Map<String, List<String>> prms = queryStringDecoder.parameters();
+                        attributes = new HashMap<>();
+
+                        if (!prms.isEmpty()) {
+                            for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
+                                attributes.put(entry.getKey(), entry.getValue().get(0));
+                            }
+                        }
+                    }
+                    return attributes;
                 }
 
                 @Override

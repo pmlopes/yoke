@@ -51,7 +51,7 @@ The API of Yoke is quite simple, in fact it consist only of 4 methods:
 
 You register middleware onto it using the ```use``` method, you might call the method with the following signatures:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
 // Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
 // This middleware will run on every request path
 use(Middleware middlewareImplementation);
@@ -76,7 +76,7 @@ The difference between the Middleware abstract class and the
 to define the "next" on the middleware itself but yoke takes care of it. An implementation of Middleware requires you
 to implement the following closure:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
 /**
  * Handles a request.
  *
@@ -119,7 +119,7 @@ simple *GroovyTemplate* that allows you to use the powerful GroovyTemplate class
 Of course this is a very naive engine so you can add your own or use other ones provided by the community. If you need
 to implement one yourself all you need to implement is the following method:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
 /**
  * The required to implement method.
  *
@@ -153,14 +153,14 @@ script: ```HelloWorldVerticle.groovy``` under ```src/main/resources```. At this 
 The reason we have a *Verticle* class is because Yoke does not forces you to use any special classes, you still code
 like you would on Vert.x. So we start by creating a Verticle the same way we would on any other Vert.x application:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 println "Nothing here!"
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is the bare minimal Verticle code you need to write. Of course this code does not do anything fancy, in fact it
 just do nothing. So lets make a *HTTP* web server that listens on port *8080*.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 def yoke = new GYoke(vertx)
 yoke.listen(8080)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -176,7 +176,7 @@ If you open a web browser and navigate to your localhost at port 8080 you will g
 This is expected since you have a server running but no middleware is handling your requests. So lets install a handler
 for all request paths to respond with "Hello World".
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.boo .numberLines}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
 def yoke = new GYoke(vertx)
 yoke.use { request ->
   request.response.end("Hello World!")
