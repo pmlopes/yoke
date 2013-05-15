@@ -123,19 +123,19 @@ thread.
 
 ### Serving text
 
-![Hello World expressJS vs Yoke](text.jpg)
+![Hello World expressJS vs Yoke](text.png)
 
 As it can be seem Yoke is faster and scales the same way ExpressJS does.
 
 ### Serving json
 
-![JSON expressJS vs Yoke](json.jpg)
+![JSON expressJS vs Yoke](json.png)
 
 As it can be seem Yoke is faster and scales the same way ExpressJS does.
 
 ### Middleware
 
-![Middleware expressJS vs Yoke](middleware.jpg)
+![Middleware expressJS vs Yoke](middleware.png)
 
 As it can be seem Yoke is faster and scales the same way ExpressJS does.
 
