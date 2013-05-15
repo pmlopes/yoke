@@ -12,6 +12,8 @@ import org.vertx.testtools.TestVerticle;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.vertx.testtools.VertxAssert.*;
 
@@ -56,7 +58,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             // create a temp template
             File temp = File.createTempFile("template", ".html");
             FileOutputStream out = new FileOutputStream(temp);
-            out.write("Hello ${fnName}!".getBytes());
+            out.write("Hello ${fnName('Lopes')}!".getBytes());
             out.close();
             final String location = temp.getAbsolutePath();
 
@@ -64,7 +66,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             yoke.set("fnName", new Function() {
                 @Override
                 public String exec(Map<String, Object> context, Object... args) {
-                    return "Paulo";
+                    return "Paulo " + args[0];
                 }
             });
             yoke.engine("html", new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
@@ -80,7 +82,7 @@ public class StringPlaceholderEngine extends TestVerticle {
                 @Override
                 public void handle(Response resp) {
                     assertEquals(200, resp.getStatusCode());
-                    assertEquals("Hello Paulo!", resp.body.toString());
+                    assertEquals("Hello Paulo Lopes!", resp.body.toString());
                     testComplete();
                 }
             });
@@ -88,4 +90,31 @@ public class StringPlaceholderEngine extends TestVerticle {
             fail(e.getMessage());
         }
     }
+
+//    @Test
+//    public void testRG() {
+//        String funcName = "([a-zA-Z0-9]+)";
+//        String arguments = "\\((.*)\\)";
+//        Pattern FUNCTION = Pattern.compile(funcName + "\\s*" + arguments);
+//
+////        Matcher f = FUNCTION.matcher("func()");
+//        Matcher f = FUNCTION.matcher("func(\"arg\")");
+////        Matcher f = FUNCTION.matcher("func(\"arg\", \"arg2\")");
+//        if (f.find()) {
+//            System.out.println("It is a function");
+//
+//            String argument = "(.*?)";
+//            String quote = "\"";
+//            String sep = "(,\\s*)?";
+//            Pattern ARG = Pattern.compile(quote + argument + quote + sep);
+//
+//            Matcher a = ARG.matcher(f.group(2));
+//
+//            while (a.find()) {
+//                System.out.println("It has argument: " + a.group(1));
+//            }
+//        }
+//
+//        testComplete();
+//    }
 }

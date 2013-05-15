@@ -22,6 +22,8 @@ import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringPlaceholderEngine extends Engine<String> {
 
@@ -29,6 +31,14 @@ public class StringPlaceholderEngine extends Engine<String> {
     private static final String placeholderSuffix = "}";
     private static final boolean ignoreUnresolvablePlaceholders = true;
 
+    private static final String funcName = "([a-zA-Z0-9]+)";
+    private static final String arguments = "\\((.*)\\)";
+    private static final Pattern FUNCTION = Pattern.compile(funcName + "\\s*" + arguments);
+
+    private static final String argument = "(.*?)";
+    private static final String quote = "\'";
+    private static final String sep = "(,\\s*)?";
+    private static final Pattern ARG = Pattern.compile(quote + argument + quote + sep);
 
     /**
      * An interpreter for strings with named placeholders.
@@ -81,14 +91,37 @@ public class StringPlaceholderEngine extends Engine<String> {
                 placeholder = parseStringValue(placeholder, context, visitedPlaceholders);
 
                 // Now obtain the value for the fully resolved key...
-                Object propVal = context.get(placeholder);
+                Object propVal;
+                boolean isFn = false;
+
+                Matcher fn = FUNCTION.matcher(placeholder);
+                if (fn.find()) {
+                    // function syntax used, get the object from context with the proper name
+                    propVal = context.get(fn.group(1));
+                    isFn = true;
+                } else {
+                    propVal = context.get(placeholder);
+                }
 
                 if (propVal != null) {
                     // Recursive invocation, parsing placeholders contained in the
                     // previously resolved placeholder value.
                     String propValStr;
-                    if (propVal instanceof Function) {
-                        propValStr = ((Function) propVal).exec(context);
+                    if (isFn && propVal instanceof Function) {
+                        Matcher arg = ARG.matcher(fn.group(2));
+                        List<Object> args = null;
+
+                        while (arg.find()) {
+                            if (args == null) {
+                                args = new ArrayList<>();
+                            }
+                            args.add(arg.group(1));
+                        }
+                        if (args == null) {
+                            propValStr = ((Function) propVal).exec(context);
+                        } else {
+                            propValStr = ((Function) propVal).exec(context, args.toArray());
+                        }
                     } else {
                         propValStr = propVal.toString();
                     }
