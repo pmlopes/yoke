@@ -100,7 +100,7 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
 
 ## Benchmarks
 
-* [Benchmarks](Benchmarks.html) Simple Benchmarks against [ExpressJS](http://expressjs.com)
+* [Benchmark](Benchmark.html) Simple Benchmarks Yoke vs [ExpressJS](http://expressjs.com)
 
 
 ## 3rd-party
