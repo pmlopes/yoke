@@ -32,7 +32,7 @@ import java.util.Map;
 
 public class GroovyTemplateEngine extends Engine<Template> {
 
-    private TemplateEngine engine = new SimpleTemplateEngine();
+    private final TemplateEngine engine = new SimpleTemplateEngine();
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> next) {

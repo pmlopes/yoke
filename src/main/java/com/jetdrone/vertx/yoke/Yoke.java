@@ -63,6 +63,7 @@ public class Yoke implements RequestWrapper {
         this.vertx = vertx;
         this.requestWrapper = requestWrapper == null ? this : requestWrapper;
         defaultContext.put("title", "Yoke");
+        defaultContext.put("x-powered-by", true);
     }
 
     private static class MountedMiddleware {
@@ -222,6 +223,12 @@ public class Yoke implements RequestWrapper {
                 // the context map is shared with all middlewares
                 final Map<String, Object> context = new HashMap<>(defaultContext);
                 final YokeRequest request = requestWrapper.wrap(req, secure, context, engineMap);
+
+                // add x-powered-by header is enabled
+                Object poweredBy = context.get("x-powered-by");
+                if (poweredBy != null && (Boolean) poweredBy) {
+                    request.response().putHeader("x-powered-by", "yoke");
+                }
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;

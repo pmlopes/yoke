@@ -5,16 +5,16 @@ import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine;
 import com.jetdrone.vertx.yoke.middleware.*;
-import io.netty.handler.codec.http.multipart.FileUpload;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
-import java.io.IOException;
 import java.util.Map;
 
 public class KitCMS extends Verticle {
@@ -40,49 +40,18 @@ public class KitCMS extends Verticle {
         // install the favicon middleware
         yoke.use(new Favicon());
         // install custom middleware to identify the domain
-        yoke.use(new com.jetdrone.vertx.yoke.Middleware() {
-            @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
-                String host = request.getHeader("host");
-                if (host == null) {
-                    // there is no host header
-                    next.handle(400);
-                } else {
-                    if (host.indexOf(':') != -1) {
-                        host = host.substring(0, host.indexOf(':'));
-                    }
-
-                    Config.Domain found = null;
-
-                    for (Config.Domain domain : config.domains) {
-                        if (domain.pattern.matcher(host).find()) {
-                            found = domain;
-                            break;
-                        }
-                    }
-
-                    if (found == null) {
-                        // still no host found even with header present
-                        next.handle(404);
-                    } else {
-                        request.put("domain", found);
-                        next.handle(null);
-                    }
-                }
-            }
-        });
+        yoke.use(new DomainMiddleware(config));
         // install the static file server
         // note that since we are mounting under /static the root for the static middleware
         // will always be prefixed with /static
         yoke.use("/static", new Static("."));
         // install the BasicAuth middleware
-        // TODO: get it from config
-        yoke.use("/admin", new BasicAuth("foo", "bar"));
+        yoke.use("/admin", new BasicAuth(config.adminUsername, config.adminPassword));
         // install body parser for /admin requests
         yoke.use("/admin", new BodyParser());
         // install router for admin requests
-        yoke.use(new Router() {{
-            get("/admin", new Middleware() {
+        yoke.use(new Router()
+            .get("/admin", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
@@ -110,8 +79,8 @@ public class KitCMS extends Verticle {
                         }
                     });
                 }
-            });
-            get("/admin/keys", new Middleware() {
+            })
+            .get("/admin/keys", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
@@ -122,14 +91,13 @@ public class KitCMS extends Verticle {
                             if (asyncResult.failed()) {
                                 next.handle(asyncResult.cause());
                             } else {
-                                request.response().putHeader("Content-Type", "application/json");
-                                request.response().end(asyncResult.result().encode());
+                                request.response().end(asyncResult.result());
                             }
                         }
                     });
                 }
-            });
-            get("/admin/get", new Middleware() {
+            })
+            .get("/admin/get", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
@@ -153,13 +121,13 @@ public class KitCMS extends Verticle {
                         }
                     });
                 }
-            });
-            post("/admin/set", new Middleware() {
+            })
+            .post("/admin/set", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    Map<String, String> body = request.mapBody();
+                    Map<String, String> body = request.formAttributes();
 
                     String key = body.get("key");
                     String value = body.get("value");
@@ -186,13 +154,13 @@ public class KitCMS extends Verticle {
                         }
                     });
                 }
-            });
-            post("/admin/unset", new Middleware() {
+            })
+            .post("/admin/unset", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    Map<String, String> body = request.mapBody();
+                    Map<String, String> body = request.formAttributes();
 
                     String key = body.get("key");
 
@@ -213,8 +181,8 @@ public class KitCMS extends Verticle {
                         }
                     });
                 }
-            });
-            get("/admin/export", new Middleware() {
+            })
+            .get("/admin/export", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
@@ -254,9 +222,8 @@ public class KitCMS extends Verticle {
 
                                             String filename = System.currentTimeMillis() + "_export.kit";
 
-                                            response.putHeader("Content-Type", "application/json");
                                             response.putHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
-                                            response.end(buffer.encode());
+                                            response.end(buffer);
                                         }
                                     }
                                 };
@@ -264,40 +231,49 @@ public class KitCMS extends Verticle {
                         }
                     });
                 }
-            });
-            post("/admin/import", new Middleware() {
+            })
+            .post("/admin/import", new Middleware() {
                 @Override
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    FileUpload file = request.files().get("file");
-                    try {
-                        new AsyncIterator<Object>(new JsonArray(new String(file.get()))) {
-                            @Override
-                            public void handle(Object o) {
-                                if (!isEnd()) {
-                                    final JsonObject json = (JsonObject) o;
-                                    db.set(domain.namespace, json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
-                                        @Override
-                                        public void handle(AsyncResult<Void> asyncResult) {
-                                            if (asyncResult.failed()) {
-                                                next.handle(asyncResult.cause());
-                                            } else {
-                                                next();
+                    HttpServerFileUpload file = request.files().get("file");
+                    final Buffer json = new Buffer();
+
+                    file.dataHandler(new Handler<Buffer>() {
+                        @Override
+                        public void handle(Buffer buff) {
+                            json.appendBuffer(buff);
+                        }
+                    });
+
+                    file.endHandler(new Handler<Void>() {
+                        @Override
+                        public void handle(Void event) {
+                            new AsyncIterator<Object>(new JsonArray(json.toString())) {
+                                @Override
+                                public void handle(Object o) {
+                                    if (!isEnd()) {
+                                        final JsonObject json = (JsonObject) o;
+                                        db.set(domain.namespace, json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
+                                            @Override
+                                            public void handle(AsyncResult<Void> asyncResult) {
+                                                if (asyncResult.failed()) {
+                                                    next.handle(asyncResult.cause());
+                                                } else {
+                                                    next();
+                                                }
                                             }
-                                        }
-                                    });
-                                } else {
-                                    request.response().redirect("/admin");
+                                        });
+                                    } else {
+                                        request.response().redirect("/admin");
+                                    }
                                 }
-                            }
-                        };
-                    } catch (IOException ioex) {
-                        next.handle(ioex);
-                    }
+                            };
+                        }
+                    });
                 }
-            });
-        }});
+            }));
 
         // if the request fall through it is a view to render from the db
         yoke.use(new Middleware() {

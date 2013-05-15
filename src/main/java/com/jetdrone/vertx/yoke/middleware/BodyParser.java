@@ -83,7 +83,7 @@ public class BodyParser extends Middleware {
 
                 request.dataHandler(new Handler<Buffer>() {
                     long size = 0;
-                    long limit = request.bodyLengthLimit();
+                    final long limit = request.bodyLengthLimit();
 
                     @Override
                     public void handle(Buffer event) {

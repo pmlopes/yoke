@@ -260,13 +260,6 @@ public class YokeRequest implements HttpServerRequest {
         return request;
     }
 
-//    public HttpRequest nettyRequest() {
-//        if (request instanceof DefaultHttpServerRequest) {
-//            return ((DefaultHttpServerRequest) request).nettyRequest();
-//        }
-//        return null;
-//    }
-
     @Override
     public HttpVersion version() {
         return request.version();
@@ -500,10 +493,6 @@ public class YokeRequest implements HttpServerRequest {
     public HttpServerRequest getVertxHttpServerRequest() {
         return vertxHttpServerRequest();
     }
-
-//    public HttpRequest getNettyRequest() {
-//        return nettyRequest();
-//    }
 
     public HttpVersion getVersion() {
         return version();

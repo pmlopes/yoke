@@ -126,4 +126,12 @@ public final class Utils {
         }
         return null;
     }
+
+    public static String escape(String html) {
+        return html
+                .replaceAll("&", "&amp;")
+                .replaceAll("\"", "&quot;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;");
+    }
 }

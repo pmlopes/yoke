@@ -30,6 +30,9 @@ public class Config {
     // Domains that are resolved by server
     // checks against req.host
     public final Domain[] domains;
+    // admin credentials
+    public final String adminUsername;
+    public final String adminPassword;
 
     public static final String REDIS_ADDRESS = "kitcms.redis";
 
@@ -41,6 +44,9 @@ public class Config {
 
         dbServer = config.getString("dbServer", "localhost");
         dbPort = (Integer) config.getNumber("dbPort", 6379);
+
+        adminUsername = config.getString("adminUsername", "foo");
+        adminPassword = config.getString("adminPassword", "bar");
 
         JsonArray domains = config.getArray("domains");
         if (domains != null) {
