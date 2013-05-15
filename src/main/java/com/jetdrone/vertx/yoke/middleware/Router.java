@@ -711,31 +711,31 @@ public class Router extends Middleware {
                         router.get(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof PUT) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.put(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof POST) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.post(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof DELETE) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.delete(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof OPTIONS) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.options(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof HEAD) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.head(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof TRACE) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.trace(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof PATCH) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.patch(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof CONNECT) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.connect(path, wrap(o, m, type == 1));
                     }
                     if (a instanceof ALL) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.all(path, wrap(o, m, type == 1));
                     }
                 }
             }
