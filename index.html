@@ -66,20 +66,20 @@ code > span.er { font-weight: bold; }
       }
     })).<span class="fu">listen</span>(<span class="dv">3000</span>);</code></pre></td></tr></table>
 <h3 id="groovy"><a href="#groovy">Groovy</a></h3>
-<table class="sourceCode boo numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+<table class="sourceCode java numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
 4
 5
 6
 7
-</pre></td><td class="sourceCode"><pre><code class="sourceCode boo"><span class="kw">def</span> yoke = new GYoke(vertx)
-  .use(new Favicon())
-  .use(new Static(<span class="st">&quot;webroot&quot;</span>))
-  .use(new GRouter()
-    .all(<span class="st">&quot;/hello&quot;</span>) { request -&gt;
-      request.response().end(<span class="st">&quot;Hello World!&quot;</span>);
-    }).listen(<span class="dv">3000</span>)</code></pre></td></tr></table>
+</pre></td><td class="sourceCode"><pre><code class="sourceCode java">def yoke = <span class="kw">new</span> <span class="fu">GYoke</span>(vertx)
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Favicon</span>())
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Static</span>(<span class="st">&quot;webroot&quot;</span>))
+  .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">GRouter</span>()
+    .<span class="fu">all</span>(<span class="st">&quot;/hello&quot;</span>) { request -&gt;
+      request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+    }).<span class="fu">listen</span>(<span class="dv">3000</span>)</code></pre></td></tr></table>
 <h3 id="javascript"><a href="#javascript">JavaScript</a></h3>
 <table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2

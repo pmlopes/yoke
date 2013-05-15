@@ -42,27 +42,25 @@ code > span.er { font-weight: bold; }
 <h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
 <h2 id="bodyparser"><a href="#bodyparser">BodyParser</a></h2>
 <p>Parse request bodies, supports <em>application/json</em>, <em>application/x-www-form-urlencoded</em>, and <em>multipart/form-data</em>.</p>
-<p>Once data has been parsed the result is visible in the field <code>body</code> of the request. To help there are 3 helper getters for this field:</p>
+<p>Once data has been parsed the result is visible in the field <code>body</code> of the request. To help there are 2 helper getters for this field:</p>
 <ul>
 <li><code>bodyJson()</code> returns <code>JsonObject</code></li>
-<li><code>bodyMap()</code> returns <code>Map</code></li>
 <li><code>bodyBuffer()</code> returns <code>Buffer</code></li>
 </ul>
 <p>If the content type was <em>multipart/form-data</em> and there were uploaded files the files are:</p>
 <ul>
-<li><code>files()</code> returns <code>Map&lt;String, UploadFile&gt;</code></li>
+<li><code>files()</code> returns <code>Map&lt;String, HttpServerFileUpload&gt;</code></li>
 </ul>
 <h2 id="usage"><a href="#usage">Usage</a></h2>
 <pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BodyParser</span>()</code></pre>
 <h2 id="defines"><a href="#defines">Defines</a></h2>
-<p>Defines the variable <code>body</code> in the request. This variable is of type <code>Object</code> there are 3 helpers to cast the value to:</p>
+<p>Defines the variable <code>body</code> in the request. This variable is of type <code>Object</code> there are 2 helpers to cast the value to:</p>
 <ul>
 <li><em>JsonObject</em> <code>bodyJson()</code></li>
-<li><em>Map</em> <code>bodyMap()</code></li>
 <li><em>Buffer</em> <code>bodyBuffer()</code></li>
 </ul>
 <h2 id="limitations"><a href="#limitations">Limitations</a></h2>
-<p>Currently when parsing <em>multipart/form-data</em> if there are several files uploaded under the same name, only the last is preserved.</p>
+<p>Currently when parsing <em>multipart/form-data</em> if there are several files uploaded under the same name, only the last is preserved. Same with attributes when <em>application/x-www-form-urlencoded</em>.</p>
 <div id="footer">
   &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
 </div>
