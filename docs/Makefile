@@ -10,7 +10,8 @@ BASE =	index.html \
 		Router.html \
 		Static.html \
 		Timeout.html \
-		Vhost.html
+		Vhost.html \
+		Benchmark.html
 
 TUTORIALS =	Java-Tutorial.html \
 			Groovy-Tutorial.html \

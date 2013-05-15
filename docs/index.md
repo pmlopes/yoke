@@ -98,6 +98,10 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
 * [GroovyTemplate](GroovyTemplate.html) GroovyTemplate
 * [MicroTemplateEngine](MicroTemplateEngine.html) MicroTemplateEngine
 
+## Benchmarks
+
+* [Benchmarks](Benchmarks.html) Simple Benchmarks against [ExpressJS](http://expressjs.com)
+
 
 ## 3rd-party
 
