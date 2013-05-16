@@ -380,18 +380,4 @@ public class YokeResponse implements HttpServerResponse {
         response.exceptionHandler(handler);
         return this;
     }
-
-    // JavaBean accessors
-
-    public MultiMap getHeaders() {
-        return headers();
-    }
-
-    public MultiMap getTrailers() {
-        return trailers();
-    }
-
-    public boolean isWriteQueueFull() {
-        return writeQueueFull();
-    }
 }

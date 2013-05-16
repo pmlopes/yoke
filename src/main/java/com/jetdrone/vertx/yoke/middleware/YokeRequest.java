@@ -28,10 +28,42 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
 public class YokeRequest implements HttpServerRequest {
+
+    private static final Comparator<String> ACCEPT_X_COMPARATOR = new Comparator<String>() {
+        float getQuality(String s) {
+            if (s == null) {
+                return 0;
+            }
+
+            String[] params = s.split(" *; *");
+            for (int i = 1; i < params.length; i++) {
+                String[] q = params[1].split(" *= *");
+                if ("q".equals(q[0])) {
+                    return Float.parseFloat(q[1]);
+                }
+            }
+            return 1;
+        }
+        @Override
+        public int compare(String o1, String o2) {
+            // verify if there is a
+            float f1 = getQuality(o1);
+            float f2 = getQuality(o2);
+            if (f1 < f2) {
+                return 1;
+            }
+            if (f1 > f2) {
+                return -1;
+            }
+            return 0;
+        }
+    };
 
     // the original request
     private final HttpServerRequest request;
@@ -254,6 +286,55 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /**
+     * Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which
+     * case you should respond with 406 "Not Acceptable".
+     *
+     * The type value must be a single mime type string such as "application/json" and is validated by checking
+     * if the request string starts with it.
+     */
+    public String accepts(String... types) {
+        String accept = getHeader("accept");
+        // accept anything when accept is not present
+        if (accept == null) {
+            return types[0];
+        }
+
+        // parse
+        String[] acceptTypes = accept.split(" *, *");
+        // sort on quality
+        Arrays.sort(acceptTypes, ACCEPT_X_COMPARATOR);
+
+        for (String senderAccept : acceptTypes) {
+            for (String appAccept : types) {
+                if (senderAccept.startsWith(appAccept)) {
+                    return senderAccept;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For
+     * Header
+     */
+    public String ip() {
+        Boolean trustProxy = (Boolean) context.get("trust-proxy");
+        if (trustProxy != null && trustProxy) {
+            String xForwardFor = getHeader("x-forward-for");
+            if (xForwardFor != null) {
+                String[] ips = xForwardFor.split(" *, *");
+                if (ips.length > 0) {
+                    return ips[0];
+                }
+            }
+        }
+
+        return request.remoteAddress().getHostName();
+    }
+
+    /**
      * Return the real request
      */
     public HttpServerRequest vertxHttpServerRequest() {
@@ -415,94 +496,5 @@ public class YokeRequest implements HttpServerRequest {
     public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
         request.exceptionHandler(handler);
         return this;
-    }
-
-    // JavaBean like accessors helpers for other language bindings such as Groovy
-
-    public String getMethod() {
-        return method();
-    }
-
-    public String getUri() {
-        return uri();
-    }
-
-    public String getPath() {
-        return path();
-    }
-
-    public String getQuery() {
-        return query();
-    }
-
-    public YokeResponse getResponse() {
-        return response();
-    }
-
-    public MultiMap getHeaders() {
-        return headers();
-    }
-
-    public MultiMap getParams() {
-        return params();
-    }
-
-    public InetSocketAddress getRemoteAddress() {
-        return remoteAddress();
-    }
-
-    public X509Certificate[] getPeerCertificateChain() throws SSLPeerUnverifiedException {
-        return peerCertificateChain();
-    }
-
-    public URI getAbsoluteURI() {
-        return absoluteURI();
-    }
-
-    public String getOriginalMethod() {
-        return originalMethod();
-    }
-
-    public long getBodyLengthLimit() {
-        return bodyLengthLimit();
-    }
-
-    public long getContentLength() {
-        return contentLength();
-    }
-
-    public Object getBody() {
-        return body();
-    }
-
-    public JsonObject getJsonBody() {
-        return jsonBody();
-    }
-    public Buffer getBufferBody() {
-        return bufferBody();
-    }
-
-    public Map<String, HttpServerFileUpload> getFiles() {
-        return files();
-    }
-
-    public Set<YokeCookie> getCookies() {
-        return cookies();
-    }
-
-    public HttpServerRequest getVertxHttpServerRequest() {
-        return vertxHttpServerRequest();
-    }
-
-    public HttpVersion getVersion() {
-        return version();
-    }
-
-    public NetSocket getNetSocket() {
-        return netSocket();
-    }
-
-    public Map<String, String> getFormAttributes() {
-        return formAttributes();
     }
 }

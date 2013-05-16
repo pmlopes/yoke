@@ -16,19 +16,41 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import groovy.lang.Closure;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.groovy.core.buffer.Buffer;
 
 import java.util.Map;
 
-public class GYokeResponse extends YokeResponse {
+public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.core.http.HttpServerResponse*/ {
 
     public GYokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
         super(response, context, engines);
     }
 
+    public void closeHandler(final Closure closure) {
+        this.closeHandler(new Handler<Void>() {
+            @Override
+            public void handle(Void v) {
+                closure.call();
+            }
+        });
+    }
+
     public GYokeResponse write(Buffer buffer) {
         write(buffer.toJavaBuffer());
+        return this;
+    }
+
+    public GYokeResponse drainHandler(final Closure closure) {
+        this.drainHandler(new Handler<Void>() {
+            @Override
+            public void handle(Void v) {
+                closure.call();
+            }
+        });
         return this;
     }
 
@@ -43,5 +65,28 @@ public class GYokeResponse extends YokeResponse {
     public GYokeResponse leftShift(String s) {
         write(s);
         return this;
+    }
+
+    public GYokeResponse exceptionHandler(final Closure closure) {
+        this.exceptionHandler(new Handler<Throwable>() {
+            @Override
+            public void handle(Throwable exception) {
+                closure.call();
+            }
+        });
+
+        return this;
+    }
+
+    public MultiMap getHeaders() {
+        return headers();
+    }
+
+    public MultiMap getTrailers() {
+        return trailers();
+    }
+
+    public boolean isWriteQueueFull() {
+        return writeQueueFull();
     }
 }

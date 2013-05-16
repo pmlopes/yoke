@@ -62,8 +62,10 @@ public class Yoke implements RequestWrapper {
     public Yoke(Vertx vertx, RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.requestWrapper = requestWrapper == null ? this : requestWrapper;
+        // defaults
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
+        defaultContext.put("trust-proxy", true);
     }
 
     private static class MountedMiddleware {

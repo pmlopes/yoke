@@ -16,8 +16,8 @@
 
 // utilities
 
-function wrapHandler(callback) {
-    return new org.vertx.java.core.Handler({
+function wrapAsyncResultHandler(callback) {
+    return new org.vertx.java.core.AsyncResultHandler({
         handle: callback
     });
 }
@@ -47,7 +47,7 @@ function MicroTemplateEngine() {
     var self = this;
     this.jEngine = new com.jetdrone.vertx.yoke.Engine({
         render: function (filename, context, handler) {
-            self.jEngine.load(filename, wrapHandler(function (asyncResult) {
+            self.jEngine.read(filename, wrapAsyncResultHandler(function (asyncResult) {
                 if (asyncResult.failed()) {
                     handler.handle(wrapAsyncResult(asyncResult.cause()));
                 } else {

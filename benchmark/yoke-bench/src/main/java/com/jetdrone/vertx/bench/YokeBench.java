@@ -23,11 +23,10 @@ public class YokeBench extends Verticle {
 
         new Yoke(vertx)
                 .use(new BodyParser())
-                // this should be only here to test the middleware resource
-                .use(foo)
-                .use(foo)
-                .use(foo)
-                .use(foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
                 .use(new Router()
                         .get("/", new Handler<YokeRequest>() {
                             @Override

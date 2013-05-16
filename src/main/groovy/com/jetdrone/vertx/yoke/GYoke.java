@@ -15,6 +15,7 @@
  */
 package com.jetdrone.vertx.yoke;
 
+import com.jetdrone.vertx.yoke.middleware.GYokeRequest;
 import com.jetdrone.vertx.yoke.middleware.GYokeResponse;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import groovy.lang.Closure;
@@ -57,7 +58,7 @@ public class GYoke {
             @Override
             public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
                 GYokeResponse response = new GYokeResponse(request.response(), context, engines);
-                return new YokeRequest(request, response, secure, context);
+                return new GYokeRequest(request, response, secure, context);
             }
         });
     }
