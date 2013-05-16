@@ -14,7 +14,7 @@ to know *gradle* since we are using this template project.
 Start by downloading the [yoke-gradle-template](yoke-gradle-template.tar.gz) to your local development work directory.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pmlopes@jetdrone:~/Projects$ curl http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
+pmlopes@jetdrone:~/Projects$ curl -0 http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
 pmlopes@jetdrone:~/Projects$
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -176,10 +176,24 @@ just do nothing. So lets make a *HTTP* web server that listens on port *8080*.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.listen(8080);
   }
 ...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+At this point you have almost everything needed to run your verticle, the only missing item is the module descriptor.
+The module descriptor is a simple *JSON* file that describes the main verticle and any other metadata required for your
+verticle.
+
+For this example we only need to define 2 entries, the *main* verticle class and the dependency on *Yoke*. Create a file
+under ```src/main/resources/mod.json``` with the following content:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines}
+{
+  "main": "com.jetdrone.vertx.HelloWorldVerticle",
+  "includes": "com.jetdrone~yoke~1.0.0-SNAPSHOT"
+}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 And you can quickly test your new Verticle by running:
@@ -196,7 +210,7 @@ for all request paths to respond with "Hello World".
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new Handler<YokeRequest>() {
       @Override
       public void handle(YokeRequest request) {
@@ -227,7 +241,7 @@ middleware. With this middleware we define the 4 actions *POST*, *PUT*, *GET* an
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new Router()
         .post("/resource", new Handler<YokeRequest>() {
           @Override
@@ -265,7 +279,7 @@ become:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new Router()
         .post("/resource", new Handler<YokeRequest>() {
           @Override
@@ -312,7 +326,7 @@ your router middleware you are going to have to install the body parser before t
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new BodyParser());
     yoke.use(new Router()
         .post("/resource", new Handler<YokeRequest>() {
@@ -329,7 +343,7 @@ an upload of a maximum size of 4kb (4096 bytes):
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new Limit(4096));
     yoke.use(new BodyParser());
     yoke.use(new Router()
@@ -350,7 +364,7 @@ change out handlers to become middlewares, lets focus alone in the *POST* code, 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new Limit(4096));
     yoke.use(new BodyParser());
     yoke.use(new Router()
@@ -376,7 +390,7 @@ with the error name. To make it prettier lets use the error handler middleware.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.use(new ErrorHandler(true));
     yoke.use(new Limit(4096));
     yoke.use(new BodyParser());
@@ -418,7 +432,7 @@ So in order to do this, you first need to register the engine:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines startFrom="10"}
 ...
   public void start() {
-    Yoke yoke = new Yoke();
+    Yoke yoke = new Yoke(vertx);
     yoke.engine("tmpl", new StringPlaceholderEngine());
     yoke.use(new ErrorHandler(true));
 ...

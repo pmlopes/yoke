@@ -14,7 +14,7 @@ to know *gradle* since we are using this template project.
 Start by downloading the [yoke-gradle-template](yoke-gradle-template.tar.gz) to your local development work directory.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-pmlopes@jetdrone:~/Projects$ curl http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
+pmlopes@jetdrone:~/Projects$ curl -0 http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
 pmlopes@jetdrone:~/Projects$
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
