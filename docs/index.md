@@ -53,7 +53,7 @@ var yoke = new Yoke()
 
 ### Vert.x module
 
-Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
+Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-beta1```
 
 ### Maven artifact
 
@@ -61,7 +61,7 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-SNAPSHOT```
 <dependency>
   <groupId>com.jetdrone</groupId>
   <artifactId>yoke</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0-beta1</version>
   <scope>provided</scope>
 </dependency>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
