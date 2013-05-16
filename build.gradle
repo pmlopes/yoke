@@ -71,6 +71,7 @@ Please edit the details below.
  */
 def configurePom(def pom) {
   pom.project {
+    name 'Yoke'
     description 'Yoke a middleware framework for Vert.x'
     inceptionYear '2013'
     packaging 'zip'
