@@ -72,6 +72,7 @@ Please edit the details below.
  */
 def configurePom(def pom) {
   pom.project {
+    name rootProject.name
     description 'Description of your module here'
     inceptionYear '2013'
     packaging 'zip'

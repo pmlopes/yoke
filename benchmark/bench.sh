@@ -2,8 +2,8 @@
 set -e
 
 # clean up
-rm *.dat
-rm *.png
+rm *.dat || true
+rm *.png || true
 
 # run ab 3 times to warm up the server
 ab -n 8000 -c 100 -k -g yoke.dat http://localhost:8080/json
