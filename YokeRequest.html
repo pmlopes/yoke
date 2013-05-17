@@ -13,11 +13,11 @@
 <ul>
 <li><a href="#yoke"><a href="/">Yoke</a></a><ul>
 <li><a href="#yokerequest">YokeRequest</a></li>
-<li><a href="#r-getstring-name"><R> R get(String name)</a></li>
-<li><a href="#r-getstring-name-r-defaultvalue"><R> R get(String name, R defaultValue)</a></li>
-<li><a href="#r-putstring-name-r-value"><R> R put(String name, R value)</a></li>
-<li><a href="#r-getheaderstring-name"><R> R getHeader(String name)</a></li>
-<li><a href="#r-getheaderstring-name-r-defaultvalue"><R> R getHeader(String name, R defaultValue)</a></li>
+<li><a href="#r-r-getstring-name">&lt;R&gt; R get(String name)</a></li>
+<li><a href="#r-r-getstring-name-r-defaultvalue">&lt;R&gt; R get(String name, R defaultValue)</a></li>
+<li><a href="#r-r-putstring-name-r-value">&lt;R&gt; R put(String name, R value)</a></li>
+<li><a href="#r-r-getheaderstring-name">&lt;R&gt; R getHeader(String name)</a></li>
+<li><a href="#r-r-getheaderstring-name-r-defaultvalue">&lt;R&gt; R getHeader(String name, R defaultValue)</a></li>
 <li><a href="#string-originalmethod">String originalMethod()</a></li>
 <li><a href="#long-bodylengthlimit">long bodyLengthLimit()</a></li>
 <li><a href="#boolean-hasbody">boolean hasBody()</a></li>
@@ -38,42 +38,42 @@
 <h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
 <h2 id="yokerequest"><a href="#yokerequest">YokeRequest</a></h2>
 <p>YokeRequest is an extension to Vert.x <em>HttpServerRequest</em> with some helper methods to make it easier to perform common tasks related to web application development.</p>
-<h2 id="r-getstring-name"><a href="#r-getstring-name"><R> R get(String name)</a></h2>
+<h2 id="r-r-getstring-name"><a href="#r-r-getstring-name">&lt;R&gt; R get(String name)</a></h2>
 <p>Allow getting properties in a generified way from the context.</p>
 <ul>
 <li><em>name</em> The key to get</li>
-<li><em><R></em> The type of the return</li>
+<li><em>&lt;R&gt;</em> The type of the return</li>
 </ul>
 <p>Returns the found object</p>
-<h2 id="r-getstring-name-r-defaultvalue"><a href="#r-getstring-name-r-defaultvalue"><R> R get(String name, R defaultValue)</a></h2>
+<h2 id="r-r-getstring-name-r-defaultvalue"><a href="#r-r-getstring-name-r-defaultvalue">&lt;R&gt; R get(String name, R defaultValue)</a></h2>
 <p>Allow getting properties in a generified way from the context and return defaultValue if the key does not exist.</p>
 <ul>
 <li><em>name</em> The key to get</li>
 <li><em>defaultValue</em> value returned when the key does not exist</li>
-<li><em><R></em> The type of the return</li>
+<li><em>&lt;R&gt;</em> The type of the return</li>
 </ul>
 <p>Returns the found object</p>
-<h2 id="r-putstring-name-r-value"><a href="#r-putstring-name-r-value"><R> R put(String name, R value)</a></h2>
+<h2 id="r-r-putstring-name-r-value"><a href="#r-r-putstring-name-r-value">&lt;R&gt; R put(String name, R value)</a></h2>
 <p>Allows putting a value into the context and return the previous value.</p>
 <ul>
 <li><em>name</em> the key to store</li>
 <li><em>value</em> the value to store</li>
-<li><em><R></em> the type of the previous value if present</li>
+<li><em>&lt;R&gt;</em> the type of the previous value if present</li>
 </ul>
 <p>Returns the previous value or null</p>
-<h2 id="r-getheaderstring-name"><a href="#r-getheaderstring-name"><R> R getHeader(String name)</a></h2>
+<h2 id="r-r-getheaderstring-name"><a href="#r-r-getheaderstring-name">&lt;R&gt; R getHeader(String name)</a></h2>
 <p>Allow getting headers in a generified way.</p>
 <ul>
 <li><em>name</em> The key to get</li>
-<li><em><R></em> The type of the return</li>
+<li><em>&lt;R&gt;</em> The type of the return</li>
 </ul>
 <p>Returns the found header value</p>
-<h2 id="r-getheaderstring-name-r-defaultvalue"><a href="#r-getheaderstring-name-r-defaultvalue"><R> R getHeader(String name, R defaultValue)</a></h2>
+<h2 id="r-r-getheaderstring-name-r-defaultvalue"><a href="#r-r-getheaderstring-name-r-defaultvalue">&lt;R&gt; R getHeader(String name, R defaultValue)</a></h2>
 <p>Allow getting headers in a generified way from the context and return defaultValue if the key does not exist.</p>
 <ul>
 <li><em>name</em> The key to get</li>
 <li><em>defaultValue</em> value returned when the key does not exist</li>
-<li><em><R></em> The type of the return</li>
+<li><em>&lt;R&gt;</em> The type of the return</li>
 </ul>
 <p>Returns the found object.</p>
 <h2 id="string-originalmethod"><a href="#string-originalmethod">String originalMethod()</a></h2>
