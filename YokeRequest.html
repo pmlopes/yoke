@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Yoke a middleware framework for Vert.x: YokeRequest</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
+<li><a href="#yokerequest">YokeRequest</a></li>
+<li><a href="#r-getstring-name"><R> R get(String name)</a></li>
+<li><a href="#r-getstring-name-r-defaultvalue"><R> R get(String name, R defaultValue)</a></li>
+<li><a href="#r-putstring-name-r-value"><R> R put(String name, R value)</a></li>
+<li><a href="#r-getheaderstring-name"><R> R getHeader(String name)</a></li>
+<li><a href="#r-getheaderstring-name-r-defaultvalue"><R> R getHeader(String name, R defaultValue)</a></li>
+<li><a href="#string-originalmethod">String originalMethod()</a></li>
+<li><a href="#long-bodylengthlimit">long bodyLengthLimit()</a></li>
+<li><a href="#boolean-hasbody">boolean hasBody()</a></li>
+<li><a href="#long-contentlength">long contentLength()</a></li>
+<li><a href="#object-body">Object body()</a></li>
+<li><a href="#buffer-bufferbody">Buffer bufferBody()</a></li>
+<li><a href="#map-files">Map<String, HttpServerFileUpload> files()</a></li>
+<li><a href="#set-cookies">Set<YokeCookie> cookies()</a></li>
+<li><a href="#void-setsessionidstring-sessionid">void setSessionId(String sessionId)</a></li>
+<li><a href="#string-getsessionid">String getSessionId()</a></li>
+<li><a href="#boolean-issecure">boolean isSecure()</a></li>
+<li><a href="#string-acceptsstring...-types">String accepts(String... types)</a></li>
+<li><a href="#string-ip">String ip()</a></li>
+<li><a href="#httpserverrequest-vertxhttpserverrequest">HttpServerRequest vertxHttpServerRequest()</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
+<h2 id="yokerequest"><a href="#yokerequest">YokeRequest</a></h2>
+<p>YokeRequest is an extension to Vert.x <em>HttpServerRequest</em> with some helper methods to make it easier to perform common tasks related to web application development.</p>
+<h2 id="r-getstring-name"><a href="#r-getstring-name"><R> R get(String name)</a></h2>
+<p>Allow getting properties in a generified way from the context.</p>
+<ul>
+<li><em>name</em> The key to get</li>
+<li><em><R></em> The type of the return</li>
+</ul>
+<p>Returns the found object</p>
+<h2 id="r-getstring-name-r-defaultvalue"><a href="#r-getstring-name-r-defaultvalue"><R> R get(String name, R defaultValue)</a></h2>
+<p>Allow getting properties in a generified way from the context and return defaultValue if the key does not exist.</p>
+<ul>
+<li><em>name</em> The key to get</li>
+<li><em>defaultValue</em> value returned when the key does not exist</li>
+<li><em><R></em> The type of the return</li>
+</ul>
+<p>Returns the found object</p>
+<h2 id="r-putstring-name-r-value"><a href="#r-putstring-name-r-value"><R> R put(String name, R value)</a></h2>
+<p>Allows putting a value into the context and return the previous value.</p>
+<ul>
+<li><em>name</em> the key to store</li>
+<li><em>value</em> the value to store</li>
+<li><em><R></em> the type of the previous value if present</li>
+</ul>
+<p>Returns the previous value or null</p>
+<h2 id="r-getheaderstring-name"><a href="#r-getheaderstring-name"><R> R getHeader(String name)</a></h2>
+<p>Allow getting headers in a generified way.</p>
+<ul>
+<li><em>name</em> The key to get</li>
+<li><em><R></em> The type of the return</li>
+</ul>
+<p>Returns the found header value</p>
+<h2 id="r-getheaderstring-name-r-defaultvalue"><a href="#r-getheaderstring-name-r-defaultvalue"><R> R getHeader(String name, R defaultValue)</a></h2>
+<p>Allow getting headers in a generified way from the context and return defaultValue if the key does not exist.</p>
+<ul>
+<li><em>name</em> The key to get</li>
+<li><em>defaultValue</em> value returned when the key does not exist</li>
+<li><em><R></em> The type of the return</li>
+</ul>
+<p>Returns the found object.</p>
+<h2 id="string-originalmethod"><a href="#string-originalmethod">String originalMethod()</a></h2>
+<p>The original HTTP setMethod for the request. One of GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD</p>
+<h2 id="long-bodylengthlimit"><a href="#long-bodylengthlimit">long bodyLengthLimit()</a></h2>
+<p>Holds the maximum allowed length for the setBody data. -1 for unlimited</p>
+<h2 id="boolean-hasbody"><a href="#boolean-hasbody">boolean hasBody()</a></h2>
+<p>Returns true if this request has a body. In other words: true if content-length or transfer-encoding is present.</p>
+<h2 id="long-contentlength"><a href="#long-contentlength">long contentLength()</a></h2>
+<p>Returns the content length of this request setBody or -1 if header is not present.</p>
+<h2 id="object-body"><a href="#object-body">Object body()</a></h2>
+<p>The request setBody and eventually a parsed version of it in json or buffer.</p>
+<h2 id="buffer-bufferbody"><a href="#buffer-bufferbody">Buffer bufferBody()</a></h2>
+<p>The request setBody casted to buffer or null if it cannot be casted</p>
+<h2 id="map-files"><a href="#map-files">Map<String, HttpServerFileUpload> files()</a></h2>
+<p>The uploaded files parsed by the body parser middleware.</p>
+<h2 id="set-cookies"><a href="#set-cookies">Set<YokeCookie> cookies()</a></h2>
+<p>The Cookies parsed from the CookieParser middleware.</p>
+<h2 id="void-setsessionidstring-sessionid"><a href="#void-setsessionidstring-sessionid">void setSessionId(String sessionId)</a></h2>
+<p>Update the session cookie with the new session id.</p>
+<h2 id="string-getsessionid"><a href="#string-getsessionid">String getSessionId()</a></h2>
+<p>Get the session id from the cookie.</p>
+<h2 id="boolean-issecure"><a href="#boolean-issecure">boolean isSecure()</a></h2>
+<p>True if the request is served in a HTTPS server.</p>
+<h2 id="string-acceptsstring...-types"><a href="#string-acceptsstring...-types">String accepts(String... types)</a></h2>
+<p>Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which case you should respond with 406 &quot;Not Acceptable&quot;.</p>
+<p>he type value must be a single mime type string such as &quot;application/json&quot; and is validated by checking if the request string starts with it.</p>
+<h2 id="string-ip"><a href="#string-ip">String ip()</a></h2>
+<p>Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For header.</p>
+<h2 id="httpserverrequest-vertxhttpserverrequest"><a href="#httpserverrequest-vertxhttpserverrequest">HttpServerRequest vertxHttpServerRequest()</a></h2>
+<p>Return the real request.</p>
+<div id="footer">
+  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+</div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-3682522-6', 'github.io');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
