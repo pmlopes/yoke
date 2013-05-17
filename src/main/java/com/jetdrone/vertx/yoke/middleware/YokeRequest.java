@@ -127,7 +127,7 @@ public class YokeRequest implements HttpServerRequest {
      * @return the previous value or null
      */
     @SuppressWarnings("unchecked")
-    public <R> R put(String name, Object value) {
+    public <R> R put(String name, R value) {
         return (R) context.put(name, value);
     }
 

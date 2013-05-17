@@ -67,6 +67,12 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-beta2```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
+## Extensions to Vert.x
+
+* [YokeRequest](YokeRequest.html) - The internal augmented request object.
+* [YokeResponse](YokeResponse.html) - The internal augmented response object.
+
+
 ## Tutorials
 
 * [Java](Java-Tutorial.html) Java Tutorials
