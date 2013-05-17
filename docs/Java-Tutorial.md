@@ -192,7 +192,7 @@ under ```src/main/resources/mod.json``` with the following content:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines}
 {
   "main": "com.jetdrone.vertx.HelloWorldVerticle",
-  "includes": "com.jetdrone~yoke~1.0.0-beta1"
+  "includes": "com.jetdrone~yoke~1.0.0-beta2"
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
