@@ -20,17 +20,40 @@ import org.vertx.java.core.Handler;
 
 import java.util.UUID;
 
-class Csrf extends Middleware {
+public class Csrf extends Middleware {
 
     final ValueHandler valueHandler;
+    final String key;
 
-    public Csrf() {
+    public Csrf(final String key) {
+        this.key = key;
         valueHandler = new ValueHandler() {
             @Override
             public String handle(YokeRequest request) {
-                return null;
+                String token = request.formAttributes().get(key);
+                if (token == null) {
+                    token = request.params().get(key);
+                    if (token == null) {
+                        token = request.headers().get("x-csrf-token");
+                    }
+                }
+
+                return token;
             }
         };
+    }
+
+    public Csrf() {
+        this("_csrf");
+    }
+
+    public Csrf(String key, ValueHandler valueHandler) {
+        this.key = key;
+        this.valueHandler = valueHandler;
+    }
+
+    public Csrf(ValueHandler valueHandler) {
+        this("_csrf", valueHandler);
     }
 
     public interface ValueHandler {
@@ -46,10 +69,8 @@ class Csrf extends Middleware {
             return;
         }
 
-        // TODO: missing session storage, this does not work since the token is created on every request
-
         // generate CSRF token
-        String token = request.get("csrf", UUID.randomUUID().toString());
+        String token = request.get(key, UUID.randomUUID().toString());
 
         // determine value
         String val = valueHandler.handle(request);
