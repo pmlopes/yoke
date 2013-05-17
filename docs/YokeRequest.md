@@ -6,55 +6,55 @@ YokeRequest is an extension to Vert.x *HttpServerRequest* with some helper metho
 tasks related to web application development.
 
 
-## <R> R get(String name)
+## &lt;R&gt; R get(String name)
 
 Allow getting properties in a generified way from the context.
 
 * *name* The key to get
-* *<R>* The type of the return
+* *&lt;R&gt;* The type of the return
 
 Returns the found object
 
 
-## <R> R get(String name, R defaultValue)
+## &lt;R&gt; R get(String name, R defaultValue)
 
 Allow getting properties in a generified way from the context and return defaultValue if the key does not exist.
 
 * *name* The key to get
 * *defaultValue* value returned when the key does not exist
-* *<R>* The type of the return
+* *&lt;R&gt;* The type of the return
 
 Returns the found object
 
 
-## <R> R put(String name, R value)
+## &lt;R&gt; R put(String name, R value)
 
 Allows putting a value into the context and return the previous value.
 
 * *name* the key to store
 * *value* the value to store
-* *<R>* the type of the previous value if present
+* *&lt;R&gt;* the type of the previous value if present
 
 Returns the previous value or null
 
 
-## <R> R getHeader(String name)
+## &lt;R&gt; R getHeader(String name)
 
 Allow getting headers in a generified way.
 
 * *name* The key to get
-* *<R>* The type of the return
+* *&lt;R&gt;* The type of the return
 
 Returns the found header value
 
 
-## <R> R getHeader(String name, R defaultValue)
+## &lt;R&gt; R getHeader(String name, R defaultValue)
 
 Allow getting headers in a generified way from the context and return defaultValue if the key does not exist.
 
 * *name* The key to get
 * *defaultValue* value returned when the key does not exist
-* *<R>* The type of the return
+* *&lt;R&gt;* The type of the return
 
 Returns the found object.
 

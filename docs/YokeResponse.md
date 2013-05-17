@@ -15,23 +15,23 @@ Renders a template using the registered template engines and use the handler to 
 Renders a template using the registered template engines.
 
 
-## <R> R getHeader(String name)
+## &lt;R&gt; R getHeader(String name)
 
 Allow getting headers in a generified way.
 
 * *name* The key to get
-* *<R>* The type of the return
+* *&lt;R&gt;* The type of the return
 
 Returns the found header value
 
 
-## <R> R getHeader(String name, R defaultValue)
+## &lt;R&gt; R getHeader(String name, R defaultValue)
 
 Allow getting headers in a generified way from the context and return defaultValue if the key does not exist.
 
 * *name* The key to get
 * *defaultValue* value returned when the key does not exist
-* *<R>* The type of the return
+* *&lt;R&gt;* The type of the return
 
 Returns the found object.
 
