@@ -1,11 +1,11 @@
+# Apple crap
 .DS_Store
+# Build tools crap
 .gradle
 .idea
 .classpath
 .project
 .settings
-.yardoc
-.yardopts
 bin
 build
 target
@@ -13,12 +13,14 @@ out
 *.iml
 *.ipr
 *.iws
-test-output
-Scratch.java
-ScratchTest.java
-test-results
-test-tmp
-*.class
 mods
+# Ruby crap
+.yardoc
+.yardopts
+# Generated site crap
 docs/*.html
 docs/yoke-gradle-template.tar.gz
+# Benchmark crap
+node_modules
+benchmark/*.dat
+benchmark/*.png
