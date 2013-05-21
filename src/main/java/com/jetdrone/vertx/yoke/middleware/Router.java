@@ -694,7 +694,7 @@ public class Router extends Middleware {
                         // single argument handler
                         type = 1;
                     }
-                    if (paramTypes.length == 2 && paramTypes[0].equals(YokeRequest.class) && paramTypes[0].equals(Handler.class)) {
+                    if (paramTypes.length == 2 && paramTypes[0].equals(YokeRequest.class) && paramTypes[1].equals(Handler.class)) {
                         // double argument handler
                         type = 2;
                     }
