@@ -62,7 +62,9 @@ public class MethodOverride extends Middleware {
 
         if (xHttpMethodOverride != null) {
             request.setMethod(xHttpMethodOverride);
-            next.handle(null);
         }
+
+        // if reached the end continue to the next middleware
+        next.handle(null);
     }
 }
