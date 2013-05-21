@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.json.DecodeException;
@@ -59,64 +60,69 @@ public class BodyParser extends Middleware {
         if ("GET".equals(method) || "HEAD".equals(method)) {
             next.handle(null);
         } else {
+
+            // has no body
+            MultiMap headers = request.headers();
+            if (!headers.contains("transfer-encoding") && !headers.contains("content-length")) {
+                next.handle(null);
+                return;
+            }
+
             final String contentType = request.getHeader("content-type");
 
-            if (contentType != null) {
-
-                final boolean isJSON = contentType.contains("application/json");
-                final boolean isMULTIPART = contentType.contains("multipart/form-data");
-                final boolean isURLENCODEC = contentType.contains("application/x-www-form-urlencoded");
-                final Buffer buffer = (!isMULTIPART && !isURLENCODEC) ? new Buffer(0) : null;
+            final boolean isJSON = contentType != null && contentType.contains("application/json");
+            final boolean isMULTIPART = contentType != null && contentType.contains("multipart/form-data");
+            final boolean isURLENCODEC = contentType != null && contentType.contains("application/x-www-form-urlencoded");
+            final Buffer buffer = (!isMULTIPART && !isURLENCODEC) ? new Buffer(0) : null;
 
 
-                if (isMULTIPART) {
-                    request.uploadHandler(new Handler<HttpServerFileUpload>() {
-                        @Override
-                        public void handle(final HttpServerFileUpload fileUpload) {
-                            if (request.files() == null) {
-                                request.setFiles(new HashMap<String, HttpServerFileUpload>());
-                            }
-                            request.files().put(fileUpload.name(), fileUpload);
-                        }
-                    });
-                }
-
-                request.dataHandler(new Handler<Buffer>() {
-                    long size = 0;
-                    final long limit = request.bodyLengthLimit();
-
+            if (isMULTIPART) {
+                request.uploadHandler(new Handler<HttpServerFileUpload>() {
                     @Override
-                    public void handle(Buffer event) {
-                        if (limit != -1) {
-                            size += event.length();
-                            if (size < limit) {
-                                if (!isMULTIPART && !isURLENCODEC) {
-                                    buffer.appendBuffer(event);
-                                }
-                            } else {
-                                request.dataHandler(null);
-                                request.endHandler(null);
-                                next.handle(413);
-                            }
-                        } else {
-                            if (!isMULTIPART && !isURLENCODEC) {
-                                buffer.appendBuffer(event);
-                            }
+                    public void handle(final HttpServerFileUpload fileUpload) {
+                        if (request.files() == null) {
+                            request.setFiles(new HashMap<String, HttpServerFileUpload>());
                         }
-                    }
-                });
-
-                request.endHandler(new Handler<Void>() {
-                    @Override
-                    public void handle(Void _void) {
-                        if (isJSON) {
-                            parseJson(request, buffer, next);
-                        } else {
-                            next.handle(null);
-                        }
+                        request.files().put(fileUpload.name(), fileUpload);
                     }
                 });
             }
+
+            request.dataHandler(new Handler<Buffer>() {
+                long size = 0;
+                final long limit = request.bodyLengthLimit();
+
+                @Override
+                public void handle(Buffer event) {
+                    if (limit != -1) {
+                        size += event.length();
+                        if (size < limit) {
+                            if (!isMULTIPART && !isURLENCODEC) {
+                                buffer.appendBuffer(event);
+                            }
+                        } else {
+                            request.dataHandler(null);
+                            request.endHandler(null);
+                            next.handle(413);
+                        }
+                    } else {
+                        if (!isMULTIPART && !isURLENCODEC) {
+                            buffer.appendBuffer(event);
+                        }
+                    }
+                }
+            });
+
+            request.endHandler(new Handler<Void>() {
+                @Override
+                public void handle(Void _void) {
+                    if (isJSON) {
+                        parseJson(request, buffer, next);
+                    } else {
+                        next.handle(null);
+                    }
+                }
+            });
         }
     }
 }
