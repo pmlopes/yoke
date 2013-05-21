@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Yoke a middleware framework for Vert.x: Benchmark</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; background-color: #f8f8f8; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+pre, code { background-color: #f8f8f8; }
+code > span.kw { color: #204a87; font-weight: bold; }
+code > span.dt { color: #204a87; }
+code > span.dv { color: #0000cf; }
+code > span.bn { color: #0000cf; }
+code > span.fl { color: #0000cf; }
+code > span.ch { color: #4e9a06; }
+code > span.st { color: #4e9a06; }
+code > span.co { color: #8f5902; font-style: italic; }
+code > span.ot { color: #8f5902; }
+code > span.al { color: #ef2929; }
+code > span.fu { color: #000000; }
+code > span.er { font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
+<li><a href="#benchmarks">Benchmarks</a></li>
+<li><a href="#expressjs-code">ExpressJS code</a></li>
+<li><a href="#yoke-code">Yoke code</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#conclusions">Conclusions</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
+<h2 id="benchmarks"><a href="#benchmarks">Benchmarks</a></h2>
+<p>Yoke has a simple benchmark to compare to ExpressJS, these benchmarks are too simple and do not represent real world scenarios. Proper benchmarking should be done comparing what you need and not just serving static text or json resources.</p>
+<h2 id="expressjs-code"><a href="#expressjs-code">ExpressJS code</a></h2>
+<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> express = require(<span class="ch">&#39;express&#39;</span>);
+<span class="kw">var</span> app = express();
+
+<span class="kw">app</span>.<span class="fu">configure</span>(<span class="kw">function</span>(){
+    <span class="kw">app</span>.<span class="fu">use</span>(<span class="kw">express</span>.<span class="fu">bodyParser</span>());
+});
+
+<span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/&#39;</span>, <span class="kw">function</span>(req, res){
+    <span class="kw">res</span>.<span class="fu">send</span>(<span class="ch">&#39;Hello World\n&#39;</span>);
+});
+
+<span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/json&#39;</span>, <span class="kw">function</span>(req, res){
+    <span class="kw">res</span>.<span class="fu">send</span>({ <span class="dt">name</span>: <span class="ch">&#39;Tobi&#39;</span>, <span class="dt">role</span>: <span class="ch">&#39;admin&#39;</span> });
+});
+
+<span class="kw">function</span> foo(req, res, next) {
+    next();
+}
+
+<span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/middleware&#39;</span>, foo, foo, foo, foo, <span class="kw">function</span>(req, res){
+    <span class="kw">res</span>.<span class="fu">send</span>(<span class="ch">&#39;1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890&#39;</span>);
+});
+
+<span class="kw">app</span>.<span class="fu">listen</span>(<span class="dv">8000</span>);</code></pre>
+<p>This application was running node <em>v0.10.3</em> and express <em>3.2.4</em> and in a single thread.</p>
+<h2 id="yoke-code"><a href="#yoke-code">Yoke code</a></h2>
+<p>Due to differences between <em>express</em> and <em>yoke</em> APIs yoke code had 2 versions. The first version was used to test <em>text</em> and <em>json</em> resources and the second, to test the <em>middleware</em> resource to have the same 4 hops as on <em>express</em> before reaching the resource.</p>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> YokeBench <span class="kw">extends</span> Verticle {
+
+    @Override
+    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
+        <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
+                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>())
+                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
+                        .<span class="fu">get</span>(<span class="st">&quot;/&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                            @Override
+                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
+                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World</span><span class="ch">\n</span><span class="st">&quot;</span>);
+                            }
+                        })
+                        .<span class="fu">get</span>(<span class="st">&quot;/json&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                            @Override
+                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
+                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putString</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;Tobi&quot;</span>).<span class="fu">putString</span>(<span class="st">&quot;role&quot;</span>, <span class="st">&quot;admin&quot;</span>));
+                            }
+                        })
+                ).<span class="fu">listen</span>(<span class="dv">8080</span>);
+    }
+}</code></pre>
+<p>The seconds code to test only the <em>middleware</em> resource.</p>
+<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> YokeBench <span class="kw">extends</span> Verticle {
+
+    @Override
+    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
+
+        <span class="dt">final</span> Middleware foo = <span class="kw">new</span> <span class="fu">Middleware</span>() {
+            @Override
+            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request, Handler&lt;Object&gt; next) {
+                next.<span class="fu">handle</span>(<span class="kw">null</span>);
+            }
+        };
+
+        <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
+                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>())
+                <span class="co">// this should be only here to test the middleware resource</span>
+                .<span class="fu">use</span>(foo)
+                .<span class="fu">use</span>(foo)
+                .<span class="fu">use</span>(foo)
+                .<span class="fu">use</span>(foo)
+                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
+                        .<span class="fu">get</span>(<span class="st">&quot;/&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                            @Override
+                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
+                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World</span><span class="ch">\n</span><span class="st">&quot;</span>);
+                            }
+                        })
+                        .<span class="fu">get</span>(<span class="st">&quot;/json&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                            @Override
+                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
+                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putString</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;Tobi&quot;</span>).<span class="fu">putString</span>(<span class="st">&quot;role&quot;</span>, <span class="st">&quot;admin&quot;</span>));
+                            }
+                        })
+                        .<span class="fu">get</span>(<span class="st">&quot;/middleware&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                            @Override
+                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
+                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890&quot;</span>);
+                            }
+                        })
+                ).<span class="fu">listen</span>(<span class="dv">8080</span>);
+    }
+}</code></pre>
+<p>This application was running java <em>1.7.0_21 (Oracle)</em>, yoke <em>1.0.0-SNAPSHOT</em> and vert.x <em>2.0.0-SNAPSHOT</em> and in a single thread.</p>
+<h2 id="results"><a href="#results">Results</a></h2>
+<h3 id="serving-text"><a href="#serving-text">Serving text</a></h3>
+<div class="figure">
+<img src="text.png" alt="Hello World expressJS vs Yoke" /><p class="caption">Hello World expressJS vs Yoke</p>
+</div>
+<p>As it can be seem Yoke is faster and scales the same way ExpressJS does.</p>
+<h3 id="serving-json"><a href="#serving-json">Serving json</a></h3>
+<div class="figure">
+<img src="json.png" alt="JSON expressJS vs Yoke" /><p class="caption">JSON expressJS vs Yoke</p>
+</div>
+<p>As it can be seem Yoke is faster and scales the same way ExpressJS does.</p>
+<h3 id="middleware"><a href="#middleware">Middleware</a></h3>
+<div class="figure">
+<img src="middleware.png" alt="Middleware expressJS vs Yoke" /><p class="caption">Middleware expressJS vs Yoke</p>
+</div>
+<p>As it can be seem Yoke is faster and scales the same way ExpressJS does.</p>
+<h2 id="conclusions"><a href="#conclusions">Conclusions</a></h2>
+<p>These benchmarks are quite naive but give you a good impression that if you have a fast expressJS application and you port it to Yoke you will get some more performance and the expected scalability.</p>
+<div id="footer">
+  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+</div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-3682522-6', 'github.io');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>

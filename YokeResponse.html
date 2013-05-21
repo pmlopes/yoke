@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Yoke a middleware framework for Vert.x: YokeResponse</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+<body>
+<div id="TOC">
+<ul>
+<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
+<li><a href="#yokeresponse">YokeResponse</a></li>
+<li><a href="#renderfinal-string-template">render(final String template)</a></li>
+<li><a href="#r-r-getheaderstring-name">&lt;R&gt; R getHeader(String name)</a></li>
+<li><a href="#r-r-getheaderstring-name-r-defaultvalue">&lt;R&gt; R getHeader(String name, R defaultValue)</a></li>
+<li><a href="#void-redirectstring-url">void redirect(String url)</a></li>
+<li><a href="#void-void-redirectint-status-string-url">void void redirect(int status, String url)</a></li>
+<li><a href="#endjsonelement-json">end(JsonElement json)</a></li>
+<li><a href="#void-endreadstream-stream">void end(ReadStream&lt;?&gt; stream)</a></li>
+<li><a href="#void-addcookiecookie-cookie">void addCookie(Cookie cookie)</a></li>
+<li><a href="#void-headershandlerhandler-handler">void headersHandler(Handler<Void> handler)</a></li>
+<li><a href="#void-endhandlerhandler-handler">void endHandler(Handler<Void> handler)</a></li>
+</ul></li>
+</ul>
+</div>
+<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
+<h2 id="yokeresponse"><a href="#yokeresponse">YokeResponse</a></h2>
+<p>YokeResponse is an extension to Vert.x <em>HttpServerResponse</em> with some helper methods to make it easier to perform common tasks related to web application development.</p>
+## render(final String template, final Handler
+<Object> 
+<p>next)</p>
+<p>Renders a template using the registered template engines and use the handler to report errors or success.</p>
+<h2 id="renderfinal-string-template"><a href="#renderfinal-string-template">render(final String template)</a></h2>
+<p>Renders a template using the registered template engines.</p>
+<h2 id="r-r-getheaderstring-name"><a href="#r-r-getheaderstring-name">&lt;R&gt; R getHeader(String name)</a></h2>
+<p>Allow getting headers in a generified way.</p>
+<ul>
+<li><em>name</em> The key to get</li>
+<li><em>&lt;R&gt;</em> The type of the return</li>
+</ul>
+<p>Returns the found header value</p>
+<h2 id="r-r-getheaderstring-name-r-defaultvalue"><a href="#r-r-getheaderstring-name-r-defaultvalue">&lt;R&gt; R getHeader(String name, R defaultValue)</a></h2>
+<p>Allow getting headers in a generified way from the context and return defaultValue if the key does not exist.</p>
+<ul>
+<li><em>name</em> The key to get</li>
+<li><em>defaultValue</em> value returned when the key does not exist</li>
+<li><em>&lt;R&gt;</em> The type of the return</li>
+</ul>
+<p>Returns the found object.</p>
+<h2 id="void-redirectstring-url"><a href="#void-redirectstring-url">void redirect(String url)</a></h2>
+<p>Send a HTTP status code 302 with a redirect to the specific url.</p>
+<h2 id="void-void-redirectint-status-string-url"><a href="#void-void-redirectint-status-string-url">void void redirect(int status, String url)</a></h2>
+<p>Send a HTTP status code with a redirect to the specific url.</p>
+<h2 id="endjsonelement-json"><a href="#endjsonelement-json">end(JsonElement json)</a></h2>
+<p>Allows sending Json as a response with the correct content type header.</p>
+<h2 id="void-endreadstream-stream"><a href="#void-endreadstream-stream">void end(ReadStream&lt;?&gt; stream)</a></h2>
+<p>Pumps a Stream directly to the response object.</p>
+<h2 id="void-addcookiecookie-cookie"><a href="#void-addcookiecookie-cookie">void addCookie(Cookie cookie)</a></h2>
+<p>Adds a cookie to the response.</p>
+<h2 id="void-headershandlerhandler-handler"><a href="#void-headershandlerhandler-handler">void headersHandler(Handler<Void> handler)</a></h2>
+<p>Allows to receive notifications when headers are about to be written.</p>
+<h2 id="void-endhandlerhandler-handler"><a href="#void-endhandlerhandler-handler">void endHandler(Handler<Void> handler)</a></h2>
+<p>Allows to receive notifications when the response ended.</p>
+<div id="footer">
+  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+</div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-3682522-6', 'github.io');
+  ga('send', 'pageview');
+
+</script>
+</body>
+</html>
