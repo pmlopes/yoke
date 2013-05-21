@@ -80,6 +80,12 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-beta2```
 * [JavaScript](JavaScript-Tutorial.html) JavaScript Tutorials
 
 
+## Example Apps
+
+* [KitCMS](https://github.com/pmlopes/yoke/tree/master/example/kitcms) - Remake of KitCMS from NodeJS with Yoke
+* [Persona](https://github.com/pmlopes/yoke/tree/master/example/persona) - Implementation of Mozilla Persona Authentication with Yoke
+
+
 ## Middleware
 
 * [BasicAuth](BasicAuth.html) basic http authentication
