@@ -52,14 +52,22 @@ public class YokeCookie implements Cookie {
         this(new DefaultCookie(name, ""), hmacSHA256);
     }
 
+    public YokeCookie(String name, String value) {
+        this(new DefaultCookie(name, value), null);
+    }
+
     // extensions
     public boolean isSigned() {
         return signed;
     }
 
     public void sign() {
-        nettyCookie.setValue("s:" + Utils.sign(value, hmacSHA256));
-        signed = true;
+        if (hmacSHA256 != null) {
+            nettyCookie.setValue("s:" + Utils.sign(value, hmacSHA256));
+            signed = true;
+        } else {
+            signed = false;
+        }
     }
 
     public String getUnsignedValue() {
