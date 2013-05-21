@@ -68,7 +68,7 @@ Again piece of cake!
 
 ## Watch for login and logout actions
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.html .numberLines startFrom="28"}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines startFrom="28"}
 var currentUser = ${email};
 
   navigator.id.watch({
@@ -94,8 +94,6 @@ var currentUser = ${email};
       });
     }
   });
-</script>
-</html>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Really?
