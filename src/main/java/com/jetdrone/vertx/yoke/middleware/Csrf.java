@@ -64,7 +64,11 @@ public class Csrf extends Middleware {
     public void handle(YokeRequest request, Handler<Object> next) {
 
         // generate CSRF token
-        String token = request.get(key, UUID.randomUUID().toString());
+        String token = request.get(key);
+        if (token == null) {
+            token = UUID.randomUUID().toString();
+            request.put(key, token);
+        }
 
         // ignore these methods
         if ("GET".equals(request.method()) || "HEAD".equals(request.method()) || "OPTIONS".equals(request.method())) {
