@@ -40,37 +40,6 @@ This application was running node *v0.10.3* and express *3.2.4* and in a single 
 
 ## Yoke code
 
-Due to differences between *express* and *yoke* APIs yoke code had 2 versions. The first version was used to test *text*
-and *json* resources and the second, to test the *middleware* resource to have the same 4 hops as on *express* before
-reaching the resource.
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
-public class YokeBench extends Verticle {
-
-    @Override
-    public void start() {
-        new Yoke(vertx)
-                .use(new BodyParser())
-                .use(new Router()
-                        .get("/", new Handler<YokeRequest>() {
-                            @Override
-                            public void handle(YokeRequest request) {
-                                request.response().end("Hello World\n");
-                            }
-                        })
-                        .get("/json", new Handler<YokeRequest>() {
-                            @Override
-                            public void handle(YokeRequest request) {
-                                request.response().end(new JsonObject().putString("name", "Tobi").putString("role", "admin"));
-                            }
-                        })
-                ).listen(8080);
-    }
-}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The seconds code to test only the *middleware* resource.
-
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
 public class YokeBench extends Verticle {
 
@@ -86,11 +55,10 @@ public class YokeBench extends Verticle {
 
         new Yoke(vertx)
                 .use(new BodyParser())
-                // this should be only here to test the middleware resource
-                .use(foo)
-                .use(foo)
-                .use(foo)
-                .use(foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
                 .use(new Router()
                         .get("/", new Handler<YokeRequest>() {
                             @Override
@@ -119,6 +87,86 @@ This application was running java *1.7.0_21 (Oracle)*, yoke *1.0.0-SNAPSHOT* and
 thread.
 
 
+## Cluster
+
+Although **both** frameworks run in a single Thread, in a real production environment you might want to use all your
+cores to get all the performance out of the box.
+
+
+## ExpressJS code
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
+// Include the cluster module
+var cluster = require('cluster');
+
+// Code to run if we're in the master process
+if (cluster.isMaster) {
+
+    // Count the machine's CPUs
+    var cpuCount = require('os').cpus().length;
+
+    // Create a worker for each CPU
+    for (var i = 0; i < cpuCount; i += 1) {
+        cluster.fork();
+    }
+
+    // Listen for dying workers
+    cluster.on('exit', function (worker) {
+
+        // Replace the dead worker, we're not sentimental
+        console.log('Worker ' + worker.id + ' died :(');
+        cluster.fork();
+
+    });
+
+// Code to run if we're in a worker process
+} else {
+
+    // Include Express
+    var express = require('express');
+
+    // Create a new Express application
+    var app = express();
+
+    // Add a basic route – index page
+    app.get('/', function (req, res) {
+        res.send('Hello World\n');
+    });
+
+    // Bind to a port
+    app.listen(3000);
+    console.log('Worker ' + cluster.worker.id + ' running!');
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Lots of code here!
+
+## Yoke code
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+public class YokeBench extends Verticle {
+
+    @Override
+    public void start() {
+
+        new Yoke(vertx)
+                .use(new Router()
+                        .get("/", new Handler<YokeRequest>() {
+                            @Override
+                            public void handle(YokeRequest request) {
+                                request.response().end("Hello World\n");
+                            }
+                        })
+                ).listen(8080);
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As you can read Yoke code is cleaner and it is not the concern of the developer to implement forking as that is managed
+by the underlying Vert.x framework.
+
+
 ## Results
 
 ### Serving text
@@ -139,6 +187,12 @@ As it can be seem Yoke is faster and scales the same way ExpressJS does.
 
 As it can be seem Yoke is faster and scales the same way ExpressJS does.
 
+## Cluster Results
+
+![Cluster expressJS vs Yoke](cluster.png)
+
+Running the benchmark using 4 workers (the test machine has 4 cores) both with Express and Yoke you can see that Yoke
+is a clear winner.
 
 ## Conclusions
 

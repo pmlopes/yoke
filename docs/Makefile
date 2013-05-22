@@ -18,7 +18,8 @@ EXTENSIONS =	YokeRequest.html \
 
 TUTORIALS =	Java-Tutorial.html \
 			Groovy-Tutorial.html \
-			JavaScript-Tutorial.html
+			JavaScript-Tutorial.html \
+			Persona.html
 
 ENGINES =	StringPlaceholderEngine.html \
 			GroovyTemplate.html \
