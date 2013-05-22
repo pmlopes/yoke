@@ -51,6 +51,16 @@ Send a HTTP status code with a redirect to the specific url.
 Allows sending Json as a response with the correct content type header.
 
 
+## jsonp(String callback, JsonElement json)
+
+Allows sending Json as a response with the correct content type header as a JSONP response.
+
+
+## jsonp(JsonElement json, String json)
+
+Allows sending serialized Json as a response with the correct content type header as a JSONP response.
+
+
 ## void end(ReadStream<?> stream)
 
 Pumps a Stream directly to the response object.

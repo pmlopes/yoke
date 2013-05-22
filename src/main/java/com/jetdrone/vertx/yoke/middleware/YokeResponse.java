@@ -165,6 +165,55 @@ public class YokeResponse implements HttpServerResponse {
         }
     }
 
+    public void jsonp(String callback, JsonElement json) {
+
+        if (callback == null) {
+            // treat as normal json response
+            end(json);
+            return;
+        }
+
+        String body = null;
+
+        if (json != null) {
+            if (json.isArray()) {
+                JsonArray jsonArray = json.asArray();
+                body = jsonArray.encode();
+            } else if (json.isObject()) {
+                JsonObject jsonObject = json.asObject();
+                body = jsonObject.encode();
+            }
+        }
+
+        jsonp(callback, body);
+    }
+
+    public void jsonp(String callback, String body) {
+
+        if (callback == null) {
+            // treat as normal json response
+            response.putHeader("content-type", "application/json");
+            triggerHeadersHandlers();
+            response.end(body);
+            triggerEndHandlers();
+            return;
+        }
+
+        if (body == null) {
+            body = "null";
+        }
+
+        // replace special chars
+        body = body.replaceAll("\\u2028", "\\\\u2028").replaceAll("\\u2029", "\\\\u2029");
+
+        // content-type
+        response.putHeader("content-type", "text/javascript");
+        String cb = callback.replaceAll("[^\\[\\]\\w$.]", "");
+        triggerHeadersHandlers();
+        response.end(cb + " && " + cb + "(" + body + ");");
+        triggerEndHandlers();
+    }
+
     public void end(ReadStream<?> stream) {
         triggerHeadersHandlers();
         Pump.createPump(stream, response).start();
