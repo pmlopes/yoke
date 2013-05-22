@@ -165,6 +165,10 @@ public class YokeResponse implements HttpServerResponse {
         }
     }
 
+    public void jsonp(JsonElement json) {
+        jsonp("callback", json);
+    }
+
     public void jsonp(String callback, JsonElement json) {
 
         if (callback == null) {
@@ -186,6 +190,10 @@ public class YokeResponse implements HttpServerResponse {
         }
 
         jsonp(callback, body);
+    }
+
+    public void jsonp(String body) {
+        jsonp("callback", body);
     }
 
     public void jsonp(String callback, String body) {
