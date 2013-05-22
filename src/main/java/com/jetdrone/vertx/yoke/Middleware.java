@@ -30,7 +30,7 @@ public abstract class Middleware {
 
     protected Vertx vertx;
 
-    public Middleware setVertx(Vertx vertx) {
+    protected Middleware setVertx(Vertx vertx) {
         this.vertx = vertx;
         return this;
     }
