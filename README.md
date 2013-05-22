@@ -41,19 +41,37 @@ Please visit:  [yoke](http://pmlopes.github.io/yoke/)
 
 In the site there are simple examples and basic documentation of the implemented middleware.
 
-## Example Application
+* [BasicAuth](http://pmlopes.github.io/yoke/BasicAuth.html)
+* [Favicon](http://pmlopes.github.io/yoke/Favicon.html)
+* [Limit](http://pmlopes.github.io/yoke/Limit.html)
+* [Static](http://pmlopes.github.io/yoke/Static.html)
+* [MethodOverride](http://pmlopes.github.io/yoke/MethodOverride.html)
+* [Timeout](http://pmlopes.github.io/yoke/Timeout.html)
+* [BodyParser](http://pmlopes.github.io/yoke/BodyParser.html)
+* [Vhost](http://pmlopes.github.io/yoke/Vhost.html)
+* [CookieParser](http://pmlopes.github.io/yoke/CookieParser.html)
+* [ResponseTime](http://pmlopes.github.io/yoke/ResponseTime.html)
+* [ErrorHandler](http://pmlopes.github.io/yoke/ErrorHandler.html)
+* [Router](http://pmlopes.github.io/yoke/Router.html)
 
-Under the directory example you will find a Naive implementation of a CMS application using Redis as a database backend.
-The example shows how to use the following middleware:
+You can also get tutorials:
 
-* Favicon
-* ErrorHandler
-* Router
-* BodyParser
-* Static
-* BasicAuth
+* [Java-Tutorial](http://pmlopes.github.io/yoke/Java-Tutorial.html)
+* [Groovy-Tutorial](http://pmlopes.github.io/yoke/Groovy-Tutorial.html)
+* [JavaScript-Tutorial](http://pmlopes.github.io/yoke/JavaScript-Tutorial.html)
+* [Mozilla Persona](http://pmlopes.github.io/yoke/Persona.html)
 
-And how to add custom middleware in the route to add extra information to the request.
+And also Benchmarks:
+
+* [Benchmark](http://pmlopes.github.io/yoke/Benchmark.html)
+
+
+## Example Applications
+
+* Under the directory example you will find a Naive implementation of a CMS application using Redis as a database backend.
+* Mozilla Persona authentication implementation
+* Groovy get started example
+* JavaScript get started example
 
 
 ## Inspiration
