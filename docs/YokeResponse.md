@@ -51,12 +51,12 @@ Send a HTTP status code with a redirect to the specific url.
 Allows sending Json as a response with the correct content type header.
 
 
-## jsonp(String callback, JsonElement json)
+## jsonp(String callback = "callback", JsonElement json)
 
 Allows sending Json as a response with the correct content type header as a JSONP response.
 
 
-## jsonp(JsonElement json, String json)
+## jsonp(String callback = "callback", String body)
 
 Allows sending serialized Json as a response with the correct content type header as a JSONP response.
 

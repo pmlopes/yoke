@@ -592,11 +592,15 @@ public class Router extends Middleware {
         m.appendTail(sb);
         String regex = sb.toString();
         PatternBinding binding = new PatternBinding(Pattern.compile(regex), groups, handler);
+        // also pass the vertx object to the routes
+        handler.setVertx(vertx);
         bindings.add(binding);
     }
 
     private void addRegEx(Pattern regex, Middleware handler, List<PatternBinding> bindings) {
         PatternBinding binding = new PatternBinding(regex, null, handler);
+        // also pass the vertx object to the routes
+        handler.setVertx(vertx);
         bindings.add(binding);
     }
 
