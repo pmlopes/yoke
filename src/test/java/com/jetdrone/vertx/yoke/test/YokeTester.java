@@ -27,9 +27,7 @@ import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class YokeTester extends Yoke {
 
@@ -48,14 +46,17 @@ public class YokeTester extends Yoke {
     }
 
     public void request(final String method, final String url, final Handler<Response> handler) {
-        request(method, url, new CaseInsensitiveMultiMap(), new Buffer(0), handler);
+        request(method, url, new CaseInsensitiveMultiMap(), false, new Buffer(0), handler);
     }
 
     public void request(final String method, final String url, final MultiMap headers, final Handler<Response> handler) {
-        request(method, url, headers, new Buffer(0), handler);
+        request(method, url, headers, false, new Buffer(0), handler);
+    }
+    public void request(final String method, final String url, final MultiMap headers, final Buffer body, final Handler<Response> handler) {
+        request(method, url, headers, false, body, handler);
     }
 
-    public void request(final String method, final String url, final MultiMap headers, final Buffer body, final Handler<Response> handler) {
+    public void request(final String method, final String url, final MultiMap headers, final boolean urlEncoded, final Buffer body, final Handler<Response> handler) {
         try {
             final URI uri = new URI(url);
 
@@ -65,7 +66,7 @@ public class YokeTester extends Yoke {
             fakeServer.requestHandler().handle(new HttpServerRequest() {
 
                 MultiMap params = null;
-                Map<String, String> attributes = null;
+                MultiMap attributes = null;
 
                 @Override
                 public HttpVersion version() {
@@ -171,16 +172,18 @@ public class YokeTester extends Yoke {
                 }
 
                 @Override
-                public Map<String, String> formAttributes() {
+                public MultiMap formAttributes() {
                     if (attributes == null) {
-                        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(body.toString(), false);
+                        attributes = new CaseInsensitiveMultiMap();
+                        if (urlEncoded) {
+                            QueryStringDecoder queryStringDecoder = new QueryStringDecoder(body.toString(), false);
 
-                        Map<String, List<String>> prms = queryStringDecoder.parameters();
-                        attributes = new HashMap<>();
+                            Map<String, List<String>> prms = queryStringDecoder.parameters();
 
-                        if (!prms.isEmpty()) {
-                            for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
-                                attributes.put(entry.getKey(), entry.getValue().get(0));
+                            if (!prms.isEmpty()) {
+                                for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
+                                    attributes.add(entry.getKey(), entry.getValue());
+                                }
                             }
                         }
                     }

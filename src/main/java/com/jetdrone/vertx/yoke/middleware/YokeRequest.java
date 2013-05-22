@@ -449,7 +449,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public Map<String, String> formAttributes() {
+    public MultiMap formAttributes() {
         return request.formAttributes();
     }
 

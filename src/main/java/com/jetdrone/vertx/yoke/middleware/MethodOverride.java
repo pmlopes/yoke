@@ -17,9 +17,8 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonObject;
-
-import java.util.Map;
 
 public class MethodOverride extends Middleware {
 
@@ -35,7 +34,7 @@ public class MethodOverride extends Middleware {
 
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
-        final Map<String, String> urlEncoded = request.formAttributes();
+        final MultiMap urlEncoded = request.formAttributes();
 
         if (urlEncoded != null) {
             String method = urlEncoded.get(key);

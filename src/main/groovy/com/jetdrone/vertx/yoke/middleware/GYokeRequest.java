@@ -260,7 +260,7 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return netSocket();
     }
 
-    public Map<String, String> getFormAttributes() {
+    public MultiMap getFormAttributes() {
         return formAttributes();
     }
 
