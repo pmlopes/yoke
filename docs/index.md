@@ -124,3 +124,5 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-beta2```
 
 * GitHub [repository](https://github.com/pmlopes/yoke)
 * [Vert.x](http://vertx.io)
+* [Google Group](https://groups.google.com/forum/?fromgroups#!forum/yoke-framework)
+* [Me](http://www.jetdrone.com)
