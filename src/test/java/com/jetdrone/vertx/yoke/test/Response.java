@@ -170,6 +170,11 @@ public class Response implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse sendFile(String filename, String notFoundFile) {
+        throw new UnsupportedOperationException("This mock does not support sendFile with 2 args");
+    }
+
+    @Override
     public void close() {
         done();
     }

@@ -75,4 +75,24 @@ public class BodyParser extends TestVerticle {
             }
         });
     }
+
+    @Test
+    public void testBodyParserWithEmptyBody() {
+
+        YokeTester yoke = new YokeTester(vertx);
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+                request.response().end();
+            }
+        });
+
+        yoke.request("DELETE", "/upload", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
 }

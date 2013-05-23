@@ -428,6 +428,13 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse sendFile(String filename, String notFoundFile) {
+        triggerHeadersHandlers();
+        response.sendFile(filename, notFoundFile);
+        return this;
+    }
+
+    @Override
     public void close() {
         response.close();
     }
