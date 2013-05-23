@@ -301,13 +301,6 @@ public class YokeRequest implements HttpServerRequest {
     /**
      * Cookies
      */
-    public Set<YokeCookie> cookies() {
-        return cookies;
-    }
-
-    /**
-     * Cookies
-     */
     void setCookies(Set<YokeCookie> cookies) {
         this.cookies = cookies;
     }
