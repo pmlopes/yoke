@@ -28,10 +28,7 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class YokeRequest implements HttpServerRequest {
 
@@ -135,12 +132,20 @@ public class YokeRequest implements HttpServerRequest {
      * Allow getting headers in a generified way.
      *
      * @param name The key to get
-     * @param <R> The type of the return
      * @return The found object
      */
-    @SuppressWarnings("unchecked")
-    public <R> R getHeader(String name) {
-        return (R) headers().get(name);
+    public String getHeader(String name) {
+        return headers().get(name);
+    }
+
+    /**
+     * Allow getting headers in a generified way.
+     *
+     * @param name The key to get
+     * @return The list of all found objects
+     */
+    public List<String> getAllHeaders(String name) {
+        return headers().getAll(name);
     }
 
     /**
@@ -148,15 +153,49 @@ public class YokeRequest implements HttpServerRequest {
      *
      * @param name The key to get
      * @param defaultValue value returned when the key does not exist
-     * @param <R> The type of the return
      * @return The found object
      */
-    public <R> R getHeader(String name, R defaultValue) {
+    public String getHeader(String name, String defaultValue) {
         if (headers().contains(name)) {
             return getHeader(name);
         } else {
             return defaultValue;
         }
+    }
+
+    /**
+     * Allow getting Cookie by name.
+     *
+     * @param name The key to get
+     * @return The found object
+     */
+    public YokeCookie getCookie(String name) {
+        if (cookies != null) {
+            for (YokeCookie c : cookies) {
+                if (name.equals(c.getName())) {
+                    return c;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Allow getting all Cookie by name.
+     *
+     * @param name The key to get
+     * @return The found objects
+     */
+    public List<YokeCookie> getAllCookies(String name) {
+        List<YokeCookie> foundCookies = new ArrayList<>();
+        if (cookies != null) {
+            for (YokeCookie c : cookies) {
+                if (name.equals(c.getName())) {
+                    foundCookies.add(c);
+                }
+            }
+        }
+        return foundCookies;
     }
 
     /**

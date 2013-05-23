@@ -19,7 +19,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 
 import javax.crypto.Mac;
-import java.util.Set;
 
 public class Session extends Middleware {
 
@@ -69,7 +68,7 @@ public class Session extends Middleware {
         }
 
         // find the session cookie
-        final YokeCookie sessionCookie = getSessionCookie(request);
+        final YokeCookie sessionCookie = request.getCookie(name);
 
         int hash = 0;
 
@@ -118,18 +117,6 @@ public class Session extends Middleware {
         });
 
         next.handle(null);
-    }
-
-    private YokeCookie getSessionCookie(YokeRequest request) {
-        Set<YokeCookie> cookies = request.cookies();
-        if (cookies != null) {
-            for (YokeCookie c : cookies) {
-                if (name.equals(c.getName())) {
-                    return c;
-                }
-            }
-        }
-        return null;
     }
 
     private static final int[] CRC16_TABLE = {
