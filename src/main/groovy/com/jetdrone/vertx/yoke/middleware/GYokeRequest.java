@@ -244,10 +244,6 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return bufferBody();
     }
 
-    public Set<YokeCookie> getCookies() {
-        return cookies();
-    }
-
     public HttpServerRequest getVertxHttpServerRequest() {
         return vertxHttpServerRequest();
     }
