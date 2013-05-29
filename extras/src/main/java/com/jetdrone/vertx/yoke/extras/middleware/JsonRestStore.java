@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.extras.stores.Store;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.regex.Matcher;
@@ -122,16 +123,27 @@ public class JsonRestStore extends Middleware {
         next.handle(null);
     }
 
+    /**
+     * This will trigger a DELETE request to {target}/{id}.
+     * The service should respond with a 204 if successful,
+     * a 404 if not found or another appropriate HTTP status code.
+     */
     private void delete(final YokeRequest request, String id, final Handler<Object> next) {
-        store.delete(id, new AsyncResultHandler<Void>() {
+        store.delete(id, new AsyncResultHandler<Number>() {
             @Override
-            public void handle(AsyncResult<Void> event) {
+            public void handle(AsyncResult<Number> event) {
                 if (event.failed()) {
                     next.handle(event.cause());
                     return;
                 }
-                request.response().setStatusCode(204);
-                request.response().end();
+
+                if (event.result() == 0) {
+                    request.response().setStatusCode(404);
+                    request.response().end();
+                } else {
+                    request.response().setStatusCode(204);
+                    request.response().end();
+                }
             }
         });
     }
@@ -144,29 +156,18 @@ public class JsonRestStore extends Middleware {
                     next.handle(event.cause());
                     return;
                 }
-                request.response().putHeader("location", resource + "/" + event.result());
+                request.response().putHeader("location", request.path() + "/" + event.result());
                 request.response().setStatusCode(201);
                 request.response().end();
             }
         });
     }
 
-    private void append(YokeRequest request, String id, Handler<Object> next) {
-        System.out.println("append");
-        //To change body of created methods use File | Settings | File Templates.
-    }
-
-    private void update(YokeRequest request, String id, Handler<Object> next) {
-        System.out.println("update");
-        //To change body of created methods use File | Settings | File Templates.
-    }
-
-    private void query(YokeRequest request, Handler<Object> next) {
-        System.out.println("query");
-        //To change body of created methods use File | Settings | File Templates.
-    }
-
-    private void read(final YokeRequest request, String id, final Handler<Object> next) {
+    /**
+     * POST to {target}/{id}. If overwrite is true then If- Match: * is present,
+     * if overwrite is false: If- None-Match: *.
+     */
+    private void append(final YokeRequest request, final String id, final Handler<Object> next) {
         store.read(id, new AsyncResultHandler<JsonObject>() {
             @Override
             public void handle(AsyncResult<JsonObject> event) {
@@ -174,7 +175,98 @@ public class JsonRestStore extends Middleware {
                     next.handle(event.cause());
                     return;
                 }
-                request.response().end(event.result());
+
+                if (event.result() == null) {
+                    // does not exist, returns 404
+                    request.response().setStatusCode(404);
+                    request.response().end();
+                } else {
+                    // merge existing json with incoming one
+                    // TODO: handle overwrite
+                    final JsonObject obj = event.result();
+                    obj.mergeIn(request.jsonBody());
+
+                    // update back to the db
+                    store.update(id, obj, new AsyncResultHandler<Number>() {
+                        @Override
+                        public void handle(AsyncResult<Number> event) {
+                            if (event.failed()) {
+                                next.handle(event.cause());
+                                return;
+                            }
+
+                            if (event.result() == 0) {
+                                // nothing was updated
+                                request.response().setStatusCode(404);
+                                request.response().end();
+                            } else {
+                                request.response().setStatusCode(204);
+                                request.response().end();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void update(final YokeRequest request, final String id, final Handler<Object> next) {
+        store.update(id, request.jsonBody(), new AsyncResultHandler<Number>() {
+            @Override
+            public void handle(AsyncResult<Number> event) {
+                if (event.failed()) {
+                    next.handle(event.cause());
+                    return;
+                }
+
+                if (event.result() == 0) {
+                    // nothing was updated
+                    request.response().setStatusCode(404);
+                    request.response().end();
+                } else {
+                    request.response().setStatusCode(204);
+                    request.response().end();
+                }
+            }
+        });
+    }
+
+    /**
+     * This will trigger a GET request to {target}?{query}.
+     * If query is an object, it will be serialized using dojo/io-query::objectToQuery().
+     * If query is a string, it is appended to the URL as-is.
+     * If options includes a sort property, it will be serialized as a query parameter as well; see Sorting for more
+     * information.
+     *
+     * The service should return a JSON array of objects.
+     * If no matches are found, it should return an empty array.
+     */
+    private void query(YokeRequest request, Handler<Object> next) {
+        System.out.println("query");
+        request.response().end(new JsonArray());
+    }
+
+    /**
+     * This will trigger a GET request to {target}/{id}.
+     * The service should return a JSON object if the id exists or 404 if it does not.
+     */
+    private void read(final YokeRequest request, String id, final Handler<Object> next) {
+
+        store.read(id, new AsyncResultHandler<JsonObject>() {
+            @Override
+            public void handle(AsyncResult<JsonObject> event) {
+                if (event.failed()) {
+                    next.handle(event.cause());
+                    return;
+                }
+
+                if (event.result() == null) {
+                    // does not exist, returns 404
+                    request.response().setStatusCode(404);
+                    request.response().end();
+                } else {
+                    request.response().end(event.result());
+                }
             }
         });
     }

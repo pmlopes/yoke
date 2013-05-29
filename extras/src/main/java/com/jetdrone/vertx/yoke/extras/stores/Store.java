@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.extras.stores;
 
 import org.vertx.java.core.AsyncResultHandler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
@@ -16,15 +17,15 @@ public interface Store {
     void read(String id, AsyncResultHandler<JsonObject> response);
 
     /**
-     * Updates a object
+     * Updates a object. Returns the total updated elements
      */
-    void update(String id, JsonObject object, AsyncResultHandler<Void> response);
+    void update(String id, JsonObject object, AsyncResultHandler<Number> response);
 
     /**
-     * Deletes a object given an id.
+     * Deletes a object given an id. Returns the total number of removed elements.
      */
-    void delete(String id, AsyncResultHandler<Void> response);
+    void delete(String id, AsyncResultHandler<Number> response);
 
-    void query(String query, AsyncResultHandler<JsonArray> response);
-    void count(String query, AsyncResultHandler<Long> response);
+    void query(MultiMap query, AsyncResultHandler<JsonArray> response);
+    void count(MultiMap query, AsyncResultHandler<Long> response);
 }
