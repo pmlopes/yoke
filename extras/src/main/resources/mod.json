@@ -1,5 +1,8 @@
 {
-  "description": "Yoke a middleware framework for Vert.x",
+  "main": "com.jetdrone.vertx.yoke.extras.middleware.Demo",
+  "includes": "com.jetdrone~yoke~1.0.0-beta2",
+
+  "description": "Extras for Yoke a middleware framework for Vert.x",
   "licenses": ["The Apache Software License Version 2.0"],
   "author": "Paulo Lopes <pmlopes@gmail.com>",
 
