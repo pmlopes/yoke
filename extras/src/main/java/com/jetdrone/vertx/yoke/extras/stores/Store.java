@@ -26,6 +26,6 @@ public interface Store {
      */
     void delete(String id, AsyncResultHandler<Number> response);
 
-    void query(JsonObject query, String start, String end, AsyncResultHandler<JsonArray> response);
+    void query(JsonObject query, String start, String end, JsonObject sort, AsyncResultHandler<JsonArray> response);
     void count(JsonObject query, AsyncResultHandler<Number> response);
 }

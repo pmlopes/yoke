@@ -52,7 +52,7 @@ public class MongoDbStore implements Store {
     }
 
     @Override
-    public void query(JsonObject query, String start, String end, final AsyncResultHandler<JsonArray> handler) {
+    public void query(JsonObject query, String start, String end, JsonObject sort, final AsyncResultHandler<JsonArray> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "find");
@@ -67,6 +67,10 @@ public class MongoDbStore implements Store {
                 int limit = iEnd - iStart;
                 wrapper.putNumber("limit", limit);
             }
+        }
+
+        if (sort != null) {
+            wrapper.putObject("sort", sort);
         }
 
         eb.send(address, wrapper, new Handler<Message<JsonObject>>() {

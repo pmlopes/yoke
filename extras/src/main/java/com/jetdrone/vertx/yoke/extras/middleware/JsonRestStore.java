@@ -33,12 +33,15 @@ public class JsonRestStore extends Middleware {
     private final int allowedOperations;
     private final String resource;
     private final Store store;
+    private final String sortParam;
+    private final Pattern sortPattern = Pattern.compile("sort\\(.+\\)");
 
     public JsonRestStore(Store store, String resource, int allowedOperations) {
         this.store = store;
         this.resource = resource;
         idPattern = Pattern.compile(resource + "/(.+)$");
         this.allowedOperations = allowedOperations;
+        this.sortParam = null;
     }
 
     public JsonRestStore(Store store, String resource) {
@@ -192,6 +195,16 @@ public class JsonRestStore extends Middleware {
                     request.response().end();
                 } else {
                     // merge existing json with incoming one
+                    Boolean overwrite = null;
+
+                    if ("*".equals(request.getHeader("if-match"))) {
+                        overwrite = true;
+                    }
+
+                    if ("*".equals(request.getHeader("if-none-match"))) {
+                        overwrite = false;
+                    }
+
                     // TODO: handle overwrite
                     final JsonObject obj = event.result();
                     obj.mergeIn(request.jsonBody());
@@ -277,11 +290,41 @@ public class JsonRestStore extends Middleware {
 
         // parse query
         final JsonObject dbquery = new JsonObject();
+        final JsonObject dbsort = new JsonObject();
         for (Map.Entry<String, String> entry : request.params()) {
+            String[] sortArgs;
+            // parse sort
+            if (sortParam == null) {
+                Matcher sort = sortPattern.matcher(entry.getKey());
+
+                if (sort.matches()) {
+                    sortArgs = sort.group(1).split(",");
+                    for (String arg : sortArgs) {
+                        if (arg.charAt(0) == '+') {
+                            dbsort.putNumber(arg.substring(1), 1);
+                        } else if (arg.charAt(0) == '-') {
+                            dbsort.putNumber(arg.substring(1), -1);
+                        }
+                    }
+                    continue;
+                }
+            } else {
+                if (sortParam.equals(entry.getKey())) {
+                    sortArgs = entry.getValue().split(",");
+                    for (String arg : sortArgs) {
+                        if (arg.charAt(0) == '+') {
+                            dbsort.putNumber(arg.substring(1), 1);
+                        } else if (arg.charAt(0) == '-') {
+                            dbsort.putNumber(arg.substring(1), -1);
+                        }
+                    }
+                    continue;
+                }
+            }
             dbquery.putString(entry.getKey(), entry.getValue());
         }
 
-        store.query(dbquery, start, end, new AsyncResultHandler<JsonArray>() {
+        store.query(dbquery, start, end, dbsort, new AsyncResultHandler<JsonArray>() {
             @Override
             public void handle(final AsyncResult<JsonArray> query) {
                 if (query.failed()) {
