@@ -26,6 +26,6 @@ public interface Store {
      */
     void delete(String id, AsyncResultHandler<Number> response);
 
-    void query(MultiMap query, AsyncResultHandler<JsonArray> response);
-    void count(MultiMap query, AsyncResultHandler<Long> response);
+    void query(JsonObject query, String start, String end, AsyncResultHandler<JsonArray> response);
+    void count(JsonObject query, AsyncResultHandler<Number> response);
 }

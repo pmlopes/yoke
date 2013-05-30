@@ -10,6 +10,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +22,7 @@ public class JsonRestStore extends Middleware {
     public static final int READ =      2;
     // PUT /:id
     public static final int UPDATE =    4;
-    // POST /:id
+    // PATCH /:id
     public static final int APPEND =    8;
     // POST /
     public static final int CREATE =    16;
@@ -93,6 +94,13 @@ public class JsonRestStore extends Middleware {
                 }
                 break;
             case "POST":
+                if (!isAllowed(CREATE)) {
+                    next.handle(405);
+                    return;
+                }
+                create(request, next);
+                return;
+            case "PATCH":
                 if (idMatcher.matches()) {
                     if (!isAllowed(APPEND)) {
                         next.handle(405);
@@ -101,12 +109,7 @@ public class JsonRestStore extends Middleware {
                     append(request, idMatcher.group(1), next);
                     return;
                 }
-                if (!isAllowed(CREATE)) {
-                    next.handle(405);
-                    return;
-                }
-                create(request, next);
-                return;
+                break;
             case "DELETE":
                 if (idMatcher.matches()) {
                     if (!isAllowed(DELETE)) {
@@ -149,7 +152,14 @@ public class JsonRestStore extends Middleware {
     }
 
     private void create(final YokeRequest request, final Handler<Object> next) {
-        store.create(request.jsonBody(), new AsyncResultHandler<String>() {
+        JsonObject item = request.jsonBody();
+
+        if (item == null) {
+            next.handle("Body must be JSON");
+            return;
+        }
+
+        store.create(item, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> event) {
                 if (event.failed()) {
@@ -164,7 +174,7 @@ public class JsonRestStore extends Middleware {
     }
 
     /**
-     * POST to {target}/{id}. If overwrite is true then If- Match: * is present,
+     * PATCH to {target}/{id}. If overwrite is true then If- Match: * is present,
      * if overwrite is false: If- None-Match: *.
      */
     private void append(final YokeRequest request, final String id, final Handler<Object> next) {
@@ -211,7 +221,14 @@ public class JsonRestStore extends Middleware {
     }
 
     private void update(final YokeRequest request, final String id, final Handler<Object> next) {
-        store.update(id, request.jsonBody(), new AsyncResultHandler<Number>() {
+        JsonObject item = request.jsonBody();
+
+        if (item == null) {
+            next.handle("Body must be JSON");
+            return;
+        }
+
+        store.update(id, item, new AsyncResultHandler<Number>() {
             @Override
             public void handle(AsyncResult<Number> event) {
                 if (event.failed()) {
@@ -231,6 +248,9 @@ public class JsonRestStore extends Middleware {
         });
     }
 
+    // range pattern
+    private final Pattern rangePattern = Pattern.compile("items=(\\d+)-(\\d+)");
+
     /**
      * This will trigger a GET request to {target}?{query}.
      * If query is an object, it will be serialized using dojo/io-query::objectToQuery().
@@ -241,9 +261,54 @@ public class JsonRestStore extends Middleware {
      * The service should return a JSON array of objects.
      * If no matches are found, it should return an empty array.
      */
-    private void query(YokeRequest request, Handler<Object> next) {
-        System.out.println("query");
-        request.response().end(new JsonArray());
+    private void query(final YokeRequest request, final Handler<Object> next) {
+        // parse ranges
+        final String range = request.getHeader("range");
+        final String start, end;
+        if (range != null) {
+            Matcher m = rangePattern.matcher(range);
+            start = m.group(1);
+            end = m.group(2);
+        } else {
+            start = null;
+            end = null;
+        }
+
+
+        // parse query
+        final JsonObject dbquery = new JsonObject();
+        for (Map.Entry<String, String> entry : request.params()) {
+            dbquery.putString(entry.getKey(), entry.getValue());
+        }
+
+        store.query(dbquery, start, end, new AsyncResultHandler<JsonArray>() {
+            @Override
+            public void handle(final AsyncResult<JsonArray> query) {
+                if (query.failed()) {
+                    next.handle(query.cause());
+                    return;
+                }
+
+                if (range != null) {
+                    // need to send the content-range with totals
+                    store.count(dbquery, new AsyncResultHandler<Number>() {
+                        @Override
+                        public void handle(AsyncResult<Number> count) {
+                            if (count.failed()) {
+                                next.handle(count.cause());
+                                return;
+                            }
+
+                            request.response().putHeader("content-range", "items " + start + "-" + end + "/" + count.result());
+                            request.response().end(query.result());
+                        }
+                    });
+                    return;
+                }
+
+                request.response().end(query.result());
+            }
+        });
     }
 
     /**
