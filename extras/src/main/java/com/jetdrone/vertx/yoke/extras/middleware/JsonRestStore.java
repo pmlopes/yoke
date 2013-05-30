@@ -97,6 +97,15 @@ public class JsonRestStore extends Middleware {
                 }
                 break;
             case "POST":
+                // shortcut for patch (as by Dojo Toolkit)
+                if (idMatcher.matches()) {
+                    if (!isAllowed(APPEND)) {
+                        next.handle(405);
+                        return;
+                    }
+                    append(request, idMatcher.group(1), next);
+                    return;
+                }
                 if (!isAllowed(CREATE)) {
                     next.handle(405);
                     return;
@@ -129,11 +138,6 @@ public class JsonRestStore extends Middleware {
         next.handle(null);
     }
 
-    /**
-     * This will trigger a DELETE request to {target}/{id}.
-     * The service should respond with a 204 if successful,
-     * a 404 if not found or another appropriate HTTP status code.
-     */
     private void delete(final YokeRequest request, String id, final Handler<Object> next) {
         store.delete(id, new AsyncResultHandler<Number>() {
             @Override
@@ -176,10 +180,6 @@ public class JsonRestStore extends Middleware {
         });
     }
 
-    /**
-     * PATCH to {target}/{id}. If overwrite is true then If- Match: * is present,
-     * if overwrite is false: If- None-Match: *.
-     */
     private void append(final YokeRequest request, final String id, final Handler<Object> next) {
         store.read(id, new AsyncResultHandler<JsonObject>() {
             @Override
@@ -264,16 +264,6 @@ public class JsonRestStore extends Middleware {
     // range pattern
     private final Pattern rangePattern = Pattern.compile("items=(\\d+)-(\\d+)");
 
-    /**
-     * This will trigger a GET request to {target}?{query}.
-     * If query is an object, it will be serialized using dojo/io-query::objectToQuery().
-     * If query is a string, it is appended to the URL as-is.
-     * If options includes a sort property, it will be serialized as a query parameter as well; see Sorting for more
-     * information.
-     *
-     * The service should return a JSON array of objects.
-     * If no matches are found, it should return an empty array.
-     */
     private void query(final YokeRequest request, final Handler<Object> next) {
         // parse ranges
         final String range = request.getHeader("range");
@@ -354,10 +344,6 @@ public class JsonRestStore extends Middleware {
         });
     }
 
-    /**
-     * This will trigger a GET request to {target}/{id}.
-     * The service should return a JSON object if the id exists or 404 if it does not.
-     */
     private void read(final YokeRequest request, String id, final Handler<Object> next) {
 
         store.read(id, new AsyncResultHandler<JsonObject>() {
