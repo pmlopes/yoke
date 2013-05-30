@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Demo: Editing in a Grid</title>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dijit/themes/claro/claro.css" media="screen">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojox/grid/resources/Grid.css" />
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojox/grid/resources/claroGrid.css" />
+</head>
+<body class="claro">
+<h1>Demo: Editing in a Grid</h1>
+<p>The following grid shows the multiple editing capabilities built into dojox/grid/DataGrid.</p>
+<div id="grid"></div>
+<!-- load dojo and provide config via data attribute -->
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js" data-dojo-config="isDebug: true, async: true"></script>
+<script>
+    require([
+    "dojox/grid/DataGrid",
+    "dojox/grid/cells",
+    "dojox/grid/cells/dijit",
+    "dojo/store/Memory",
+    "dojo/store/JsonRest",
+    "dojo/data/ObjectStore",
+    "dojo/date/locale",
+    "dojo/currency",
+    "dijit/form/DateTextBox",
+    "dijit/form/CurrencyTextBox",
+    "dijit/form/HorizontalSlider",
+    "dojo/domReady!"
+    ], function(DataGrid, cells, cellsDijit, Memory, JsonRestStore, ObjectStore, locale, currency,
+    DateTextBox, CurrencyTextBox, HorizontalSlider){
+    var grid;
+
+    gridLayout = [{
+    defaultCell: { width: 8, editable: true, type: cells._Widget, styles: 'text-align: right;'  },
+    cells: [
+    { name: 'Id', field: '_id', editable: false /* Can't edit ID's of dojo/data items */ },
+    { name: 'Name', field: 'name', styles: '', width: 10 }
+    ]
+    }];
+
+//    var data = [
+//    { _id: 0, name: "Paulo"},
+//    ];
+//    var objectStore = new Memory({data:data});
+    var objectStore = new JsonRestStore({target: "/persons/" });
+
+    // global var "test_store"
+    test_store = new ObjectStore({objectStore: objectStore});
+
+    //	create the grid.
+    grid = new DataGrid({
+    store: test_store,
+    structure: gridLayout,
+    escapeHTMLInData: false,
+    "class": "grid"
+    }, "grid");
+    grid.startup();
+
+    });
+
+</script>
+</body>
+</html>

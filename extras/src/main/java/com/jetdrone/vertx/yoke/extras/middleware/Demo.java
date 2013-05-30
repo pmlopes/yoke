@@ -3,8 +3,7 @@ package com.jetdrone.vertx.yoke.extras.middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.extras.stores.MongoDbStore;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
+import com.jetdrone.vertx.yoke.middleware.Static;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -36,6 +35,7 @@ public class Demo extends Verticle {
 
         // rest
         yoke.use(new JsonRestStore(db, "/persons"));
+        yoke.use(new Static("public"));
         // listen
         yoke.listen(8080);
     }
