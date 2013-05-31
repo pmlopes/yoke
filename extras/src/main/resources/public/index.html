@@ -2,63 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Demo: Editing in a Grid</title>
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dijit/themes/claro/claro.css" media="screen">
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojox/grid/resources/Grid.css" />
+    <title>Dojo Toolkit REST</title>
     <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojox/grid/resources/claroGrid.css" />
 </head>
-<body class="claro">
-<h1>Demo: Editing in a Grid</h1>
-<p>The following grid shows the multiple editing capabilities built into dojox/grid/DataGrid.</p>
+<body>
 <div id="grid"></div>
-<!-- load dojo and provide config via data attribute -->
+<button id="save">Save</button>
+
 <script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js" data-dojo-config="isDebug: true, async: true"></script>
 <script>
     require([
-    "dojox/grid/DataGrid",
-    "dojox/grid/cells",
-    "dojox/grid/cells/dijit",
-    "dojo/store/Memory",
     "dojo/store/JsonRest",
+    "dojo/store/Memory",
+    "dojo/store/Cache",
+    "dojox/grid/DataGrid",
     "dojo/data/ObjectStore",
-    "dojo/date/locale",
-    "dojo/currency",
-    "dijit/form/DateTextBox",
-    "dijit/form/CurrencyTextBox",
-    "dijit/form/HorizontalSlider",
     "dojo/domReady!"
-    ], function(DataGrid, cells, cellsDijit, Memory, JsonRestStore, ObjectStore, locale, currency,
-    DateTextBox, CurrencyTextBox, HorizontalSlider){
-    var grid;
+    ], function(JsonRest, Memory, Cache, DataGrid, ObjectStore) {
+        var store = new Cache(new JsonRest({idProperty: '_id', target: '/persons/'}), new Memory());
 
-    gridLayout = [{
-    defaultCell: { width: 8, editable: true, type: cells._Widget, styles: 'text-align: right;'  },
-    cells: [
-    { name: 'Id', field: '_id', editable: false /* Can't edit ID's of dojo/data items */ },
-    { name: 'Name', field: 'name', styles: '', width: 10 }
-    ]
-    }];
+        var grid = new DataGrid({
+            store: new ObjectStore({objectStore: store}),
+            structure: [
+                {name:"id", field:"_id", width: "20%"},
+                {name:"name", field:"name", width: "80%", editable: true}
+            ],
+        }, "grid");
+        grid.startup();
 
-//    var data = [
-//    { _id: 0, name: "Paulo"},
-//    ];
-//    var objectStore = new Memory({data:data});
-    var objectStore = new JsonRestStore({target: "/persons/" });
-
-    // global var "test_store"
-    test_store = new ObjectStore({objectStore: objectStore});
-
-    //	create the grid.
-    grid = new DataGrid({
-    store: test_store,
-    structure: gridLayout,
-    escapeHTMLInData: false,
-    "class": "grid"
-    }, "grid");
-    grid.startup();
-
+        dojo.query("#save").onclick(function(){
+            grid.store.save();
+        });
     });
-
 </script>
 </body>
 </html>

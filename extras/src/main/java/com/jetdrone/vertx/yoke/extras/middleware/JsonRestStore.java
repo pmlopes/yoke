@@ -34,7 +34,7 @@ public class JsonRestStore extends Middleware {
     private final String resource;
     private final Store store;
     private final String sortParam;
-    private final Pattern sortPattern = Pattern.compile("sort\\(.+\\)");
+    private final Pattern sortPattern = Pattern.compile("sort\\((.+)\\)");
 
     public JsonRestStore(Store store, String resource, int allowedOperations) {
         this.store = store;
@@ -270,13 +270,17 @@ public class JsonRestStore extends Middleware {
         final String start, end;
         if (range != null) {
             Matcher m = rangePattern.matcher(range);
-            start = m.group(1);
-            end = m.group(2);
+            if (m.matches()) {
+                start = m.group(1);
+                end = m.group(2);
+            } else {
+                start = null;
+                end = null;
+            }
         } else {
             start = null;
             end = null;
         }
-
 
         // parse query
         final JsonObject dbquery = new JsonObject();
@@ -290,7 +294,7 @@ public class JsonRestStore extends Middleware {
                 if (sort.matches()) {
                     sortArgs = sort.group(1).split(",");
                     for (String arg : sortArgs) {
-                        if (arg.charAt(0) == '+') {
+                        if (arg.charAt(0) == '+' || arg.charAt(0) == ' ') {
                             dbsort.putNumber(arg.substring(1), 1);
                         } else if (arg.charAt(0) == '-') {
                             dbsort.putNumber(arg.substring(1), -1);
@@ -302,7 +306,7 @@ public class JsonRestStore extends Middleware {
                 if (sortParam.equals(entry.getKey())) {
                     sortArgs = entry.getValue().split(",");
                     for (String arg : sortArgs) {
-                        if (arg.charAt(0) == '+') {
+                        if (arg.charAt(0) == '+' || arg.charAt(0) == ' ') {
                             dbsort.putNumber(arg.substring(1), 1);
                         } else if (arg.charAt(0) == '-') {
                             dbsort.putNumber(arg.substring(1), -1);
