@@ -44,6 +44,7 @@ install - install any jars produced to the local Maven repository (.m2)
 
 dependencies {
   provided "com.jetdrone:yoke:$yokeVersion@jar"
+  compile "com.github.jknack:handlebars:${handlebarsVersion}"
 }
 
 test {
