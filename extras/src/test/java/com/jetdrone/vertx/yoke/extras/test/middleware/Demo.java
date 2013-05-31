@@ -1,6 +1,7 @@
-package com.jetdrone.vertx.yoke.extras.middleware;
+package com.jetdrone.vertx.yoke.extras.test.middleware;
 
 import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.extras.middleware.JsonRestStore;
 import com.jetdrone.vertx.yoke.extras.store.MongoDbStore;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
 import com.jetdrone.vertx.yoke.middleware.Static;

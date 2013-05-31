@@ -1,5 +1,4 @@
 {
-  "main": "com.jetdrone.vertx.yoke.extras.middleware.Demo",
   "includes": "com.jetdrone~yoke~1.0.0-beta2",
 
   "description": "Extras for Yoke a middleware framework for Vert.x",
@@ -7,6 +6,6 @@
   "author": "Paulo Lopes <pmlopes@gmail.com>",
 
   "developers": ["pmlopes"],
-  "keywords": ["middleware", "webapp", "framework", "web", "yoke", "connect", "router", "app", "api"],
+  "keywords": ["middleware", "webapp", "framework", "web", "yoke", "connect", "router", "app", "api", "extras", "REST", "handlebars"],
   "homepage": "http://pmlopes.github.io/yoke/"
 }
