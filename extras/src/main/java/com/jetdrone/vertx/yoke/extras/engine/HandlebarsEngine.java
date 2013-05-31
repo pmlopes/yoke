@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.extras.engine;
 
 import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
@@ -60,5 +61,9 @@ public class HandlebarsEngine extends Engine<Template> {
         }
 
         return template;
+    }
+
+    public void registerHelper(String name, Helper<?> helper) {
+        handlebars.registerHelper(name, helper);
     }
 }
