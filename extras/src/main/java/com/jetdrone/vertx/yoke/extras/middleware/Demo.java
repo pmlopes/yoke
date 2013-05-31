@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.yoke.extras.middleware;
 
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.extras.stores.MongoDbStore;
+import com.jetdrone.vertx.yoke.extras.store.MongoDbStore;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
 import com.jetdrone.vertx.yoke.middleware.Static;
 import org.vertx.java.core.eventbus.EventBus;

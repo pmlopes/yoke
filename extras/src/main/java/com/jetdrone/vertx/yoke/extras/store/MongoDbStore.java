@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke.extras.stores;
+package com.jetdrone.vertx.yoke.extras.store;
 
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -73,18 +73,33 @@ public class MongoDbStore implements Store {
             wrapper.putObject("sort", sort);
         }
 
+        final JsonArray result = new JsonArray();
+
         eb.send(address, wrapper, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> reply) {
                 String status = reply.body().getString("status");
 
-                if (status != null && "ok".equalsIgnoreCase(status)) {
-                    JsonArray result = reply.body().getArray("results");
-
-                    handler.handle(new YokeAsyncResult<>(null, result));
-                } else {
-                    handler.handle(new YokeAsyncResult<JsonArray>(new Throwable(status), null));
+                if (status != null) {
+                    if ("ok".equalsIgnoreCase(status)) {
+                        JsonArray itResult = reply.body().getArray("results");
+                        for (Object o : itResult) {
+                            result.add(o);
+                        }
+                        handler.handle(new YokeAsyncResult<>(null, result));
+                        return;
+                    }
+                    if ("more-exist".equalsIgnoreCase(status)) {
+                        JsonArray itResult = reply.body().getArray("results");
+                        for (Object o : itResult) {
+                            result.add(o);
+                        }
+                        // reply asking for more
+                        reply.reply(this);
+                        return;
+                    }
                 }
+                handler.handle(new YokeAsyncResult<JsonArray>(new Throwable(status), null));
             }
         });
     }

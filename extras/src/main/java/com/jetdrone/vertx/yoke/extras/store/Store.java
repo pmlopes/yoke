@@ -1,7 +1,6 @@
-package com.jetdrone.vertx.yoke.extras.stores;
+package com.jetdrone.vertx.yoke.extras.store;
 
 import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
