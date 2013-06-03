@@ -12,16 +12,14 @@ public class MongoDbStore implements Store {
 
     final EventBus eb;
     final String address;
-    final String collection;
 
-    public MongoDbStore(EventBus eb, String address, String collection) {
+    public MongoDbStore(EventBus eb, String address) {
         this.eb = eb;
         this.address = address;
-        this.collection = collection;
     }
 
     @Override
-    public void read(String id, final AsyncResultHandler<JsonObject> handler) {
+    public void read(String collection, String id, final AsyncResultHandler<JsonObject> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "findone");
@@ -52,7 +50,7 @@ public class MongoDbStore implements Store {
     }
 
     @Override
-    public void query(JsonObject query, String start, String end, JsonObject sort, final AsyncResultHandler<JsonArray> handler) {
+    public void query(String collection, JsonObject query, String start, String end, JsonObject sort, final AsyncResultHandler<JsonArray> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "find");
@@ -105,7 +103,7 @@ public class MongoDbStore implements Store {
     }
 
     @Override
-    public void count(JsonObject query, final AsyncResultHandler<Number> handler) {
+    public void count(String collection, JsonObject query, final AsyncResultHandler<Number> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "count");
@@ -127,7 +125,7 @@ public class MongoDbStore implements Store {
     }
 
     @Override
-    public void delete(String id, final AsyncResultHandler<Number> handler) {
+    public void delete(String collection, String id, final AsyncResultHandler<Number> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "delete");
@@ -150,7 +148,7 @@ public class MongoDbStore implements Store {
     }
 
     @Override
-    public void create(JsonObject document, final AsyncResultHandler<String> handler) {
+    public void create(String collection, JsonObject document, final AsyncResultHandler<String> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "save");
@@ -172,7 +170,7 @@ public class MongoDbStore implements Store {
     }
 
     @Override
-    public void update(String id, JsonObject newDocument, final AsyncResultHandler<Number> handler) {
+    public void update(String collection, String id, JsonObject newDocument, final AsyncResultHandler<Number> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "update");

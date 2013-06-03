@@ -8,23 +8,23 @@ public interface Store {
     /**
      * Creates a new Object in the database and asynchronously returns the id for this new object.
      */
-    void create(JsonObject object, AsyncResultHandler<String> response);
+    void create(String entity, JsonObject object, AsyncResultHandler<String> response);
 
     /**
      * Reads a object from the database given the id.
      */
-    void read(String id, AsyncResultHandler<JsonObject> response);
+    void read(String entity, String id, AsyncResultHandler<JsonObject> response);
 
     /**
      * Updates a object. Returns the total updated elements
      */
-    void update(String id, JsonObject object, AsyncResultHandler<Number> response);
+    void update(String entity, String id, JsonObject object, AsyncResultHandler<Number> response);
 
     /**
      * Deletes a object given an id. Returns the total number of removed elements.
      */
-    void delete(String id, AsyncResultHandler<Number> response);
+    void delete(String entity, String id, AsyncResultHandler<Number> response);
 
-    void query(JsonObject query, String start, String end, JsonObject sort, AsyncResultHandler<JsonArray> response);
-    void count(JsonObject query, AsyncResultHandler<Number> response);
+    void query(String entity, JsonObject query, String start, String end, JsonObject sort, AsyncResultHandler<JsonArray> response);
+    void count(String entity, JsonObject query, AsyncResultHandler<Number> response);
 }
