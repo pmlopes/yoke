@@ -41,28 +41,17 @@ public class MongoDbStore implements Store {
         });
     }
 
-    private static Integer parseInt(String value) {
-        try {
-            return Integer.parseInt(value);
-        } catch (NumberFormatException nfe) {
-            return null;
-        }
-    }
-
     @Override
-    public void query(String collection, JsonObject query, String start, String end, JsonObject sort, final AsyncResultHandler<JsonArray> handler) {
+    public void query(String collection, JsonObject query, Number start, Number end, JsonObject sort, final AsyncResultHandler<JsonArray> handler) {
         JsonObject wrapper = new JsonObject();
         wrapper.putString("collection", collection);
         wrapper.putString("action", "find");
         wrapper.putObject("matcher", query);
 
-        Integer iStart = parseInt(start);
-        Integer iEnd = parseInt(end);
-
-        if (iStart != null) {
-            wrapper.putNumber("skip", iStart);
-            if (iEnd != null) {
-                int limit = iEnd - iStart;
+        if (start != null) {
+            wrapper.putNumber("skip", start);
+            if (end != null) {
+                int limit = end.intValue() - start.intValue();
                 wrapper.putNumber("limit", limit);
             }
         }

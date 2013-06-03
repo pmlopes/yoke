@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.extras.test.middleware;
 
-import com.jetdrone.vertx.yoke.extras.middleware.JsonRestStore;
+import com.jetdrone.vertx.yoke.extras.middleware.JsonRestRouter;
 import com.jetdrone.vertx.yoke.extras.store.Store;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -51,7 +51,7 @@ public class RestTest extends TestVerticle {
 
         YokeTester yoke = new YokeTester(vertx);
         Router router = new Router();
-        JsonRestStore restStore = new JsonRestStore(router, dummyStore);
+        JsonRestRouter restStore = new JsonRestRouter(router, dummyStore);
         restStore.rest("/persons", "persons");
         yoke.use(router);
 

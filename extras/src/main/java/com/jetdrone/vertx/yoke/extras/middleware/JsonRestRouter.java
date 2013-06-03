@@ -16,8 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // TODO: content negotiation
-// TODO: extend Router?
-public class JsonRestStore {
+public class JsonRestRouter extends Router {
 
     // GET /
     public static final int QUERY =     1;
@@ -35,7 +34,6 @@ public class JsonRestStore {
     private final String sortParam;
     private final Pattern sortPattern = Pattern.compile("sort\\((.+)\\)");
 
-    private final Router router;
     private final Store store;
 
     private static final Middleware NOT_ALLOWED = new Middleware() {
@@ -45,8 +43,7 @@ public class JsonRestStore {
         }
     };
 
-    public JsonRestStore(Router router, Store store) {
-        this.router = router;
+    public JsonRestRouter(Store store) {
         this.store = store;
         this.sortParam = null;
     }
@@ -56,52 +53,52 @@ public class JsonRestStore {
     }
 
 
-    public JsonRestStore rest(String resource, String entity) {
+    public JsonRestRouter rest(String resource, String entity) {
         return rest(resource, entity, QUERY + READ + UPDATE + APPEND + CREATE + DELETE);
     }
 
-    public JsonRestStore rest(String resource, String entity, int allowedOperations) {
+    public JsonRestRouter rest(String resource, String entity, int allowedOperations) {
         // build the resource url
         String resourcePath = entity.endsWith("/") ? resource.substring(0, resource.length() - 1) : resource;
 
         if (isAllowed(QUERY, allowedOperations)) {
-            router.get(resourcePath, query(entity));
+            super.get(resourcePath, query(entity));
         } else {
-            router.get(resourcePath, NOT_ALLOWED);
+            super.get(resourcePath, NOT_ALLOWED);
         }
 
         if (isAllowed(READ, allowedOperations)) {
-            router.get(resourcePath + "/:" + entity, read(entity));
+            super.get(resourcePath + "/:" + entity, read(entity));
         } else {
-            router.get(resourcePath + "/:" + entity, NOT_ALLOWED);
+            super.get(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         if (isAllowed(UPDATE, allowedOperations)) {
-            router.put(resourcePath + "/:" + entity, update(entity));
+            super.put(resourcePath + "/:" + entity, update(entity));
         } else {
-            router.put(resourcePath + "/:" + entity, NOT_ALLOWED);
+            super.put(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         if (isAllowed(APPEND, allowedOperations)) {
             // shortcut for patch (as by Dojo Toolkit)
-            router.post(resourcePath + "/:" + entity, append(entity));
-            router.patch(resourcePath + "/:" + entity, append(entity));
+            super.post(resourcePath + "/:" + entity, append(entity));
+            super.patch(resourcePath + "/:" + entity, append(entity));
         } else {
             // shortcut for patch (as by Dojo Toolkit)
-            router.post(resourcePath + "/:" + entity, NOT_ALLOWED);
-            router.patch(resourcePath + "/:" + entity, NOT_ALLOWED);
+            super.post(resourcePath + "/:" + entity, NOT_ALLOWED);
+            super.patch(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         if (isAllowed(CREATE, allowedOperations)) {
-            router.post(resourcePath, create(entity));
+            super.post(resourcePath, create(entity));
         } else {
-            router.post(resourcePath, NOT_ALLOWED);
+            super.post(resourcePath, NOT_ALLOWED);
         }
 
         if (isAllowed(DELETE, allowedOperations)) {
-            router.delete(resourcePath + "/:" + entity, delete(entity));
+            super.delete(resourcePath + "/:" + entity, delete(entity));
         } else {
-            router.delete(resourcePath + "/:" + entity, NOT_ALLOWED);
+            super.delete(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         return this;
@@ -259,6 +256,13 @@ public class JsonRestStore {
         };
     }
 
+    private static Integer parseInt(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException nfe) {
+            return null;
+        }
+    }
 
     private Middleware query(final String idName) {
         // range pattern
@@ -269,12 +273,12 @@ public class JsonRestStore {
             public void handle(final YokeRequest request, final Handler<Object> next) {
                 // parse ranges
                 final String range = request.getHeader("range");
-                final String start, end;
+                final Number start, end;
                 if (range != null) {
                     Matcher m = rangePattern.matcher(range);
                     if (m.matches()) {
-                        start = m.group(1);
-                        end = m.group(2);
+                        start = parseInt(m.group(1));
+                        end = parseInt(m.group(2));
                     } else {
                         start = null;
                         end = null;
