@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // TODO: content negotiation
+// TODO: Accept-Version (API versioning)
 public class JsonRestRouter extends Router {
 
     // GET /

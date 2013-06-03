@@ -36,7 +36,7 @@ public class RestTest extends TestVerticle {
         }
 
         @Override
-        public void query(String entity, JsonObject query, String start, String end, JsonObject sort, AsyncResultHandler<JsonArray> response) {
+        public void query(String entity, JsonObject query, Number start, Number end, JsonObject sort, AsyncResultHandler<JsonArray> response) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
 
@@ -50,9 +50,8 @@ public class RestTest extends TestVerticle {
     public void restTest() {
 
         YokeTester yoke = new YokeTester(vertx);
-        Router router = new Router();
-        JsonRestRouter restStore = new JsonRestRouter(router, dummyStore);
-        restStore.rest("/persons", "persons");
+        JsonRestRouter router = new JsonRestRouter(dummyStore);
+        router.rest("/persons", "persons");
         yoke.use(router);
 
         testComplete();
