@@ -4,9 +4,16 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine;
 import com.jetdrone.vertx.yoke.extras.middleware.JsonRestRouter;
 import com.jetdrone.vertx.yoke.extras.store.MongoDbStore;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ExtrasExample extends Verticle {
 
@@ -33,6 +40,40 @@ public class ExtrasExample extends Verticle {
         router.rest("/persons", "persons");
 
         yoke.use(router);
+
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+
+                List<Map> users = new ArrayList<>();
+                Map<String, String> user;
+
+                user = new HashMap<>();
+                user.put("username", "alan");
+                user.put("firstName", "Alan");
+                user.put("lastName", "Johnson");
+                user.put("email", "alan@test.com");
+                users.add(user);
+
+                user = new HashMap<>();
+                user.put("username", "allison");
+                user.put("firstName", "Allison");
+                user.put("lastName", "House");
+                user.put("email", "allison@test.com");
+                users.add(user);
+
+                user = new HashMap<>();
+                user.put("username", "ryan");
+                user.put("firstName", "Ryan");
+                user.put("lastName", "Carson");
+                user.put("email", "ryan@test.com");
+                users.add(user);
+
+                request.put("users", users);
+                request.response().render("views/handlebars.hbs");
+            }
+        });
+
         yoke.listen(8080);
 
         container.logger().info("Yoke server listening on port 8080");
