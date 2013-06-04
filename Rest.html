@@ -88,28 +88,63 @@ container.<span class="fu">logger</span>().<span class="fu">info</span>(<span cl
 <li>allowedVerbs - a sum of all verbs as described before, or in case of not specified all are included</li>
 </ul>
 <h2 id="create-a-entity"><a href="#create-a-entity">Create a entity</a></h2>
-<p>Request: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ POST /persons HTTP/1.1 Content-Type: application/json</p>
-<p>{&quot;name&quot;:&quot;Paulo&quot;} ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
-<p>Response: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTTP/1.1 201 X-Powered-By: yoke Location: /persons/e9a1f835-28c2-4f18-9816-747a77a98234 Content-Length: 0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
+<p>Request:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">POST /persons HTTP/<span class="fl">1.1</span>
+Content-<span class="dt">Type</span>: application/json
+
+{<span class="st">&quot;name&quot;</span>:<span class="st">&quot;Paulo&quot;</span>}</code></pre>
+<p>Response:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">HTTP/<span class="fl">1.1</span> <span class="dv">201</span>
+X-Powered-<span class="dt">By</span>: yoke
+<span class="dt">Location</span>: <span class="ot">/</span><span class="fl">persons</span><span class="ot">/</span>e9a1f835-28c2-4f18<span class="dv">-9816</span>-747a77a98234
+Content-<span class="dt">Length</span>: <span class="dv">0</span></code></pre>
 <h2 id="list-all-entities"><a href="#list-all-entities">List all entities</a></h2>
-<p>Request: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GET /persons HTTP/1.1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
-<p>Response: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTTP/1.1 200 x-powered-by yoke content-type application/json Content-Length 63</p>
-<p>[{&quot;_id&quot;:&quot;e9a1f835-28c2-4f18-9816-747a77a98234&quot;,&quot;name&quot;:&quot;Paulo&quot;}] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
+<p>Request:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">GET /persons HTTP/<span class="fl">1.1</span></code></pre>
+<p>Response:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">HTTP/<span class="fl">1.1</span> <span class="dv">200</span>
+x-powered-by    yoke
+content-type    application/json
+Content-Length  <span class="dv">63</span>
+
+[{<span class="st">&quot;_id&quot;</span>:<span class="st">&quot;e9a1f835-28c2-4f18-9816-747a77a98234&quot;</span>,<span class="st">&quot;name&quot;</span>:<span class="st">&quot;Paulo&quot;</span>}]</code></pre>
 <h2 id="list-one-entity"><a href="#list-one-entity">List one entity</a></h2>
-<p>Request: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ GET /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
-<p>Response: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTTP/1.1 200 x-powered-by yoke content-type application/json Content-Length 61</p>
-<p>{&quot;_id&quot;:&quot;e9a1f835-28c2-4f18-9816-747a77a98234&quot;,&quot;name&quot;:&quot;Paulo&quot;} ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
+<p>Request:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">GET /persons/e9a1f835-28c2-4f18<span class="dv">-9816</span>-747a77a98234 HTTP/<span class="fl">1.1</span></code></pre>
+<p>Response:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">HTTP/<span class="fl">1.1</span> <span class="dv">200</span>
+x-powered-by    yoke
+content-type    application/json
+Content-Length  <span class="dv">61</span>
+
+{<span class="st">&quot;_id&quot;</span>:<span class="st">&quot;e9a1f835-28c2-4f18-9816-747a77a98234&quot;</span>,<span class="st">&quot;name&quot;</span>:<span class="st">&quot;Paulo&quot;</span>}</code></pre>
 <h2 id="append"><a href="#append">Append</a></h2>
-<p>Request: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PATCH /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1 Content-Type: application/json</p>
-<p>{&quot;username&quot;:&quot;pmlopes&quot;} ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
-<p>Response: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTTP/1.1 204 x-powered-by yoke Content-Length 0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
+<p>Request:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">PATCH /persons/e9a1f835-28c2-4f18<span class="dv">-9816</span>-747a77a98234 HTTP/<span class="fl">1.1</span>
+Content-<span class="dt">Type</span>: application/json
+
+{<span class="st">&quot;username&quot;</span>:<span class="st">&quot;pmlopes&quot;</span>}</code></pre>
+<p>Response:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">HTTP/<span class="fl">1.1</span> <span class="dv">204</span>
+x-powered-by    yoke
+Content-Length  <span class="dv">0</span></code></pre>
 <h2 id="update"><a href="#update">Update</a></h2>
-<p>Request: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ PUT /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1 Content-Type: application/json</p>
-<p>{&quot;name&quot;: &quot;Paulo Lopes&quot;, &quot;username&quot;:&quot;pmlopes&quot;} ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
-<p>Response: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTTP/1.1 204 x-powered-by yoke Content-Length 0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
+<p>Request:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">PUT /persons/e9a1f835-28c2-4f18<span class="dv">-9816</span>-747a77a98234 HTTP/<span class="fl">1.1</span>
+Content-<span class="dt">Type</span>: application/json
+
+{<span class="st">&quot;name&quot;</span>: <span class="st">&quot;Paulo Lopes&quot;</span>, <span class="st">&quot;username&quot;</span>:<span class="st">&quot;pmlopes&quot;</span>}</code></pre>
+<p>Response:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">HTTP/<span class="fl">1.1</span> <span class="dv">204</span>
+x-powered-by    yoke
+Content-Length  <span class="dv">0</span></code></pre>
 <h2 id="delete"><a href="#delete">Delete</a></h2>
-<p>Request: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DELETE /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
-<p>Response: ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ HTTP/1.1 204 x-powered-by yoke Content-Length 0 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~</p>
+<p>Request:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">DELETE /persons/e9a1f835-28c2-4f18<span class="dv">-9816</span>-747a77a98234 HTTP/<span class="fl">1.1</span></code></pre>
+<p>Response:</p>
+<pre class="sourceCode javascript"><code class="sourceCode javascript">HTTP/<span class="fl">1.1</span> <span class="dv">204</span>
+x-powered-by    yoke
+Content-Length  <span class="dv">0</span></code></pre>
 <h2 id="validation"><a href="#validation">Validation</a></h2>
 <p>Of course one cannot create a service and expect the data received from the network is always valid, in case we need to validate the data. In order to achieve this one can use the ValidationStore class. The ValidationStore class wraps a store and allows you to override any of the crud operations:</p>
 <ul>
