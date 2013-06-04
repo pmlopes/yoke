@@ -97,6 +97,10 @@ public class ErrorHandler extends Middleware {
         }
         String errorMessage = getMessage(request.get("error"));
         int errorCode = response.getStatusCode();
+
+        // set the status message also to the right error code
+        response.setStatusMessage(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
+
         List<String> stackTrace = getStackTrace(request.get("error"));
 
         String accept = request.getHeader("accept", "text/plain");

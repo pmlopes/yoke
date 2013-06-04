@@ -53,3 +53,104 @@ All you need to define is a Database store and after create a router with at lea
 * resource - the root resource for the REST call (e.g.: */persons*)
 * entityName - the entity name, in mongoDb terms this is the collection name (e.g.: *persons*)
 * allowedVerbs - a sum of all verbs as described before, or in case of not specified all are included
+
+## Create a entity
+
+Request:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+POST /persons HTTP/1.1
+Content-Type: application/json
+
+{"name":"Paulo"}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP/1.1 201
+X-Powered-By: yoke
+Location: /persons/e9a1f835-28c2-4f18-9816-747a77a98234
+Content-Length: 0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## List all entities
+
+Request:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+GET /persons HTTP/1.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP/1.1 200
+x-powered-by	yoke
+content-type	application/json
+Content-Length	63
+
+[{"_id":"e9a1f835-28c2-4f18-9816-747a77a98234","name":"Paulo"}]
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## List one entity
+
+Request:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+GET /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP/1.1 200
+x-powered-by	yoke
+content-type	application/json
+Content-Length	61
+
+{"_id":"e9a1f835-28c2-4f18-9816-747a77a98234","name":"Paulo"}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Append
+
+Request:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PATCH /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
+Content-Type: application/json
+
+{"username":"pmlopes"}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP/1.1 204
+x-powered-by	yoke
+Content-Length	0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Update
+
+Request:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PUT /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
+Content-Type: application/json
+
+{"name": "Paulo Lopes", "username":"pmlopes"}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP/1.1 204
+x-powered-by	yoke
+Content-Length	0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Delete
+
+Request:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DELETE /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Response:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP/1.1 204
+x-powered-by	yoke
+Content-Length	0
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+

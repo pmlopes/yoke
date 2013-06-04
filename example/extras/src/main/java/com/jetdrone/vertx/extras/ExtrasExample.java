@@ -4,7 +4,8 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine;
 import com.jetdrone.vertx.yoke.extras.middleware.JsonRestRouter;
 import com.jetdrone.vertx.yoke.extras.store.MongoDbStore;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.middleware.*;
+import com.jetdrone.vertx.yoke.middleware.BodyParser;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.json.JsonObject;
@@ -21,6 +22,9 @@ public class ExtrasExample extends Verticle {
     public void start() {
         final Yoke yoke = new Yoke(vertx);
         yoke.engine("hbs", new HandlebarsEngine());
+
+        yoke.use(new BodyParser());
+        yoke.use(new ErrorHandler(true));
 
         JsonObject persistorCfg = new JsonObject();
         persistorCfg.putString("host", "localhost");
