@@ -25,11 +25,13 @@ ENGINES =	StringPlaceholderEngine.html \
 			GroovyTemplate.html \
 			MicroTemplateEngine.html
 
+EXTRAS =	Rest.html
+
 %.html: %.md
 	@pandoc $< -s --highlight-style tango -c style.css --toc --toc-depth=2 -A footer.txt -o $@
 	@sed -i 's/<title><\/title>/<title>Yoke a middleware framework for Vert.x: $(patsubst %.html,%,$@)<\/title>/g' $@
 
-all: $(BASE) $(TUTORIALS) $(EXTENSIONS)
+all: $(BASE) $(TUTORIALS) $(EXTENSIONS) $(EXTRAS)
 	@tar -czvf yoke-gradle-template.tar.gz yoke-gradle-template
 
 clean:
