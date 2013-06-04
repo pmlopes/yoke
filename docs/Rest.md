@@ -57,7 +57,8 @@ All you need to define is a Database store and after create a router with at lea
 ## Create a entity
 
 Request:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 POST /persons HTTP/1.1
 Content-Type: application/json
 
@@ -65,7 +66,8 @@ Content-Type: application/json
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Response:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 HTTP/1.1 201
 X-Powered-By: yoke
 Location: /persons/e9a1f835-28c2-4f18-9816-747a77a98234
@@ -75,12 +77,14 @@ Content-Length: 0
 ## List all entities
 
 Request:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 GET /persons HTTP/1.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Response:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 HTTP/1.1 200
 x-powered-by	yoke
 content-type	application/json
@@ -92,12 +96,14 @@ Content-Length	63
 ## List one entity
 
 Request:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 GET /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Response:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 HTTP/1.1 200
 x-powered-by	yoke
 content-type	application/json
@@ -109,7 +115,8 @@ Content-Length	61
 ## Append
 
 Request:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 PATCH /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
 Content-Type: application/json
 
@@ -117,7 +124,8 @@ Content-Type: application/json
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Response:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 HTTP/1.1 204
 x-powered-by	yoke
 Content-Length	0
@@ -126,7 +134,8 @@ Content-Length	0
 ## Update
 
 Request:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 PUT /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
 Content-Type: application/json
 
@@ -134,7 +143,8 @@ Content-Type: application/json
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Response:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 HTTP/1.1 204
 x-powered-by	yoke
 Content-Length	0
@@ -143,12 +153,14 @@ Content-Length	0
 ## Delete
 
 Request:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 DELETE /persons/e9a1f835-28c2-4f18-9816-747a77a98234 HTTP/1.1
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Response:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
 HTTP/1.1 204
 x-powered-by	yoke
 Content-Length	0
