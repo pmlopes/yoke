@@ -115,6 +115,11 @@ Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-beta2```
 * [Benchmark](Benchmark.html) Simple Benchmarks Yoke vs [ExpressJS](http://expressjs.com)
 
 
+## Extras
+
+* [Rest](Rest.html) Json REST Router
+
+
 ## 3rd-party
 
 * [Google Closure templates](https://github.com/core9/vertx-yoke-engine-closure) Yoke templating engine for Google Closure templates
