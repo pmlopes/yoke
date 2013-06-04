@@ -154,3 +154,35 @@ x-powered-by	yoke
 Content-Length	0
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+## Validation
+
+Of course one cannot create a service and expect the data received from the network is always valid, in case we need
+to validate the data. In order to achieve this one can use the ValidationStore class. The ValidationStore class wraps
+a store and allows you to override any of the crud operations:
+
+* create
+* read
+* update
+* delete
+* query
+* count
+
+either before or after the database round trip. In order to do this just override either:
+
+* beforeCreate
+* beforeRead
+* beforeUpdate
+* beforeDelete
+* beforeQuery
+* beforeCount
+
+or:
+
+* afterCreate
+* afterRead
+* afterUpdate
+* afterDelete
+* afterQuery
+* afterCount
+
+By default the validation store will assume success, so you only need to override the methods you really need.
