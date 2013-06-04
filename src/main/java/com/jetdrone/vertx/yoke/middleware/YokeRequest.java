@@ -317,6 +317,26 @@ public class YokeRequest implements HttpServerRequest {
         return secure;
     }
 
+    private static String[] splitMime(String mime) {
+        // find any ; e.g.: "application/json;q=0.8"
+        int space = mime.indexOf(';');
+
+        if (space != -1) {
+            mime = mime.substring(0, space);
+        }
+
+        String[] parts = mime.split("/");
+
+        if (parts.length < 2) {
+            return new String[] {
+                    parts[0],
+                    "*"
+            };
+        }
+
+        return parts;
+    }
+
     /**
      * Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which
      * case you should respond with 406 "Not Acceptable".
@@ -337,8 +357,14 @@ public class YokeRequest implements HttpServerRequest {
         Arrays.sort(acceptTypes, ACCEPT_X_COMPARATOR);
 
         for (String senderAccept : acceptTypes) {
+            String[] sAccept = splitMime(senderAccept);
+
             for (String appAccept : types) {
-                if (senderAccept.startsWith(appAccept)) {
+                String[] aAccept = splitMime(appAccept);
+
+                if (
+                        (sAccept[0].equals(aAccept[0]) || "*".equals(sAccept[0]) || "*".equals(aAccept[0])) &&
+                        (sAccept[1].equals(aAccept[1]) || "*".equals(sAccept[1]) || "*".equals(aAccept[1]))) {
                     return senderAccept;
                 }
             }
