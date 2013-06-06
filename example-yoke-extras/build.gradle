@@ -55,7 +55,7 @@ dependencies {
   //provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   // get yoke jar for parent
-  provided project(':yoke')
+  provided project(':')
   // get yoke jar for extras
   provided project(':extras')
 }
