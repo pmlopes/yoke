@@ -1,1 +1,1 @@
-include 'extras', 'example/extras', 'example/groovy', 'example/javascript', 'example/kitcms', 'example/persona'
+include 'extras', 'example/extras', 'example/groovy', 'example/javascript', 'example/kitcms', 'example/persona', 'benchmark/yoke-bench', 'benchmark/yoke-cluster-bench'
