@@ -1,1 +1,1 @@
-include 'extras', 'example/example-yoke-extras', 'example/example-yoke-groovy', 'example/example-yoke-javascript', 'example/example-yoke-kitcms', 'example/example-yoke-mozilla-persona', 'benchmark/example-yoke-benchark', 'benchmark/example-yoke-cluster-benchmark'
+include 'yoke', 'extras', 'example/example-yoke-extras', 'example/example-yoke-groovy', 'example/example-yoke-javascript', 'example/example-yoke-kitcms', 'example/example-yoke-mozilla-persona', 'benchmark/example-yoke-benchark', 'benchmark/example-yoke-cluster-benchmark'

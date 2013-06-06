@@ -2,7 +2,6 @@ package com.jetdrone.vertx.yoke.extras.test.middleware;
 
 import com.jetdrone.vertx.yoke.extras.middleware.JsonRestRouter;
 import com.jetdrone.vertx.yoke.extras.store.Store;
-import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
 import org.vertx.java.core.AsyncResultHandler;

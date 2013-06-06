@@ -16,8 +16,6 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
-import java.util.Map;
-
 public class KitCMS extends Verticle {
 
     @Override
