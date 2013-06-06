@@ -72,7 +72,12 @@ public class YokeResponse implements HttpServerResponse {
                         if (asyncResult.failed()) {
                             next.handle(asyncResult.cause());
                         } else {
-                            putHeader("content-type", renderEngine.getContentType());
+                            String encoding = renderEngine.contentEncoding();
+                            if (encoding != null) {
+                                putHeader("content-type", renderEngine.contentType() + ";charset=" + encoding);
+                            } else {
+                                putHeader("content-type", renderEngine.contentType());
+                            }
                             end(asyncResult.result());
                         }
                     }

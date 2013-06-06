@@ -15,7 +15,6 @@
  */
 package com.jetdrone.vertx.yoke.engine;
 
-import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -25,7 +24,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringPlaceholderEngine extends Engine<String> {
+public class StringPlaceholderEngine extends AbstractEngine<String> {
 
     private static final String placeholderPrefix = "${";
     private static final String placeholderSuffix = "}";

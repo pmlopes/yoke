@@ -15,7 +15,6 @@
  */
 package com.jetdrone.vertx.yoke.engine;
 
-import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import groovy.lang.MissingPropertyException;
 import groovy.text.SimpleTemplateEngine;
@@ -30,7 +29,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-public class GroovyTemplateEngine extends Engine<Template> {
+public class GroovyTemplateEngine extends AbstractEngine<Template> {
 
     private final TemplateEngine engine = new SimpleTemplateEngine();
 
