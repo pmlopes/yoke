@@ -5,6 +5,7 @@ import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine;
 import com.jetdrone.vertx.yoke.middleware.*;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -127,7 +128,7 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    Map<String, String> body = request.formAttributes();
+                    MultiMap body = request.formAttributes();
 
                     String key = body.get("key");
                     String value = body.get("value");
@@ -160,7 +161,7 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    Map<String, String> body = request.formAttributes();
+                    MultiMap body = request.formAttributes();
 
                     String key = body.get("key");
 

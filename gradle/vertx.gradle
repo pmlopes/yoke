@@ -32,7 +32,7 @@ apply plugin: 'eclipse'
 // a shared Maven local and using Gradle wrapper concurrently
 loadProperties("${System.getProperty('user.home')}/.gradle/gradle.properties")
 
-apply from: "gradle/maven.gradle"
+apply from: "$rootDir/gradle/maven.gradle"
 
 group = modowner
 archivesBaseName = modname

@@ -1,0 +1,1 @@
+include 'extras', 'example/extras', 'example/groovy', 'example/javascript', 'example/kitcms', 'example/persona'

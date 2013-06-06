@@ -1,4 +1,4 @@
-apply from: "gradle/vertx.gradle"
+apply from: "$rootDir/gradle/vertx.gradle"
 apply plugin: "scala"
 
 /*
