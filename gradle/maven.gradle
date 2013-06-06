@@ -35,30 +35,30 @@ signing {
 }
 
 uploadArchives {
-  if (!modname.endsWith("example")) {
-  group 'build'
-  description = "Does a maven deploy of archives artifacts"
+  if (!modname.startsWith("example")) {
+    group 'build'
+    description = "Does a maven deploy of archives artifacts"
 
-  repositories {
+    repositories {
       mavenDeployer {
-      // setUniqueVersion(false)
-      configuration = configurations.archives
+        // setUniqueVersion(false)
+        configuration = configurations.archives
 
-      repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-        authentication(userName: sonatypeUsername, password: sonatypePassword)
+        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+          authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+          authentication(userName: sonatypeUsername, password: sonatypePassword)
+        }
+
+        if (isReleaseVersion) {
+          beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+        }
+
+        configurePom(pom)
       }
-
-      snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-        authentication(userName: sonatypeUsername, password: sonatypePassword)
-      }
-
-      if (isReleaseVersion) {
-        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-      }
-
-      configurePom(pom)
     }
-  }
   }
 }
 
