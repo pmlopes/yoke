@@ -24,6 +24,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -34,18 +35,18 @@ public class GroovyTemplateEngine extends AbstractEngine<Template> {
     private final TemplateEngine engine = new SimpleTemplateEngine();
 
     @Override
-    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> next) {
+    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         read(filename, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
                 } else {
                     try {
-                        String result = internalRender(compile(filename, asyncResult.result()), context);
+                        Buffer result = internalRender(compile(filename, asyncResult.result()), context);
                         next.handle(new YokeAsyncResult<>(result));
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
-                        next.handle(new YokeAsyncResult<String>(ex));
+                        next.handle(new YokeAsyncResult<Buffer>(ex));
                     }
                 }
             }
@@ -64,7 +65,7 @@ public class GroovyTemplateEngine extends AbstractEngine<Template> {
         return template;
     }
 
-    private static String internalRender(Template template, final Map<String, Object> context) throws IOException {
+    private static Buffer internalRender(Template template, final Map<String, Object> context) throws IOException {
         final StringBuilder buffer = new StringBuilder();
 
         template.make(context).writeTo(new Writer() {
@@ -84,6 +85,6 @@ public class GroovyTemplateEngine extends AbstractEngine<Template> {
             }
         });
 
-        return buffer.toString();
+        return new Buffer(buffer.toString());
     }
 }

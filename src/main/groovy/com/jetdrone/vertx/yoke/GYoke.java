@@ -56,7 +56,7 @@ public class GYoke {
         this.vertx = vertx.toJavaVertx();
         jYoke = new Yoke(this.vertx, new RequestWrapper() {
             @Override
-            public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine<?>> engines) {
+            public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines) {
                 GYokeResponse response = new GYokeResponse(request.response(), context, engines);
                 return new GYokeRequest(request, response, secure, context);
             }

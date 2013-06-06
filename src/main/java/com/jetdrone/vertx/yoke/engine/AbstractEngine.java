@@ -33,7 +33,7 @@ import java.util.Date;
  * extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
  * operations in the context of the module.
  */
-public abstract class AbstractEngine<T> implements Engine<T> {
+public abstract class AbstractEngine<T> implements Engine {
 
     protected Vertx vertx;
 

@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.buffer.Buffer;
 
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import java.util.Map;
  * extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
  * operations in the context of the module.
  */
-public interface Engine<T> {
+public interface Engine {
 
     /**
      * Called on register to allow using vertx in the engine
@@ -55,5 +56,5 @@ public interface Engine<T> {
      * @param context - Map with key values that might get substituted in the template
      * @param handler - The future result handler with a Buffer in case of success
      */
-    public abstract void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> handler);
+    public abstract void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler);
 }

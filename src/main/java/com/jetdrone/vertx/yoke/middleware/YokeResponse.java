@@ -39,7 +39,7 @@ public class YokeResponse implements HttpServerResponse {
     // the context
     private final Map<String, Object> context;
     // engine map
-    private final Map<String, Engine<?>> engines;
+    private final Map<String, Engine> engines;
     // response cookies
     private Set<Cookie> cookies;
 
@@ -48,7 +48,7 @@ public class YokeResponse implements HttpServerResponse {
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
-    public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
+    public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         this.response = response;
         this.context = context;
         this.engines = engines;
@@ -61,14 +61,14 @@ public class YokeResponse implements HttpServerResponse {
         if (sep != -1) {
             String extension = template.substring(sep + 1);
 
-            final Engine<?> renderEngine = engines.get(extension);
+            final Engine renderEngine = engines.get(extension);
 
             if (renderEngine == null) {
                 next.handle("No engine registered for extension: " + extension);
             } else {
-                renderEngine.render(template, context, new AsyncResultHandler<String>() {
+                renderEngine.render(template, context, new AsyncResultHandler<Buffer>() {
                     @Override
-                    public void handle(AsyncResult<String> asyncResult) {
+                    public void handle(AsyncResult<Buffer> asyncResult) {
                         if (asyncResult.failed()) {
                             next.handle(asyncResult.cause());
                         } else {

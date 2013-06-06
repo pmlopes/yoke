@@ -26,7 +26,7 @@ import java.util.Map;
 
 public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.core.http.HttpServerResponse*/ {
 
-    public GYokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine<?>> engines) {
+    public GYokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         super(response, context, engines);
     }
 
