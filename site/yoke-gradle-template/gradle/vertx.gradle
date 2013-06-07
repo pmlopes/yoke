@@ -1,0 +1,203 @@
+import org.vertx.java.core.AsyncResult
+import org.vertx.java.core.AsyncResultHandler
+import org.vertx.java.platform.PlatformLocator
+import org.vertx.java.platform.impl.ModuleClassLoader
+
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+
+/*
+ * Copyright 2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+// We  have to explicitly load props from the user home dir - on CI we set
+// GRADLE_USER_HOME to a different dir to avoid problems with concurrent builds corrupting
+// a shared Maven local and using Gradle wrapper concurrently
+loadProperties("${System.getProperty('user.home')}/.gradle/gradle.properties")
+
+apply from: "gradle/maven.gradle"
+
+group = modowner
+archivesBaseName = modname
+
+defaultTasks = ['assemble']
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+project.ext.moduleName = "$modowner~$modname~$version"
+
+if (produceJar == 'false') {
+  jar.enabled = false
+  assert configurations.archives.artifacts.removeAll { it.file == jar.archivePath }
+}
+
+configurations {
+  provided
+  testCompile.extendsFrom provided
+}
+
+repositories {
+  if (System.getenv("VERTX_DISABLE_MAVENLOCAL") == null) {
+    // We don't want to use mavenLocal when running on CI - mavenLocal is only useful in Gradle for
+    // publishing artifacts locally for development purposes - maven local is also not threadsafe when there
+    // are concurrent builds
+    mavenLocal()
+  }
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+  mavenCentral()
+}
+
+dependencies {
+  provided "io.vertx:vertx-core:$vertxVersion"
+  provided "io.vertx:vertx-platform:$vertxVersion"
+  testCompile "junit:junit:$junitVersion"
+  testCompile "io.vertx:testtools:$toolsVersion"
+}
+
+// This sets up the classpath for the script itself
+buildscript {
+
+  repositories {
+    if (System.getenv("VERTX_DISABLE_MAVENLOCAL") == null) {
+      // We don't want to use mavenLocal when running on CI - mavenLocal is only useful in Gradle for
+      // publishing artifacts locally for development purposes - maven local is also not threadsafe when there
+      // are concurrent builds
+      mavenLocal()
+    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "io.vertx:vertx-core:$vertxVersion"
+    classpath "io.vertx:vertx-platform:$vertxVersion"
+  }
+}
+
+sourceSets {
+  main {
+    compileClasspath = compileClasspath + configurations.provided
+  }
+}
+
+task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module into the local mods directory' ) {
+  into "build/mods/$moduleName"
+  from compileJava
+  from 'src/main/resources'
+  into( 'lib' ) {
+    from configurations.compile
+  }
+}
+
+task modZip( type: Zip, dependsOn: 'pullInDeps', description: 'Package the module .zip file') {
+  group = 'vert.x'
+  description = "Assembles a vert.x module"
+  destinationDir = project.file('build/libs')
+  archiveName = "${modname}-${version}" + ".zip"
+  from copyMod
+}
+
+artifacts {
+  archives modZip
+}
+
+test {
+  dependsOn copyMod
+
+  // Make sure tests are always run!
+  outputs.upToDateWhen { false }
+
+  // Show output
+  testLogging.showStandardStreams = true
+
+  testLogging { exceptionFormat "full" }
+
+  systemProperty 'vertx.loadWithPlatformCL', "false"
+  systemProperty 'vertx.mods', "build/mods"
+}
+
+task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
+  setSysProps()
+  def pm = PlatformLocator.factory.createPlatformManager()
+  def latch = new CountDownLatch(1)
+  pm.deployModule(moduleName, null, 1, new AsyncResultHandler<String>() {
+    public void handle(AsyncResult<String> asyncResult) {
+      if (asyncResult.succeeded()) {
+        println "CTRL-C to stop server"
+      } else {
+        println "Failed to deploy module"
+        asyncResult.cause().printStackTrace()
+        latch.countDown()
+      }
+    }
+  });
+  latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+}
+
+task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module dependencies for the module into the nested mods directory') << {
+  if (pullInDeps == 'true') {
+    setSysProps()
+    def pm = PlatformLocator.factory.createPlatformManager()
+    def latch = new CountDownLatch(1)
+    println "Pulling in dependencies for module $moduleName. Please wait"
+    pm.pullInDependencies(moduleName, new AsyncResultHandler<Void>() {
+      public void handle(AsyncResult<Void> asyncResult) {
+        if (asyncResult.succeeded()) {
+          println "Dependencies pulled in successfully"
+          latch.countDown()
+        } else {
+          println "Failed to pull in dependencies"
+          asyncResult.cause().printStackTrace()
+          latch.countDown()
+        }
+      }
+    })
+    latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+  }
+}
+
+def setSysProps() {
+  System.setProperty("vertx.mods", "build/mods")
+  System.setProperty("vertx.loadWithPlatformCL", "false");
+}
+
+def loadProperties(String sourceFileName) {
+  def config = new Properties()
+  def propFile = new File(sourceFileName)
+  if (propFile.canRead()) {
+    config.load(new FileInputStream(propFile))
+    for (Map.Entry property in config) {
+      project.ext[property.key] = property.value;
+    }
+  }
+}
+
+// Map the 'provided' dependency configuration to the appropriate IDEA visibility scopes.
+plugins.withType(IdeaPlugin) {
+  idea {
+    module {
+      scopes.PROVIDED.plus += configurations.provided
+      scopes.COMPILE.minus += configurations.provided
+      scopes.TEST.minus += configurations.provided
+      scopes.RUNTIME.minus += configurations.provided
+    }
+  }
+}
