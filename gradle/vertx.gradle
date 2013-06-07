@@ -1,7 +1,6 @@
 import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.platform.PlatformLocator
-import org.vertx.java.platform.impl.ModuleClassLoader
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -190,7 +189,6 @@ task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module depende
 
 def setSysProps() {
   System.setProperty("vertx.mods", "build/mods")
-  System.setProperty("vertx.loadWithPlatformCL", "false");
 }
 
 def loadProperties(String sourceFileName) {
@@ -199,7 +197,7 @@ def loadProperties(String sourceFileName) {
   if (propFile.canRead()) {
     config.load(new FileInputStream(propFile))
     for (Map.Entry property in config) {
-      project.ext[property.key] = property.value;
+      project.ext[(String) property.key] = property.value;
     }
   }
 }
