@@ -28,7 +28,14 @@ ENGINES =	StringPlaceholderEngine.html \
 EXTRAS =	Rest.html
 
 %.html: %.md
-	@pandoc $< -s --highlight-style tango -c style.css --toc --toc-depth=2 -A footer.txt -o $@
+# First escape < and >
+	@cp $< /tmp/escaped.md
+	@sed -i 's/</\&lt;/g' /tmp/escaped.md
+	@sed -i 's/>/\&gt;/g' /tmp/escaped.md
+# Replace into template
+	@echo '/MARKDOWN_FILE/ {\nr /tmp/escaped.md\nd }' > /tmp/script.sed
+	@sed -f /tmp/script.sed < template/template.html > $@
+# adjust title
 	@sed -i 's/<title><\/title>/<title>Yoke a middleware framework for Vert.x: $(patsubst %.html,%,$@)<\/title>/g' $@
 
 all: $(BASE) $(TUTORIALS) $(EXTENSIONS) $(EXTRAS)
