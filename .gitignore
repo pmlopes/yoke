@@ -1,3 +1,5 @@
+# Ignore project files
 .idea
 *.iml
-docs
+# Ignore generated html
+site/*.html
