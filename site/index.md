@@ -11,7 +11,7 @@ bundles the *MicroTemplateEngine*.
 
 ### Java
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
+``` java
 Yoke yoke = new Yoke(vertx)
   .use(new Favicon())
   .use(new Static("webroot"))
@@ -22,11 +22,11 @@ Yoke yoke = new Yoke(vertx)
         request.response().end("Hello World!");
       }
     })).listen(3000);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Groovy
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
+``` groovy
 def yoke = new GYoke(vertx)
   .use(new Favicon())
   .use(new Static("webroot"))
@@ -34,11 +34,11 @@ def yoke = new GYoke(vertx)
     .all("/hello") { request ->
       request.response().end("Hello World!");
     }).listen(3000)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### JavaScript
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines}
+``` js
 var yoke = new Yoke()
   .use(new Favicon())
   .use(new Static('webroot'))
@@ -46,25 +46,27 @@ var yoke = new Yoke()
     .all("/hello", function (request) {
       request.response().end('Hello World!');
     })).listen(3000);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 ## Installation
 
 ### Vert.x module
 
-Vert.x 2 module: ```com.jetdrone~yoke~1.0.0-beta2```
+Vert.x 2 module:
+
+```com.jetdrone~yoke~1.0.0-beta2```
 
 ### Maven artifact
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.xml}
+``` xml
 <dependency>
   <groupId>com.jetdrone</groupId>
   <artifactId>yoke</artifactId>
   <version>1.0.0-beta2</version>
   <scope>provided</scope>
 </dependency>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 ## Extensions to Vert.x

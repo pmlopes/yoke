@@ -9,6 +9,6 @@ Creates pretty print error pages in *html*, *text* or *json* depending on the *a
 
 * *boolean* include stack trace. Useful in development mode but probably you don't want it in production.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new ErrorHandler(true)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

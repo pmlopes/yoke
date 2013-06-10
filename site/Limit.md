@@ -9,6 +9,6 @@ Limits the request body to a specific amount of bytes. If the request body conta
 
 * ```bytes```  max amount of bytes allowed in the request body
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new Limit(1024)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

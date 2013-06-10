@@ -8,17 +8,17 @@ Pass an optional ```key``` to use when checking for a method override, othewise 
 
 ## Usage
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new MethodOverride()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Or with optional key name
 
 * *String* key
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new MethodOverride("x_method")
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 ## Notes

@@ -1,124 +1,135 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="viewport" content="width=device-width">
+
   <title>Yoke a middleware framework for Vert.x: BasicAuth</title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; background-color: #f8f8f8; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-pre, code { background-color: #f8f8f8; }
-code > span.kw { color: #204a87; font-weight: bold; }
-code > span.dt { color: #204a87; }
-code > span.dv { color: #0000cf; }
-code > span.bn { color: #0000cf; }
-code > span.fl { color: #0000cf; }
-code > span.ch { color: #4e9a06; }
-code > span.st { color: #4e9a06; }
-code > span.co { color: #8f5902; font-style: italic; }
-code > span.ot { color: #8f5902; }
-code > span.al { color: #ef2929; }
-code > span.fu { color: #000000; }
-code > span.er { font-weight: bold; }
-  </style>
-  <link rel="stylesheet" href="style.css" type="text/css" />
+
+  <!-- Flatdoc -->
+  <script src='js/jquery.min.js'></script>
+  <script src="js/prettify.min.js"></script>
+  <script src='js/marked.min.js'></script>
+  <script src='js/flatdoc.js'></script>
+
+  <!-- Flatdoc theme -->
+  <link  href='theme-white/style.css' rel='stylesheet'>
+  <script src='theme-white/script.js'></script>
+  <!-- Prettify theme -->
+  <link  href='css/prettify.css' rel='stylesheet'>
+
+  <!-- Meta -->
+  <meta content="Yoke" property="og:site_name">
+  <meta content="Yoke" property="og:title">
+  <meta content="website" property="og:type">
+  <meta content="Yoke a middleware framework for Vert.x" name="description">
+  <meta content="Yoke a middleware framework for Vert.x" property="og:description">
+
+  <!-- Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-3682522-6', 'github.io');
+    ga('send', 'pageview');
+  </script>
 </head>
-<body>
-<div id="TOC">
-<ul>
-<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
-<li><a href="#basicauth">BasicAuth</a></li>
-<li><a href="#usage">Usage</a></li>
-<li><a href="#defines">Defines</a></li>
-<li><a href="#extensions">Extensions</a></li>
-</ul></li>
-</ul>
-</div>
-<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
-<h2 id="basicauth"><a href="#basicauth">BasicAuth</a></h2>
-<p>Enfore basic authentication by providing a <code>BasicAuth.AuthHandler</code> interface, which must return <code>true</code> in order to gain access. Alternatively an fixed username, password is provided. The middleware populates <code>request.user</code>.</p>
-<h2 id="usage"><a href="#usage">Usage</a></h2>
-<h3 id="username-and-password"><a href="#username-and-password">Username and password</a></h3>
-<ul>
-<li><em>String</em> username</li>
-<li><em>String</em> password</li>
-</ul>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="st">&quot;username&quot;</span>, <span class="st">&quot;password&quot;</span>)</code></pre>
-<h3 id="username-password-and-realm-name"><a href="#username-password-and-realm-name">Username, password and realm name</a></h3>
-<ul>
-<li><em>String</em> username</li>
-<li><em>String</em> password</li>
-<li><em>String</em> realm</li>
-</ul>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="st">&quot;username&quot;</span>, <span class="st">&quot;password&quot;</span>, <span class="st">&quot;Authentication Required&quot;</span>)</code></pre>
-<h3 id="authentication-handler"><a href="#authentication-handler">Authentication handler</a></h3>
-<ul>
-<li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
-</ul>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="kw">new</span> BasicAuth.<span class="fu">AuthHandler</span>() {
+<body role='flatdoc' onload="Flatdoc.run({fetcher: Flatdoc.domElement('srcmd')});">
+<textarea id='srcmd' style='display:none;'>
+# [Yoke](/)
+
+## BasicAuth
+
+Enfore basic authentication by providing a ```BasicAuth.AuthHandler``` interface, which must return ```true``` in order
+to gain access. Alternatively an fixed username, password is provided. The middleware populates ```request.user```.
+
+
+## Usage
+
+### Username and password
+
+* *String* username
+* *String* password
+
+``` java
+new BasicAuth("username", "password")
+```
+
+### Username, password and realm name
+
+* *String* username
+* *String* password
+* *String* realm
+
+``` java
+new BasicAuth("username", "password", "Authentication Required")
+```
+
+### Authentication handler
+
+* *BasicAuth.AuthHandler* async handler to allow fetching user data asynchronous
+
+``` java
+new BasicAuth(new BasicAuth.AuthHandler() {
   @Override
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(String username, String password, Handler&lt;Boolean&gt; result) {
-    <span class="kw">if</span> (<span class="st">&quot;username&quot;</span>.<span class="fu">equals</span>(username) &amp;&amp; <span class="st">&quot;password&quot;</span>.<span class="fu">equals</span>(<span class="st">&quot;password&quot;</span>)) {
-      result.<span class="fu">handle</span>(<span class="kw">true</span>);
-    } <span class="kw">else</span> {
-      result.<span class="fu">handle</span>(<span class="kw">false</span>);
+  public void handle(String username, String password, Handler&lt;Boolean&gt; result) {
+    if ("username".equals(username) && "password".equals("password")) {
+      result.handle(true);
+    } else {
+      result.handle(false);
     }
   }
-});</code></pre>
-<h3 id="authentication-handler-and-realm-name"><a href="#authentication-handler-and-realm-name">Authentication handler and realm name</a></h3>
-<ul>
-<li><em>BasicAuth.AuthHandler</em> async handler to allow fetching user data asynchronous</li>
-<li><em>String</em> realm</li>
-</ul>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">new</span> <span class="fu">BasicAuth</span>(<span class="kw">new</span> BasicAuth.<span class="fu">AuthHandler</span>() {
+});
+```
+
+### Authentication handler and realm name
+
+* *BasicAuth.AuthHandler* async handler to allow fetching user data asynchronous
+* *String* realm
+
+``` java
+new BasicAuth(new BasicAuth.AuthHandler() {
   @Override
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(String username, String password, Handler&lt;Boolean&gt; result) {
-    <span class="kw">if</span> (<span class="st">&quot;username&quot;</span>.<span class="fu">equals</span>(username) &amp;&amp; <span class="st">&quot;password&quot;</span>.<span class="fu">equals</span>(<span class="st">&quot;password&quot;</span>)) {
-      result.<span class="fu">handle</span>(<span class="kw">true</span>);
-    } <span class="kw">else</span> {
-      result.<span class="fu">handle</span>(<span class="kw">false</span>);
+  public void handle(String username, String password, Handler&lt;Boolean&gt; result) {
+    if ("username".equals(username) && "password".equals("password")) {
+      result.handle(true);
+    } else {
+      result.handle(false);
     }
   }
-}, <span class="st">&quot;Authentication required&quot;</span>);</code></pre>
-<h2 id="defines"><a href="#defines">Defines</a></h2>
-<p>Defines the property <code>user</code> in the request context.</p>
-<h2 id="extensions"><a href="#extensions">Extensions</a></h2>
-<p>When there is a need to support several realms under the same server, you can override the the <code>getRealm</code> method.</p>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> String <span class="fu">getRealm</span>(YokeRequest request) {
-  <span class="co">// do something with the request to generate the valid realm name</span>
-  <span class="kw">return</span> <span class="st">&quot;Authentication is required to access this resource&quot;</span>;
-}</code></pre>
-<div id="footer">
-  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+}, "Authentication required");
+```
+
+
+## Defines
+
+Defines the property ```user``` in the request context.
+
+
+## Extensions
+
+When there is a need to support several realms under the same server, you can override the the ```getRealm``` method.
+
+``` java
+public String getRealm(YokeRequest request) {
+  // do something with the request to generate the valid realm name
+  return "Authentication is required to access this resource";
+}
+```
+</textarea>
+<div class='header'>
+  <div class='left'>
+    <h1 role='flatdoc-title'></h1>
+  </div>
 </div>
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://pmlopes.github.io/yoke/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
-<!-- Place this tag where you want the +1 button to render. -->
-<div class="g-plusone" data-size="medium" data-href="http://pmlopes.github.io/yoke/"></div>
-
-<!-- Place this tag after the last +1 button tag. -->
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-3682522-6', 'github.io');
-  ga('send', 'pageview');
-
-</script>
+<div role='flatdoc' class='content-root'>
+  <div class='menubar'>
+    <div class='menu section' role='flatdoc-menu'></div>
+  </div>
+  <div role='flatdoc-content' class='content'></div>
+</div>
 </body>
 </html>

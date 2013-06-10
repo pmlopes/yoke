@@ -1,455 +1,312 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="viewport" content="width=device-width">
+
   <title>Yoke a middleware framework for Vert.x: Persona</title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; background-color: #f8f8f8; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-pre, code { background-color: #f8f8f8; }
-code > span.kw { color: #204a87; font-weight: bold; }
-code > span.dt { color: #204a87; }
-code > span.dv { color: #0000cf; }
-code > span.bn { color: #0000cf; }
-code > span.fl { color: #0000cf; }
-code > span.ch { color: #4e9a06; }
-code > span.st { color: #4e9a06; }
-code > span.co { color: #8f5902; font-style: italic; }
-code > span.ot { color: #8f5902; }
-code > span.al { color: #ef2929; }
-code > span.fu { color: #000000; }
-code > span.er { font-weight: bold; }
-  </style>
-  <link rel="stylesheet" href="style.css" type="text/css" />
+
+  <!-- Flatdoc -->
+  <script src='js/jquery.min.js'></script>
+  <script src="js/prettify.min.js"></script>
+  <script src='js/marked.min.js'></script>
+  <script src='js/flatdoc.js'></script>
+
+  <!-- Flatdoc theme -->
+  <link  href='theme-white/style.css' rel='stylesheet'>
+  <script src='theme-white/script.js'></script>
+  <!-- Prettify theme -->
+  <link  href='css/prettify.css' rel='stylesheet'>
+
+  <!-- Meta -->
+  <meta content="Yoke" property="og:site_name">
+  <meta content="Yoke" property="og:title">
+  <meta content="website" property="og:type">
+  <meta content="Yoke a middleware framework for Vert.x" name="description">
+  <meta content="Yoke a middleware framework for Vert.x" property="og:description">
+
+  <!-- Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-3682522-6', 'github.io');
+    ga('send', 'pageview');
+  </script>
 </head>
-<body>
-<div id="TOC">
-<ul>
-<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
-<li><a href="#mozilla-persona">Mozilla Persona</a></li>
-<li><a href="#include-persona-js-library">Include Persona JS library</a></li>
-<li><a href="#add-loginlogout-buttons">Add login/logout buttons</a></li>
-<li><a href="#watch-for-login-and-logout-actions">Watch for login and logout actions</a></li>
-<li><a href="#verify-the-users-credentials">Verify the user's credentials</a></li>
-<li><a href="#source-code">Source code</a></li>
-<li><a href="#notes">Notes</a></li>
-</ul></li>
-</ul>
-</div>
-<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
-<h2 id="mozilla-persona"><a href="#mozilla-persona">Mozilla Persona</a></h2>
-<p><em>Persona allows you to sign in to sites using an email address you choose. So, instead of having to manage multiple usernames and passwords across your favorite sites and devices, you'll have more time to do the important stuff. Mozilla Will manage the details!</em></p>
-<p>Adding the Persona login system to your site takes just five steps:</p>
-<ul>
-<li>Include the Persona JavaScript library on your pages.</li>
-<li>Add &quot;login&quot; and &quot;logout&quot; buttons.</li>
-<li>Watch for login and logout actions.</li>
-<li>Verify the user's credentials.</li>
-<li>Review best practices.</li>
-</ul>
-<p>This is the description available on the Mozilla website, and indeed it is quite simple to add Persona authentication to a application built on Yoke and <a href="http://vertx.io">Vert.x</a></p>
-<h2 id="include-persona-js-library"><a href="#include-persona-js-library">Include Persona JS library</a></h2>
-<pre class="sourceCode html"><code class="sourceCode html"><span class="dt">&lt;!DOCTYPE </span>html<span class="dt">&gt;</span>
-<span class="kw">&lt;html&gt;</span>
-<span class="kw">&lt;head&gt;</span>
-  <span class="kw">&lt;title&gt;</span>${title}<span class="kw">&lt;/title&gt;</span>
-  <span class="kw">&lt;meta</span><span class="ot"> http-equiv=</span><span class="st">&quot;X-UA-Compatible&quot;</span><span class="ot"> content=</span><span class="st">&quot;IE=Edge&quot;</span><span class="kw">&gt;</span>
-  <span class="kw">&lt;link</span><span class="ot"> rel=</span><span class="st">&quot;stylesheet&quot;</span><span class="ot"> href=</span><span class="st">&quot;/css/persona-buttons.css&quot;</span> <span class="kw">/&gt;</span>
-  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span>
-  <span class="kw">&lt;script</span><span class="ot"> src=</span><span class="st">&quot;https://login.persona.org/include.js&quot;</span><span class="kw">&gt;&lt;/script&gt;</span>
-<span class="kw">&lt;/head&gt;</span>
-<span class="kw">&lt;body&gt;</span>
-<span class="kw">&lt;/body&gt;</span>
-<span class="kw">&lt;/html&gt;</span></code></pre>
-<p>This was very simple. Just save this in the resources directory and later we will use the <a href="Static.html">Static</a> middleware to serve it in parallel with the String placeholder engine.</p>
-<h2 id="add-loginlogout-buttons"><a href="#add-loginlogout-buttons">Add login/logout buttons</a></h2>
-<table class="sourceCode html numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-</pre></td><td class="sourceCode"><pre><code class="sourceCode html"><span class="kw">&lt;body&gt;</span>
-  <span class="kw">&lt;ul&gt;</span>
-      <span class="kw">&lt;li&gt;&lt;a</span><span class="ot"> id=</span><span class="st">&quot;signin&quot;</span><span class="ot"> href=</span><span class="st">&quot;#&quot;</span><span class="ot"> class=</span><span class="st">&quot;persona-button&quot;</span><span class="kw">&gt;&lt;span&gt;</span>Sign in with your Email<span class="kw">&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;</span>
-      <span class="kw">&lt;li&gt;&lt;a</span><span class="ot"> id=</span><span class="st">&quot;signout&quot;</span><span class="ot"> href=</span><span class="st">&quot;#&quot;</span><span class="kw">&gt;</span>Log out<span class="kw">&lt;/a&gt;&lt;/li&gt;</span>
-  <span class="kw">&lt;/ul&gt;</span>
+<body role='flatdoc' onload="Flatdoc.run({fetcher: Flatdoc.domElement('srcmd')});">
+<textarea id='srcmd' style='display:none;'>
+# [Yoke](/)
+
+## Mozilla Persona
+
+*Persona allows you to sign in to sites using an email address you choose. So, instead of having to manage multiple
+usernames and passwords across your favorite sites and devices, you'll have more time to do the important stuff. Mozilla
+Will manage the details!*
+
+Adding the Persona login system to your site takes just five steps:
+
+* Include the Persona JavaScript library on your pages.
+* Add "login" and "logout" buttons.
+* Watch for login and logout actions.
+* Verify the user's credentials.
+* Review best practices.
+
+This is the description available on the Mozilla website, and indeed it is quite simple to add
+Persona authentication to a application built on Yoke and [Vert.x](http://vertx.io)
+
+
+## Include Persona JS library
+
+``` html
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;${title}&lt;/title&gt;
+  &lt;meta http-equiv="X-UA-Compatible" content="IE=Edge"&gt;
+  &lt;link rel="stylesheet" href="/css/persona-buttons.css" /&gt;
+  &lt;script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"&gt;&lt;/script&gt;
+  &lt;script src="https://login.persona.org/include.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+```
+
+This was very simple. Just save this in the resources directory and later we will use the
+[Static](Static.html) middleware to serve it in parallel with the String placeholder engine.
+
+
+## Add login/logout buttons
+
+``` html
+&lt;body&gt;
+  &lt;ul&gt;
+      &lt;li&gt;&lt;a id="signin" href="#" class="persona-button"&gt;&lt;span&gt;Sign in with your Email&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a id="signout" href="#"&gt;Log out&lt;/a&gt;&lt;/li&gt;
+  &lt;/ul&gt;
   Current User: ${email}
-<span class="kw">&lt;/body&gt;</span>
-<span class="kw">&lt;script&gt;</span>
-  <span class="kw">var</span> signinLink = <span class="kw">document</span>.<span class="fu">getElementById</span>(<span class="ch">&#39;signin&#39;</span>);
-  <span class="kw">if</span> (signinLink) {
-    <span class="kw">signinLink</span>.<span class="fu">onclick</span> = <span class="kw">function</span>() { <span class="kw">navigator</span>.<span class="fu">id</span>.<span class="fu">request</span>(); };
+&lt;/body&gt;
+&lt;script&gt;
+  var signinLink = document.getElementById('signin');
+  if (signinLink) {
+    signinLink.onclick = function() { navigator.id.request(); };
   }
 
-  <span class="kw">var</span> signoutLink = <span class="kw">document</span>.<span class="fu">getElementById</span>(<span class="ch">&#39;signout&#39;</span>);
-  <span class="kw">if</span> (signoutLink) {
-    <span class="kw">signoutLink</span>.<span class="fu">onclick</span> = <span class="kw">function</span>() { <span class="kw">navigator</span>.<span class="fu">id</span>.<span class="fu">logout</span>(); };
+  var signoutLink = document.getElementById('signout');
+  if (signoutLink) {
+    signoutLink.onclick = function() { navigator.id.logout(); };
   }
-<span class="kw">&lt;/script&gt;</span>
-<span class="kw">&lt;/html&gt;</span></code></pre></td></tr></table>
-<p>Again piece of cake!</p>
-<h2 id="watch-for-login-and-logout-actions"><a href="#watch-for-login-and-logout-actions">Watch for login and logout actions</a></h2>
-<table class="sourceCode javascript numberLines" startFrom="28"><tr class="sourceCode"><td class="lineNumbers"><pre>28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript"><span class="kw">var</span> currentUser = ${email};
+&lt;/script&gt;
+&lt;/html&gt;
+```
 
-  <span class="kw">navigator</span>.<span class="fu">id</span>.<span class="fu">watch</span>({
-    <span class="dt">loggedInUser</span>: currentUser,
-    <span class="dt">onlogin</span>: <span class="kw">function</span>(assertion) {
-      $.<span class="fu">ajax</span>({
-        <span class="dt">type</span>: <span class="ch">&#39;POST&#39;</span>,
-        <span class="dt">url</span>: <span class="ch">&#39;/auth/login&#39;</span>,
-        <span class="dt">data</span>: {<span class="dt">assertion</span>: assertion},
-        <span class="dt">success</span>: <span class="kw">function</span>(res, status, xhr) { <span class="kw">window</span>.<span class="fu">location</span>.<span class="fu">reload</span>(); },
-        <span class="dt">error</span>: <span class="kw">function</span>(xhr, status, err) {
-          <span class="kw">navigator</span>.<span class="fu">id</span>.<span class="fu">logout</span>();
-          alert(<span class="st">&quot;Login failure: &quot;</span> + err);
+Again piece of cake!
+
+
+## Watch for login and logout actions
+
+``` javascript
+var currentUser = ${email};
+
+  navigator.id.watch({
+    loggedInUser: currentUser,
+    onlogin: function(assertion) {
+      $.ajax({
+        type: 'POST',
+        url: '/auth/login',
+        data: {assertion: assertion},
+        success: function(res, status, xhr) { window.location.reload(); },
+        error: function(xhr, status, err) {
+          navigator.id.logout();
+          alert("Login failure: " + err);
         }
       });
     },
-    <span class="dt">onlogout</span>: <span class="kw">function</span>() {
-      $.<span class="fu">ajax</span>({
-        <span class="dt">type</span>: <span class="ch">&#39;POST&#39;</span>,
-        <span class="dt">url</span>: <span class="ch">&#39;/auth/logout&#39;</span>,
-        <span class="dt">success</span>: <span class="kw">function</span>(res, status, xhr) { <span class="kw">window</span>.<span class="fu">location</span>.<span class="fu">reload</span>(); },
-        <span class="dt">error</span>: <span class="kw">function</span>(xhr, status, err) { alert(<span class="st">&quot;Logout failure: &quot;</span> + err); }
+    onlogout: function() {
+      $.ajax({
+        type: 'POST',
+        url: '/auth/logout',
+        success: function(res, status, xhr) { window.location.reload(); },
+        error: function(xhr, status, err) { alert("Logout failure: " + err); }
       });
     }
-  });</code></pre></td></tr></table>
-<p>Really?</p>
-<h2 id="verify-the-users-credentials"><a href="#verify-the-users-credentials">Verify the user's credentials</a></h2>
-<p>At this moment we enter the server side, so we need to implement a <a href="Static.html">Static</a> middleware to serve html, javascript and css files. After that we need to render the right html, since this example is so simple the string placeholder is perfect. and later we need to manage the session for the user and the API entry points:</p>
-<ul>
-<li><em>/</em> main page</li>
-<li><em>/auth/login</em> login end-point</li>
-<li><em>/auth/logout</em> logout end-point</li>
-</ul>
-<table class="sourceCode java numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> Persona <span class="kw">extends</span> Verticle {
+  });
+```
 
-  <span class="co">// This is an example only use a proper persistent storage</span>
-  Map&lt;String, String&gt; storage = <span class="kw">new</span> HashMap&lt;&gt;();
+Really?
+
+
+## Verify the user's credentials
+
+At this moment we enter the server side, so we need to implement a [Static](Static.html)
+middleware to serve html, javascript and css files. After that we need to render the right
+html, since this example is so simple the string placeholder is perfect. and later we need to
+manage the session for the user and the API entry points:
+
+* */* main page
+* */auth/login* login end-point
+* */auth/logout* logout end-point
+
+``` java
+public class Persona extends Verticle {
+
+  // This is an example only use a proper persistent storage
+  Map&lt;String, String&gt; storage = new HashMap&lt;&gt;();
 
   @Override
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    <span class="dt">final</span> Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">engine</span>(<span class="st">&quot;html&quot;</span>, <span class="kw">new</span> <span class="fu">StringPlaceholderEngine</span>());
+  public void start() {
+    final Yoke yoke = new Yoke(vertx);
+    yoke.engine("html", new StringPlaceholderEngine());
 
-    Mac secret = Utils.<span class="fu">newHmacSHA256</span>(<span class="st">&quot;secret here&quot;</span>);
+    Mac secret = Utils.newHmacSHA256("secret here");
 
-    <span class="co">// all environments</span>
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">CookieParser</span>(secret));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Session</span>(secret));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>());
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Static</span>(<span class="st">&quot;static&quot;</span>));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> ErrorHandler(<span class="kw">true</span>));
+    // all environments
+    yoke.use(new CookieParser(secret));
+    yoke.use(new Session(secret));
+    yoke.use(new BodyParser());
+    yoke.use(new Static("static"));
+    yoke.use(new ErrorHandler(true));
 
-    <span class="co">// routes</span>
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-      .<span class="fu">get</span>(<span class="st">&quot;/&quot;</span>, <span class="kw">new</span> <span class="fu">Middleware</span>() {
+    // routes
+    yoke.use(new Router()
+      .get("/", new Middleware() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(<span class="dt">final</span> YokeRequest request, <span class="dt">final</span> Handler&lt;Object&gt; next) {
-          String sid = request.<span class="fu">getSessionId</span>();
-          String email = storage.<span class="fu">get</span>(sid == <span class="kw">null</span> ? <span class="st">&quot;&quot;</span> : sid);
+          public void handle(final YokeRequest request, final Handler&lt;Object&gt; next) {
+          String sid = request.getSessionId();
+          String email = storage.get(sid == null ? "" : sid);
 
-          <span class="kw">if</span> (email == <span class="kw">null</span>) {
-            request.<span class="fu">put</span>(<span class="st">&quot;email&quot;</span>, <span class="st">&quot;null&quot;</span>);
-          } <span class="kw">else</span> {
-            request.<span class="fu">put</span>(<span class="st">&quot;email&quot;</span>, <span class="st">&quot;&#39;&quot;</span> + email + <span class="st">&quot;&#39;&quot;</span>);
+          if (email == null) {
+            request.put("email", "null");
+          } else {
+            request.put("email", "'" + email + "'");
           }
-          request.<span class="fu">response</span>().<span class="fu">render</span>(<span class="st">&quot;views/index.html&quot;</span>, next);
-          }
-      })
-      .<span class="fu">post</span>(<span class="st">&quot;/auth/logout&quot;</span>, <span class="kw">new</span> <span class="fu">Middleware</span>() {
-          @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request, Handler&lt;Object&gt; next) {
-          <span class="co">// remove session from storage</span>
-          String sid = request.<span class="fu">getSessionId</span>();
-          storage.<span class="fu">remove</span>(sid == <span class="kw">null</span> ? <span class="st">&quot;&quot;</span> : sid);
-          <span class="co">// destroy session</span>
-          request.<span class="fu">setSessionId</span>(<span class="kw">null</span>);
-          <span class="co">// send OK</span>
-          request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putBoolean</span>(<span class="st">&quot;success&quot;</span>, <span class="kw">true</span>));
+          request.response().render("views/index.html", next);
           }
       })
-      .<span class="fu">post</span>(<span class="st">&quot;/auth/login&quot;</span>, <span class="kw">new</span> <span class="fu">Middleware</span>() {
+      .post("/auth/logout", new Middleware() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(<span class="dt">final</span> YokeRequest request, <span class="dt">final</span> Handler&lt;Object&gt; next) {
+          public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
+          // remove session from storage
+          String sid = request.getSessionId();
+          storage.remove(sid == null ? "" : sid);
+          // destroy session
+          request.setSessionId(null);
+          // send OK
+          request.response().end(new JsonObject().putBoolean("success", true));
+          }
+      })
+      .post("/auth/login", new Middleware() {
+          @Override
+          public void handle(final YokeRequest request, final Handler&lt;Object&gt; next) {
           String data;
 
-          <span class="kw">try</span> {
-            <span class="co">// generate the data</span>
-            data = <span class="st">&quot;assertion=&quot;</span> + URLEncoder.<span class="fu">encode</span>(request.<span class="fu">formAttributes</span>().<span class="fu">get</span>(<span class="st">&quot;assertion&quot;</span>), <span class="st">&quot;UTF-8&quot;</span>) +
-                <span class="st">&quot;&amp;audience=&quot;</span> + URLEncoder.<span class="fu">encode</span>(<span class="st">&quot;http://localhost:8080&quot;</span>, <span class="st">&quot;UTF-8&quot;</span>);
-          } <span class="kw">catch</span> (UnsupportedEncodingException e) {
-            next.<span class="fu">handle</span>(e);
-            <span class="kw">return</span>;
+          try {
+            // generate the data
+            data = "assertion=" + URLEncoder.encode(request.formAttributes().get("assertion"), "UTF-8") +
+                "&audience=" + URLEncoder.encode("http://localhost:8080", "UTF-8");
+          } catch (UnsupportedEncodingException e) {
+            next.handle(e);
+            return;
           }
 
-          HttpClient client = <span class="fu">getVertx</span>().<span class="fu">createHttpClient</span>().<span class="fu">setSSL</span>(<span class="kw">true</span>).<span class="fu">setHost</span>(<span class="st">&quot;verifier.login.persona.org&quot;</span>).<span class="fu">setPort</span>(<span class="dv">443</span>);
+          HttpClient client = getVertx().createHttpClient().setSSL(true).setHost("verifier.login.persona.org").setPort(443);
 
-          HttpClientRequest clientRequest = client.<span class="fu">post</span>(<span class="st">&quot;/verify&quot;</span>, <span class="kw">new</span> Handler&lt;HttpClientResponse&gt;() {
-            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(HttpClientResponse response) {
-              <span class="co">// error handler</span>
-              response.<span class="fu">exceptionHandler</span>(<span class="kw">new</span> Handler&lt;Throwable&gt;() {
+          HttpClientRequest clientRequest = client.post("/verify", new Handler&lt;HttpClientResponse&gt;() {
+            public void handle(HttpClientResponse response) {
+              // error handler
+              response.exceptionHandler(new Handler&lt;Throwable&gt;() {
                 @Override
-                <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(Throwable err) {
-                  next.<span class="fu">handle</span>(err);
+                public void handle(Throwable err) {
+                  next.handle(err);
                 }
               });
 
-              <span class="dt">final</span> Buffer body = <span class="kw">new</span> Buffer(<span class="dv">0</span>);
+              final Buffer body = new Buffer(0);
 
-              <span class="co">// body handler</span>
-              response.<span class="fu">dataHandler</span>(<span class="kw">new</span> Handler&lt;Buffer&gt;() {
+              // body handler
+              response.dataHandler(new Handler&lt;Buffer&gt;() {
                 @Override
-                <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(Buffer buffer) {
-                  body.<span class="fu">appendBuffer</span>(buffer);
+                public void handle(Buffer buffer) {
+                  body.appendBuffer(buffer);
                 }
               });
-              <span class="co">// done</span>
-              response.<span class="fu">endHandler</span>(<span class="kw">new</span> Handler&lt;Void&gt;() {
+              // done
+              response.endHandler(new Handler&lt;Void&gt;() {
                 @Override
-                <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(Void event) {
-                  <span class="kw">try</span> {
-                    JsonObject verifierResp = <span class="kw">new</span> <span class="fu">JsonObject</span>(body.<span class="fu">toString</span>());
-                    <span class="dt">boolean</span> valid = <span class="st">&quot;okay&quot;</span>.<span class="fu">equals</span>(verifierResp.<span class="fu">getString</span>(<span class="st">&quot;status&quot;</span>));
-                    String email = valid ? verifierResp.<span class="fu">getString</span>(<span class="st">&quot;email&quot;</span>) : <span class="kw">null</span>;
-                    <span class="kw">if</span> (valid) {
-                      <span class="co">// assertion is valid:</span>
-                      <span class="co">// generate a session Id</span>
-                      String sid = UUID.<span class="fu">randomUUID</span>().<span class="fu">toString</span>();
+                public void handle(Void event) {
+                  try {
+                    JsonObject verifierResp = new JsonObject(body.toString());
+                    boolean valid = "okay".equals(verifierResp.getString("status"));
+                    String email = valid ? verifierResp.getString("email") : null;
+                    if (valid) {
+                      // assertion is valid:
+                      // generate a session Id
+                      String sid = UUID.randomUUID().toString();
 
-                      request.<span class="fu">setSessionId</span>(sid);
-                      <span class="co">// save it and associate to the email address</span>
-                      storage.<span class="fu">put</span>(sid, email);
-                      <span class="co">// OK response</span>
-                      request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putBoolean</span>(<span class="st">&quot;success&quot;</span>, <span class="kw">true</span>));
-                    } <span class="kw">else</span> {
-                      request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putBoolean</span>(<span class="st">&quot;success&quot;</span>, <span class="kw">false</span>));
+                      request.setSessionId(sid);
+                      // save it and associate to the email address
+                      storage.put(sid, email);
+                      // OK response
+                      request.response().end(new JsonObject().putBoolean("success", true));
+                    } else {
+                      request.response().end(new JsonObject().putBoolean("success", false));
                     }
-                  } <span class="kw">catch</span> (DecodeException ex) {
-                    <span class="co">// bogus response from verifier!</span>
-                    request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putBoolean</span>(<span class="st">&quot;success&quot;</span>, <span class="kw">false</span>));
+                  } catch (DecodeException ex) {
+                    // bogus response from verifier!
+                    request.response().end(new JsonObject().putBoolean("success", false));
                   }
                 }
               });
             }
           });
 
-          clientRequest.<span class="fu">putHeader</span>(<span class="st">&quot;content-type&quot;</span>, <span class="st">&quot;application/x-www-form-urlencoded&quot;</span>);
-          clientRequest.<span class="fu">putHeader</span>(<span class="st">&quot;content-length&quot;</span>, Integer.<span class="fu">toString</span>(data.<span class="fu">length</span>()));
-          clientRequest.<span class="fu">end</span>(data);
+          clientRequest.putHeader("content-type", "application/x-www-form-urlencoded");
+          clientRequest.putHeader("content-length", Integer.toString(data.length()));
+          clientRequest.end(data);
           }
       })
     );
 
-    yoke.<span class="fu">listen</span>(<span class="dv">8080</span>);
-    container.<span class="fu">logger</span>().<span class="fu">info</span>(<span class="st">&quot;Yoke server listening on port 8080&quot;</span>);
+    yoke.listen(8080);
+    container.logger().info("Yoke server listening on port 8080");
   }
-}</code></pre></td></tr></table>
-<p>There you go, less than 120 lines and you have a secure site!</p>
-<h2 id="source-code"><a href="#source-code">Source code</a></h2>
-<p>For the full source code and project files all is available in <a href="https://github.com/pmlopes/yoke/blob/master/example/persona">github</a>.</p>
-<h2 id="notes"><a href="#notes">Notes</a></h2>
-<p>The application is quite simple and of course the map in memory is not a valid or proper storage engine. With vert.x is quite simple to integrate data storages such as:</p>
-<ul>
-<li>mongoDB</li>
-<li>redis</li>
-<li>mysql</li>
-</ul>
-<p>But this is just a demo of the possibilities of Yoke and Vert.x.</p>
-<div id="footer">
-  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+}
+```
+
+There you go, less than 120 lines and you have a secure site!
+
+
+## Source code
+
+For the full source code and project files all is available in
+[github](https://github.com/pmlopes/yoke/blob/master/example/persona).
+
+
+## Notes
+
+The application is quite simple and of course the map in memory is not a valid or proper
+storage engine. With vert.x is quite simple to integrate data storages such as:
+
+* mongoDB
+* redis
+* mysql
+
+But this is just a demo of the possibilities of Yoke and Vert.x.
+</textarea>
+<div class='header'>
+  <div class='left'>
+    <h1 role='flatdoc-title'></h1>
+  </div>
 </div>
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://pmlopes.github.io/yoke/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
-<!-- Place this tag where you want the +1 button to render. -->
-<div class="g-plusone" data-size="medium" data-href="http://pmlopes.github.io/yoke/"></div>
-
-<!-- Place this tag after the last +1 button tag. -->
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-3682522-6', 'github.io');
-  ga('send', 'pageview');
-
-</script>
+<div role='flatdoc' class='content-root'>
+  <div class='menubar'>
+    <div class='menu section' role='flatdoc-menu'></div>
+  </div>
+  <div role='flatdoc-content' class='content'></div>
+</div>
 </body>
 </html>

@@ -16,9 +16,9 @@ If the content type was *multipart/form-data* and there were uploaded files the 
 
 ## Usage
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new BodyParser()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ## Defines
 

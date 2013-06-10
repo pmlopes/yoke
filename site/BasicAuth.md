@@ -13,9 +13,9 @@ to gain access. Alternatively an fixed username, password is provided. The middl
 * *String* username
 * *String* password
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new BasicAuth("username", "password")
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Username, password and realm name
 
@@ -23,15 +23,15 @@ new BasicAuth("username", "password")
 * *String* password
 * *String* realm
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new BasicAuth("username", "password", "Authentication Required")
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Authentication handler
 
 * *BasicAuth.AuthHandler* async handler to allow fetching user data asynchronous
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new BasicAuth(new BasicAuth.AuthHandler() {
   @Override
   public void handle(String username, String password, Handler<Boolean> result) {
@@ -42,14 +42,14 @@ new BasicAuth(new BasicAuth.AuthHandler() {
     }
   }
 });
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 ### Authentication handler and realm name
 
 * *BasicAuth.AuthHandler* async handler to allow fetching user data asynchronous
 * *String* realm
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new BasicAuth(new BasicAuth.AuthHandler() {
   @Override
   public void handle(String username, String password, Handler<Boolean> result) {
@@ -60,7 +60,7 @@ new BasicAuth(new BasicAuth.AuthHandler() {
     }
   }
 }, "Authentication required");
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 ## Defines
@@ -72,9 +72,9 @@ Defines the property ```user``` in the request context.
 
 When there is a need to support several realms under the same server, you can override the the ```getRealm``` method.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 public String getRealm(YokeRequest request) {
   // do something with the request to generate the valid realm name
   return "Authentication is required to access this resource";
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

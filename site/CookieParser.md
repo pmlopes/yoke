@@ -10,9 +10,9 @@ Once data has been parsed the result is visible in the field ```cookies``` of th
 
 * ```cookies()``` returns ```Map<YokeCookie>```
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new CookieParser()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 If a cooke value starts with *s:* it means that it is a signed cookie. In this case the value is expected to be
 *s:<cookie>.<signature>*. The signature is *HMAC + SHA256*.
@@ -21,6 +21,6 @@ When the Cookie parser is initialized with a secret then that value is used to v
 
 * *hmacsha512* hmac+sha512 MAC
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new CookieParser(hmacsha512)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

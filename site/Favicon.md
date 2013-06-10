@@ -10,18 +10,18 @@ By default serves the Yoke favicon, or the favicon located by the given ```path`
 * *long* ```maxAge``` cache-control max-age directive, defaulting to 1 day
 
 Using Yoke favicon and default max-age:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new Favicon()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Using your favicon and default max-age:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new Favicon("favicon.ico")
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Using your favicon and custom max-age:
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new Favicon("favicon.ico", 1000)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

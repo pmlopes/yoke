@@ -8,7 +8,7 @@ resources.
 
 ## ExpressJS code
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
+``` javascript
 var express = require('express');
 var app = express();
 
@@ -33,14 +33,14 @@ app.get('/middleware', foo, foo, foo, foo, function(req, res){
 });
 
 app.listen(8000);
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This application was running node *v0.10.3* and express *3.2.4* and in a single thread.
 
 
 ## Yoke code
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 public class YokeBench extends Verticle {
 
     @Override
@@ -81,7 +81,7 @@ public class YokeBench extends Verticle {
                 ).listen(8080);
     }
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This application was running java *1.7.0_21 (Oracle)*, yoke *1.0.0-SNAPSHOT* and vert.x *2.0.0-SNAPSHOT* and in a single
 thread.
@@ -95,7 +95,7 @@ cores to get all the performance out of the box.
 
 ## ExpressJS code
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript}
+``` javascript
 // Include the cluster module
 var cluster = require('cluster');
 
@@ -138,13 +138,13 @@ if (cluster.isMaster) {
     console.log('Worker ' + cluster.worker.id + ' running!');
 
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Lots of code here!
 
 ## Yoke code
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 public class YokeBench extends Verticle {
 
     @Override
@@ -161,7 +161,7 @@ public class YokeBench extends Verticle {
                 ).listen(8080);
     }
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 As you can read Yoke code is cleaner and it is not the concern of the developer to implement forking as that is managed
 by the underlying Vert.x framework.

@@ -1,233 +1,254 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="viewport" content="width=device-width">
+
   <title>Yoke a middleware framework for Vert.x: Benchmark</title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; background-color: #f8f8f8; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-pre, code { background-color: #f8f8f8; }
-code > span.kw { color: #204a87; font-weight: bold; }
-code > span.dt { color: #204a87; }
-code > span.dv { color: #0000cf; }
-code > span.bn { color: #0000cf; }
-code > span.fl { color: #0000cf; }
-code > span.ch { color: #4e9a06; }
-code > span.st { color: #4e9a06; }
-code > span.co { color: #8f5902; font-style: italic; }
-code > span.ot { color: #8f5902; }
-code > span.al { color: #ef2929; }
-code > span.fu { color: #000000; }
-code > span.er { font-weight: bold; }
-  </style>
-  <link rel="stylesheet" href="style.css" type="text/css" />
+
+  <!-- Flatdoc -->
+  <script src='js/jquery.min.js'></script>
+  <script src="js/prettify.min.js"></script>
+  <script src='js/marked.min.js'></script>
+  <script src='js/flatdoc.js'></script>
+
+  <!-- Flatdoc theme -->
+  <link  href='theme-white/style.css' rel='stylesheet'>
+  <script src='theme-white/script.js'></script>
+  <!-- Prettify theme -->
+  <link  href='css/prettify.css' rel='stylesheet'>
+
+  <!-- Meta -->
+  <meta content="Yoke" property="og:site_name">
+  <meta content="Yoke" property="og:title">
+  <meta content="website" property="og:type">
+  <meta content="Yoke a middleware framework for Vert.x" name="description">
+  <meta content="Yoke a middleware framework for Vert.x" property="og:description">
+
+  <!-- Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-3682522-6', 'github.io');
+    ga('send', 'pageview');
+  </script>
 </head>
-<body>
-<div id="TOC">
-<ul>
-<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
-<li><a href="#benchmarks">Benchmarks</a></li>
-<li><a href="#expressjs-code">ExpressJS code</a></li>
-<li><a href="#yoke-code">Yoke code</a></li>
-<li><a href="#cluster">Cluster</a></li>
-<li><a href="#expressjs-code-1">ExpressJS code</a></li>
-<li><a href="#yoke-code-1">Yoke code</a></li>
-<li><a href="#results">Results</a></li>
-<li><a href="#cluster-results">Cluster Results</a></li>
-<li><a href="#conclusions">Conclusions</a></li>
-</ul></li>
-</ul>
-</div>
-<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
-<h2 id="benchmarks"><a href="#benchmarks">Benchmarks</a></h2>
-<p>Yoke has a simple benchmark to compare to ExpressJS, these benchmarks are too simple and do not represent real world scenarios. Proper benchmarking should be done comparing what you need and not just serving static text or json resources.</p>
-<h2 id="expressjs-code"><a href="#expressjs-code">ExpressJS code</a></h2>
-<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="kw">var</span> express = require(<span class="ch">&#39;express&#39;</span>);
-<span class="kw">var</span> app = express();
+<body role='flatdoc' onload="Flatdoc.run({fetcher: Flatdoc.domElement('srcmd')});">
+<textarea id='srcmd' style='display:none;'>
+# [Yoke](/)
 
-<span class="kw">app</span>.<span class="fu">configure</span>(<span class="kw">function</span>(){
-    <span class="kw">app</span>.<span class="fu">use</span>(<span class="kw">express</span>.<span class="fu">bodyParser</span>());
+## Benchmarks
+
+Yoke has a simple benchmark to compare to ExpressJS, these benchmarks are too simple and do not represent real world
+scenarios. Proper benchmarking should be done comparing what you need and not just serving static text or json
+resources.
+
+## ExpressJS code
+
+``` javascript
+var express = require('express');
+var app = express();
+
+app.configure(function(){
+    app.use(express.bodyParser());
 });
 
-<span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/&#39;</span>, <span class="kw">function</span>(req, res){
-    <span class="kw">res</span>.<span class="fu">send</span>(<span class="ch">&#39;Hello World\n&#39;</span>);
+app.get('/', function(req, res){
+    res.send('Hello World\n');
 });
 
-<span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/json&#39;</span>, <span class="kw">function</span>(req, res){
-    <span class="kw">res</span>.<span class="fu">send</span>({ <span class="dt">name</span>: <span class="ch">&#39;Tobi&#39;</span>, <span class="dt">role</span>: <span class="ch">&#39;admin&#39;</span> });
+app.get('/json', function(req, res){
+    res.send({ name: 'Tobi', role: 'admin' });
 });
 
-<span class="kw">function</span> foo(req, res, next) {
+function foo(req, res, next) {
     next();
 }
 
-<span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/middleware&#39;</span>, foo, foo, foo, foo, <span class="kw">function</span>(req, res){
-    <span class="kw">res</span>.<span class="fu">send</span>(<span class="ch">&#39;1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890&#39;</span>);
+app.get('/middleware', foo, foo, foo, foo, function(req, res){
+    res.send('1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890');
 });
 
-<span class="kw">app</span>.<span class="fu">listen</span>(<span class="dv">8000</span>);</code></pre>
-<p>This application was running node <em>v0.10.3</em> and express <em>3.2.4</em> and in a single thread.</p>
-<h2 id="yoke-code"><a href="#yoke-code">Yoke code</a></h2>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> YokeBench <span class="kw">extends</span> Verticle {
+app.listen(8000);
+```
+
+This application was running node *v0.10.3* and express *3.2.4* and in a single thread.
+
+
+## Yoke code
+
+``` java
+public class YokeBench extends Verticle {
 
     @Override
-    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
+    public void start() {
 
-        <span class="dt">final</span> Middleware foo = <span class="kw">new</span> <span class="fu">Middleware</span>() {
+        final Middleware foo = new Middleware() {
             @Override
-            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request, Handler&lt;Object&gt; next) {
-                next.<span class="fu">handle</span>(<span class="kw">null</span>);
+            public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
+                next.handle(null);
             }
         };
 
-        <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
-                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>())
-                .<span class="fu">use</span>(<span class="st">&quot;/middleware&quot;</span>, foo)
-                .<span class="fu">use</span>(<span class="st">&quot;/middleware&quot;</span>, foo)
-                .<span class="fu">use</span>(<span class="st">&quot;/middleware&quot;</span>, foo)
-                .<span class="fu">use</span>(<span class="st">&quot;/middleware&quot;</span>, foo)
-                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-                        .<span class="fu">get</span>(<span class="st">&quot;/&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        new Yoke(vertx)
+                .use(new BodyParser())
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use("/middleware", foo)
+                .use(new Router()
+                        .get("/", new Handler&lt;YokeRequest&gt;() {
                             @Override
-                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World</span><span class="ch">\n</span><span class="st">&quot;</span>);
+                            public void handle(YokeRequest request) {
+                                request.response().end("Hello World\n");
                             }
                         })
-                        .<span class="fu">get</span>(<span class="st">&quot;/json&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                        .get("/json", new Handler&lt;YokeRequest&gt;() {
                             @Override
-                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putString</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;Tobi&quot;</span>).<span class="fu">putString</span>(<span class="st">&quot;role&quot;</span>, <span class="st">&quot;admin&quot;</span>));
+                            public void handle(YokeRequest request) {
+                                request.response().end(new JsonObject().putString("name", "Tobi").putString("role", "admin"));
                             }
                         })
-                        .<span class="fu">get</span>(<span class="st">&quot;/middleware&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+                        .get("/middleware", new Handler&lt;YokeRequest&gt;() {
                             @Override
-                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890&quot;</span>);
+                            public void handle(YokeRequest request) {
+                                request.response().end("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
                             }
                         })
-                ).<span class="fu">listen</span>(<span class="dv">8080</span>);
+                ).listen(8080);
     }
-}</code></pre>
-<p>This application was running java <em>1.7.0_21 (Oracle)</em>, yoke <em>1.0.0-SNAPSHOT</em> and vert.x <em>2.0.0-SNAPSHOT</em> and in a single thread.</p>
-<h2 id="cluster"><a href="#cluster">Cluster</a></h2>
-<p>Although <strong>both</strong> frameworks run in a single Thread, in a real production environment you might want to use all your cores to get all the performance out of the box.</p>
-<h2 id="expressjs-code-1"><a href="#expressjs-code-1">ExpressJS code</a></h2>
-<pre class="sourceCode javascript"><code class="sourceCode javascript"><span class="co">// Include the cluster module</span>
-<span class="kw">var</span> cluster = require(<span class="ch">&#39;cluster&#39;</span>);
+}
+```
 
-<span class="co">// Code to run if we&#39;re in the master process</span>
-<span class="kw">if</span> (<span class="kw">cluster</span>.<span class="fu">isMaster</span>) {
+This application was running java *1.7.0_21 (Oracle)*, yoke *1.0.0-SNAPSHOT* and vert.x *2.0.0-SNAPSHOT* and in a single
+thread.
 
-    <span class="co">// Count the machine&#39;s CPUs</span>
-    <span class="kw">var</span> cpuCount = require(<span class="ch">&#39;os&#39;</span>).<span class="fu">cpus</span>().<span class="fu">length</span>;
 
-    <span class="co">// Create a worker for each CPU</span>
-    <span class="kw">for</span> (<span class="kw">var</span> i = <span class="dv">0</span>; i &lt; cpuCount; i += <span class="dv">1</span>) {
-        <span class="kw">cluster</span>.<span class="fu">fork</span>();
+## Cluster
+
+Although **both** frameworks run in a single Thread, in a real production environment you might want to use all your
+cores to get all the performance out of the box.
+
+
+## ExpressJS code
+
+``` javascript
+// Include the cluster module
+var cluster = require('cluster');
+
+// Code to run if we're in the master process
+if (cluster.isMaster) {
+
+    // Count the machine's CPUs
+    var cpuCount = require('os').cpus().length;
+
+    // Create a worker for each CPU
+    for (var i = 0; i &lt; cpuCount; i += 1) {
+        cluster.fork();
     }
 
-    <span class="co">// Listen for dying workers</span>
-    <span class="kw">cluster</span>.<span class="fu">on</span>(<span class="ch">&#39;exit&#39;</span>, <span class="kw">function</span> (worker) {
+    // Listen for dying workers
+    cluster.on('exit', function (worker) {
 
-        <span class="co">// Replace the dead worker, we&#39;re not sentimental</span>
-        <span class="kw">console</span>.<span class="fu">log</span>(<span class="ch">&#39;Worker &#39;</span> + <span class="kw">worker</span>.<span class="fu">id</span> + <span class="ch">&#39; died :(&#39;</span>);
-        <span class="kw">cluster</span>.<span class="fu">fork</span>();
+        // Replace the dead worker, we're not sentimental
+        console.log('Worker ' + worker.id + ' died :(');
+        cluster.fork();
 
     });
 
-<span class="co">// Code to run if we&#39;re in a worker process</span>
-} <span class="kw">else</span> {
+// Code to run if we're in a worker process
+} else {
 
-    <span class="co">// Include Express</span>
-    <span class="kw">var</span> express = require(<span class="ch">&#39;express&#39;</span>);
+    // Include Express
+    var express = require('express');
 
-    <span class="co">// Create a new Express application</span>
-    <span class="kw">var</span> app = express();
+    // Create a new Express application
+    var app = express();
 
-    <span class="co">// Add a basic route – index page</span>
-    <span class="kw">app</span>.<span class="fu">get</span>(<span class="ch">&#39;/&#39;</span>, <span class="kw">function</span> (req, res) {
-        <span class="kw">res</span>.<span class="fu">send</span>(<span class="ch">&#39;Hello World\n&#39;</span>);
+    // Add a basic route – index page
+    app.get('/', function (req, res) {
+        res.send('Hello World\n');
     });
 
-    <span class="co">// Bind to a port</span>
-    <span class="kw">app</span>.<span class="fu">listen</span>(<span class="dv">3000</span>);
-    <span class="kw">console</span>.<span class="fu">log</span>(<span class="ch">&#39;Worker &#39;</span> + <span class="kw">cluster.worker</span>.<span class="fu">id</span> + <span class="ch">&#39; running!&#39;</span>);
+    // Bind to a port
+    app.listen(3000);
+    console.log('Worker ' + cluster.worker.id + ' running!');
 
-}</code></pre>
-<p>Lots of code here!</p>
-<h2 id="yoke-code-1"><a href="#yoke-code-1">Yoke code</a></h2>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="kw">public</span> <span class="kw">class</span> YokeBench <span class="kw">extends</span> Verticle {
+}
+```
+
+Lots of code here!
+
+## Yoke code
+
+``` java
+public class YokeBench extends Verticle {
 
     @Override
-    <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
+    public void start() {
 
-        <span class="kw">new</span> <span class="fu">Yoke</span>(vertx)
-                .<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-                        .<span class="fu">get</span>(<span class="st">&quot;/&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        new Yoke(vertx)
+                .use(new Router()
+                        .get("/", new Handler&lt;YokeRequest&gt;() {
                             @Override
-                            <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-                                request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World</span><span class="ch">\n</span><span class="st">&quot;</span>);
+                            public void handle(YokeRequest request) {
+                                request.response().end("Hello World\n");
                             }
                         })
-                ).<span class="fu">listen</span>(<span class="dv">8080</span>);
+                ).listen(8080);
     }
-}</code></pre>
-<p>As you can read Yoke code is cleaner and it is not the concern of the developer to implement forking as that is managed by the underlying Vert.x framework.</p>
-<h2 id="results"><a href="#results">Results</a></h2>
-<h3 id="serving-text"><a href="#serving-text">Serving text</a></h3>
-<div class="figure">
-<img src="text.png" alt="Hello World expressJS vs Yoke" /><p class="caption">Hello World expressJS vs Yoke</p>
-</div>
-<p>As it can be seem Yoke is faster and scales the same way ExpressJS does.</p>
-<h3 id="serving-json"><a href="#serving-json">Serving json</a></h3>
-<div class="figure">
-<img src="json.png" alt="JSON expressJS vs Yoke" /><p class="caption">JSON expressJS vs Yoke</p>
-</div>
-<p>As it can be seem Yoke is faster and scales the same way ExpressJS does.</p>
-<h3 id="middleware"><a href="#middleware">Middleware</a></h3>
-<div class="figure">
-<img src="middleware.png" alt="Middleware expressJS vs Yoke" /><p class="caption">Middleware expressJS vs Yoke</p>
-</div>
-<p>As it can be seem Yoke is faster and scales the same way ExpressJS does.</p>
-<h2 id="cluster-results"><a href="#cluster-results">Cluster Results</a></h2>
-<div class="figure">
-<img src="cluster.png" alt="Cluster expressJS vs Yoke" /><p class="caption">Cluster expressJS vs Yoke</p>
-</div>
-<p>Running the benchmark using 4 workers (the test machine has 4 cores) both with Express and Yoke you can see that Yoke is a clear winner.</p>
-<h2 id="conclusions"><a href="#conclusions">Conclusions</a></h2>
-<p>These benchmarks are quite naive but give you a good impression that if you have a fast expressJS application and you port it to Yoke you will get some more performance and the expected scalability.</p>
-<div id="footer">
-  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
-</div>
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://pmlopes.github.io/yoke/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+}
+```
 
-<!-- Place this tag where you want the +1 button to render. -->
-<div class="g-plusone" data-size="medium" data-href="http://pmlopes.github.io/yoke/"></div>
+As you can read Yoke code is cleaner and it is not the concern of the developer to implement forking as that is managed
+by the underlying Vert.x framework.
 
-<!-- Place this tag after the last +1 button tag. -->
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-3682522-6', 'github.io');
-  ga('send', 'pageview');
+## Results
 
-</script>
+### Serving text
+
+![Hello World expressJS vs Yoke](text.png)
+
+As it can be seem Yoke is faster and scales the same way ExpressJS does.
+
+### Serving json
+
+![JSON expressJS vs Yoke](json.png)
+
+As it can be seem Yoke is faster and scales the same way ExpressJS does.
+
+### Middleware
+
+![Middleware expressJS vs Yoke](middleware.png)
+
+As it can be seem Yoke is faster and scales the same way ExpressJS does.
+
+## Cluster Results
+
+![Cluster expressJS vs Yoke](cluster.png)
+
+Running the benchmark using 4 workers (the test machine has 4 cores) both with Express and Yoke you can see that Yoke
+is a clear winner.
+
+## Conclusions
+
+These benchmarks are quite naive but give you a good impression that if you have a fast expressJS application and you
+port it to Yoke you will get some more performance and the expected scalability.</textarea>
+<div class='header'>
+  <div class='left'>
+    <h1 role='flatdoc-title'></h1>
+  </div>
+</div>
+<div role='flatdoc' class='content-root'>
+  <div class='menubar'>
+    <div class='menu section' role='flatdoc-menu'></div>
+  </div>
+  <div role='flatdoc-content' class='content'></div>
+</div>
 </body>
 </html>

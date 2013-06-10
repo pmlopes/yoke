@@ -20,7 +20,7 @@ Persona authentication to a application built on Yoke and [Vert.x](http://vertx.
 
 ## Include Persona JS library
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.html}
+``` html
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,7 +33,7 @@ Persona authentication to a application built on Yoke and [Vert.x](http://vertx.
 <body>
 </body>
 </html>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This was very simple. Just save this in the resources directory and later we will use the
 [Static](Static.html) middleware to serve it in parallel with the String placeholder engine.
@@ -41,7 +41,7 @@ This was very simple. Just save this in the resources directory and later we wil
 
 ## Add login/logout buttons
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.html .numberLines startFrom="10"}
+``` html
 <body>
   <ul>
       <li><a id="signin" href="#" class="persona-button"><span>Sign in with your Email</span></a></li>
@@ -61,14 +61,14 @@ This was very simple. Just save this in the resources directory and later we wil
   }
 </script>
 </html>
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Again piece of cake!
 
 
 ## Watch for login and logout actions
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.javascript .numberLines startFrom="28"}
+``` javascript
 var currentUser = ${email};
 
   navigator.id.watch({
@@ -94,7 +94,7 @@ var currentUser = ${email};
       });
     }
   });
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Really?
 
@@ -110,7 +110,7 @@ manage the session for the user and the API entry points:
 * */auth/login* login end-point
 * */auth/logout* logout end-point
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java .numberLines}
+``` java
 public class Persona extends Verticle {
 
   // This is an example only use a proper persistent storage
@@ -234,7 +234,7 @@ public class Persona extends Verticle {
     container.logger().info("Yoke server listening on port 8080");
   }
 }
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 There you go, less than 120 lines and you have a secure site!
 

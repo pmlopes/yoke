@@ -7,6 +7,6 @@ Adds the ```x-response-time``` header displaying the response duration in millis
 
 ## Usage
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new ResponseTime()
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

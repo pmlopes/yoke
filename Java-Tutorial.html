@@ -1,510 +1,508 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!doctype html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
+  <meta charset='utf-8'>
+  <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+  <meta name="viewport" content="width=device-width">
+
   <title>Yoke a middleware framework for Vert.x: Java-Tutorial</title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; background-color: #f8f8f8; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-pre, code { background-color: #f8f8f8; }
-code > span.kw { color: #204a87; font-weight: bold; }
-code > span.dt { color: #204a87; }
-code > span.dv { color: #0000cf; }
-code > span.bn { color: #0000cf; }
-code > span.fl { color: #0000cf; }
-code > span.ch { color: #4e9a06; }
-code > span.st { color: #4e9a06; }
-code > span.co { color: #8f5902; font-style: italic; }
-code > span.ot { color: #8f5902; }
-code > span.al { color: #ef2929; }
-code > span.fu { color: #000000; }
-code > span.er { font-weight: bold; }
-  </style>
-  <link rel="stylesheet" href="style.css" type="text/css" />
+
+  <!-- Flatdoc -->
+  <script src='js/jquery.min.js'></script>
+  <script src="js/prettify.min.js"></script>
+  <script src='js/marked.min.js'></script>
+  <script src='js/flatdoc.js'></script>
+
+  <!-- Flatdoc theme -->
+  <link  href='theme-white/style.css' rel='stylesheet'>
+  <script src='theme-white/script.js'></script>
+  <!-- Prettify theme -->
+  <link  href='css/prettify.css' rel='stylesheet'>
+
+  <!-- Meta -->
+  <meta content="Yoke" property="og:site_name">
+  <meta content="Yoke" property="og:title">
+  <meta content="website" property="og:type">
+  <meta content="Yoke a middleware framework for Vert.x" name="description">
+  <meta content="Yoke a middleware framework for Vert.x" property="og:description">
+
+  <!-- Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'UA-3682522-6', 'github.io');
+    ga('send', 'pageview');
+  </script>
 </head>
-<body>
-<div id="TOC">
-<ul>
-<li><a href="#yoke"><a href="/">Yoke</a></a><ul>
-<li><a href="#java-tutorial">Java Tutorial</a></li>
-<li><a href="#boostraping-a-project">Boostraping a Project</a></li>
-<li><a href="#introduction">Introduction</a></li>
-<li><a href="#hello-world">Hello World</a></li>
-<li><a href="#rest">REST</a></li>
-<li><a href="#error-handling">Error Handling</a></li>
-<li><a href="#templates">Templates</a></li>
-</ul></li>
-</ul>
-</div>
-<h1 id="yoke"><a href="#yoke"><a href="/">Yoke</a></a></h1>
-<h2 id="java-tutorial"><a href="#java-tutorial">Java Tutorial</a></h2>
-<h2 id="boostraping-a-project"><a href="#boostraping-a-project">Boostraping a Project</a></h2>
-<p>There are several options on creating projects for Java. In this tutorial the chosen method is using <a href="http://www.gradle.org/">Gradle</a>. The choice was made because there is no required installation of software (as long as you have <em>JDK &gt;= 1.7</em> installed in your system.</p>
-<p>It is assumed that the reader has basic knowledge of <em>git</em>, <em>shell</em> scripting and of course <em>Java</em>. You are not required to know <em>gradle</em> since we are using this template project.</p>
-<p>Start by downloading the <a href="yoke-gradle-template.tar.gz">yoke-gradle-template</a> to your local development work directory.</p>
-<pre><code>pmlopes@jetdrone:~/Projects$ curl -0 http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
-pmlopes@jetdrone:~/Projects$</code></pre>
-<p>The extracted project lives under the directory <em>yoke-gradle-template</em> it should be expected to be renamed to a better suitable name describing the project to be implemented.</p>
-<pre><code>pmlopes@jetdrone:~/Projects$ mv yoke-gradle-template yoke-tutorial
+<body role='flatdoc' onload="Flatdoc.run({fetcher: Flatdoc.domElement('srcmd')});">
+<textarea id='srcmd' style='display:none;'>
+# [Yoke](/)
+
+## Java Tutorial
+
+## Boostraping a Project
+
+There are several options on creating projects for Java. In this tutorial the chosen method is using
+[Gradle](http://www.gradle.org/). The choice was made because there is no required installation of software (as long as
+you have *JDK &gt;= 1.7* installed in your system.
+
+It is assumed that the reader has basic knowledge of *git*, *shell* scripting and of course *Java*. You are not required
+to know *gradle* since we are using this template project.
+
+Start by downloading the [yoke-gradle-template](yoke-gradle-template.tar.gz) to your local development work directory.
+
+```
+pmlopes@jetdrone:~/Projects$ curl -0 http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
+pmlopes@jetdrone:~/Projects$
+```
+
+The extracted project lives under the directory *yoke-gradle-template* it should be expected to be renamed to a better
+suitable name describing the project to be implemented.
+
+```
+pmlopes@jetdrone:~/Projects$ mv yoke-gradle-template yoke-tutorial
 pmlopes@jetdrone:~/Projects$ cd yoke-tutorial
-pmlopes@jetdrone:~/Projects/yoke-tutorial$</code></pre>
-<h2 id="introduction"><a href="#introduction">Introduction</a></h2>
-<p>Yoke is a minimal and flexible Vert.x web application framework, providing a robust set of features for building single and multi-page, and hybrid web applications. Yoke provides a thin layer of features fundamental to any web application, without obscuring features that you know and love in Vert.x.</p>
-<p>Before you start, you need to understand the basic functionality under Yoke. Yoke is a chain executor, modelled in a way like the <a href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">chain-of-responsability pattern</a>. Yoke is responsible to execute all your processing objects, which from now on we call Middleware. Middleware makes it easier for software developers to perform specialized tasks, such as <em>HTTP Parsing</em>, <em>Authentication</em>, <em>Routing</em>, etc..., so they can focus on the specific purpose of their application.</p>
-<p>The API of Yoke is quite simple, in fact it consist only of 4 methods:</p>
-<ul>
-<li><code>use</code></li>
-<li><code>set</code></li>
-<li><code>engine</code></li>
-<li><code>listen</code></li>
-</ul>
-<h3 id="use"><a href="#use">use</a></h3>
-<p>You register middleware onto it using the <code>use</code> method, you might call the method with the following signatures:</p>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="co">// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.</span>
-<span class="co">// This middleware will run on every request path</span>
-<span class="fu">use</span>(Middleware middlewareImplementation);
+pmlopes@jetdrone:~/Projects/yoke-tutorial$
+```
 
-<span class="co">// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.</span>
-<span class="co">// This middleware will run only on requests which path starts with the route you specify. A tipical use case is when</span>
-<span class="co">// you want to do authentication on a specific route e.g.: all requests starting with /secure</span>
-<span class="fu">use</span>(String route, Middleware middlewareImplementation);
 
-<span class="co">// Alternatively you can use handlers in the same way you would on Vert.x, internally these Handlers are handled as</span>
-<span class="co">// Middleware classes and processed accordingly.</span>
-<span class="fu">use</span>(Handler&lt;YokeRequest&gt; request);
-<span class="fu">use</span>(String route, Handler&lt;YokeRequest&gt; request);</code></pre>
-<p>You can registeras many middleware as you want, but keep in mind that the order you used to register is the order that is used to process a request. In other words If you need to consume the request body of a request you need to use the <a href="BodyParser.html">BodyParser</a> middleware before the middleware you are implementing.</p>
-<p>The difference between the Middleware abstract class and the <a href="http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern">chain-of-responsability pattern</a> is that you don't have to define the &quot;next&quot; on the middleware itself but yoke takes care of it. An implementation of Middleware requires you to implement the following method:</p>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="co">/**</span>
-<span class="co"> </span>*<span class="co"> Handles a request.</span>
-<span class="co"> *</span>
-<span class="co"> * </span><span class="kw">@param request </span><span class="co">A YokeRequest which in practice is a extended HttpServerRequest</span>
-<span class="co"> * </span><span class="kw">@param next </span><span class="co">The callback to inform that the next middleware in the chain should be used</span>.<span class="co"> A value different from</span>
-<span class="co"> *             null represents an error and in that case the error handler middleware will be executed</span>.
-<span class="co"> */</span>
-<span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request, Handler&lt;Object&gt; next);</code></pre>
-<p>The <code>next</code> parameter is a <a href="http://en.wikipedia.org/wiki/Callback_%28computer_programming%29">callback</a>. The reason for using callbacks is to allow asynchronous execution of tasks. So in your code you can call <code>next.handle(object)</code> in the end of your method, or if you need to wait for some asynchronous call then at that moment you can call the callback.</p>
-<p>The value you pass to the callback is an <em>Error</em>. It might feel strange that the callback accepts <em>Object</em> instead of <em>Exception</em> but the reason is that sometimes you might want to raise errors that do not require a full stack trace to be generated by the JVM. In those cases you just pass a <em>Number</em> which is interpreted as a <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes"><em>HTTP Error</em></a>. When a <em>String</em> is passed, then a generic <em>Internal Server Error</em> is raised. If your middleware completed successfuly then your error should be <em>null</em>.</p>
-<p>To signal the end of processing of a request, just don't call the callback handler anymore. To summarize, calling next informs Yoke to execute the next <em>Middleware</em> in the chain, if the handler contains anything other than <em>null</em> then an error middleware is executed skipping all the remaining middleware.</p>
-<h3 id="set"><a href="#set">set</a></h3>
-<p>Every YokeRequest contains a context. A context is just a Java <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html">Map</a>. The context is how you can share data between middlewares and lives during the request lifetime. When a request arrives at Yoke the context is initialized with an empty Map and all the values you define on Yoke with the <code>set</code> method. Yoke always defines the key <em>title</em> with the value <em>Yoke</em>. You might want to override this by setting the title to your application name.</p>
-<h3 id="engine"><a href="#engine">engine</a></h3>
-<p>Yoke allows you to use template engines so you do not need to generate <em>HTML</em> by appending strings. You register an engine but registering it's extension and a class that extends the Engine abstract class. By default Yoke bundles a simple <em>StringPlaceholderEngine</em> that allows replacing keys in a document.</p>
-<p>Of course this is a very naive engine so you can add your own or use other ones provided by the community. If you need to implement one yourself all you need to implement is the following method:</p>
-<pre class="sourceCode java"><code class="sourceCode java"><span class="co">/**</span>
-<span class="co"> </span>*<span class="co"> The required to implement method.</span>
-<span class="co"> *</span>
-<span class="co"> * </span><span class="kw">@param filename </span>-<span class="co"> String representing the file path to the template</span>
-<span class="co"> * </span><span class="kw">@param context </span>-<span class="co"> Map with key values that might get substituted in the template</span>
-<span class="co"> * </span><span class="kw">@param handler </span>-<span class="co"> The future result handler with a Buffer in case of success</span>
-<span class="co"> */</span>
-<span class="kw">public</span> <span class="dt">void</span> <span class="fu">render</span>(String filename, Map&lt;String, Object&gt; context, AsyncResultHandler&lt;String&gt; handler);</code></pre>
-<p>The context is passed from the request directly and in fact is the same Map that was described on the <code>set</code> method.</p>
-<p>To use the engines all you need to do is use the <code>render</code> method on the YokeResponse and pass the filename with the correct file extension used to register the engine.</p>
-<h3 id="listen"><a href="#listen">listen</a></h3>
-<p>With this method you start a server, either listening on a specific port, address + port, or on top of an existing Vert.x HttpServer.</p>
-<h2 id="hello-world"><a href="#hello-world">Hello World</a></h2>
-<p>At this moment you should understand the basic API of Yoke, and how it works so it is time to write your first <em>Hello World</em> example.</p>
-<p>Assuming you already bootstraped your project and are inside the working directory we are going to create the class: <code>com.jetdrone.yoke.HelloWorldVerticle</code> under <code>src/main/java</code>. At this moment you should have the file <code>src/main/java/com/jetdrone/yoke/HelloWorldVerticle.java</code> in your file system.</p>
-<p>The reason we have a <em>Verticle</em> class is because Yoke does not forces you to use any special classes, you still code like you would on Vert.x. So we start by creating a Verticle the same way we would on any other Vert.x application:</p>
-<table class="sourceCode java numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java"><span class="kw">package com.jetdrone.vertx;</span>
+## Introduction
 
-<span class="kw">import com.jetdrone.vertx.yoke.*;</span>
-<span class="kw">import com.jetdrone.vertx.yoke.middleware.*;</span>
+Yoke is a minimal and flexible Vert.x web application framework, providing a robust set of features for building single
+and multi-page, and hybrid web applications. Yoke provides a thin layer of features fundamental to any web application,
+without obscuring features that you know and love in Vert.x.
 
-<span class="kw">import org.vertx.java.core.*;</span>
-<span class="kw">import org.vertx.java.platform.*;</span>
+Before you start, you need to understand the basic functionality under Yoke. Yoke is a chain executor, modelled in a way
+like the [chain-of-responsability pattern](http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern). Yoke is
+responsible to execute all your processing objects, which from now on we call Middleware. Middleware makes it easier for
+software developers to perform specialized tasks, such as *HTTP Parsing*, *Authentication*, *Routing*, etc..., so they
+can focus on the specific purpose of their application.
 
-<span class="kw">public</span> <span class="kw">class</span> HelloWorldVerticle <span class="kw">extends</span> Verticle {
+The API of Yoke is quite simple, in fact it consist only of 4 methods:
+
+* ```use```
+* ```set```
+* ```engine```
+* ```listen```
+
+### use
+
+You register middleware onto it using the ```use``` method, you might call the method with the following signatures:
+
+``` java
+// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
+// This middleware will run on every request path
+use(Middleware middlewareImplementation);
+
+// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
+// This middleware will run only on requests which path starts with the route you specify. A tipical use case is when
+// you want to do authentication on a specific route e.g.: all requests starting with /secure
+use(String route, Middleware middlewareImplementation);
+
+// Alternatively you can use handlers in the same way you would on Vert.x, internally these Handlers are handled as
+// Middleware classes and processed accordingly.
+use(Handler&lt;YokeRequest&gt; request);
+use(String route, Handler&lt;YokeRequest&gt; request);
+```
+
+You can registeras many middleware as you want, but keep in mind that the order you used to register is the order that
+is used to process a request. In other words If you need to consume the request body of a request you need to use the
+[BodyParser](BodyParser.html) middleware before the middleware you are implementing.
+
+The difference between the Middleware abstract class and the
+[chain-of-responsability pattern](http://en.wikipedia.org/wiki/Chain-of-responsibility_pattern) is that you don't have
+to define the "next" on the middleware itself but yoke takes care of it. An implementation of Middleware requires you
+to implement the following method:
+
+``` java
+/**
+ * Handles a request.
+ *
+ * @param request A YokeRequest which in practice is a extended HttpServerRequest
+ * @param next The callback to inform that the next middleware in the chain should be used. A value different from
+ *             null represents an error and in that case the error handler middleware will be executed.
+ */
+public void handle(YokeRequest request, Handler&lt;Object&gt; next);
+```
+
+The ```next``` parameter is a [callback](http://en.wikipedia.org/wiki/Callback_%28computer_programming%29). The reason
+for using callbacks is to allow asynchronous execution of tasks. So in your code you can call ```next.handle(object)```
+in the end of your method, or if you need to wait for some asynchronous call then at that moment you can call the
+callback.
+
+The value you pass to the callback is an *Error*. It might feel strange that the callback accepts *Object* instead of
+*Exception* but the reason is that sometimes you might want to raise errors that do not require a full stack trace to be
+generated by the JVM. In those cases you just pass a *Number* which is interpreted as a
+[*HTTP Error*](http://en.wikipedia.org/wiki/List_of_HTTP_status_codes). When a *String* is passed, then a generic
+*Internal Server Error* is raised. If your middleware completed successfuly then your error should be *null*.
+
+To signal the end of processing of a request, just don't call the callback handler anymore. To summarize, calling next
+informs Yoke to execute the next *Middleware* in the chain, if the handler contains anything other than *null* then an
+error middleware is executed skipping all the remaining middleware.
+
+### set
+
+Every YokeRequest contains a context. A context is just a Java
+[Map](http://docs.oracle.com/javase/7/docs/api/java/util/Map.html). The context is how you can share data between
+middlewares and lives during the request lifetime. When a request arrives at Yoke the context is initialized with an
+empty Map and all the values you define on Yoke with the ```set``` method. Yoke always defines the key *title* with the
+value *Yoke*. You might want to override this by setting the title to your application name.
+
+### engine
+
+Yoke allows you to use template engines so you do not need to generate *HTML* by appending strings. You register an
+engine but registering it's extension and a class that extends the Engine abstract class. By default Yoke bundles a
+simple *StringPlaceholderEngine* that allows replacing keys in a document.
+
+Of course this is a very naive engine so you can add your own or use other ones provided by the community. If you need
+to implement one yourself all you need to implement is the following method:
+
+``` java
+/**
+ * The required to implement method.
+ *
+ * @param filename - String representing the file path to the template
+ * @param context - Map with key values that might get substituted in the template
+ * @param handler - The future result handler with a Buffer in case of success
+ */
+public void render(String filename, Map&lt;String, Object&gt; context, AsyncResultHandler&lt;String&gt; handler);
+```
+
+The context is passed from the request directly and in fact is the same Map that was described on the ```set``` method.
+
+To use the engines all you need to do is use the ```render``` method on the YokeResponse and pass the filename with the
+correct file extension used to register the engine.
+
+### listen
+
+With this method you start a server, either listening on a specific port, address + port, or on top of an existing
+Vert.x HttpServer.
+
+
+## Hello World
+
+At this moment you should understand the basic API of Yoke, and how it works so it is time to write your first *Hello
+World* example.
+
+Assuming you already bootstraped your project and are inside the working directory we are going to create the class:
+```com.jetdrone.yoke.HelloWorldVerticle``` under ```src/main/java```. At this moment you should have the file
+```src/main/java/com/jetdrone/yoke/HelloWorldVerticle.java``` in your file system.
+
+The reason we have a *Verticle* class is because Yoke does not forces you to use any special classes, you still code
+like you would on Vert.x. So we start by creating a Verticle the same way we would on any other Vert.x application:
+
+``` java
+package com.jetdrone.vertx;
+
+import com.jetdrone.vertx.yoke.*;
+import com.jetdrone.vertx.yoke.middleware.*;
+
+import org.vertx.java.core.*;
+import org.vertx.java.platform.*;
+
+public class HelloWorldVerticle extends Verticle {
 
   @Override
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
+  public void start() {
   }
-}</code></pre></td></tr></table>
-<p>This is the bare minimal Verticle code you need to write. Of course this code does not do anything fancy, in fact it just do nothing. So lets make a <em>HTTP</em> web server that listens on port <em>8080</em>.</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">listen</span>(<span class="dv">8080</span>);
+}
+```
+
+This is the bare minimal Verticle code you need to write. Of course this code does not do anything fancy, in fact it
+just do nothing. So lets make a *HTTP* web server that listens on port *8080*.
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.listen(8080);
   }
-...</code></pre></td></tr></table>
-<p>At this point you have almost everything needed to run your verticle, the only missing item is the module descriptor. The module descriptor is a simple <em>JSON</em> file that describes the main verticle and any other metadata required for your verticle.</p>
-<p>For this example we only need to define 2 entries, the <em>main</em> verticle class and the dependency on <em>Yoke</em>. Create a file under <code>src/main/resources/mod.json</code> with the following content:</p>
-<table class="sourceCode javascript numberLines"><tr class="sourceCode"><td class="lineNumbers"><pre>1
-2
-3
-4
-</pre></td><td class="sourceCode"><pre><code class="sourceCode javascript">{
-  <span class="st">&quot;main&quot;</span>: <span class="st">&quot;com.jetdrone.vertx.HelloWorldVerticle&quot;</span>,
-  <span class="st">&quot;includes&quot;</span>: <span class="st">&quot;com.jetdrone~yoke~1.0.0-beta2&quot;</span>
-}</code></pre></td></tr></table>
-<p>And you can quickly test your new Verticle by running:</p>
-<pre><code>pmlopes@jetdrone:~/Projects/yoke-tutorial$ ./gradlew runMod
-pmlopes@jetdrone:~/Projects/yoke-tutorial$</code></pre>
-<p>If you open a web browser and navigate to your localhost at port 8080 you will get a <em>404</em> <em>Not Found</em> error message. This is expected since you have a server running but no middleware is handling your requests. So lets install a handler for all request paths to respond with &quot;Hello World&quot;.</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+...
+```
+
+At this point you have almost everything needed to run your verticle, the only missing item is the module descriptor.
+The module descriptor is a simple *JSON* file that describes the main verticle and any other metadata required for your
+verticle.
+
+For this example we only need to define 2 entries, the *main* verticle class and the dependency on *Yoke*. Create a file
+under ```src/main/resources/mod.json``` with the following content:
+
+``` javascript
+{
+  "main": "com.jetdrone.vertx.HelloWorldVerticle",
+  "includes": "com.jetdrone~yoke~1.0.0-beta2"
+}
+```
+
+And you can quickly test your new Verticle by running:
+
+```
+pmlopes@jetdrone:~/Projects/yoke-tutorial$ ./gradlew runMod
+pmlopes@jetdrone:~/Projects/yoke-tutorial$
+```
+
+If you open a web browser and navigate to your localhost at port 8080 you will get a *404* *Not Found* error message.
+This is expected since you have a server running but no middleware is handling your requests. So lets install a handler
+for all request paths to respond with "Hello World".
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new Handler&lt;YokeRequest&gt;() {
       @Override
-      <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-        request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="st">&quot;Hello World!&quot;</span>);
+      public void handle(YokeRequest request) {
+        request.response().end("Hello World!");
       }
     });
-    yoke.<span class="fu">listen</span>(<span class="dv">8080</span>);
+    yoke.listen(8080);
   }
-...</code></pre></td></tr></table>
-<p>If you restart your verticle running the gradle command from before and reload your web browser you will see the text &quot;Hello World&quot; on it.</p>
-<h2 id="rest"><a href="#rest">REST</a></h2>
-<p>At this point you already know about the basics of Yoke, so lets extend the example and make a REST web service. Our REST web service will listen on the path <em>/resource</em>. Lets define a couple of functionality, when you <em>POST</em> a JSON document, the document will be stored in a database, if you <em>PUT</em> the document will be updated, if you <em>GET</em> then you retreive the document from the database and finally if you <em>DELETE</em> you delete the document from the database. Since Database handling is not the purpose of Yoke we will assume data is always available.</p>
-<p>Having to write code to handle all these <em>HTTP</em> verbs and paths would be to much boiler plate code. To help out Yoke has a <a href="Router.html">Router middleware</a>. So lets replace the *Hello World&quot; handler and replace it with the router middleware. With this middleware we define the 4 actions <em>POST</em>, <em>PUT</em>, <em>GET</em> and <em>DELETE</em>.</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-        .<span class="fu">post</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+...
+```
+
+If you restart your verticle running the gradle command from before and reload your web browser you will see the text
+"Hello World" on it.
+
+
+## REST
+
+At this point you already know about the basics of Yoke, so lets extend the example and make a REST web service. Our
+REST web service will listen on the path */resource*. Lets define a couple of functionality, when you *POST* a JSON
+document, the document will be stored in a database, if you *PUT* the document will be updated, if you *GET* then you
+retreive the document from the database and finally if you *DELETE* you delete the document from the database. Since
+Database handling is not the purpose of Yoke we will assume data is always available.
+
+Having to write code to handle all these *HTTP* verbs and paths would be to much boiler plate code. To help out Yoke
+has a [Router middleware](Router.html). So lets replace the *Hello World" handler and replace it with the router
+middleware. With this middleware we define the 4 actions *POST*, *PUT*, *GET* and *DELETE*.
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new Router()
+        .post("/resource", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            <span class="co">// will implement this later...</span>
+          public void handle(YokeRequest request) {
+            // will implement this later...
           }
         })
-        .<span class="fu">put</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .put("/resource", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            <span class="co">// will implement this later...</span>
+          public void handle(YokeRequest request) {
+            // will implement this later...
           }
         })
-        .<span class="fu">get</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .get("/resource", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            <span class="co">// will implement this later...</span>
+          public void handle(YokeRequest request) {
+            // will implement this later...
           }
         })
-        .<span class="fu">delete</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .delete("/resource", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            <span class="co">// will implement this later...</span>
+          public void handle(YokeRequest request) {
+            // will implement this later...
           }
         }));
-    yoke.<span class="fu">listen</span>(<span class="dv">8080</span>);
+    yoke.listen(8080);
   }
-...</code></pre></td></tr></table>
-<p>So your application can handle all those actions under <em>/resource</em>. Lets fill the handlers to do something. Since we have no database in the code we assume there is a database abstraction that implements the actions. So our code would become:</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-        .<span class="fu">post</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+...
+```
+
+So your application can handle all those actions under */resource*. Lets fill the handlers to do something. Since we
+have no database in the code we assume there is a database abstraction that implements the actions. So our code would
+become:
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new Router()
+        .post("/resource", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            JsonObject body = request.<span class="fu">jsonBody</span>();
-            String id = Database.<span class="fu">store</span>(body);
-            JsonObject response = <span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putString</span>(<span class="st">&quot;id&quot;</span>, id);
-            request.<span class="fu">response</span>().<span class="fu">end</span>(response);
+          public void handle(YokeRequest request) {
+            JsonObject body = request.jsonBody();
+            String id = Database.store(body);
+            JsonObject response = new JsonObject().putString("id", id);
+            request.response().end(response);
           }
         })
-        .<span class="fu">put</span>(<span class="st">&quot;/resource/:id&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .put("/resource/:id", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            JsonObject body = request.<span class="fu">jsonBody</span>();
-            Database.<span class="fu">update</span>(request.<span class="fu">params</span>().<span class="fu">get</span>(<span class="st">&quot;id&quot;</span>), body);
-            request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="dv">204</span>);
+          public void handle(YokeRequest request) {
+            JsonObject body = request.jsonBody();
+            Database.update(request.params().get("id"), body);
+            request.response().end(204);
           }
         })
-        .<span class="fu">get</span>(<span class="st">&quot;/resource/:id&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .get("/resource/:id", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            JsonObject fromDb = Database.<span class="fu">get</span>(request.<span class="fu">params</span>().<span class="fu">get</span>(<span class="st">&quot;id&quot;</span>));
-            request.<span class="fu">response</span>().<span class="fu">end</span>(fromDb);
+          public void handle(YokeRequest request) {
+            JsonObject fromDb = Database.get(request.params().get("id"));
+            request.response().end(fromDb);
           }
         })
-        .<span class="fu">delete</span>(<span class="st">&quot;/resource/:id&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
+        .delete("/resource/:id", new Handler&lt;YokeRequest&gt;() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-            Database.<span class="fu">delete</span>(request.<span class="fu">params</span>().<span class="fu">get</span>(<span class="st">&quot;id&quot;</span>));
-            request.<span class="fu">response</span>().<span class="fu">end</span>(<span class="dv">204</span>);
+          public void handle(YokeRequest request) {
+            Database.delete(request.params().get("id"));
+            request.response().end(204);
           }
         }));
-    yoke.<span class="fu">listen</span>(<span class="dv">8080</span>);
+    yoke.listen(8080);
   }
-...</code></pre></td></tr></table>
-<p>Everything seems to be OK, however if you upload a json document nothing will show up on the body of your request. This is expected because no one has parsed the request body. You don't need to worry about it, Yoke has a Middleware that does that for you. You can install the <a href="BodyParser.html">BodyParser</a> middleware easily. As it was described before, you can use as many middleware as you want but the order matters. This means that if you need to have the body parsed in your router middleware you are going to have to install the body parser before that, like this:</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>());
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-        .<span class="fu">post</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
-...</code></pre></td></tr></table>
-<p>So you now have a valid request body for your <em>POST</em> and <em>PUT</em>. This increases the developer productivity since you do not need to spend time implementing a HTTP body parser. However having this on could lead your application to be vulnerable to DoS attacks when someone would try to upload a json document bigger than your server memory. To be safer you can use the <a href="Limit.html">Limit</a> middleware which defines a maximum allowed size for your uploads. Again if you want the application to be aware of the limit, this needs to be defined before the parser starts doing its work like this for an upload of a maximum size of 4kb (4096 bytes):</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Limit</span>(<span class="dv">4096</span>));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>());
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-        .<span class="fu">post</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> Handler&lt;YokeRequest&gt;() {
-...</code></pre></td></tr></table>
-<p>You can look to the list of provided middleware and add as you like and also look at the 3rd party list.</p>
-<h2 id="error-handling"><a href="#error-handling">Error Handling</a></h2>
-<p>You have a working REST application but if an error occurs you need to handle it manually, however Yoke has a better way for you. There is the possibility to use <a href="ErrorHandler.html">ErrorHandler</a> middleware to generate pretty errors, however by itself this is not enough, you need to inform Yoke you want it to handle the error for you. To do this we need to change out handlers to become middlewares, lets focus alone in the <em>POST</em> code, since the other code would be the same.</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Limit</span>(<span class="dv">4096</span>));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>());
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-        .<span class="fu">post</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> <span class="fu">Middleware</span>() {
+...
+```
+
+Everything seems to be OK, however if you upload a json document nothing will show up on the body of your request. This
+is expected because no one has parsed the request body. You don't need to worry about it, Yoke has a Middleware that
+does that for you. You can install the [BodyParser](BodyParser.html) middleware easily. As it was described before, you
+can use as many middleware as you want but the order matters. This means that if you need to have the body parsed in
+your router middleware you are going to have to install the body parser before that, like this:
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Handler&lt;YokeRequest&gt;() {
+...
+```
+
+So you now have a valid request body for your *POST* and *PUT*. This increases the developer productivity since you do
+not need to spend time implementing a HTTP body parser. However having this on could lead your application to be
+vulnerable to DoS attacks when someone would try to upload a json document bigger than your server memory. To be safer
+you can use the [Limit](Limit.html) middleware which defines a maximum allowed size for your uploads. Again if you want
+the application to be aware of the limit, this needs to be defined before the parser starts doing its work like this for
+an upload of a maximum size of 4kb (4096 bytes):
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new Limit(4096));
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Handler&lt;YokeRequest&gt;() {
+...
+```
+
+You can look to the list of provided middleware and add as you like and also look at the 3rd party list.
+
+
+## Error Handling
+
+You have a working REST application but if an error occurs you need to handle it manually, however Yoke has a better way
+for you. There is the possibility to use [ErrorHandler](ErrorHandler.html) middleware to generate pretty errors, however
+by itself this is not enough, you need to inform Yoke you want it to handle the error for you. To do this we need to
+change out handlers to become middlewares, lets focus alone in the *POST* code, since the other code would be the same.
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new Limit(4096));
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Middleware() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request, Handler&lt;Object&gt; next) {
-            <span class="kw">try</span> {
-              JsonObject body = request.<span class="fu">jsonBody</span>();
-              String id = Database.<span class="fu">store</span>(body);
-              JsonObject response = <span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putString</span>(<span class="st">&quot;id&quot;</span>, id);
-              request.<span class="fu">response</span>().<span class="fu">end</span>(response);
-            } <span class="kw">catch</span> (Exception e) {
-              next.<span class="fu">handle</span>(e);
+          public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
+            try {
+              JsonObject body = request.jsonBody();
+              String id = Database.store(body);
+              JsonObject response = new JsonObject().putString("id", id);
+              request.response().end(response);
+            } catch (Exception e) {
+              next.handle(e);
             }
           }
         })
-...</code></pre></td></tr></table>
-<p>So if there was an error Yoke will handle it and generate an error message. By default it will be a ugly text string with the error name. To make it prettier lets use the error handler middleware.</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> ErrorHandler(<span class="kw">true</span>));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Limit</span>(<span class="dv">4096</span>));
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">BodyParser</span>());
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> <span class="fu">Router</span>()
-        .<span class="fu">post</span>(<span class="st">&quot;/resource&quot;</span>, <span class="kw">new</span> <span class="fu">Middleware</span>() {
+...
+```
+
+So if there was an error Yoke will handle it and generate an error message. By default it will be a ugly text string
+with the error name. To make it prettier lets use the error handler middleware.
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.use(new ErrorHandler(true));
+    yoke.use(new Limit(4096));
+    yoke.use(new BodyParser());
+    yoke.use(new Router()
+        .post("/resource", new Middleware() {
           @Override
-          <span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request, Handler&lt;Object&gt; next) {
-            <span class="kw">try</span> {
-              JsonObject body = request.<span class="fu">jsonBody</span>();
-              String id = Database.<span class="fu">store</span>(body);
-              JsonObject response = <span class="kw">new</span> <span class="fu">JsonObject</span>().<span class="fu">putString</span>(<span class="st">&quot;id&quot;</span>, id);
-              request.<span class="fu">response</span>().<span class="fu">end</span>(response);
-            } <span class="kw">catch</span> (Exception e) {
-              next.<span class="fu">handle</span>(e);
+          public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
+            try {
+              JsonObject body = request.jsonBody();
+              String id = Database.store(body);
+              JsonObject response = new JsonObject().putString("id", id);
+              request.response().end(response);
+            } catch (Exception e) {
+              next.handle(e);
             }
           }
         })
-...</code></pre></td></tr></table>
-<p>Now your errors are pretty and include stack traces if present because you are creating an handler with 1st argument to true.</p>
-<h2 id="templates"><a href="#templates">Templates</a></h2>
-<p>Not all applications are REST based and you might need to generate some HTML. It is not productive to inline the HTML in strings in your code and concatenate them at request time. Yoke ships with a simple engine but more can be added as explained before.</p>
-<p>So lets use the built in <a href="StringPlaceholderEngine.html">StringPlaceholderEngine</a> and use the template:</p>
-<pre><code>Hello ${name}!</code></pre>
-<p>So in order to do this, you first need to register the engine:</p>
-<table class="sourceCode java numberLines" startFrom="10"><tr class="sourceCode"><td class="lineNumbers"><pre>10
-11
-12
-13
-14
-15
-</pre></td><td class="sourceCode"><pre><code class="sourceCode java">...
-  <span class="kw">public</span> <span class="dt">void</span> <span class="fu">start</span>() {
-    Yoke yoke = <span class="kw">new</span> <span class="fu">Yoke</span>(vertx);
-    yoke.<span class="fu">engine</span>(<span class="st">&quot;tmpl&quot;</span>, <span class="kw">new</span> <span class="fu">StringPlaceholderEngine</span>());
-    yoke.<span class="fu">use</span>(<span class="kw">new</span> ErrorHandler(<span class="kw">true</span>));
-...</code></pre></td></tr></table>
-<p>And now in your Middleware/Handler you only need to call the render method. In order to fill the property <em>name</em> that you can see in the template, you need to add it to the request context. As explained before the context is a Map and you can update it by invoking the <code>put</code> method in the request.</p>
-<pre class="sourceCode java"><code class="sourceCode java">...
+...
+```
+
+Now your errors are pretty and include stack traces if present because you are creating an handler with 1st argument to
+true.
+
+
+## Templates
+
+Not all applications are REST based and you might need to generate some HTML. It is not productive to inline the HTML in
+strings in your code and concatenate them at request time. Yoke ships with a simple engine but more can be added as
+explained before.
+
+So lets use the built in [StringPlaceholderEngine](StringPlaceholderEngine.html) and use the template:
+
+```
+Hello ${name}!
+```
+
+So in order to do this, you first need to register the engine:
+
+``` java
+...
+  public void start() {
+    Yoke yoke = new Yoke(vertx);
+    yoke.engine("tmpl", new StringPlaceholderEngine());
+    yoke.use(new ErrorHandler(true));
+...
+```
+
+And now in your Middleware/Handler you only need to call the render method. In order to fill the property *name* that
+you can see in the template, you need to add it to the request context. As explained before the context is a Map and you
+can update it by invoking the ```put``` method in the request.
+
+``` java
+...
 @Override
-<span class="kw">public</span> <span class="dt">void</span> <span class="fu">handle</span>(YokeRequest request) {
-  request.<span class="fu">put</span>(<span class="st">&quot;name&quot;</span>, <span class="st">&quot;Yoke World&quot;</span>);
-  request.<span class="fu">response</span>().<span class="fu">render</span>(<span class="st">&quot;mytemplate.tmpl&quot;</span>);
+public void handle(YokeRequest request) {
+  request.put("name", "Yoke World");
+  request.response().render("mytemplate.tmpl");
 }
-...</code></pre>
-<div id="footer">
-  &copy; 2013 <a href="http://www.jetdrone.com">Paulo Lopes</a>
+...
+```
+</textarea>
+<div class='header'>
+  <div class='left'>
+    <h1 role='flatdoc-title'></h1>
+  </div>
 </div>
-<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://pmlopes.github.io/yoke/">Tweet</a>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
-<!-- Place this tag where you want the +1 button to render. -->
-<div class="g-plusone" data-size="medium" data-href="http://pmlopes.github.io/yoke/"></div>
-
-<!-- Place this tag after the last +1 button tag. -->
-<script type="text/javascript">
-  (function() {
-    var po = document.createElement('script'); po.type = 'text/javascript'; po.async = true;
-    po.src = 'https://apis.google.com/js/plusone.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
-  })();
-</script>
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-3682522-6', 'github.io');
-  ga('send', 'pageview');
-
-</script>
+<div role='flatdoc' class='content-root'>
+  <div class='menubar'>
+    <div class='menu section' role='flatdoc-menu'></div>
+  </div>
+  <div role='flatdoc-content' class='content'></div>
+</div>
 </body>
 </html>

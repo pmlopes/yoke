@@ -14,7 +14,7 @@ Route request by path or regular expression. All *HTTP* verbs are available:
 * ```CONNECT```
 * ```PATCH```
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new Router() {{
   get("/hello", new Handler<YokeRequest>() {
     public void handle(YokeRequest request) {
@@ -22,4 +22,4 @@ new Router() {{
     }
   });
 }}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```

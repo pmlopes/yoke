@@ -11,6 +11,6 @@ Static file server with the given ```root``` path. Optionaly will also generate 
 * ```directoryListing``` generate index pages for directories
 * ```includeHidden``` in the directory listing show dot files
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.java}
+``` java
 new Static("webroot", 0, true, false)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
