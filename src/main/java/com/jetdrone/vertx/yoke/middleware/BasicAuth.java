@@ -19,6 +19,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 
 import javax.xml.bind.DatatypeConverter;
+import java.util.regex.PatternSyntaxException;
 
 public class BasicAuth extends Middleware {
 
@@ -63,11 +64,21 @@ public class BasicAuth extends Middleware {
             response.setStatusCode(401);
             next.handle("No authorization token");
         } else {
-            String[] parts = authorization.split(" ");
-            String scheme = parts[0];
-            String[] credentials = new String(DatatypeConverter.parseBase64Binary(parts[1])).split(":");
-            final String user = credentials[0];
-            final String pass = credentials[1];
+            final String user;
+            final String pass;
+            final String scheme;
+
+            try {
+                String[] parts = authorization.split(" ");
+                scheme = parts[0];
+                String[] credentials = new String(DatatypeConverter.parseBase64Binary(parts[1])).split(":");
+                user = credentials[0];
+                pass = credentials[1];
+            } catch (IllegalArgumentException | NullPointerException e) {
+                // IllegalArgumentException includes PatternSyntaxException
+                next.handle(e);
+                return;
+            }
 
             if (!"Basic".equals(scheme)) {
                 next.handle(400);
