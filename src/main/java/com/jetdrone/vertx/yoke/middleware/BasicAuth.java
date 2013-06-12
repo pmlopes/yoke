@@ -73,7 +73,8 @@ public class BasicAuth extends Middleware {
                 scheme = parts[0];
                 String[] credentials = new String(DatatypeConverter.parseBase64Binary(parts[1])).split(":");
                 user = credentials[0];
-                pass = credentials[1];
+                // when the header is: "user:"
+                pass = credentials.length > 1 ? credentials[1] : null;
             } catch (IllegalArgumentException | NullPointerException e) {
                 // IllegalArgumentException includes PatternSyntaxException
                 next.handle(e);
