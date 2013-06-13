@@ -7,8 +7,6 @@ Flatdoc (http://ricostacruz.com/flatdoc)
 (function($) {
   var exports = this;
 
-  var marked;
-
   /**
    * Basic Flatdoc module.
    *
@@ -91,9 +89,7 @@ Flatdoc (http://ricostacruz.com/flatdoc)
    * See `Parser` for more info.
    */
   Parser.parse = function(source) {
-    marked = exports.marked;
-
-    Parser.setMarkedOptions();
+    var marked = exports.marked;
 
     var html = $("<div>" + marked(source));
     var h1 = html.find('h1').eq(0);
@@ -104,9 +100,6 @@ Flatdoc (http://ricostacruz.com/flatdoc)
     var menu = Transformer.getMenu(html);
 
     return { title: title, content: html, menu: menu };
-  };
-
-  Parser.setMarkedOptions = function() {
   };
 
   /**
@@ -179,7 +172,7 @@ Flatdoc (http://ricostacruz.com/flatdoc)
       var $el = $(this);
       var level = +(this.nodeName.substr(1));
 
-      parent = mkdir_p(level-1);
+      var parent = mkdir_p(level-1);
 
       var obj = { section: $el.text(), items: [], level: level, id: $el.attr('id') };
       parent.items.push(obj);
