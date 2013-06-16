@@ -69,11 +69,17 @@ JSYoke.prototype.set = function (key, value) {
 };
 
 JSYoke.prototype.listen = function (port, address) {
-    if (address === undefined) {
-        address = '0.0.0.0';
-    }
+    // check if port looks like an HTTP server as created by vertx.createHttpServer
+    if (typeof port === 'object' && port._to_java_server() instanceof org.vertx.java.core.http.HttpServer) {
+        // in that case pass it directly to the jYoke
+        this.jYoke.listen(port._to_java_server());
+    } else {
+        if (address === undefined) {
+            address = '0.0.0.0';
+        }
 
-    this.jYoke.listen(port, address);
+        this.jYoke.listen(port, address);
+    }
 };
 
 module.exports = JSYoke;
