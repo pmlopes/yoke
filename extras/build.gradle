@@ -1,4 +1,4 @@
-apply from: "../gradle/vertx.gradle"
+apply from: "$rootDir/gradle/vertx.gradle"
 
 /*
 Usage:
@@ -43,8 +43,13 @@ install - install any jars produced to the local Maven repository (.m2)
  */
 
 dependencies {
-  provided "com.jetdrone:yoke:$yokeVersion@jar"
-  compile "com.github.jknack:handlebars:${handlebarsVersion}"
+  // get yoke jar for parent
+  provided project(':')
+  // include handlerbars
+  compile("com.github.jknack:handlebars:$handlebarsVersion") {
+    // slf4j version colides with vert.x provided one
+    exclude group: "org.slf4j"
+  }
 }
 
 test {

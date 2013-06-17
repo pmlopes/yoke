@@ -45,7 +45,7 @@ function wrapMap(map) {
 
 function MicroTemplateEngine() {
     var self = this;
-    this.jEngine = new com.jetdrone.vertx.yoke.Engine({
+    this.jEngine = new com.jetdrone.vertx.yoke.engine.AbstractEngine({
         render: function (filename, context, handler) {
             self.jEngine.read(filename, wrapAsyncResultHandler(function (asyncResult) {
                 if (asyncResult.failed()) {

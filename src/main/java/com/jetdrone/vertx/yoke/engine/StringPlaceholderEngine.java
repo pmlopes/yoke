@@ -15,17 +15,17 @@
  */
 package com.jetdrone.vertx.yoke.engine;
 
-import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringPlaceholderEngine extends Engine<String> {
+public class StringPlaceholderEngine extends AbstractEngine<String> {
 
     private static final String placeholderPrefix = "${";
     private static final String placeholderSuffix = "}";
@@ -57,25 +57,25 @@ public class StringPlaceholderEngine extends Engine<String> {
      * ignored.
      */
     @Override
-    public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<String>> handler) {
+    public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
         // verify if the file is still fresh in the cache
         read(file, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
-                    handler.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                    handler.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
                 } else {
                     try {
                         handler.handle(new YokeAsyncResult<>(parseStringValue(asyncResult.result(), context, new HashSet<String>())));
                     } catch (IllegalArgumentException iae) {
-                        handler.handle(new YokeAsyncResult<String>(iae));
+                        handler.handle(new YokeAsyncResult<Buffer>(iae));
                     }
                 }
             }
         });
     }
 
-    private static String parseStringValue(String template, Map<String, Object> context, Set<String> visitedPlaceholders) {
+    private Buffer parseStringValue(String template, Map<String, Object> context, Set<String> visitedPlaceholders) {
         StringBuilder buf = new StringBuilder(template);
 
         int startIndex = template.indexOf(placeholderPrefix);
@@ -88,7 +88,7 @@ public class StringPlaceholderEngine extends Engine<String> {
                             "Circular placeholder reference '" + placeholder + "' in property definitions");
                 }
                 // Recursive invocation, parsing placeholders contained in the placeholder key.
-                placeholder = parseStringValue(placeholder, context, visitedPlaceholders);
+                placeholder = parseStringValue(placeholder, context, visitedPlaceholders).toString(contentEncoding());
 
                 // Now obtain the value for the fully resolved key...
                 Object propVal;
@@ -125,7 +125,7 @@ public class StringPlaceholderEngine extends Engine<String> {
                     } else {
                         propValStr = propVal.toString();
                     }
-                    propValStr = parseStringValue(propValStr, context, visitedPlaceholders);
+                    propValStr = parseStringValue(propValStr, context, visitedPlaceholders).toString(contentEncoding());
                     buf.replace(startIndex, endIndex + placeholderSuffix.length(), propValStr);
 
                     startIndex = buf.indexOf(placeholderPrefix, startIndex + propValStr.length());
@@ -145,7 +145,7 @@ public class StringPlaceholderEngine extends Engine<String> {
             }
         }
 
-        return buf.toString();
+        return new Buffer(buf.toString());
     }
 
     private static int findPlaceholderEndIndex(CharSequence buf, int startIndex) {

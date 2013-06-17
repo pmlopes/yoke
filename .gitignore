@@ -17,10 +17,5 @@ mods
 # Ruby crap
 .yardoc
 .yardopts
-# Generated site crap
-docs/*.html
-docs/yoke-gradle-template.tar.gz
 # Benchmark crap
 node_modules
-benchmark/*.dat
-benchmark/*.png

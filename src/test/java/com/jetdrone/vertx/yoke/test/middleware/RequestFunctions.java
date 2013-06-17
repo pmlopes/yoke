@@ -19,7 +19,7 @@ public class RequestFunctions extends TestVerticle {
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {
-                request.response().end(request.accepts("text/"));
+                request.response().end(request.accepts("text"));
             }
         });
 

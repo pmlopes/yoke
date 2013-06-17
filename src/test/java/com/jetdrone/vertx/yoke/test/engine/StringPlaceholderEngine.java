@@ -12,8 +12,6 @@ import org.vertx.testtools.TestVerticle;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.vertx.testtools.VertxAssert.*;
 

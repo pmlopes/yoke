@@ -18,32 +18,33 @@ package com.jetdrone.vertx.yoke.extras.engine;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
-import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.engine.AbstractEngine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class HandlebarsEngine extends Engine<Template> {
+public class HandlebarsEngine extends AbstractEngine<Template> {
 
     private final Handlebars handlebars = new Handlebars();
 
     @Override
-    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<String>> next) {
+    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         read(filename, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<String>(asyncResult.cause()));
+                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
                 } else {
                     try {
                         Template template = compile(filename, asyncResult.result());
-                        next.handle(new YokeAsyncResult<>(template.apply(context)));
+                        next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
                     } catch (IOException ex) {
-                        next.handle(new YokeAsyncResult<String>(ex));
+                        next.handle(new YokeAsyncResult<Buffer>(ex));
                     }
                 }
             }
