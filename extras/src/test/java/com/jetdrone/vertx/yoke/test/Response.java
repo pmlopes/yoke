@@ -15,7 +15,7 @@
  */
 package com.jetdrone.vertx.yoke.test;
 
-import org.vertx.java.core.CaseInsensitiveMultiMap;
+import org.vertx.java.core.impl.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;

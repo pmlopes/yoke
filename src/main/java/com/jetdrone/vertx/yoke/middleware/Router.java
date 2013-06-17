@@ -620,7 +620,7 @@ public class Router extends Middleware {
                         params.put("param" + i, m.group(i + 1));
                     }
                 }
-                request.params().set(params);
+                request.params().add(params);
                 binding.middleware.handle(request, next);
                 return;
             }
