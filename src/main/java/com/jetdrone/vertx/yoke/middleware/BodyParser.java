@@ -81,9 +81,9 @@ public class BodyParser extends Middleware {
                     @Override
                     public void handle(final HttpServerFileUpload fileUpload) {
                         if (request.files() == null) {
-                            request.setFiles(new HashMap<String, HttpServerFileUpload>());
+                            request.setFiles(new HashMap<String, YokeFileUpload>());
                         }
-                        request.files().put(fileUpload.name(), fileUpload);
+                        request.files().put(fileUpload.name(), new YokeFileUpload(fileUpload));
                     }
                 });
             }

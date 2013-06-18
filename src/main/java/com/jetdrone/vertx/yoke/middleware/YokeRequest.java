@@ -75,7 +75,7 @@ public class YokeRequest implements HttpServerRequest {
     private String method;
     private long bodyLengthLimit = -1;
     private Object body;
-    private Map<String, HttpServerFileUpload> files;
+    private Map<String, YokeFileUpload> files;
     private Set<YokeCookie> cookies;
     private String sessionId;
 
@@ -287,14 +287,14 @@ public class YokeRequest implements HttpServerRequest {
     /**
      * The uploaded setFiles
      */
-    public Map<String, HttpServerFileUpload> files() {
+    public Map<String, YokeFileUpload> files() {
         return files;
     }
 
     /**
      * The uploaded setFiles
      */
-    void setFiles(Map<String, HttpServerFileUpload> files) {
+    void setFiles(Map<String, YokeFileUpload> files) {
         this.files = files;
     }
 

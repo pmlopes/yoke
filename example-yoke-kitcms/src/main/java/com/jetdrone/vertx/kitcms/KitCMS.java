@@ -11,7 +11,6 @@ import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -24,7 +23,7 @@ public class KitCMS extends Verticle {
         final EventBus eb = vertx.eventBus();
 
         // deploy redis module
-        container.deployModule("com.jetdrone~mod-redis-io~1.1.0-SNAPSHOT", config.getRedisConfig());
+        container.deployModule("com.jetdrone~mod-redis-io~1.1.0-beta3", config.getRedisConfig());
 
         // db access
         final Db db = new Db(eb, Config.REDIS_ADDRESS);
@@ -236,19 +235,11 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    HttpServerFileUpload file = request.files().get("file");
-                    final Buffer json = new Buffer();
+                    YokeFileUpload file = request.files().get("file");
 
-                    file.dataHandler(new Handler<Buffer>() {
+                    file.fileHandler(new Handler<Buffer>() {
                         @Override
-                        public void handle(Buffer buff) {
-                            json.appendBuffer(buff);
-                        }
-                    });
-
-                    file.endHandler(new Handler<Void>() {
-                        @Override
-                        public void handle(Void event) {
+                        public void handle(Buffer json) {
                             new AsyncIterator<Object>(new JsonArray(json.toString())) {
                                 @Override
                                 public void handle(Object o) {
