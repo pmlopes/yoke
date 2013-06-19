@@ -15,13 +15,19 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.Vertx;
+import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.http.HttpServerFileUpload;
 
+import java.io.File;
 import java.nio.charset.Charset;
+import java.util.UUID;
 
 public class YokeFileUpload {
+
+    final FileSystem fileSystem;
 
     private final String filename;
     private final String name;
@@ -29,11 +35,11 @@ public class YokeFileUpload {
     private final String contentTransferEncoding;
     private final Charset charset;
     private final long size;
-    private final Buffer file;
-    private Handler<Buffer> handler;
-    private boolean complete;
+    private final String path;
 
-    YokeFileUpload(HttpServerFileUpload fileUpload) {
+    YokeFileUpload(Vertx vertx, HttpServerFileUpload fileUpload, String uploadDir) {
+        this.fileSystem = vertx.fileSystem();
+
         this.filename = fileUpload.filename();
         this.name = fileUpload.name();
         this.contentType = fileUpload.contentType();
@@ -41,24 +47,22 @@ public class YokeFileUpload {
         this.charset = fileUpload.charset();
         this.size = fileUpload.size();
 
-        this.file = new Buffer();
+        if (!uploadDir.endsWith(File.separator)) {
+            uploadDir += File.separator;
+        }
 
-        fileUpload.dataHandler(new Handler<Buffer>() {
-            @Override
-            public void handle(Buffer buffer) {
-                file.appendBuffer(buffer);
-            }
-        });
+        this.path = uploadDir + UUID.randomUUID().toString();
+    }
 
-        fileUpload.endHandler(new Handler<Void>() {
-            @Override
-            public void handle(Void event) {
-                complete = true;
-                if (handler != null) {
-                    handler.handle(file);
-                }
-            }
-        });
+    YokeFileUpload(FileSystem fileSystem, String filename, String name, String contentType, String contentTransferEncoding, Charset charset, long size, String path) {
+        this.fileSystem = fileSystem;
+        this.filename = filename;
+        this.name = name;
+        this.contentType = contentType;
+        this.contentTransferEncoding = contentTransferEncoding;
+        this.charset = charset;
+        this.size = size;
+        this.path = path;
     }
 
     /**
@@ -104,12 +108,30 @@ public class YokeFileUpload {
     }
 
     /**
-     * Lazy handler of the upload body. Required since yoke does not guarantees when the callback is setup.
+     * Returns filesystem path location
      */
-    public void fileHandler(Handler<Buffer> handler) {
-        this.handler = handler;
-        if (complete) {
-            handler.handle(file);
-        }
+    public String path() {
+        return path;
+    }
+
+    public void delete(final Handler<Throwable> handler) {
+        fileSystem.delete(path, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> result) {
+                if (result.failed()) {
+                    handler.handle(result.cause());
+                } else {
+                    handler.handle(null);
+                }
+            }
+        });
+    }
+
+    public void delete() {
+        this.delete(new Handler<Throwable>() {
+            @Override
+            public void handle(Throwable result) {
+            }
+        });
     }
 }

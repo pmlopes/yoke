@@ -28,6 +28,16 @@ import java.util.HashMap;
 
 public class BodyParser extends Middleware {
 
+    private final String uploadDir;
+
+    public BodyParser(String uploadDir) {
+        this.uploadDir = uploadDir;
+    }
+
+    public BodyParser() {
+        this(System.getProperty("java.io.tmpdir"));
+    }
+
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
             String jsonString = buffer.toString();
@@ -83,7 +93,20 @@ public class BodyParser extends Middleware {
                         if (request.files() == null) {
                             request.setFiles(new HashMap<String, YokeFileUpload>());
                         }
-                        request.files().put(fileUpload.name(), new YokeFileUpload(fileUpload));
+                        YokeFileUpload upload = new YokeFileUpload(vertx, fileUpload, uploadDir);
+
+                        // setup callbacks
+                        fileUpload.exceptionHandler(new Handler<Throwable>() {
+                            @Override
+                            public void handle(Throwable throwable) {
+                                next.handle(throwable);
+                            }
+                        });
+
+                        // stream to the generated path
+                        fileUpload.streamToFileSystem(upload.path());
+                        // store a reference in the request
+                        request.files().put(fileUpload.name(), upload);
                     }
                 });
             }

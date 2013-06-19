@@ -292,6 +292,17 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /**
+     * Get an uploaded file
+     */
+    public YokeFileUpload getFile(String name) {
+        if (files == null) {
+            return null;
+        }
+
+        return files.get(name);
+    }
+
+    /**
      * The uploaded setFiles
      */
     void setFiles(Map<String, YokeFileUpload> files) {

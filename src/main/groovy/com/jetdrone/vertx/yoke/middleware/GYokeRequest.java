@@ -1,3 +1,18 @@
+/*
+ * Copyright 2011-2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import groovy.lang.Closure;
@@ -20,7 +35,7 @@ import java.util.Map;
 
 public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core.http.HttpServerRequest*/ {
 
-    private Map<String, HttpServerFileUpload> files;
+    private Map<String, GYokeFileUpload> files;
 
     public GYokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context) {
         super(request, response, secure, context);
@@ -118,16 +133,20 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     /**
      * The uploaded setFiles
      */
-    public Map<String, HttpServerFileUpload> getFiles() {
+    public Map<String, GYokeFileUpload> getFiles() {
         if (files == null) {
             files = new HashMap<>();
             if (super.files() != null) {
-                for (final Map.Entry<String, org.vertx.java.core.http.HttpServerFileUpload> entry : files().entrySet()) {
-                    files.put(entry.getKey(), wrap(entry.getValue()));
+                for (final Map.Entry<String, YokeFileUpload> entry : files().entrySet()) {
+                    files.put(entry.getKey(), new GYokeFileUpload(entry.getValue()));
                 }
             }
         }
         return files;
+    }
+
+    public GYokeFileUpload getFile(String name) {
+        return getFiles().get(name);
     }
 
     public GYokeRequest uploadHandler(final Closure closure) {

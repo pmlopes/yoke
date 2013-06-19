@@ -11,6 +11,7 @@ import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -21,6 +22,7 @@ public class KitCMS extends Verticle {
     public void start() {
         final Config config = new Config(container.config());
         final EventBus eb = vertx.eventBus();
+        final FileSystem fileSystem = vertx.fileSystem();
 
         // deploy redis module
         container.deployModule("com.jetdrone~mod-redis-io~1.1.0-beta3", config.getRedisConfig());
@@ -235,12 +237,17 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    YokeFileUpload file = request.files().get("file");
+                    final YokeFileUpload file = request.getFile("file");
 
-                    file.fileHandler(new Handler<Buffer>() {
+                    fileSystem.readFile(file.path(), new AsyncResultHandler<Buffer>() {
                         @Override
-                        public void handle(Buffer json) {
-                            new AsyncIterator<Object>(new JsonArray(json.toString())) {
+                        public void handle(AsyncResult<Buffer> read) {
+                            // delete the temp file
+                            file.delete();
+                            // parse
+                            JsonArray json = new JsonArray(read.result().toString());
+                            // iterate
+                            new AsyncIterator<Object>(json) {
                                 @Override
                                 public void handle(Object o) {
                                     if (!isEnd()) {

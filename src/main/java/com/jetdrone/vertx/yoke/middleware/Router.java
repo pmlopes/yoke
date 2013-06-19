@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -37,6 +38,50 @@ public class Router extends Middleware {
     private final List<PatternBinding> traceBindings = new ArrayList<>();
     private final List<PatternBinding> connectBindings = new ArrayList<>();
     private final List<PatternBinding> patchBindings = new ArrayList<>();
+
+    @Override
+    public Middleware setVertx(Vertx vertx) {
+        super.setVertx(vertx);
+        // since this call can happen after the bindings are in place we need to update all bindings to have a reference
+        // to the vertx object
+        for (PatternBinding binding : getBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : putBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : postBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : deleteBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : optionsBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : headBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : traceBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : connectBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        for (PatternBinding binding : patchBindings) {
+            binding.middleware.setVertx(vertx);
+        }
+
+        return this;
+    }
 
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
