@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.util;
 
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import javax.crypto.Mac;
@@ -31,6 +32,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 
 public final class Utils {
 
@@ -167,9 +169,9 @@ public final class Utils {
     }
 
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
-    private static final String XSLT = Utils.readResourceToString(XML.class, "xml-to-json.xsl");
+    private static final String XSLT = Utils.readResourceToString(Utils.class, "xml-to-json.xsl");
 
-    public static JsonObject XMLToJson(String xml) throws TransformerException {
+    public static JsonObject xmlToJson(String xml) throws TransformerException {
         // allocate the size of the xml (this is probably is more than needed but avoid re-allocations)
         StringWriter out = new StringWriter(xml.length());
 
@@ -181,21 +183,85 @@ public final class Utils {
 
     private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
 
-    public static String JsonToXML(JsonObject json) throws XMLStreamException {
+    public static String jsonToXml(JsonObject json, String rootName) throws XMLStreamException {
         Writer xml = new StringWriter();
         // Create an XML stream writer
         XMLStreamWriter xmlw = XML_OUTPUT_FACTORY.createXMLStreamWriter(xml);
 
         // Write XML prologue
         xmlw.writeStartDocument();
-
-        // TODO: real conversion
-
-        // Write document end. This closes all open structures
-        xmlw.writeEndDocument();
+        // perform real conversion
+        jsonToXml(xmlw, json, rootName);
         // Close the writer to flush the output
         xmlw.close();
 
         return xml.toString();
+    }
+
+    private static void jsonToXml(XMLStreamWriter writer, JsonObject json, String name) throws XMLStreamException {
+        // get all field names
+        Set<String> fields = json.getFieldNames();
+
+        if (fields.size() == 0) {
+            // start with element name
+            writer.writeEmptyElement(name);
+            return;
+        }
+
+        // start with element name
+        writer.writeStartElement(name);
+        for (String field : fields) {
+            Object value = json.getField(field);
+            if (value != null) {
+                if (value instanceof JsonObject) {
+                    // process child
+                    jsonToXml(writer, (JsonObject) value, field);
+                } else if (value instanceof JsonArray) {
+                    jsonToXml(writer, (JsonArray) value, field);
+                } else {
+                    // Writing a few attributes
+                    if (field.charAt(0) == '@') {
+                        writer.writeAttribute(field.substring(1), json.getValue(field).toString());
+                    } else if ("$".equals(field)) {
+                        writer.writeCharacters(json.getValue(field).toString());
+                    }
+                }
+            }
+        }
+        // end with element name
+        writer.writeEndElement();
+    }
+
+    private static void jsonToXml(XMLStreamWriter writer, JsonArray json, String name) throws XMLStreamException {
+        if (json.size() == 0) {
+            // start with element name
+            writer.writeEmptyElement(name);
+            return;
+        }
+
+        for (int i = 0 ; i < json.size(); i++) {
+            Object element = json.get(i);
+
+            if (element == null) {
+                writer.writeEmptyElement(name);
+                continue;
+            }
+
+            if (element instanceof JsonObject) {
+                jsonToXml(writer, (JsonObject) element, name);
+                continue;
+            }
+
+            if (element instanceof JsonArray) {
+                jsonToXml(writer, (JsonArray) element, name);
+                continue;
+            }
+
+            // start with element name
+            writer.writeStartElement(name);
+            writer.writeCharacters(element.toString());
+            // end with element name
+            writer.writeEndElement();
+        }
     }
 }

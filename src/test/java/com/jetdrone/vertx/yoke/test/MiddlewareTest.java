@@ -5,13 +5,11 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.stream.StreamSource;
-import java.io.StringReader;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.transform.TransformerException;
 
 import static org.vertx.testtools.VertxAssert.*;
 
@@ -32,7 +30,7 @@ public class MiddlewareTest extends TestVerticle {
     }
 
     @Test
-    public void testXml() throws Exception {
+    public void testXml() throws TransformerException, XMLStreamException {
         String message = "\n" +
                 "\n" +
                 "<Customers>\n" +
@@ -59,18 +57,12 @@ public class MiddlewareTest extends TestVerticle {
                 "</Customers>\n" +
                 "\n";
 
-        String s = Utils.readResourceToBuffer(Utils.class, "xml-to-json.xsl").toString();
+        JsonObject json = Utils.xmlToJson(message).getObject("Customers");
+        assertNotNull(json);
 
-        StreamSource xslSource = new StreamSource(new StringReader(s));
-
-        TransformerFactory factory = TransformerFactory.newInstance();
-        Transformer transformer = factory.newTransformer(xslSource);
-
-        transformer.transform( new StreamSource(new StringReader(message))
-                , new StreamResult(System.out)
-        );
+        String xml = Utils.jsonToXml(json, "Customers");
+        assertNotNull(xml);
 
         testComplete();
-
     }
 }
