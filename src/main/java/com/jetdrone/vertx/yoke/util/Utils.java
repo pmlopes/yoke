@@ -16,9 +16,18 @@
 package com.jetdrone.vertx.yoke.util;
 
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.json.JsonObject;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -88,6 +97,28 @@ public final class Utils {
     }
 
     /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    public static String readResourceToString(Class<?> clazz, String resource) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                return writer.toString();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    /**
      * Creates a new HmacSHA256 Message Authentication Code
      * @param secret The secret key used to create signatures
      * @return Mac implementation
@@ -133,5 +164,38 @@ public final class Utils {
                 .replaceAll("\"", "&quot;")
                 .replaceAll("<", "&lt;")
                 .replaceAll(">", "&gt;");
+    }
+
+    private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
+    private static final String XSLT = Utils.readResourceToString(XML.class, "xml-to-json.xsl");
+
+    public static JsonObject XMLToJson(String xml) throws TransformerException {
+        // allocate the size of the xml (this is probably is more than needed but avoid re-allocations)
+        StringWriter out = new StringWriter(xml.length());
+
+        Transformer transformer = TRANSFORMER_FACTORY.newTransformer(new StreamSource(new StringReader(XSLT)));
+        transformer.transform(new StreamSource(new StringReader(xml)), new StreamResult(out));
+
+        return new JsonObject(out.toString());
+    }
+
+    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
+
+    public static String JsonToXML(JsonObject json) throws XMLStreamException {
+        Writer xml = new StringWriter();
+        // Create an XML stream writer
+        XMLStreamWriter xmlw = XML_OUTPUT_FACTORY.createXMLStreamWriter(xml);
+
+        // Write XML prologue
+        xmlw.writeStartDocument();
+
+        // TODO: real conversion
+
+        // Write document end. This closes all open structures
+        xmlw.writeEndDocument();
+        // Close the writer to flush the output
+        xmlw.close();
+
+        return xml.toString();
     }
 }
