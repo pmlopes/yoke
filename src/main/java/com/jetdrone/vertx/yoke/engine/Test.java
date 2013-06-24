@@ -63,9 +63,55 @@ public class Test {
         }
     }
 
+    static String template1 = "\t\n" +
+            "\n" +
+            "    <script type=\"text/html\" id=\"item_tmpl\">\n" +
+            "      <div id=\"<%=id%>\" class=\"<%=(i % 2 == 1 ? \" even\" : \"\")%>\">\n" +
+            "        <div class=\"grid_1 alpha right\">\n" +
+            "          <img class=\"righted\" src=\"<%=profile_image_url%>\"/>\n" +
+            "        </div>\n" +
+            "        <div class=\"grid_6 omega contents\">\n" +
+            "          <p><b><a href=\"/<%=from_user%>\"><%=from_user%></a>:</b> <%=text%></p>\n" +
+            "        </div>\n" +
+            "      </div>\n" +
+            "    </script>\n" +
+            "\n";
+
+    static String template2 = "\t\n" +
+            "\n" +
+            "    <script type=\"text/html\" id=\"user_tmpl\">\n" +
+            "      <% for ( var i = 0; i < users.length; i++ ) { %>\n" +
+            "        <li><a href=\"<%=users[i].url%>\"><%=users[i].name%></a></li>\n" +
+            "      <% } %>\n" +
+            "    </script>\n" +
+            "\n";
+
+    public static void template() {
+        int open = 0;
+        int close = 0;
+
+        for (int i = 0; i < template1.length() - 1; i++) {
+            if (template1.charAt(i) == '<' && template1.charAt(i+1) == '%') {
+                if (close < i) {
+                    // slice
+                    System.out.println("S:" + template1.substring(close, i));
+                }
+                open = i;
+            }
+            if (template1.charAt(i) == '%' && template1.charAt(i+1) == '>') {
+                close = i+2;
+                if (open < i) {
+                    // slice
+                    System.out.println("C:" + template1.substring(open, close));
+                }
+            }
+        }
+    }
+
     public static void main(String[] args) {
-        availableEngine();
-        jsEvalWithVariable();
+        template();
+//        availableEngine();
+//        jsEvalWithVariable();
 
     }
 }
