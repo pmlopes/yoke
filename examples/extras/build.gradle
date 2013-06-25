@@ -55,7 +55,9 @@ dependencies {
   //provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   // get yoke jar for parent
-  compile project(':')
+  provided project(':framework')
+  // get yoke jar for extras
+  provided project(':framework-extras')
 }
 
 test {
@@ -72,21 +74,21 @@ Please edit the details below.
  */
 def configurePom(def pom) {
   pom.project {
-    description 'Description of your module here'
+    description 'Example of the extras'
     inceptionYear '2013'
     packaging 'zip'
-    url 'Your project url'
+    url 'http://pmlopes.github.io/yoke/'
 
     developers {
       developer {
-        id 'developer id (e.g. github username)'
-        name 'developer name'
-        email 'developer email'
+        id 'pmlopes'
+        name 'Paulo Lopes'
+        email 'pmlopes@gmail.com'
       }
     }
 
     scm {
-      url 'url to your repo - e.g. github repo url'
+      url 'git@github.com:pmlopes/yoke.git'
     }
 
     licenses {
