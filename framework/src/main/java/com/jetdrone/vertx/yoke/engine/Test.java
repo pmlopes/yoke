@@ -86,30 +86,40 @@ public class Test {
             "    </script>\n" +
             "\n";
 
-    public static void template() {
+    public static void template(String template) {
         int open = 0;
         int close = 0;
 
-        for (int i = 0; i < template1.length() - 1; i++) {
-            if (template1.charAt(i) == '<' && template1.charAt(i+1) == '%') {
+        List<String> strings = new ArrayList<>();
+        StringBuilder code = new StringBuilder();
+
+        for (int i = 0; i < template.length() - 1; i++) {
+            if (template.charAt(i) == '<' && template.charAt(i+1) == '%') {
                 if (close < i) {
                     // slice
-                    System.out.println("S:" + template1.substring(close, i));
+                    int id = strings.size();
+                    strings.add(template.substring(close, i));
+                    code.append("print(");
+                    code.append(id);
+                    code.append(");\n");
                 }
                 open = i;
             }
-            if (template1.charAt(i) == '%' && template1.charAt(i+1) == '>') {
+            if (template.charAt(i) == '%' && template.charAt(i+1) == '>') {
                 close = i+2;
                 if (open < i) {
                     // slice
-                    System.out.println("C:" + template1.substring(open, close));
+                    code.append(template.substring(open, close));
+                    code.append("\n");
                 }
             }
         }
+
+        System.out.println(code.toString());
     }
 
     public static void main(String[] args) {
-        template();
+        template(template2);
 //        availableEngine();
 //        jsEvalWithVariable();
 

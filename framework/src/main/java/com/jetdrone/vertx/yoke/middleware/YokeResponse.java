@@ -31,6 +31,7 @@ import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.streams.ReadStream;
 
+import java.nio.charset.Charset;
 import java.util.*;
 
 public class YokeResponse implements HttpServerResponse {
@@ -48,13 +49,38 @@ public class YokeResponse implements HttpServerResponse {
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
+    // writer filter
+    private WriterFilter filter;
+
+    // content-type, content-encoding
+    private String contentType = null;
+    private String contentEncoding = Charset.defaultCharset().name();
+
     public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         this.response = response;
         this.context = context;
         this.engines = engines;
     }
 
+    // protected extension
+
+    void setFilter(WriterFilter filter) {
+        this.filter = filter;
+    }
+
     // extension to default interface
+
+    public YokeResponse setContentType(String contentType) {
+        this.contentType = contentType;
+        // TODO: apply it to the response headers
+        return this;
+    }
+
+    public YokeResponse setContentEncoding(String contentEncoding) {
+        this.contentEncoding = contentEncoding;
+        // TODO: apply it to the response headers
+        return this;
+    }
 
     public void render(final String template, final Handler<Object> next) {
         int sep = template.lastIndexOf('.');
@@ -148,25 +174,21 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     public void redirect(int status, String url) {
-        response.setStatusCode(status);
-        response.setStatusMessage(HttpResponseStatus.valueOf(status).reasonPhrase());
-        response.putHeader("location", url);
+        setStatusCode(status);
+        setStatusMessage(HttpResponseStatus.valueOf(status).reasonPhrase());
+        putHeader("location", url);
         end();
     }
 
     public void end(JsonElement json) {
         if (json.isArray()) {
             JsonArray jsonArray = json.asArray();
-            response.putHeader("content-type", "application/json");
-            triggerHeadersHandlers();
-            response.end(jsonArray.encode());
-            triggerEndHandlers();
+            putHeader("content-type", "application/json");
+            end(jsonArray.encode());
         } else if (json.isObject()) {
             JsonObject jsonObject = json.asObject();
-            response.putHeader("content-type", "application/json");
-            triggerHeadersHandlers();
-            response.end(jsonObject.encode());
-            triggerEndHandlers();
+            putHeader("content-type", "application/json");
+            end(jsonObject.encode());
         }
     }
 
@@ -205,10 +227,8 @@ public class YokeResponse implements HttpServerResponse {
 
         if (callback == null) {
             // treat as normal json response
-            response.putHeader("content-type", "application/json");
-            triggerHeadersHandlers();
-            response.end(body);
-            triggerEndHandlers();
+            putHeader("content-type", "application/json");
+            end(body);
             return;
         }
 
@@ -220,15 +240,14 @@ public class YokeResponse implements HttpServerResponse {
         body = body.replaceAll("\\u2028", "\\\\u2028").replaceAll("\\u2029", "\\\\u2029");
 
         // content-type
-        response.putHeader("content-type", "text/javascript");
+        putHeader("content-type", "text/javascript");
         String cb = callback.replaceAll("[^\\[\\]\\w$.]", "");
-        triggerHeadersHandlers();
-        response.end(cb + " && " + cb + "(" + body + ");");
-        triggerEndHandlers();
+        end(cb + " && " + cb + "(" + body + ");");
     }
 
     public void end(ReadStream<?> stream) {
         triggerHeadersHandlers();
+        // TODO: filter stream
         Pump.createPump(stream, response).start();
         stream.endHandler(new Handler<Void>() {
             @Override
@@ -361,6 +380,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(Buffer chunk) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.write(chunk);
         return this;
@@ -385,6 +405,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(String chunk, String enc) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.write(chunk, enc);
         return this;
@@ -392,6 +413,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(String chunk) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.write(chunk);
         return this;
@@ -399,6 +421,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public void end(String chunk) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.end(chunk);
         triggerEndHandlers();
@@ -406,6 +429,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public void end(String chunk, String enc) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.end(chunk, enc);
         triggerEndHandlers();
@@ -413,6 +437,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public void end(Buffer chunk) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.end(chunk);
         triggerEndHandlers();
@@ -420,6 +445,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public void end() {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.end();
         triggerEndHandlers();
@@ -427,6 +453,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse sendFile(String filename) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.sendFile(filename);
         return this;
@@ -434,6 +461,7 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse sendFile(String filename, String notFoundFile) {
+        // TODO: filter chunk
         triggerHeadersHandlers();
         response.sendFile(filename, notFoundFile);
         return this;
