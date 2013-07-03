@@ -9,7 +9,7 @@ import java.io.OutputStream;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class Compress extends Middleware {
+class Compress extends Middleware {
 
     private static final class GZipWriterFilter implements WriterFilter {
 

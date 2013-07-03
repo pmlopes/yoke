@@ -49,12 +49,12 @@ public class YokeResponse implements HttpServerResponse {
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
-    // writer filter
-    private WriterFilter filter;
+//    // writer filter
+//    private WriterFilter filter;
 
-    // content-type, content-encoding
-    private String contentType = null;
-    private String contentEncoding = Charset.defaultCharset().name();
+//    // content-type, content-encoding
+//    private String contentType = null;
+//    private String contentEncoding = Charset.defaultCharset().name();
 
     public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         this.response = response;
@@ -64,23 +64,23 @@ public class YokeResponse implements HttpServerResponse {
 
     // protected extension
 
-    void setFilter(WriterFilter filter) {
-        this.filter = filter;
-    }
+//    void setFilter(WriterFilter filter) {
+//        this.filter = filter;
+//    }
 
     // extension to default interface
 
-    public YokeResponse setContentType(String contentType) {
-        this.contentType = contentType;
-        // TODO: apply it to the response headers
-        return this;
-    }
-
-    public YokeResponse setContentEncoding(String contentEncoding) {
-        this.contentEncoding = contentEncoding;
-        // TODO: apply it to the response headers
-        return this;
-    }
+//    public YokeResponse setContentType(String contentType) {
+//        this.contentType = contentType;
+//        // TODO: apply it to the response headers
+//        return this;
+//    }
+//
+//    public YokeResponse setContentEncoding(String contentEncoding) {
+//        this.contentEncoding = contentEncoding;
+//        // TODO: apply it to the response headers
+//        return this;
+//    }
 
     public void render(final String template, final Handler<Object> next) {
         int sep = template.lastIndexOf('.');
