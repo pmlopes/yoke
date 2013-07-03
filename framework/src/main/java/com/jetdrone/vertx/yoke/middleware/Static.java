@@ -88,7 +88,7 @@ public class Static extends Middleware {
         // write content type
         String contentType = MimeType.getMime(file);
         String charset = MimeType.getCharset(contentType);
-        request.response().putHeader("content-type",contentType + (charset != null ? "; charset=" + charset : ""));
+        request.response().setContentType(contentType, charset);
         request.response().putHeader("Content-Length", Long.toString(props.size()));
 
         // head support
@@ -158,7 +158,7 @@ public class Static extends Middleware {
                             directory.append("</a>");
                         }
 
-                        request.response().putHeader("Content-Type", "text/html");
+                        request.response().setContentType("text/html");
                         request.response().end(
                                 directoryTemplate.replace("{title}", (String) request.get("title")).replace("{directory}", normalizedDir)
                                         .replace("{linked-path}", directory.toString())
@@ -191,7 +191,7 @@ public class Static extends Middleware {
                             buffer.append('\n');
                         }
 
-                        request.response().putHeader("content-type", "text/plain");
+                        request.response().setContentType("text/plain");
                         request.response().end(buffer.toString());
                     }
                 }

@@ -114,7 +114,7 @@ public class KitCMS extends Verticle {
                             if (asyncResult.failed()) {
                                 next.handle(asyncResult.cause());
                             } else {
-                                request.response().putHeader("Content-Type", "application/json");
+                                request.response().setContentType("application/json");
                                 // TODO: escape
                                 request.response().end("\"" + asyncResult.result() + "\"");
                             }
@@ -148,7 +148,7 @@ public class KitCMS extends Verticle {
                             if (asyncResult.failed()) {
                                 next.handle(asyncResult.cause());
                             } else {
-                                request.response().putHeader("Content-Type", "application/json");
+                                request.response().setContentType("application/json");
                                 request.response().end("\"OK\"");
                             }
                         }
@@ -175,7 +175,7 @@ public class KitCMS extends Verticle {
                             if (asyncResult.failed()) {
                                 next.handle(asyncResult.cause());
                             } else {
-                                request.response().putHeader("Content-Type", "application/json");
+                                request.response().setContentType("application/json");
                                 request.response().end("\"OK\"");
                             }
                         }
@@ -289,7 +289,7 @@ public class KitCMS extends Verticle {
                                 // if nothing is found on the database proceed with the chain
                                 next.handle(null);
                             } else {
-                                request.response().putHeader("Content-Type", MimeType.getMime(file, "text/html"));
+                                request.response().setContentType(MimeType.getMime(file, "text/html"));
                                 request.response().end(asyncResult.result());
                             }
                         }

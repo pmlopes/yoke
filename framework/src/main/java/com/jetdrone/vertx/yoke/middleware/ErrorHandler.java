@@ -113,7 +113,7 @@ public class ErrorHandler extends Middleware {
                 stack.append("</li>");
             }
 
-            response.putHeader("Content-Type", "text/html");
+            response.setContentType("text/html");
             response.end(
                     errorTemplate.replace("{title}", (String) request.get("title"))
                             .replace("{errorCode}", Integer.toString(errorCode))
@@ -129,10 +129,10 @@ public class ErrorHandler extends Middleware {
                 }
                 jsonError.putArray("stack", stack);
             }
-            response.putHeader("Content-Type", "application/json");
+            response.setContentType("application/json", "UTF-8");
             response.end(jsonError.encode());
         } else {
-            response.putHeader("Content-Type", "text/plain");
+            response.setContentType("text/plain");
 
             StringBuilder sb = new StringBuilder();
             sb.append("Error ");

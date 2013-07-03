@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.MimeType;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
@@ -31,7 +32,6 @@ import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.streams.ReadStream;
 
-import java.nio.charset.Charset;
 import java.util.*;
 
 public class YokeResponse implements HttpServerResponse {
@@ -52,10 +52,6 @@ public class YokeResponse implements HttpServerResponse {
 //    // writer filter
 //    private WriterFilter filter;
 
-//    // content-type, content-encoding
-//    private String contentType = null;
-//    private String contentEncoding = Charset.defaultCharset().name();
-
     public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         this.response = response;
         this.context = context;
@@ -70,17 +66,19 @@ public class YokeResponse implements HttpServerResponse {
 
     // extension to default interface
 
-//    public YokeResponse setContentType(String contentType) {
-//        this.contentType = contentType;
-//        // TODO: apply it to the response headers
-//        return this;
-//    }
-//
-//    public YokeResponse setContentEncoding(String contentEncoding) {
-//        this.contentEncoding = contentEncoding;
-//        // TODO: apply it to the response headers
-//        return this;
-//    }
+    public YokeResponse setContentType(String contentType) {
+        setContentType(contentType, MimeType.getCharset(contentType));
+        return this;
+    }
+
+    public YokeResponse setContentType(String contentType, String contentEncoding) {
+        if (contentEncoding == null) {
+            putHeader("content-type", contentType);
+        } else {
+            putHeader("content-type", contentType + ";charset=" + contentEncoding);
+        }
+        return this;
+    }
 
     public void render(final String template, final Handler<Object> next) {
         int sep = template.lastIndexOf('.');
@@ -98,12 +96,7 @@ public class YokeResponse implements HttpServerResponse {
                         if (asyncResult.failed()) {
                             next.handle(asyncResult.cause());
                         } else {
-                            String encoding = renderEngine.contentEncoding();
-                            if (encoding != null) {
-                                putHeader("content-type", renderEngine.contentType() + ";charset=" + encoding);
-                            } else {
-                                putHeader("content-type", renderEngine.contentType());
-                            }
+                            setContentType(renderEngine.contentType(), renderEngine.contentEncoding());
                             end(asyncResult.result());
                         }
                     }
@@ -183,11 +176,11 @@ public class YokeResponse implements HttpServerResponse {
     public void end(JsonElement json) {
         if (json.isArray()) {
             JsonArray jsonArray = json.asArray();
-            putHeader("content-type", "application/json");
+            setContentType("application/json", "UTF-8");
             end(jsonArray.encode());
         } else if (json.isObject()) {
             JsonObject jsonObject = json.asObject();
-            putHeader("content-type", "application/json");
+            setContentType("application/json", "UTF-8");
             end(jsonObject.encode());
         }
     }
@@ -227,7 +220,7 @@ public class YokeResponse implements HttpServerResponse {
 
         if (callback == null) {
             // treat as normal json response
-            putHeader("content-type", "application/json");
+            setContentType("application/json", "UTF-8");
             end(body);
             return;
         }
@@ -240,7 +233,7 @@ public class YokeResponse implements HttpServerResponse {
         body = body.replaceAll("\\u2028", "\\\\u2028").replaceAll("\\u2029", "\\\\u2029");
 
         // content-type
-        putHeader("content-type", "text/javascript");
+        setContentType("text/javascript", "UTF-8");
         String cb = callback.replaceAll("[^\\[\\]\\w$.]", "");
         end(cb + " && " + cb + "(" + body + ");");
     }

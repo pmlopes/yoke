@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import java.util.Map;
 public class MimeType {
 
     private static final Map<String, String> mimes = new HashMap<>();
+    private static final String defaultContentEncoding = Charset.defaultCharset().name();
 
     private static void loadFile(InputStream in) {
 
@@ -95,8 +97,9 @@ public class MimeType {
      * @return charset string
      */
     public static String getCharset(String mime, String fallback) {
+        // TODO: exceptions json and which other should also be marked as text
         if (mime.startsWith("text")) {
-            return "UTF-8";
+            return defaultContentEncoding;
         }
 
         return fallback;
