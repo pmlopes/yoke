@@ -3,11 +3,7 @@ package com.jetdrone.vertx.bench;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.extras.engine.MVELEngine;
-import com.jetdrone.vertx.yoke.middleware.BodyParser;
-import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
-import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
@@ -19,6 +15,38 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class TechEmpower extends Verticle {
+
+    // utilities
+    private static JsonObject buildQuery(String action, String collection, int id) {
+        return new JsonObject()
+                .putString("action", action)
+                .putString("collection", collection)
+                .putObject("matcher", new JsonObject().putNumber("id", id));
+    }
+
+    private static JsonObject buildQuery(String action, String collection) {
+        return new JsonObject()
+                .putString("action", action)
+                .putString("collection", collection)
+                .putObject("matcher", new JsonObject());
+    }
+
+    private static int parseRequestParam(YokeRequest request, String param) {
+        int value = 1;
+        try {
+            value = Integer.parseInt(request.params().get(param));
+            // Bounds check.
+            if (value > 500) {
+                value = 500;
+            }
+            if (value < 1) {
+                value = 1;
+            }
+        } catch (NumberFormatException nfexc) {
+            // do nothing
+        }
+        return value;
+    }
 
     @Override
     public void start() {
@@ -54,27 +82,21 @@ public class TechEmpower extends Verticle {
 
                         final Random random = ThreadLocalRandom.current();
 
-                        eb.send(
-                                address,
-                                new JsonObject()
-                                        .putString("action", "findone")
-                                        .putString("collection", "world")
-                                        .putObject("matcher", new JsonObject().putNumber("id", (random.nextInt(10000) + 1))),
-                                new Handler<Message<JsonObject>>() {
-                                    @Override
-                                    public void handle(Message<JsonObject> message) {
-                                        // get the body
-                                        final JsonObject body = message.body();
+                        eb.send(address, buildQuery("findone", "world", random.nextInt(10000) + 1), new Handler<Message<JsonObject>>() {
+                            @Override
+                            public void handle(Message<JsonObject> message) {
+                                // get the body
+                                final JsonObject body = message.body();
 
-                                        if ("ok".equals(body.getString("status"))) {
-                                            // json -> string serialization
-                                            request.response().end(body.getObject("result"));
-                                            return;
-                                        }
+                                if ("ok".equals(body.getString("status"))) {
+                                    // json -> string serialization
+                                    request.response().end(body.getObject("result"));
+                                    return;
+                                }
 
-                                        next.handle(body.getString("message"));
-                                    }
-                                });
+                                next.handle(body.getString("message"));
+                            }
+                        });
                     }
                 })
                 // Test 3: queries
@@ -84,23 +106,8 @@ public class TechEmpower extends Verticle {
 
                         final Random random = ThreadLocalRandom.current();
 
-                        int param = 1;
-                        try {
-                            param = Integer.parseInt(request.params().get("queries"));
-
-                            // Bounds check.
-                            if (param > 500) {
-                                param = 500;
-                            }
-                            if (param < 1) {
-                                param = 1;
-                            }
-                        } catch (NumberFormatException nfexc) {
-                            // do nothing
-                        }
-
                         // Get the count of queries to run.
-                        final int count = param;
+                        final int count = parseRequestParam(request, "queries");
 
                         final Handler<Message<JsonObject>> dbh = new Handler<Message<JsonObject>>() {
                             // how many messages have this handler received
@@ -129,13 +136,7 @@ public class TechEmpower extends Verticle {
                         };
 
                         for (int i = 0; i < count; i++) {
-                            eb.send(
-                                    address,
-                                    new JsonObject()
-                                            .putString("action", "findone")
-                                            .putString("collection", "world")
-                                            .putObject("matcher", new JsonObject().putNumber("id", (random.nextInt(10000) + 1))),
-                                    dbh);
+                            eb.send(address, buildQuery("findone", "world", random.nextInt(10000) + 1), dbh);
                         }
                     }
                 })
@@ -146,50 +147,44 @@ public class TechEmpower extends Verticle {
 
                         final List<JsonObject> results = new ArrayList<>();
 
-                        eb.send(address,
-                                new JsonObject()
-                                        .putString("action", "find")
-                                        .putString("collection", "fortune")
-                                        .putObject("matcher", new JsonObject()),
-                                new Handler<Message<JsonObject>>() {
-                                    @Override
-                                    public void handle(Message<JsonObject> reply) {
-                                        String status = reply.body().getString("status");
+                        eb.send(address, buildQuery("find", "fortune"), new Handler<Message<JsonObject>>() {
+                            @Override
+                            public void handle(Message<JsonObject> reply) {
+                                String status = reply.body().getString("status");
 
-                                        if (status != null) {
-                                            if ("ok".equalsIgnoreCase(status)) {
-                                                JsonArray itResult = reply.body().getArray("results");
-                                                for (Object o : itResult) {
-                                                    results.add((JsonObject) o);
-                                                }
-                                                // end condition
-                                                results.add(new JsonObject().putNumber("id", 0).putString("message", "Additional fortune added at request time."));
-                                                // sort ASC
-                                                Collections.sort(results, new Comparator<JsonObject>() {
-                                                    @Override
-                                                    public int compare(JsonObject o1, JsonObject o2) {
-                                                        return o1.getNumber("id").intValue() - o2.getNumber("id").intValue();
-                                                    }
-                                                });
-                                                // render
-                                                request.put("fortunes", results);
-                                                request.response().render("views/fortunes.mvel", next);
-                                                return;
-                                            }
-                                            if ("more-exist".equalsIgnoreCase(status)) {
-                                                JsonArray itResult = reply.body().getArray("results");
-                                                for (Object o : itResult) {
-                                                    results.add((JsonObject) o);
-                                                }
-                                                // reply asking for more
-                                                reply.reply(this);
-                                                return;
-                                            }
+                                if (status != null) {
+                                    if ("ok".equalsIgnoreCase(status)) {
+                                        JsonArray itResult = reply.body().getArray("results");
+                                        for (Object o : itResult) {
+                                            results.add((JsonObject) o);
                                         }
-                                        next.handle("error");
+                                        // end condition
+                                        results.add(new JsonObject().putNumber("id", 0).putString("message", "Additional fortune added at request time."));
+                                        // sort ASC
+                                        Collections.sort(results, new Comparator<JsonObject>() {
+                                            @Override
+                                            public int compare(JsonObject o1, JsonObject o2) {
+                                                return o1.getNumber("id").intValue() - o2.getNumber("id").intValue();
+                                            }
+                                        });
+                                        // render
+                                        request.put("fortunes", results);
+                                        request.response().render("views/fortunes.mvel", next);
+                                        return;
                                     }
-                                });
-
+                                    if ("more-exist".equalsIgnoreCase(status)) {
+                                        JsonArray itResult = reply.body().getArray("results");
+                                        for (Object o : itResult) {
+                                            results.add((JsonObject) o);
+                                        }
+                                        // reply asking for more
+                                        reply.reply(this);
+                                        return;
+                                    }
+                                }
+                                next.handle("error");
+                            }
+                        });
                     }
                 })
 //                // Test 5: updates
@@ -199,23 +194,8 @@ public class TechEmpower extends Verticle {
 //
 //                        final Random random = ThreadLocalRandom.current();
 //
-//                        int param = 1;
-//                        try {
-//                            param = Integer.parseInt(request.params().get("queries"));
-//
-//                            // Bounds check.
-//                            if (param > 500) {
-//                                param = 500;
-//                            }
-//                            if (param < 1) {
-//                                param = 1;
-//                            }
-//                        } catch (NumberFormatException nfexc) {
-//                            // do nothing
-//                        }
-//
 //                        // Get the count of queries to run.
-//                        final int count = param;
+//                        final int count = parseRequestParam(request, "queries");
 //
 //                        final Handler<Message<JsonObject>> dbh = new Handler<Message<JsonObject>>() {
 //                            // how many messages have this handler received
