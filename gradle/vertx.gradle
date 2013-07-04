@@ -32,7 +32,7 @@ apply plugin: 'eclipse'
 // a shared Maven local and using Gradle wrapper concurrently
 loadProperties("${System.getProperty('user.home')}/.gradle/gradle.properties")
 
-apply from: "$rootDir/gradle/maven.gradle"
+apply from: "gradle/maven.gradle"
 
 group = modowner
 archivesBaseName = modname
@@ -47,6 +47,8 @@ project.ext.moduleName = "$modowner~$modname~$version"
 if (produceJar == 'false') {
   jar.enabled = false
   assert configurations.archives.artifacts.removeAll { it.file == jar.archivePath }
+} else {
+
 }
 
 configurations {
@@ -116,22 +118,8 @@ task modZip( type: Zip, dependsOn: 'pullInDeps', description: 'Package the modul
   from copyMod
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-  from sourceSets.main.allSource
-  classifier = 'sources'
-}
-
-javadoc.classpath += configurations.provided
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
 artifacts {
   archives modZip
-  archives sourcesJar
-  archives javadocJar
 }
 
 test {
