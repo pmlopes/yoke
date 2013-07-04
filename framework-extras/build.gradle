@@ -50,6 +50,8 @@ dependencies {
     // slf4j version colides with vert.x provided one
     exclude group: "org.slf4j"
   }
+  // include mvel2
+  compile("org.mvel:mvel2:$mvelVersion")
 }
 
 test {
