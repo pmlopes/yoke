@@ -55,6 +55,8 @@ dependencies {
   //provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   provided project(':framework')
+  // get yoke jar for extras
+  provided project(':framework-extras')
 }
 
 test {
@@ -71,7 +73,7 @@ Please edit the details below.
  */
 def configurePom(def pom) {
   pom.project {
-    description 'Yoke benchmark'
+    description 'Yoke Techempower benchmark'
     inceptionYear '2013'
     packaging 'zip'
     url 'http://pmlopes.github.io/yoke/'
