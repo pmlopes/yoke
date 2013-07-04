@@ -1,6 +1,7 @@
 import org.vertx.java.core.AsyncResult
 import org.vertx.java.core.AsyncResultHandler
 import org.vertx.java.platform.PlatformLocator
+import org.vertx.java.platform.impl.ModuleClassLoader
 
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -108,6 +109,7 @@ task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module
 
 task modZip( type: Zip, dependsOn: 'pullInDeps', description: 'Package the module .zip file') {
   group = 'vert.x'
+  classifier = "mod"
   description = "Assembles a vert.x module"
   destinationDir = project.file('build/libs')
   archiveName = "${modname}-${version}" + ".zip"
@@ -143,8 +145,39 @@ test {
 
   testLogging { exceptionFormat "full" }
 
-  systemProperty 'vertx.loadWithPlatformCL', "false"
   systemProperty 'vertx.mods', "build/mods"
+}
+
+task runModIDEA(dependsOn: copyMod, description: 'Run the module from the resources in IntelliJ') << {
+  def classpath = [ new URL('file:src/main/resources/'), new URL('file:src/test/resources/'),
+      new URL("file:out/production/${project.name}/"), new URL("file:out/test/${project.name}/")] as URL[]
+
+  println "file:out/production/${project.name}"
+  runModWithClasspath(classpath)
+}
+
+task runModEclipse(dependsOn: copyMod, description: 'Run the module from the resources in Eclipse') << {
+  def classpath = [ new URL('file:src/main/resources/'), new URL('file:src/test/resources/'), new URL('file:bin/')] as URL[]
+  runModWithClasspath(classpath)
+}
+
+def runModWithClasspath(URL[] classpath) {
+  setSysProps()
+  def pm = PlatformLocator.factory.createPlatformManager()
+  def latch = new CountDownLatch(1)
+  pm.deployModuleFromClasspath(moduleName, null, 1, classpath, new
+  AsyncResultHandler<String>() {
+    public void handle(AsyncResult<String> asyncResult) {
+      if (asyncResult.succeeded()) {
+        println "CTRL-C to stop server"
+      } else {
+        println "Failed to deploy module"
+        asyncResult.cause().printStackTrace()
+        latch.countDown()
+      }
+    }
+  });
+  latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
 }
 
 task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
@@ -197,7 +230,7 @@ def loadProperties(String sourceFileName) {
   if (propFile.canRead()) {
     config.load(new FileInputStream(propFile))
     for (Map.Entry property in config) {
-      project.ext[(String) property.key] = property.value;
+      project.ext[property.key] = property.value;
     }
   }
 }
