@@ -404,6 +404,36 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /**
+     * Allow getting parameters in a generified way.
+     *
+     * @param name The key to get
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R getParameter(String name) {
+        return (R) params().get(name);
+    }
+
+    /**
+     * Allow getting parameters in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    public <R> R getParameter(String name, R defaultValue) {
+        R value = getParameter(name);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return value;
+    }
+
+    /**
      * Return the real request
      */
     public HttpServerRequest vertxHttpServerRequest() {
