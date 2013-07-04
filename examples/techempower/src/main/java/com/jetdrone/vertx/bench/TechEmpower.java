@@ -31,6 +31,16 @@ public class TechEmpower extends Verticle {
                 .putObject("matcher", new JsonObject());
     }
 
+    private static JsonObject buildUpdate(String collection, int id, int randomNumber) {
+        return new JsonObject()
+                .putString("collection", collection)
+                .putString("action", "update")
+                .putObject("criteria", new JsonObject().putNumber("id", id))
+                .putObject("objNew", new JsonObject().
+                        putObject("$set", new JsonObject().putNumber("randomNumber", randomNumber)));
+
+    }
+
     private static int parseRequestParam(YokeRequest request, String param) {
         int value = 1;
         try {
@@ -187,53 +197,54 @@ public class TechEmpower extends Verticle {
                         });
                     }
                 })
-//                // Test 5: updates
-//                .use("/updates", new Middleware() {
-//                    @Override
-//                    public void handle(final YokeRequest request, final Handler<Object> next) {
-//
-//                        final Random random = ThreadLocalRandom.current();
-//
-//                        // Get the count of queries to run.
-//                        final int count = parseRequestParam(request, "queries");
-//
-//                        final Handler<Message<JsonObject>> dbh = new Handler<Message<JsonObject>>() {
-//                            // how many messages have this handler received
-//                            int received = 0;
-//                            // keeps the received messages
-//                            JsonArray result = new JsonArray();
-//
-//                            @Override
-//                            public void handle(Message<JsonObject> message) {
-//                                // increase the counter
-//                                received++;
-//
-//                                // get the body
-//                                final JsonObject body = message.body();
-//
-//                                if ("ok".equals(body.getString("status"))) {
-//                                    // json -> string serialization
-//                                    result.add(body.getObject("result"));
-//                                }
-//
-//                                // end condition
-//                                if (received == count) {
-//                                    request.response().end(result);
-//                                }
-//                            }
-//                        };
-//
-//                        for (int i = 0; i < count; i++) {
-//                            eb.send(
-//                                    address,
-//                                    new JsonObject()
-//                                            .putString("action", "findone")
-//                                            .putString("collection", "world")
-//                                            .putObject("matcher", new JsonObject().putNumber("id", (random.nextInt(10000) + 1))),
-//                                    dbh);
-//                        }
-//                    }
-//                })
+                // Test 5: updates
+                .use("/updates", new Middleware() {
+                    @Override
+                    public void handle(final YokeRequest request, final Handler<Object> next) {
+
+                        final Random random = ThreadLocalRandom.current();
+
+                        // Get the count of queries to run.
+                        final int count = parseRequestParam(request, "queries");
+
+                        final Handler<Message<JsonObject>> dbh = new Handler<Message<JsonObject>>() {
+                            // how many messages have this handler received
+                            int received = 0;
+                            // keeps the received messages
+                            JsonArray worlds = new JsonArray();
+
+                            @Override
+                            public void handle(Message<JsonObject> message) {
+
+                                // get the body
+                                final JsonObject body = message.body();
+                                JsonObject world;
+
+                                if ("ok".equals(body.getString("status"))) {
+                                    world = new JsonObject()
+                                            .putNumber("id", received)
+                                            .putNumber("randomNumber", body.getObject("result").getNumber("randomNumber"));
+                                    worlds.add(world);
+
+                                    world.putNumber("randomNumber", random.nextInt(10000) + 1);
+                                    eb.send(address, buildUpdate("world", world.getInteger("id"), world.getInteger("randomNumber")));
+                                }
+
+                                // increase the counter
+                                received++;
+
+                                // end condition
+                                if (received == count) {
+                                    request.response().end(worlds);
+                                }
+                            }
+                        };
+
+                        for (int i = 0; i < count; i++) {
+                            eb.send(address, buildQuery("findone", "world", random.nextInt(10000) + 1), dbh);
+                        }
+                    }
+                })
                 // Test 6: plain text
                 .use("/plaintext", new Middleware() {
                     @Override
