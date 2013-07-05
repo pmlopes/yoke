@@ -407,12 +407,10 @@ public class YokeRequest implements HttpServerRequest {
      * Allow getting parameters in a generified way.
      *
      * @param name The key to get
-     * @param <R> The type of the return
      * @return The found object
      */
-    @SuppressWarnings("unchecked")
-    public <R> R getParameter(String name) {
-        return (R) params().get(name);
+    public String getParameter(String name) {
+        return params().get(name);
     }
 
     /**
@@ -420,17 +418,26 @@ public class YokeRequest implements HttpServerRequest {
      *
      * @param name The key to get
      * @param defaultValue value returned when the key does not exist
-     * @param <R> The type of the return
      * @return The found object
      */
-    public <R> R getParameter(String name, R defaultValue) {
-        R value = getParameter(name);
+    public String getParameter(String name, String defaultValue) {
+        String value = getParameter(name);
 
         if (value == null) {
             return defaultValue;
         }
 
         return value;
+    }
+
+    /**
+     * Allow getting parameters in a generified way.
+     *
+     * @param name The key to get
+     * @return The found object
+     */
+    public List<String> getParameterList(String name) {
+        return params().getAll(name);
     }
 
     /**
