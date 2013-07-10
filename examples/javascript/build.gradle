@@ -15,8 +15,7 @@ idea - generate a skeleton IntelliJ IDEA project
 
 eclipse - generate a skeleton Eclipse IDE project
 
-assemble - builds the outputs, by default this is the module zip file. It can also include a jar file if produceJar
-          in gradle.properties is set to true. Outputs are created in build/libs.
+assemble - builds the outputs, by default this is the module zip and jar files. Outputs are created in build/libs.
           if pullInDeps in gradle.properties is set to 'true' then the modules dependencies will be
           automatically pulled into a nested mods directory inside the module during the build
 
@@ -74,7 +73,7 @@ def configurePom(def pom) {
   pom.project {
     description 'Description of your module here'
     inceptionYear '2013'
-    packaging 'zip'
+    packaging 'jar'
     url 'Your project url'
 
     developers {

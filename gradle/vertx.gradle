@@ -44,11 +44,6 @@ targetCompatibility = '1.7'
 
 project.ext.moduleName = "$modowner~$modname~$version"
 
-if (produceJar == 'false') {
-  jar.enabled = false
-  assert configurations.archives.artifacts.removeAll { it.file == jar.archivePath }
-}
-
 configurations {
   provided
   testCompile.extendsFrom provided
