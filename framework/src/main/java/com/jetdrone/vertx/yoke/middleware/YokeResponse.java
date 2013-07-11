@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.MimeType;
+import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
@@ -49,8 +50,9 @@ public class YokeResponse implements HttpServerResponse {
     private boolean headersHandlerTriggered;
     private List<Handler<Void>> endHandler;
 
-//    // writer filter
-//    private WriterFilter filter;
+    // writer filter
+    private WriterFilter filter;
+    private boolean hasBody;
 
     public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         this.response = response;
@@ -60,9 +62,9 @@ public class YokeResponse implements HttpServerResponse {
 
     // protected extension
 
-//    void setFilter(WriterFilter filter) {
-//        this.filter = filter;
-//    }
+    void setFilter(WriterFilter filter) {
+        this.filter = filter;
+    }
 
     // extension to default interface
 
@@ -239,8 +241,10 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     public void end(ReadStream<?> stream) {
+        // TODO: filter stream?
+        hasBody = true;
+        filter = null;
         triggerHeadersHandlers();
-        // TODO: filter stream
         Pump.createPump(stream, response).start();
         stream.endHandler(new Handler<Void>() {
             @Override
@@ -276,14 +280,33 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     private void triggerHeadersHandlers() {
-        if (headersHandler != null && !headersHandlerTriggered) {
+        if (!headersHandlerTriggered) {
             headersHandlerTriggered = true;
-            for (Handler<Void> handler : headersHandler) {
-                handler.handle(null);
+            // if there are handlers call them
+            if (headersHandler != null) {
+                for (Handler<Void> handler : headersHandler) {
+                    handler.handle(null);
+                }
             }
             // convert the cookies set to the right header
             if (cookies != null) {
                 response.putHeader("set-cookie", ServerCookieEncoder.encode(cookies));
+            }
+
+            // if there is a filter then set the right header
+            if (filter != null) {
+                // verify if the filter can filter this content
+                if (filter.canFilter(response.headers().get("content-type"))) {
+                    response.putHeader("content-encoding", filter.encoding());
+                } else {
+                    // disable the filter
+                    filter = null;
+                }
+            }
+            // if there is no content delete content-type, content-encoding
+            if (!hasBody) {
+                response.headers().remove("content-encoding");
+                response.headers().remove("content-type");
             }
         }
     }
@@ -373,9 +396,13 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(Buffer chunk) {
-        // TODO: filter chunk
+        hasBody = true;
         triggerHeadersHandlers();
-        response.write(chunk);
+        if (filter == null) {
+            response.write(chunk);
+        } else {
+            filter.write(chunk);
+        }
         return this;
     }
 
@@ -398,47 +425,62 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse write(String chunk, String enc) {
-        // TODO: filter chunk
+        hasBody = true;
         triggerHeadersHandlers();
-        response.write(chunk, enc);
+        if (filter == null) {
+            response.write(chunk, enc);
+        } else {
+            filter.write(chunk, enc);
+        }
         return this;
     }
 
     @Override
     public HttpServerResponse write(String chunk) {
-        // TODO: filter chunk
+        hasBody = true;
         triggerHeadersHandlers();
-        response.write(chunk);
+        if (filter == null) {
+            response.write(chunk);
+        } else {
+            filter.write(chunk);
+        }
         return this;
     }
 
     @Override
     public void end(String chunk) {
-        // TODO: filter chunk
+        hasBody = true;
         triggerHeadersHandlers();
-        response.end(chunk);
+        if (filter == null) {
+            response.end(chunk);
+        } else {
+            response.end(filter.end(chunk));
+        }
         triggerEndHandlers();
     }
 
     @Override
     public void end(String chunk, String enc) {
-        // TODO: filter chunk
+        hasBody = true;
         triggerHeadersHandlers();
-        response.end(chunk, enc);
+        if (filter == null) {
+            response.end(chunk, enc);
+        } else {
+            response.end(filter.end(chunk, enc));
+        }
         triggerEndHandlers();
     }
 
     @Override
     public void end(Buffer chunk) {
-        // TODO: filter chunk
+        hasBody = true;
         triggerHeadersHandlers();
-        response.end(chunk);
+        response.end(filter == null ? chunk : filter.end(chunk));
         triggerEndHandlers();
     }
 
     @Override
     public void end() {
-        // TODO: filter chunk
         triggerHeadersHandlers();
         response.end();
         triggerEndHandlers();
@@ -446,7 +488,9 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse sendFile(String filename) {
-        // TODO: filter chunk
+        // TODO: filter file?
+        hasBody = true;
+        filter = null;
         triggerHeadersHandlers();
         response.sendFile(filename);
         return this;
@@ -454,7 +498,9 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public HttpServerResponse sendFile(String filename, String notFoundFile) {
-        // TODO: filter chunk
+        // TODO: filter file?
+        hasBody = true;
+        filter = null;
         triggerHeadersHandlers();
         response.sendFile(filename, notFoundFile);
         return this;

@@ -13,10 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.middleware.filters;
 
 import org.vertx.java.core.buffer.Buffer;
 
 public interface WriterFilter {
-    Buffer write(String contentType, Buffer string);
+    /**
+     * Returns the content encoding name for this filter.
+     * @return encoder name gzip, deflate
+     */
+    String encoding();
+
+    void write(Buffer buffer);
+
+    void write(String chunk);
+
+    void write(String chunk, String enc);
+
+    Buffer end(Buffer buffer);
+
+    Buffer end(String chunk);
+
+    Buffer end(String chunk, String enc);
+
+    boolean canFilter(String contentType);
 }

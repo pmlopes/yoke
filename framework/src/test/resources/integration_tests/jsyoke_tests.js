@@ -15,10 +15,10 @@ function testJS() {
         next(401);
     });
 
-    yoke.listen(8080);
+    yoke.listen(8888);
 
     // The server is listening so send an HTTP request
-    vertx.createHttpClient().port(8080).getNow("/", function(resp) {
+    vertx.createHttpClient().port(8888).getNow("/", function(resp) {
         vassert.assertTrue(401 == resp.statusCode());
         vassert.testComplete();
     });
@@ -34,10 +34,10 @@ function testJSListenToServer() {
     });
 
     yoke.listen(server);
-    server.listen(8080);
+    server.listen(8888);
 
     // The server is listening so send an HTTP request
-    vertx.createHttpClient().port(8080).getNow("/", function(resp) {
+    vertx.createHttpClient().port(8888).getNow("/", function(resp) {
         vassert.assertTrue(401 == resp.statusCode());
         vassert.testComplete();
     });

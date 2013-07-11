@@ -1,76 +1,68 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.middleware.filters.AbstractWriterFilter;
+import com.jetdrone.vertx.yoke.middleware.filters.DeflateWriterFilter;
+import com.jetdrone.vertx.yoke.middleware.filters.GZipWriterFilter;
+import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPOutputStream;
 
-class Compress extends Middleware {
+public class Compress extends Middleware {
 
-    private static final class GZipWriterFilter implements WriterFilter {
+    private final Pattern filter;
 
-        final GZIPOutputStream gzip;
-        private Buffer buffer;
-
-        GZipWriterFilter() {
-            try {
-                gzip = new GZIPOutputStream(new OutputStream() {
-                    @Override
-                    public void write(int i) throws IOException {
-                        buffer.appendByte((byte) i);
-                    }
-                });
-            } catch (IOException ioe) {
-                throw new RuntimeException(ioe);
-            }
-        }
-
-        @Override
-        public Buffer write(String contentType, Buffer string) {
-            try {
-                buffer = new Buffer();
-                gzip.write(string.getBytes());
-                gzip.flush();
-                return buffer;
-            } catch (IOException e) {
-                return null;
-            }
-        }
+    public Compress(Pattern filter) {
+        this.filter = filter;
     }
 
-    private static final class DeflateWriterFilter implements WriterFilter {
-
-        final DeflaterOutputStream deflate;
-        private Buffer buffer;
-
-        DeflateWriterFilter() {
-            deflate = new DeflaterOutputStream(new OutputStream() {
-                @Override
-                public void write(int i) throws IOException {
-                    buffer.appendByte((byte) i);
-                }
-            });
-        }
-
-        @Override
-        public Buffer write(String contentType, Buffer string) {
-            try {
-                buffer = new Buffer();
-                deflate.write(string.getBytes());
-                deflate.flush();
-                return buffer;
-            } catch (IOException e) {
-                return null;
-            }
-        }
+    public Compress() {
+        this(Pattern.compile("json|text|javascript"));
     }
 
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        final String method = request.method();
+        final YokeResponse response = request.response();
+
+        // vary
+        response.putHeader("vary", "accept-encoding");
+
+        // head requests are not compressed
+        if ("HEAD".equals(method)) {
+            next.handle(null);
+            return;
+        }
+
+        final String accept = request.getHeader("accept-encoding");
+
+        // if no accept then there is no need to filter
+        if (accept == null) {
+            next.handle(null);
+            return;
+        }
+
+        try {
+            // default to gzip
+            if ("*".equals(accept.trim())) {
+                response.setFilter(new GZipWriterFilter(filter));
+            } else {
+                if (accept.contains("gzip")) {
+                    response.setFilter(new GZipWriterFilter(filter));
+                } else if (accept.contains("deflate")) {
+                    response.setFilter(new DeflateWriterFilter(filter));
+                }
+            }
+            next.handle(null);
+        } catch (IOException ioe) {
+            next.handle(ioe);
+        }
     }
 }
