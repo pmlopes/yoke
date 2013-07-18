@@ -35,7 +35,7 @@ public class ExtrasExample extends Verticle {
         final EventBus eb = vertx.eventBus();
 
         // deploy mongo module
-        container.deployModule("io.vertx~mod-mongo-persistor~2.0.0-beta1", persistorCfg);
+        container.deployModule("io.vertx~mod-mongo-persistor~2.0.0-final", persistorCfg);
 
         // db access
         final MongoDbStore db = new MongoDbStore(eb, "mongo.persons");

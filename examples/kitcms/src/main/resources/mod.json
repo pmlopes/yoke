@@ -1,4 +1,4 @@
 {
   "main": "com.jetdrone.vertx.kitcms.KitCMS",
-  "includes": "com.jetdrone~yoke~1.0.0-beta3"
+  "includes": "com.jetdrone~yoke~1.0.0"
 }

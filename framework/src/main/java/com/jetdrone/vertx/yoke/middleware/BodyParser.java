@@ -87,6 +87,9 @@ public class BodyParser extends Middleware {
 
 
             if (isMULTIPART) {
+                // enable the parsing at Vert.x level
+                request.expectMultiPart(true);
+
                 request.uploadHandler(new Handler<HttpServerFileUpload>() {
                     @Override
                     public void handle(final HttpServerFileUpload fileUpload) {

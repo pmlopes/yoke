@@ -70,7 +70,7 @@ public class TechEmpower extends Verticle {
                 .putString("host", "localhost");
 
         // deploy mongo module
-        container.deployModule("io.vertx~mod-mongo-persistor~2.0.0-CR2", dbConfig);
+        container.deployModule("io.vertx~mod-mongo-persistor~2.0.0-final", dbConfig);
 
         // create the yoke app
         new Yoke(vertx)

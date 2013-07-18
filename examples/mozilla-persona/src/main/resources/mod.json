@@ -1,4 +1,4 @@
 {
   "main": "com.jetdrone.vertx.persona.Persona",
-  "includes": "com.jetdrone~yoke~1.0.0-beta2"
+  "includes": "com.jetdrone~yoke~1.0.0"
 }

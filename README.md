@@ -17,7 +17,7 @@ include the maven dependency your self.
 At the moment this module is only compatible with Vert.x 2. It can be backported to the 1.x series but there is no work
 in progress in that direction.
 
-The Vert.x module id is: `com.jetdrone~yoke~1.0.0-beta2`
+The Vert.x module id is: `com.jetdrone~yoke~1.0.0`
 
 
 ### Maven artifact
@@ -27,7 +27,7 @@ You can get the jar file using maven with the following configuration:
     <dependency>
       <groupId>com.jetdrone</groupId>
       <artifactId>yoke</artifactId>
-      <version>1.0.0-beta2</version>
+      <version>1.0.0</version>
       <scope>provided</scope>
     </dependency>
 

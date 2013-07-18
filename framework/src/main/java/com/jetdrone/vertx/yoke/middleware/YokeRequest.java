@@ -550,6 +550,12 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
+    public HttpServerRequest expectMultiPart(boolean expect) {
+        request.expectMultiPart(expect);
+        return this;
+    }
+
+    @Override
     public HttpServerRequest uploadHandler(Handler<HttpServerFileUpload> uploadHandler) {
         return request.uploadHandler(uploadHandler);
     }

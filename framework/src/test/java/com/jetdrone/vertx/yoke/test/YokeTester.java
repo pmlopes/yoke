@@ -168,6 +168,12 @@ public class YokeTester extends Yoke {
                 }
 
                 @Override
+                public HttpServerRequest expectMultiPart(boolean expect) {
+                    // NOOP
+                    return this;
+                }
+
+                @Override
                 public HttpServerRequest uploadHandler(Handler<HttpServerFileUpload> uploadHandler) {
                     throw new UnsupportedOperationException("This mock does not support uploadHandler");
                 }

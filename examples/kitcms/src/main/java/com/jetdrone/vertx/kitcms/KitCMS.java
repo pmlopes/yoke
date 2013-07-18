@@ -25,7 +25,7 @@ public class KitCMS extends Verticle {
         final FileSystem fileSystem = vertx.fileSystem();
 
         // deploy redis module
-        container.deployModule("com.jetdrone~mod-redis-io~1.1.0-beta3", config.getRedisConfig());
+        container.deployModule("com.jetdrone~mod-redis-io~1.1.0", config.getRedisConfig());
 
         // db access
         final Db db = new Db(eb, Config.REDIS_ADDRESS);
