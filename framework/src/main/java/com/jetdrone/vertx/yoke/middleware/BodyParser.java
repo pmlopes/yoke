@@ -85,10 +85,8 @@ public class BodyParser extends Middleware {
             final boolean isURLENCODEC = contentType != null && contentType.contains("application/x-www-form-urlencoded");
             final Buffer buffer = (!isMULTIPART && !isURLENCODEC) ? new Buffer(0) : null;
 
-            if (isMULTIPART || isURLENCODEC) {
-                // enable the parsing at Vert.x level
-                request.expectMultiPart(true);
-            }
+            // enable the parsing at Vert.x level
+            request.expectMultiPart(true);
 
             if (isMULTIPART) {
                 request.uploadHandler(new Handler<HttpServerFileUpload>() {
