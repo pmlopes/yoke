@@ -17,17 +17,17 @@ import org.vertx.java.platform.Verticle;
 import javax.crypto.Mac;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
 
 public class Persona extends Verticle {
 
-    // This is an example only use a proper persistent storage
-    Map<String, String> storage = new HashMap<>();
-
     @Override
     public void start() {
+
+        // This is an example only, use a proper persistent storage
+        final ConcurrentMap<String, String> storage = vertx.sharedData().getMap("session.storage.persona");
+
         final Yoke yoke = new Yoke(vertx);
         yoke.engine("html", new StringPlaceholderEngine());
 
