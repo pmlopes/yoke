@@ -34,6 +34,10 @@ public class MethodOverride extends Middleware {
 
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
+
+        // expect multipart
+        request.expectMultiPart(true);
+
         final MultiMap urlEncoded = request.formAttributes();
 
         if (urlEncoded != null) {
