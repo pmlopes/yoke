@@ -78,6 +78,8 @@ public class YokeRequest implements HttpServerRequest {
     private Map<String, YokeFileUpload> files;
     private Set<YokeCookie> cookies;
     private String sessionId;
+    // control flags
+    private boolean expectMultiPartCalled = false;
 
     public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context) {
         this.context = context;
@@ -551,7 +553,18 @@ public class YokeRequest implements HttpServerRequest {
 
     @Override
     public HttpServerRequest expectMultiPart(boolean expect) {
-        request.expectMultiPart(expect);
+        // if we expect
+        if (expect) {
+            // then only call it once
+            if (!expectMultiPartCalled) {
+                expectMultiPartCalled = true;
+                request.expectMultiPart(expect);
+            }
+        } else {
+            // if we don't expect reset even if we were called before
+            expectMultiPartCalled = false;
+            request.expectMultiPart(expect);
+        }
         return this;
     }
 

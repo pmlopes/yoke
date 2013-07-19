@@ -76,12 +76,16 @@ public class Csrf extends Middleware {
             return;
         }
 
+        // expect multipart
+        request.expectMultiPart(true);
+
         // determine value
         String val = valueHandler.handle(request);
 
         // check
         if (!token.equals(val)) {
             next.handle(403);
+            return;
         }
 
         // OK
