@@ -75,7 +75,13 @@ public class BasicAuth extends Middleware {
                 user = credentials[0];
                 // when the header is: "user:"
                 pass = credentials.length > 1 ? credentials[1] : null;
-            } catch (IllegalArgumentException | NullPointerException e) {
+            } catch (ArrayIndexOutOfBoundsException e) {
+				YokeResponse response = request.response();
+				response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
+				response.setStatusCode(401);
+				next.handle("No authorization token");
+				return;
+			} catch (IllegalArgumentException | NullPointerException e) {
                 // IllegalArgumentException includes PatternSyntaxException
                 next.handle(e);
                 return;
