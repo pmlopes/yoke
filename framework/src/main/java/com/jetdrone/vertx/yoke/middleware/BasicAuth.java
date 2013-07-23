@@ -53,16 +53,20 @@ public class BasicAuth extends Middleware {
     public BasicAuth(AuthHandler authHandler) {
         this(authHandler, "Authentication required");
     }
+    
+    private void handle401(final YokeRequest request, final Handler<Object> next) {
+        YokeResponse response = request.response();
+        response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
+        response.setStatusCode(401);
+        next.handle("No authorization token");
+    }
 
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
         String authorization = request.getHeader("authorization");
 
         if (authorization == null) {
-            YokeResponse response = request.response();
-            response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
-            response.setStatusCode(401);
-            next.handle("No authorization token");
+            handle401(request, next);
         } else {
             final String user;
             final String pass;
@@ -76,10 +80,7 @@ public class BasicAuth extends Middleware {
                 // when the header is: "user:"
                 pass = credentials.length > 1 ? credentials[1] : null;
             } catch (ArrayIndexOutOfBoundsException e) {
-				YokeResponse response = request.response();
-				response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
-				response.setStatusCode(401);
-				next.handle("No authorization token");
+				handle401(request, next);
 				return;
 			} catch (IllegalArgumentException | NullPointerException e) {
                 // IllegalArgumentException includes PatternSyntaxException
@@ -97,10 +98,7 @@ public class BasicAuth extends Middleware {
                             request.put("user", user);
                             next.handle(null);
                         } else {
-                            YokeResponse response = request.response();
-                            response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
-                            response.setStatusCode(401);
-                            next.handle("No authorization token");
+                            handle401(request, next);
                         }
                     }
                 });
