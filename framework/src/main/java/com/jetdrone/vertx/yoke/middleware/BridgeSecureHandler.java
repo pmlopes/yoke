@@ -32,31 +32,42 @@ import java.util.concurrent.ConcurrentMap;
 * Please see vert.x doc on how to use secured EventBus Bridge.<p>
 */
 public class BridgeSecureHandler extends Middleware {
+
     private static final String DEFAULT_AUTH_ADDRESS = "vertx.basicauthmanager.authorise";
 
-    public BridgeSecureHandler(final Vertx vertx, final String authAddress, final String sessionStorage) {
-        super.setVertx(vertx);
-        vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
-          @Override
-          public void handle(Message<JsonObject> message) {
-            final ConcurrentMap<String, String> storage = vertx.sharedData().getMap(sessionStorage);
-            JsonObject json = new JsonObject();
-            String sessionID = message.body().getString("sessionID");
+    private final String authAddress;
+    private final String sessionStorage;
 
-            if (sessionID != null && storage.get(sessionID) != null) {
-                json.putString("status", "ok");
-                json.putString("username", storage.get(sessionID));
-            } else {
-                json.putString("status", "denied");
+    @Override
+    public Middleware setVertx(final Vertx vertx) {
+        vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> message) {
+                final ConcurrentMap<String, String> storage = vertx.sharedData().getMap(sessionStorage);
+                JsonObject json = new JsonObject();
+                String sessionID = message.body().getString("sessionID");
+
+                if (sessionID != null && storage.get(sessionID) != null) {
+                    json.putString("status", "ok");
+                    json.putString("username", storage.get(sessionID));
+                } else {
+                    json.putString("status", "denied");
+                }
+
+                message.reply(json);
             }
-            
-            message.reply(json);
-          }
         });
+
+        return this;
     }
 
-    public BridgeSecureHandler(final Vertx vertx, final String sessionStorage) {
-        this(vertx, DEFAULT_AUTH_ADDRESS, sessionStorage);
+    public BridgeSecureHandler(final String authAddress, final String sessionStorage) {
+        this.authAddress = authAddress;
+        this.sessionStorage = sessionStorage;
+    }
+
+    public BridgeSecureHandler(final String sessionStorage) {
+        this(DEFAULT_AUTH_ADDRESS, sessionStorage);
     }
 
     @Override
