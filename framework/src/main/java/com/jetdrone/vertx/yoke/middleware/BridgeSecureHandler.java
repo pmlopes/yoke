@@ -43,6 +43,7 @@ public class BridgeSecureHandler extends Middleware {
         vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> message) {
+                // TODO: storage should be abstract to allow async storages such as redis, mongo, sql, etc...
                 final ConcurrentMap<String, String> storage = vertx.sharedData().getMap(sessionStorage);
                 JsonObject json = new JsonObject();
                 String sessionID = message.body().getString("sessionID");
