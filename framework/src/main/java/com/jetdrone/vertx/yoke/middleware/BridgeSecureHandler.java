@@ -33,7 +33,7 @@ import java.util.concurrent.ConcurrentMap;
 */
 public class BridgeSecureHandler extends Middleware {
 
-    private static final String DEFAULT_AUTH_ADDRESS = "vertx.basicauthmanager.authorise";
+    private static final String DEFAULT_AUTH_ADDRESS = "yoke.basicauthmanager.authorise";
 
     private final String authAddress;
     private final String sessionStorage;
