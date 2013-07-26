@@ -21,7 +21,7 @@ public class YokeBench extends Verticle {
             }
         };
 
-        new Yoke(vertx)
+        new Yoke(this)
                 .use(new BodyParser())
                 .use("/middleware", foo)
                 .use("/middleware", foo)

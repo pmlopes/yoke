@@ -15,7 +15,7 @@ public class YokeRequestTest extends TestVerticle {
 
     @Test
     public void testAccept() {
-        final YokeTester yoke = new YokeTester(vertx);
+        final YokeTester yoke = new YokeTester(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

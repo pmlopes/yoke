@@ -13,7 +13,7 @@ public class ResponseTime extends TestVerticle {
 
     @Test
     public void testResponseTime() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.ResponseTime());
         yoke.use(new Handler<YokeRequest>() {
             @Override

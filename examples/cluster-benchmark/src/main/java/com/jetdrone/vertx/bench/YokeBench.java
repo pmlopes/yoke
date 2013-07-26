@@ -11,7 +11,7 @@ public class YokeBench extends Verticle {
     @Override
     public void start() {
 
-        new Yoke(vertx)
+        new Yoke(this)
                 .use(new Router()
                         .get("/", new Handler<YokeRequest>() {
                             @Override

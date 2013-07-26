@@ -2,7 +2,7 @@ import com.jetdrone.vertx.yoke.middleware.*
 import com.jetdrone.vertx.yoke.GYoke
 import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
 
-new GYoke(vertx)
+new GYoke(vertx, container.logger)
   .engine('html', new GroovyTemplateEngine())
   .use(new ErrorHandler(true))
   .use(new GRouter()

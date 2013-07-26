@@ -29,7 +29,7 @@ public class HandlebarsEngine extends TestVerticle {
             out.close();
             final String location = temp.getAbsolutePath();
 
-            YokeTester yoke = new YokeTester(vertx);
+            YokeTester yoke = new YokeTester(this);
             yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
             yoke.use(new Middleware() {
                 @Override
@@ -62,7 +62,7 @@ public class HandlebarsEngine extends TestVerticle {
             out.close();
             final String location = temp.getAbsolutePath();
 
-            YokeTester yoke = new YokeTester(vertx);
+            YokeTester yoke = new YokeTester(this);
             yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
             yoke.use(new Middleware() {
                 @Override

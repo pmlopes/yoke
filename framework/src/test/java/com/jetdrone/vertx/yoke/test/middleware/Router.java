@@ -24,7 +24,7 @@ public class Router extends TestVerticle {
 
     @Test
     public void testAnnotatedRouter() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(com.jetdrone.vertx.yoke.middleware.Router.from(new TestRouter()));
 
         yoke.request("GET", "/ws", new Handler<Response>() {

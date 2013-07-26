@@ -14,7 +14,7 @@ public class Favicon extends TestVerticle {
 
     @Test
     public void testFavicon() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Favicon());
 
         final Buffer icon = Utils.readResourceToBuffer(com.jetdrone.vertx.yoke.middleware.Favicon.class, "favicon.ico");

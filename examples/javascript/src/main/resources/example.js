@@ -9,7 +9,7 @@ yoke.use(new ResponseTime());
 yoke.use(router);
 router.get('/hello', function (req) {
     req.put('name', 'World');
-    req.response().render('/home/plopes/Projects/oss/yoke/example/javascript/src/main/resources/template.html');
+    req.response().render('src/main/resources/template.html');
 });
 // all other resources are forbidden
 yoke.use(function (req, next) {

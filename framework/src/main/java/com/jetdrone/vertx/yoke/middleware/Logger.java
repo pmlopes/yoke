@@ -35,23 +35,21 @@ public class Logger extends Middleware {
 
     final boolean immediate;
     final Format format;
-    final org.vertx.java.core.logging.Logger logger;
 
-    public Logger(boolean immediate, Format format, org.vertx.java.core.logging.Logger logger) {
+    public Logger(boolean immediate, Format format) {
         this.immediate = immediate;
         this.format = format;
-        this.logger = logger;
 
         ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
         ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    public Logger(Format format, org.vertx.java.core.logging.Logger logger) {
-        this(false, format, logger);
+    public Logger(Format format) {
+        this(false, format);
     }
 
-    public Logger(org.vertx.java.core.logging.Logger logger) {
-        this(false, Format.DEFAULT, logger);
+    public Logger() {
+        this(false, Format.DEFAULT);
     }
 
     private String getVersionString(HttpVersion version) {

@@ -20,7 +20,7 @@ public class BodyParser extends TestVerticle {
 
         final JsonObject json = new JsonObject().putString("key", "value");
 
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new Handler<YokeRequest>() {
             @Override
@@ -50,7 +50,7 @@ public class BodyParser extends TestVerticle {
     @Test
     public void testMapBodyParser() {
 
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {
@@ -79,7 +79,7 @@ public class BodyParser extends TestVerticle {
     @Test
     public void testBodyParserWithEmptyBody() {
 
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {

@@ -21,6 +21,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.logging.Logger;
 
 import java.util.concurrent.ConcurrentMap;
 
@@ -39,7 +40,9 @@ public class BridgeSecureHandler extends Middleware {
     private final String sessionStorage;
 
     @Override
-    public Middleware setVertx(final Vertx vertx) {
+    public Middleware init(final Vertx vertx, final Logger logger) {
+        super.init(vertx, logger);
+
         vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> message) {

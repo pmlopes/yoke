@@ -15,7 +15,7 @@ public class RequestFunctions extends TestVerticle {
 
     @Test
     public void testAccepts() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {
@@ -44,7 +44,7 @@ public class RequestFunctions extends TestVerticle {
 
     @Test
     public void testIp() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {

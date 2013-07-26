@@ -73,7 +73,7 @@ public class TechEmpower extends Verticle {
         container.deployModule("io.vertx~mod-mongo-persistor~2.0.0-final", dbConfig);
 
         // create the yoke app
-        new Yoke(vertx)
+        new Yoke(this)
                 // register the MVEL engine
                 .engine("mvel", new MVELEngine())
 

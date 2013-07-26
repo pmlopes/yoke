@@ -30,11 +30,11 @@ public class KitCMS extends Verticle {
         // db access
         final Db db = new Db(eb, Config.REDIS_ADDRESS);
 
-        final Yoke yoke = new Yoke(vertx);
+        final Yoke yoke = new Yoke(this);
         // register jMustache render engine
         yoke.engine("html", new StringPlaceholderEngine());
         // log the requests
-        yoke.use(new Logger(container.logger()));
+        yoke.use(new Logger());
         // install the pretty error handler middleware
         yoke.use(new ErrorHandler(true));
         // install the favicon middleware

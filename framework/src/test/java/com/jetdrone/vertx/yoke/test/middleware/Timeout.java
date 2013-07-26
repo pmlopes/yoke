@@ -13,7 +13,7 @@ public class Timeout extends TestVerticle {
 
     @Test
     public void testTimeout() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Timeout(10));
         yoke.use(new Handler<YokeRequest>() {
             @Override

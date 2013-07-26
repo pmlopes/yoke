@@ -17,7 +17,7 @@ public class VHost extends TestVerticle {
 
     @Test
     public void testLimit() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new Vhost("*.com", new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest request) {

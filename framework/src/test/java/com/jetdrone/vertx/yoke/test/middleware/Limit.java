@@ -15,7 +15,7 @@ public class Limit extends TestVerticle {
 
     @Test
     public void testLimit() {
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Limit(1000));
 
         MultiMap headers = new CaseInsensitiveMultiMap();

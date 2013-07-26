@@ -16,7 +16,7 @@ public class BasicAuth extends TestVerticle {
 
     @Test
     public void testBasicAuth() {
-        final YokeTester yoke = new YokeTester(vertx);
+        final YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth("Aladdin", "open sesame"));
         yoke.use(new Middleware() {
             @Override
@@ -49,7 +49,7 @@ public class BasicAuth extends TestVerticle {
 
     @Test
     public void testEmptyPassword() {
-        final YokeTester yoke = new YokeTester(vertx);
+        final YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth(new com.jetdrone.vertx.yoke.middleware.BasicAuth.AuthHandler() {
             @Override
             public void handle(String username, String password, Handler<Boolean> result) {

@@ -16,7 +16,7 @@
 
 function JSYoke() {
     this.vertx = __jvertx;
-    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx);
+    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, __jcontainer.logger());
 }
 
 JSYoke.prototype.use = function (route, callback) {

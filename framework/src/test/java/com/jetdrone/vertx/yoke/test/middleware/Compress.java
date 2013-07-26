@@ -19,7 +19,7 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 public class Compress extends TestVerticle {
   @Test
   public void testGzipCompress() {
-    YokeTester yoke = new YokeTester(vertx);
+    YokeTester yoke = new YokeTester(this);
     yoke.use(new com.jetdrone.vertx.yoke.middleware.Compress());
     yoke.use(new Middleware() {
       @Override

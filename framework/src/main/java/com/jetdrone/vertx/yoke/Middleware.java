@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.logging.Logger;
 
 /**
  * Abstract class that needs to be implemented when creating a new middleware piece.
@@ -30,8 +31,12 @@ public abstract class Middleware {
 
     protected Vertx vertx;
 
-    public Middleware setVertx(Vertx vertx) {
+    protected Logger logger;
+
+    public Middleware init(Vertx vertx, Logger logger) {
         this.vertx = vertx;
+        this.logger = logger;
+
         return this;
     }
 

@@ -20,6 +20,8 @@ import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.platform.Container;
+import org.vertx.java.core.logging.Logger;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -68,9 +70,9 @@ public class Favicon extends Middleware {
     }
 
     @Override
-    public Middleware setVertx(Vertx vertx) {
+    public Middleware init(Vertx vertx, Logger logger) {
         try {
-            super.setVertx(vertx);
+            super.init(vertx, logger);
             if (path == null) {
                 icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {

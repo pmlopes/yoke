@@ -28,7 +28,7 @@ public class Persona extends Verticle {
         // This is an example only, use a proper persistent storage
         final ConcurrentMap<String, String> storage = vertx.sharedData().getMap("session.storage.persona");
 
-        final Yoke yoke = new Yoke(vertx);
+        final Yoke yoke = new Yoke(this);
         yoke.engine("html", new StringPlaceholderEngine());
 
         Mac secret = Utils.newHmacSHA256("secret here");

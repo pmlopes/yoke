@@ -27,7 +27,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             out.close();
             final String location = temp.getAbsolutePath();
 
-            YokeTester yoke = new YokeTester(vertx);
+            YokeTester yoke = new YokeTester(this);
             yoke.engine("html", new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
             yoke.use(new Middleware() {
                 @Override
@@ -60,7 +60,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             out.close();
             final String location = temp.getAbsolutePath();
 
-            YokeTester yoke = new YokeTester(vertx);
+            YokeTester yoke = new YokeTester(this);
             yoke.set("fnName", new Function() {
                 @Override
                 public String exec(Map<String, Object> context, Object... args) {

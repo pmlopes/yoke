@@ -23,6 +23,8 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.logging.Logger;
+import org.vertx.java.platform.Verticle;
 
 import java.util.*;
 
@@ -40,11 +42,12 @@ import java.util.*;
 public class Yoke implements RequestWrapper {
 
     private final Vertx vertx;
+    private final Logger logger;
+    // the request wrapper in use
+    private final RequestWrapper requestWrapper;
 
     private final Map<String, Object> defaultContext = new HashMap<>();
     private final Map<String, Engine> engineMap = new HashMap<>();
-    // the request wrapper in use
-    private final RequestWrapper requestWrapper;
 
     /**
      * Creates a Yoke instance.
@@ -52,15 +55,18 @@ public class Yoke implements RequestWrapper {
      * instance. This instance will be shared with all registered middleware.
      * The reason behind this is to allow middleware to use Vertx features such
      * as file system and timers.
-     *
-     * @param vertx The Vertx instance
      */
-    public Yoke(Vertx vertx) {
-        this(vertx, null);
+    public Yoke(Verticle verticle) {
+        this(verticle.getVertx(), verticle.getContainer().logger(), null);
     }
 
-    public Yoke(Vertx vertx, RequestWrapper requestWrapper) {
+    public Yoke(Vertx vertx, Logger logger) {
+        this(vertx, logger, null);
+    }
+
+    public Yoke(Vertx vertx, Logger logger, RequestWrapper requestWrapper) {
         this.vertx = vertx;
+        this.logger = logger;
         this.requestWrapper = requestWrapper == null ? this : requestWrapper;
         // defaults
         defaultContext.put("title", "Yoke");
@@ -98,8 +104,8 @@ public class Yoke implements RequestWrapper {
             middlewareList.add(new MountedMiddleware(route, middleware));
         }
 
-        // share the common vertx
-        middleware.setVertx(vertx);
+        // initialize the middleware
+        middleware.init(vertx, logger);
         return this;
     }
 

@@ -22,6 +22,7 @@ import org.vertx.java.core.impl.CaseInsensitiveMultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.*;
 import org.vertx.java.core.net.NetSocket;
+import org.vertx.java.platform.Verticle;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -35,15 +36,15 @@ public class YokeTester extends Yoke {
     private final Vertx vertx;
     private final HttpServer fakeServer = new FakeHttpServer();
 
-    public YokeTester(Vertx vertx, boolean fakeSSL) {
-        super(vertx);
-        this.vertx = vertx;
+    public YokeTester(Verticle verticle, boolean fakeSSL) {
+        super(verticle);
+        this.vertx = verticle.getVertx();
         fakeServer.setSSL(fakeSSL);
         listen(fakeServer);
     }
 
-    public YokeTester(Vertx vertx) {
-        this(vertx, false);
+    public YokeTester(Verticle verticle) {
+        this(verticle, false);
     }
 
     public void request(final String method, final String url, final Handler<Response> handler) {

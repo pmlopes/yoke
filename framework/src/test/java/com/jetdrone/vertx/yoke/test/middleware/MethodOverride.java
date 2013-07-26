@@ -19,7 +19,7 @@ public class MethodOverride extends TestVerticle {
     @Test
     public void testOverride() {
 
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.MethodOverride());
         yoke.use(new Handler<YokeRequest>() {
             @Override
@@ -44,7 +44,7 @@ public class MethodOverride extends TestVerticle {
     @Test
     public void testOverrideUrlPost() {
 
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new com.jetdrone.vertx.yoke.middleware.MethodOverride());
         yoke.use(new Handler<YokeRequest>() {
@@ -75,7 +75,7 @@ public class MethodOverride extends TestVerticle {
 
         final JsonObject json = new JsonObject().putString("_method", "delete");
 
-        YokeTester yoke = new YokeTester(vertx);
+        YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new com.jetdrone.vertx.yoke.middleware.MethodOverride());
         yoke.use(new Handler<YokeRequest>() {
