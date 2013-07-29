@@ -81,8 +81,7 @@ public class ProxyServer extends Middleware {
             });
             cRes.exceptionHandler(new Handler<Throwable>() {
               public void handle(Throwable t) {
-                logger.error("Proxy connection exception:", t);
-                next.handle(null);
+                next.handle(t);
               }
             });
           }
