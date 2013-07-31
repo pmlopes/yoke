@@ -37,6 +37,7 @@ public class ProxyServer extends Middleware {
     private final String prefix;
     private final String host;
     private final int port;
+    private final boolean secure;
 
     @Override
     public Middleware init(final Vertx vertx, final Logger logger) {
@@ -44,14 +45,15 @@ public class ProxyServer extends Middleware {
         return this;
     }
 
-    public ProxyServer(String prefix, String host, int port) {
+    public ProxyServer(String prefix, String host, int port, boolean secure) {
         this.prefix = prefix;
         this.host = host;
-        this.port = port;        
+        this.port = port;
+        this.secure = secure;
     }
 
-    public ProxyServer(String prefix, int port) {
-        this(prefix, "localhost", port);     
+    public ProxyServer(String prefix, int port, boolean secure) {
+        this(prefix, "localhost", port, secure);
     }
 
     @Override
@@ -62,6 +64,10 @@ public class ProxyServer extends Middleware {
         }
         final String newUri = req.uri().replaceFirst(prefix, "");
         final HttpClient client = vertx.createHttpClient().setHost(host).setPort(port);
+
+        if (secure) {
+            client.setSSL(true);
+        }
         
         final HttpClientRequest cReq = client.request(req.method(), newUri, new Handler<HttpClientResponse>() {
           public void handle(HttpClientResponse cRes) {
