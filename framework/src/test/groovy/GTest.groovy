@@ -1,4 +1,6 @@
 import com.jetdrone.vertx.yoke.GYoke
+import com.jetdrone.vertx.yoke.annotations.GET
+import com.jetdrone.vertx.yoke.annotations.Path
 import com.jetdrone.vertx.yoke.middleware.Favicon
 import org.junit.Test
 import org.vertx.groovy.core.Vertx
@@ -18,5 +20,13 @@ class GTest extends TestVerticle {
         gYoke.use(new Favicon())
 
         testComplete()
+    }
+
+    @Path('/rest')
+    class AnnotatedRouter {
+        @GET
+        def getResource = { req, next ->
+            req.response.end();
+        }
     }
 }

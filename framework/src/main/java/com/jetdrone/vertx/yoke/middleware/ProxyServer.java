@@ -17,7 +17,6 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.VoidHandler;
 import org.vertx.java.core.buffer.Buffer;

@@ -387,6 +387,61 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /**
+     * Check if the incoming request contains the "Content-Type"
+     * header field, and it contains the give mime `type`.
+     *
+     * Examples:
+     *
+     * // With Content-Type: text/html; charset=utf-8
+     * req.is('html');
+     * req.is('text/html');
+     * req.is('text/*');
+     * // => true
+     *
+     * // When Content-Type is application/json
+     * req.is('json');
+     * req.is('application/json');
+     * req.is('application/*');
+     * // => true
+     *
+     * req.is('html');
+     * // => false
+     *
+     * @param type content type
+     * @return true if content type is of type
+     */
+    public boolean is(String type) {
+        String ct = getHeader("Content-Type");
+        if (ct == null) {
+            return false;
+        }
+        // get the content type only (exclude charset)
+        ct = ct.split(";")[0];
+
+        // if we received an incomplete CT
+        if (type.indexOf('/') == -1) {
+            type = "*" + type;
+        }
+
+        // process wildcards
+        if (type.contains("*")) {
+            String[] parts = type.split("/");
+            String[] ctParts = ct.split("/");
+            if ("*".equals(parts[0]) && parts[1].equals(ctParts[1])) {
+                return true;
+            }
+
+            if ("*".equals(parts[1]) && parts[0].equals(ctParts[0])) {
+                return true;
+            }
+
+            return false;
+        }
+
+        return ct.contains(type);
+    }
+
+    /**
      * Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For
      * Header
      */

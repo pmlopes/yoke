@@ -76,10 +76,10 @@ public class GYoke {
      * @param closure The closure add to the chain
      */
     public GYoke use(String route, final Closure closure) {
+        final int params = closure.getMaximumNumberOfParameters();
         jYoke.use(route, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
-                int params = closure.getMaximumNumberOfParameters();
                 if (params == 1) {
                     closure.call(request);
                 } else if (params == 2) {

@@ -703,11 +703,42 @@ public class Router extends Middleware {
         throw new RuntimeException("Cannot infer the path for this method");
     }
 
-    private static Middleware wrap(final Object o, final Method m, final boolean simple) {
+    private static Middleware wrap(final Object o, final Method m, final boolean simple, final String[] consumes, final String[] produces) {
         return new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
                 try {
+                    // we only know how to process certain media types
+                    if (consumes != null) {
+                        boolean canConsume = false;
+                        for (String c : consumes) {
+                            if (request.is(c)) {
+                                canConsume = true;
+                                break;
+                            }
+                        }
+
+                        if (!canConsume) {
+                            // 415 Unsupported Media Type (we don't know how to handle this media)
+                            next.handle(415);
+                            return;
+                        }
+                    }
+
+                    // the object was marked with a specific content type
+                    if (produces != null) {
+                        String bestContentType = request.accepts(produces);
+
+                        // the client does not know how to handle our content type, return 406
+                        if (bestContentType == null) {
+                            next.handle(406);
+                            return;
+                        }
+
+                        // mark the response with the correct content type (which allows middleware to know it later on)
+                        request.response().setContentType(bestContentType);
+                    }
+
                     if (simple) {
                         m.invoke(o, request);
                     } else {
@@ -756,36 +787,66 @@ public class Router extends Middleware {
 
                 String path = getPath(o, m);
 
+                String[] produces = null;
+                String[] consumes = null;
+
+                // identify produces/consumes for content negotiation
+                for (Annotation a : annotations) {
+                    if (a instanceof Consumes) {
+                        consumes = ((Consumes) a).value();
+                    }
+                    if (a instanceof Produces) {
+                        produces = ((Produces) a).value();
+                    }
+                }
+
+                // if still null inspect class
+                if (consumes == null) {
+                    Annotation c = o.getClass().getAnnotation(Consumes.class);
+                    if (c != null) {
+                        // top level consumes is present
+                        consumes = ((Consumes) c).value();
+                    }
+                }
+
+                if (produces == null) {
+                    Annotation p = o.getClass().getAnnotation(Produces.class);
+                    if (p != null) {
+                        // top level consumes is present
+                        produces = ((Produces) p).value();
+                    }
+                }
+
                 for (Annotation a : annotations) {
                     if (a instanceof GET) {
-                        router.get(path, wrap(o, m, type == 1));
+                        router.get(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof PUT) {
-                        router.put(path, wrap(o, m, type == 1));
+                        router.put(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof POST) {
-                        router.post(path, wrap(o, m, type == 1));
+                        router.post(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof DELETE) {
-                        router.delete(path, wrap(o, m, type == 1));
+                        router.delete(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof OPTIONS) {
-                        router.options(path, wrap(o, m, type == 1));
+                        router.options(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof HEAD) {
-                        router.head(path, wrap(o, m, type == 1));
+                        router.head(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof TRACE) {
-                        router.trace(path, wrap(o, m, type == 1));
+                        router.trace(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof PATCH) {
-                        router.patch(path, wrap(o, m, type == 1));
+                        router.patch(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof CONNECT) {
-                        router.connect(path, wrap(o, m, type == 1));
+                        router.connect(path, wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof ALL) {
-                        router.all(path, wrap(o, m, type == 1));
+                        router.all(path, wrap(o, m, type == 1, consumes, produces));
                     }
                 }
             }
