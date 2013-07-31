@@ -26,13 +26,13 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.logging.Logger;
 
 /**
-* ProxyServer provides web client a simple way to interact with other REST service
+* RequestProxy provides web client a simple way to interact with other REST service
 * providers via Yoke, meanwhile Yoke could pre-handle authentication, logging and etc.<p>
 *
 * In order to handler the proxy request properly, Bodyparser should be disabled for the
-* path matched by ProxyServer.<p>
+* path matched by RequestProxy.<p>
 */
-public class ProxyServer extends Middleware {
+public class RequestProxy extends Middleware {
 
     private final String prefix;
     private final String host;
@@ -45,14 +45,14 @@ public class ProxyServer extends Middleware {
         return this;
     }
 
-    public ProxyServer(String prefix, String host, int port, boolean secure) {
+    public RequestProxy(String prefix, String host, int port, boolean secure) {
         this.prefix = prefix;
         this.host = host;
         this.port = port;
         this.secure = secure;
     }
 
-    public ProxyServer(String prefix, int port, boolean secure) {
+    public RequestProxy(String prefix, int port, boolean secure) {
         this(prefix, "localhost", port, secure);
     }
 
