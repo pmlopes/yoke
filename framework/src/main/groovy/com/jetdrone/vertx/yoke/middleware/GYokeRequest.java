@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import groovy.lang.Closure;
+import groovy.json.JsonSlurper;
 import org.vertx.groovy.core.http.HttpServerFileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -258,6 +259,12 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     public JsonObject getJsonBody() {
         return jsonBody();
     }
+    
+    public Object getJson() {
+        JsonSlurper slurper = new JsonSlurper();
+        return slurper.parseText(jsonBody().toString());
+    }
+    
     public Buffer getBufferBody() {
         return bufferBody();
     }
