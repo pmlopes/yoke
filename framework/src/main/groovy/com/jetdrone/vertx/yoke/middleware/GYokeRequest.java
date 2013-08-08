@@ -261,8 +261,15 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     }
     
     public Object getJson() {
-        JsonSlurper slurper = new JsonSlurper();
-        return slurper.parseText(jsonBody().toString());
+        Object _body = body();
+        if (_body != null && _body instanceof String) {
+            char initial = ((String)_body).charAt(0);
+            if (initial == '{') {
+                JsonSlurper slurper = new JsonSlurper();
+                return slurper.parseText((String)_body);
+            }
+        }
+        return null;
     }
     
     public Buffer getBufferBody() {

@@ -262,8 +262,11 @@ public class YokeRequest implements HttpServerRequest {
      * The request setBody and eventually a parsed version of it in json or map
      */
     public JsonObject jsonBody() {
-        if (body != null && body instanceof JsonObject) {
-            return (JsonObject) body;
+        if (body != null && body instanceof String) {
+            char initial = ((String)body).charAt(0);
+            if (initial == '{') {
+                return new JsonObject((String)body);
+            }
         }
         return null;
     }

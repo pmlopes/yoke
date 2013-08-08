@@ -40,19 +40,14 @@ public class BodyParser extends Middleware {
 
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
-            String jsonString = buffer.toString();
-            if (jsonString.length() > 0) {
-                switch (jsonString.charAt(0)) {
-                    case '{':
-                        request.setBody(new JsonObject(jsonString));
-                        next.handle(null);
-                        break;
-                    case '[':
-                        request.setBody(new JsonArray(jsonString));
-                        next.handle(null);
-                        break;
-                    default:
-                        next.handle(400);
+            String content = buffer.toString();
+            if (content.length() > 0) {
+                char initial = content.charAt(0);
+                if (initial == '{' || initial == '[') {
+                    request.setBody(content);
+                    next.handle(null);
+                } else {
+                    next.handle(400);
                 }
             } else {
                 next.handle(400);
