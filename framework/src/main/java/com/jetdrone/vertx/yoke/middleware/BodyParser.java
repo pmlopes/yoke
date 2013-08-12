@@ -40,15 +40,17 @@ public class BodyParser extends Middleware {
 
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
-            String jsonString = buffer.toString();
-            if (jsonString.length() > 0) {
-                switch (jsonString.charAt(0)) {
+            String content = buffer.toString();
+            if (content.length() > 0) {
+                switch (content.charAt(0)) {
                     case '{':
-                        request.setBody(new JsonObject(jsonString));
+                        request.setBody(content);
+                        request.put("valid_json_object", true);
                         next.handle(null);
                         break;
                     case '[':
-                        request.setBody(new JsonArray(jsonString));
+                        request.setBody(content);
+                        request.put("valid_json_array", true);
                         next.handle(null);
                         break;
                     default:
