@@ -42,12 +42,19 @@ public class BodyParser extends Middleware {
         try {
             String content = buffer.toString();
             if (content.length() > 0) {
-                char initial = content.charAt(0);
-                if (initial == '{' || initial == '[') {
-                    request.setBody(content);
-                    next.handle(null);
-                } else {
-                    next.handle(400);
+                switch (content.charAt(0)) {
+                    case '{':
+                        request.setBody(content);
+                        request.put("valid_json_object", true);
+                        next.handle(null);
+                        break;
+                    case '[':
+                        request.setBody(content);
+                        request.put("valid_json_array", true);
+                        next.handle(null);
+                        break;
+                    default:
+                        next.handle(400);
                 }
             } else {
                 next.handle(400);
