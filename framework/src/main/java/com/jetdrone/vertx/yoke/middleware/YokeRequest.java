@@ -22,6 +22,8 @@ import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.net.NetSocket;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -259,11 +261,27 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /**
-     * The request setBody and eventually a parsed version of it in json or map
+     * A parsed Json Array if body is detected to contain a valid String for Json Object.
      */
     public JsonObject jsonBody() {
-        if (body != null && body instanceof JsonObject) {
-            return (JsonObject) body;
+        if (body != null && body instanceof String) {
+            Boolean flag = (Boolean)get("valid_json_object");
+            if (flag != null && flag) {
+                return new JsonObject((String)body);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * A parsed Json Array if body is detected to contain a valid String for Json array.
+     */
+    public JsonArray jsonArrayBody() {
+        if (body != null && body instanceof String) {
+            Boolean flag = (Boolean)get("valid_json_array");
+            if (flag != null && flag) {
+                return new JsonArray((String)body);
+            }
         }
         return null;
     }
@@ -420,7 +438,7 @@ public class YokeRequest implements HttpServerRequest {
 
         // if we received an incomplete CT
         if (type.indexOf('/') == -1) {
-            type = "*" + type;
+            type = "/" + type;
         }
 
         // process wildcards
