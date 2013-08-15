@@ -58,6 +58,8 @@ repositories {
   }
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   mavenCentral()
+  // extra reppo
+  maven { url "https://raw.github.com/neuland/jade4j/master/releases" }
 }
 
 dependencies {

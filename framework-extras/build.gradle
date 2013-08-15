@@ -41,10 +41,6 @@ install - install any jars produced to the local Maven repository (.m2)
 
  */
 
-repositories {
-  maven { url "https://raw.github.com/neuland/jade4j/master/releases" }
-}
-
 dependencies {
   // get yoke jar for parent
   provided project(':framework')
