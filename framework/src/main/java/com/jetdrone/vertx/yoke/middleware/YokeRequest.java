@@ -23,7 +23,6 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.net.NetSocket;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
@@ -265,9 +264,9 @@ public class YokeRequest implements HttpServerRequest {
      */
     public JsonObject jsonBody() {
         if (body != null && body instanceof String) {
-            Boolean flag = (Boolean)get("valid_json_object");
-            if (flag != null && flag) {
-                return new JsonObject((String)body);
+            boolean flag = get("valid_json_object", false);
+            if (flag) {
+                return new JsonObject((String) body);
             }
         }
         return null;
@@ -278,9 +277,9 @@ public class YokeRequest implements HttpServerRequest {
      */
     public JsonArray jsonArrayBody() {
         if (body != null && body instanceof String) {
-            Boolean flag = (Boolean)get("valid_json_array");
-            if (flag != null && flag) {
-                return new JsonArray((String)body);
+            boolean flag = get("valid_json_array", false);
+            if (flag) {
+                return new JsonArray((String) body);
             }
         }
         return null;
@@ -438,7 +437,9 @@ public class YokeRequest implements HttpServerRequest {
 
         // if we received an incomplete CT
         if (type.indexOf('/') == -1) {
-            type = "/" + type;
+            // when the content is incomplete we assume */type, e.g.:
+            // json -> */json
+            type = "*/" + type;
         }
 
         // process wildcards
