@@ -17,16 +17,20 @@ package com.jetdrone.vertx.yoke.extras.engine;
 
 import com.jetdrone.vertx.yoke.engine.AbstractEngine;
 import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
-import de.neuland.jade4j.Jade4J;
+import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.JadeTemplate;
+import de.neuland.jade4j.template.ReaderTemplateLoader;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 
+import java.io.StringReader;
 import java.util.Map;
 
 public class Jade4JEngine extends AbstractEngine<JadeTemplate> {
+
+    private JadeConfiguration config = new JadeConfiguration();
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
@@ -39,10 +43,11 @@ public class Jade4JEngine extends AbstractEngine<JadeTemplate> {
                     try {
                         JadeTemplate template = getTemplateFromCache(filename);
                         if(template == null) {
-                            template = Jade4J.getTemplate(filename);
+                            config.setTemplateLoader(new ReaderTemplateLoader(new StringReader(asyncResult.result()), filename));
+                            template = config.getTemplate(filename);
                             putTemplateToCache(filename, template);
                         }
-                        next.handle(new YokeAsyncResult<>(new Buffer(Jade4J.render(template, context))));
+                        next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));
                     } catch (Exception ex) {
                         next.handle(new YokeAsyncResult<Buffer>(ex));
                     }
