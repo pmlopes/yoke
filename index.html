@@ -25,17 +25,6 @@
   <meta content="website" property="og:type">
   <meta content="Yoke a middleware framework for Vert.x" name="description">
   <meta content="Yoke a middleware framework for Vert.x" property="og:description">
-
-  <!-- Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-3682522-6', 'github.io');
-    ga('send', 'pageview');
-  </script>
 </head>
 <body role='flatdoc' onload="Flatdoc.run({fetcher: Flatdoc.domElement('srcmd')});">
 <textarea id='srcmd' style='display:none;'>
@@ -48,6 +37,10 @@ languages and can be used interchangeably like with other Vert.x components.
 Yoke also does templating with its abstract template engine that can be extended to support any format needed. Out
 of the box, *Java* bundles a simple *StringPlaceholderEngine*, *Groovy* bundles the *GroovyTemplate* and *JavaScript*
 bundles the *MicroTemplateEngine*.
+
+Using the `yoke-extras` module more render engines have been added such as [handlebars](http://handlebarsjs.com/), [jade](http://jade-lang.com/)
+and [mvel2](http://mvel.codehaus.org/). The `extras` project provides new features that either are in a experimental
+phase or have additional dependencies.
 
 
 ### Java
@@ -96,7 +89,7 @@ var yoke = new Yoke()
 
 Vert.x 2 module:
 
-```com.jetdrone~yoke~1.0.0-beta2```
+```com.jetdrone~yoke~1.0.1```
 
 ### Maven artifact
 
@@ -104,7 +97,7 @@ Vert.x 2 module:
 &lt;dependency&gt;
   &lt;groupId&gt;com.jetdrone&lt;/groupId&gt;
   &lt;artifactId&gt;yoke&lt;/artifactId&gt;
-  &lt;version&gt;1.0.0-beta2&lt;/version&gt;
+  &lt;version&gt;1.0.1&lt;/version&gt;
   &lt;scope&gt;provided&lt;/scope&gt;
 &lt;/dependency&gt;
 ```
@@ -125,7 +118,7 @@ Vert.x 2 module:
 
 ## Example Apps
 
-* [KitCMS](https://github.com/pmlopes/yoke/tree/master/example/kitcms) - Remake of KitCMS from NodeJS with Yoke
+* [KitCMS](https://github.com/pmlopes/yoke/tree/master/examples/kitcms) - Remake of KitCMS from NodeJS with Yoke
 * [Persona](Persona.html) - Implementation of Mozilla Persona Authentication with Yoke
 
 
