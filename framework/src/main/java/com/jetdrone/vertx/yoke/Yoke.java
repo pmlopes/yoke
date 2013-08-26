@@ -17,6 +17,7 @@ package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
+import com.jetdrone.vertx.yoke.util.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -270,6 +271,7 @@ public class Yoke implements RequestWrapper {
                             if (errorHandler != null) {
                                 errorHandler.handle(request, null);
                             } else {
+                                // TODO: handle YokeException
                                 HttpServerResponse response = request.response();
 
                                 int errorCode;
@@ -280,6 +282,8 @@ public class Yoke implements RequestWrapper {
                                     // if it was set as the error object use it
                                     if (error instanceof Number) {
                                         errorCode = ((Number) error).intValue();
+                                    } else if (error instanceof YokeException) {
+                                        errorCode = ((YokeException) error).getErrorCode().intValue();
                                     } else {
                                         // default error code
                                         errorCode = 500;
