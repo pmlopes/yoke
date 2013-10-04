@@ -1,18 +1,6 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2011-2012 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
@@ -29,34 +17,50 @@ import org.vertx.java.platform.Verticle;
 
 import java.util.*;
 
-/**
- * Yoke is a chain executor of middleware for Vert.x 2.x.
- * The goal of this library is not to provide a web application framework but
- * the backbone that helps the creation of web applications.
- *
- * Yoke works in a similar way to Connect middleware. Users start by declaring
- * which middleware components want to use and then start an http server either
- * managed by Yoke or provided by the user (say when you need https).
- *
- * Yoke has no extra dependencies than Vert.x itself so it is self contained.
- */
+// # Yoke
+//
+// Yoke is a chain executor of middleware for Vert.x 2.x. The goal of this library is not to provide a web application
+// framework but the backbone that helps the creation of web applications.
+//
+// Yoke works in a similar way to Connect middleware. Users start by declaring which middleware components want to use
+// and then start an http server either managed by Yoke or provided by the user (say when you need https).
+//
+// Yoke has no extra dependencies than Vert.x itself so it is self contained.
 public class Yoke implements RequestWrapper {
 
+    // The Vert.x instance
+    // @private
     private final Vertx vertx;
+    // The internal logger
+    // @private
     private final Logger logger;
-    // the request wrapper in use
+    // The request wrapper in use
+    // @private
     private final RequestWrapper requestWrapper;
-
+    // The default context used by all requests
+    // @private
     private final Map<String, Object> defaultContext = new HashMap<>();
+    // The internal registry of [render engines](Engine.html)
+    // @private
     private final Map<String, Engine> engineMap = new HashMap<>();
 
-    /**
-     * Creates a Yoke instance.
-     * This constructor should be called from a verticle and pass a valid Vertx
-     * instance. This instance will be shared with all registered middleware.
-     * The reason behind this is to allow middleware to use Vertx features such
-     * as file system and timers.
-     */
+    // Creates a Yoke instance.
+    //
+    // This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
+    // with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
+    // system and timers.
+    //
+    // @constructor
+    // @param {Verticle} verticle
+
+    //
+    // @example
+    //      public class MyVerticle extends Verticle {
+    //          public void start() {
+    //              final Yoke yoke = new Yoke(this);
+    //              ...
+    //          }
+    //      }
     public Yoke(Verticle verticle) {
         this(verticle.getVertx(), verticle.getContainer().logger(), null);
     }

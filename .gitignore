@@ -14,6 +14,7 @@ out
 *.ipr
 *.iws
 mods
+doc
 # Ruby crap
 .yardoc
 .yardopts

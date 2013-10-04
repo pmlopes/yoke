@@ -3,7 +3,7 @@ var vassert = require('vertx_assert');
 
 var vertx = require('vertx');
 
-var Yoke = require('yokejs/Yoke');
+var Yoke = require('yoke/Yoke');
 
 // The test methods must begin with "test"
 

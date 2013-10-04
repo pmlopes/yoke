@@ -1,28 +1,18 @@
 # Yoke
 
-Yoke is a middleware framework for Vert.x, shipping with over 12 bundled middleware.
+Yoke is a polyglot middleware framework for Vert.x, shipping with over 12 bundled middleware.
 
 [![Build Status](https://travis-ci.org/pmlopes/yoke.png?branch=master)](https://travis-ci.org/pmlopes/yoke)
-
 
 
 ## Instalation
 
 To get started with Yoke in your project you can use Vert.x module system to download it from the maven repository or
-include the maven dependency your self.
+include the maven dependency your self. The moment this module is only compatible with Vert.x 2. It can be backported to
+the 1.x series but there is no work in progress in that direction.
 
-
-### Vert.x module id
-
-At the moment this module is only compatible with Vert.x 2. It can be backported to the 1.x series but there is no work
-in progress in that direction.
-
-The Vert.x module id is: `com.jetdrone~yoke~1.0.1`
-
-
-### Maven artifact
-
-You can get the jar file using maven with the following configuration:
+The Vert.x module id is: `com.jetdrone~yoke~1.0.1`. If you prefer to use [maven](http://maven.apache.org), you can get
+the artifacts using the following dependency:
 
     <dependency>
       <groupId>com.jetdrone</groupId>
@@ -35,24 +25,13 @@ The scope is provided because you should include the module from your Vert.x app
 in the server classpath.
 
 
-## Where to get help
+## Getting started
 
-Please visit:  [yoke](http://pmlopes.github.io/yoke/)
+Yoke is a polyglot framework so you should choose a trail to follow with your favourite language:
 
-In the site there are simple examples and basic documentation of the implemented middleware.
-
-* [BasicAuth](http://pmlopes.github.io/yoke/BasicAuth.html)
-* [Favicon](http://pmlopes.github.io/yoke/Favicon.html)
-* [Limit](http://pmlopes.github.io/yoke/Limit.html)
-* [Static](http://pmlopes.github.io/yoke/Static.html)
-* [MethodOverride](http://pmlopes.github.io/yoke/MethodOverride.html)
-* [Timeout](http://pmlopes.github.io/yoke/Timeout.html)
-* [BodyParser](http://pmlopes.github.io/yoke/BodyParser.html)
-* [Vhost](http://pmlopes.github.io/yoke/Vhost.html)
-* [CookieParser](http://pmlopes.github.io/yoke/CookieParser.html)
-* [ResponseTime](http://pmlopes.github.io/yoke/ResponseTime.html)
-* [ErrorHandler](http://pmlopes.github.io/yoke/ErrorHandler.html)
-* [Router](http://pmlopes.github.io/yoke/Router.html)
+* [Java](com/jetdrone/vertx/yoke/Yoke.html)
+* [Groovy](framework/src/main/groovy/com/jetdrone/vertx/yoke/GYoke.html)
+* [JavaScript](framework/src/main/resources/yoke/Yoke.html)
 
 You can also get tutorials:
 
@@ -65,13 +44,19 @@ And also Benchmarks:
 
 * [Benchmark](http://pmlopes.github.io/yoke/Benchmark.html)
 
+If you need help with Yoke. just ask your questions on [yoke framework group](https://groups.google.com/forum/#!forum/yoke-framework).
+
 
 ## Example Applications
 
-* Under the directory example you will find a Naive implementation of a CMS application using Redis as a database backend.
+Under the directory example you will find a couple of examples built with Yoke.
+
+* A naive implementation of a CMS application using Redis as a database backend
 * Mozilla Persona authentication implementation
 * Groovy get started example
 * JavaScript get started example
+
+All these examples are presented as a showcase of the framework, they are lacking lots of features and testing.
 
 
 ## Inspiration

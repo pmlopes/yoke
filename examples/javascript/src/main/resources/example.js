@@ -1,7 +1,7 @@
-var Yoke = require('yokejs/Yoke');
-var Router = require('yokejs/middleware/Router');
-var ResponseTime = require('yokejs/middleware/ResponseTime');
-var MicroTemplateEngine = require('yokejs/engine/MicroTemplateEngine');
+var Yoke = require('yoke/Yoke');
+var Router = require('yoke/middleware/Router');
+var ResponseTime = require('yoke/middleware/ResponseTime');
+var MicroTemplateEngine = require('yoke/engine/MicroTemplateEngine');
 
 var yoke = new Yoke();
 var router = new Router();

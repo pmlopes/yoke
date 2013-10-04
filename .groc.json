@@ -1,0 +1,9 @@
+{
+    "glob": [
+        "README.md",
+        "framework/src/main/**/*.java",
+        "framework/src/main/**/*.groovy",
+        "framework/src/main/**/*.js"
+    ],
+    "github": false
+}
