@@ -39,6 +39,12 @@ public class Yoke implements RequestWrapper {
     private final RequestWrapper requestWrapper;
     // The default context used by all requests
     // @private
+    // @default
+    //     {
+    //        title: "Yoke",
+    //        x-powered-by: true,
+    //        trust-proxy: true
+    //     }
     private final Map<String, Object> defaultContext = new HashMap<>();
     // The internal registry of [render engines](Engine.html)
     // @private
@@ -52,7 +58,6 @@ public class Yoke implements RequestWrapper {
     //
     // @constructor
     // @param {Verticle} verticle
-
     //
     // @example
     //      public class MyVerticle extends Verticle {
@@ -65,31 +70,72 @@ public class Yoke implements RequestWrapper {
         this(verticle.getVertx(), verticle.getContainer().logger(), null);
     }
 
+    // Creates a Yoke instance.
+    //
+    // This constructor should be called from a verticle and pass a valid Vertx instance and a Logger. This instance
+    // will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
+    // features such as file system and timers.
+    //
+    // @constructor
+    // @param {Verticle} verticle
+    // @param {Logger} logger
+    //
+    // @example
+    //      public class MyVerticle extends Verticle {
+    //          public void start() {
+    //              final Yoke yoke = new Yoke(getVertx(), getContainer().logger());
+    //              ...
+    //          }
+    //      }
     public Yoke(Vertx vertx, Logger logger) {
         this(vertx, logger, null);
     }
 
+    // Creates a Yoke instance.
+    //
+    // This constructor should be called internally or from other language bindings.
+    //
+    // @constructor
+    // @internal
+    // @param {Verticle} verticle
+    // @param {Logger} logger
+    // @param {RequestWrapper} requestWrapper
+    //
+    // @example
+    //      public class MyVerticle extends Verticle {
+    //          public void start() {
+    //              final Yoke yoke = new Yoke(getVertx(), getContainer().logger(), new RequestWrapper() {...});
+    //              ...
+    //          }
+    //      }
     public Yoke(Vertx vertx, Logger logger, RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.logger = logger;
         this.requestWrapper = requestWrapper == null ? this : requestWrapper;
-        // defaults
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
         defaultContext.put("trust-proxy", true);
     }
 
+    // Mounted middleware represents a binding of a Middleware instance to a specific url path.
+    // @private
     private static class MountedMiddleware {
         final String mount;
         final Middleware middleware;
 
+        // Constructs a new Mounted Middleware
+        // @constructor
+        // @param {String} mount Mount path
+        // @param {Middleware} middleware Middleware to use on the path.
         MountedMiddleware(String mount, Middleware middleware) {
             this.mount = mount;
             this.middleware = middleware;
         }
     }
 
+    // Ordered list of mounted middleware in the chain
     private final List<MountedMiddleware> middlewareList = new ArrayList<>();
+    // Special middleware used for error handling
     private Middleware errorHandler;
 
     /**
