@@ -6,6 +6,9 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 
+// # ResponseTime
+//
+// Adds the ```x-response-time``` header displaying the response duration in milliseconds.
 public class ResponseTime extends Middleware {
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
