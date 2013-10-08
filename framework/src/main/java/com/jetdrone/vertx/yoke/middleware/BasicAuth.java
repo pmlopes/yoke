@@ -1,6 +1,6 @@
 // Copyright 2011-2013 the original author or authors.
 //
-// @package com.jetdrone.vertx.yoke
+// @package com.jetdrone.vertx.yoke.middleware.middleware
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -49,7 +49,8 @@ public class BasicAuth extends Middleware {
     //
     // @example
     //       Yoke yoke = new Yoke(...);
-    //       yoke.use("/admin", new BasicAuth("admin", "s3cr37", "MyApp Auth Required"));
+    //       yoke.use("/admin", new BasicAuth("admin", "s3cr37",
+    //           "MyApp Auth Required"));
     public BasicAuth(final String username, final String password, String realm) {
         this.realm = realm;
         authHandler = new AuthHandler() {
@@ -83,14 +84,14 @@ public class BasicAuth extends Middleware {
     // @example
     //       Yoke yoke = new Yoke(...);
     //       yoke.use("/admin", new AuthHandler() {
-    //           public void handle(String user, String password, Handler next) {
-    //                // a better example would be fetching user from a DB
-    //                if ("user".equals(user) && "pass".equals(password)) {
-    //                     next.handle(true);
-    //                } else {
-    //                     next.handle(false);
-    //                }
+    //         public void handle(String user, String password, Handler next) {
+    //           // a better example would be fetching user from a DB
+    //           if ("user".equals(user) && "pass".equals(password)) {
+    //             next.handle(true);
+    //           } else {
+    //             next.handle(false);
     //           }
+    //         }
     //       }, "My App Auth");
     public BasicAuth(AuthHandler authHandler, String realm) {
         this.realm = realm;
@@ -105,14 +106,14 @@ public class BasicAuth extends Middleware {
     // @example
     //       Yoke yoke = new Yoke(...);
     //       yoke.use("/admin", new AuthHandler() {
-    //           public void handle(String user, String password, Handler next) {
-    //                // a better example would be fetching user from a DB
-    //                if ("user".equals(user) && "pass".equals(password)) {
-    //                     next.handle(true);
-    //                } else {
-    //                     next.handle(false);
-    //                }
+    //         public void handle(String user, String password, Handler next) {
+    //           // a better example would be fetching user from a DB
+    //           if ("user".equals(user) && "pass".equals(password)) {
+    //             next.handle(true);
+    //           } else {
+    //             next.handle(false);
     //           }
+    //         }
     //       });
     public BasicAuth(AuthHandler authHandler) {
         this(authHandler, "Authentication required");

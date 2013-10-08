@@ -17,37 +17,39 @@ import org.vertx.java.core.logging.Logger;
 // return true.
 //
 // The current list of Middleware is:
-//
-// * [BasicAuth](middleware/BasicAuth.html)
-// * [BodyParser](middleware/BodyParser.html)
-// * [BridgeSecureHandler](middleware/BridgeSecureHandler.html)
-// * [Compress](middleware/Compress.html)
-// * [CookieParser](middleware/CookieParser.html)
-// * [Csrf](middleware/Csrf.html)
-// * [ErrorHandler](middleware/ErrorHandler.html)
-// * [Favicon](middleware/Favicon.html)
-// * [Limit](middleware/Limit.html)
-// * [Logger](middleware/Logger.html)
-// * [MethodOverride](middleware/MethodOverride.html)
-// * [RequestProxy](middleware/RequestProxy.html)
-// * [ResponseTime](middleware/ResponseTime.html)
-// * [Router](middleware/Router.html)
-// * [Session](middleware/Session.html)
-// * [Static](middleware/Static.html)
-// * [Timeout](middleware/Timeout.html)
-// * [Vhost](middleware/Vhost.html)
+// [BasicAuth](middleware/BasicAuth.html),
+// [BodyParser](middleware/BodyParser.html),
+// [BridgeSecureHandler](middleware/BridgeSecureHandler.html),
+// [Compress](middleware/Compress.html),
+// [CookieParser](middleware/CookieParser.html),
+// [Csrf](middleware/Csrf.html),
+// [ErrorHandler](middleware/ErrorHandler.html),
+// [Favicon](middleware/Favicon.html),
+// [Limit](middleware/Limit.html),
+// [Logger](middleware/Logger.html),
+// [MethodOverride](middleware/MethodOverride.html),
+// [RequestProxy](middleware/RequestProxy.html),
+// [ResponseTime](middleware/ResponseTime.html),
+// [Router](middleware/Router.html),
+// [Session](middleware/Session.html),
+// [Static](middleware/Static.html),
+// [Timeout](middleware/Timeout.html),
+// [Vhost](middleware/Vhost.html).
 //
 // Using the extras project you get the following extra Middleware:
-//
-// * [JsonRestRouter]
+// [JsonRestRouter].
 public abstract class Middleware {
 
-    // @protected
     // Local Vert.x instance for usage within the middleware. This is useful to use all asynchronous features of it.
+    //
+    // @property vertx
+    // @protected
     protected Vertx vertx;
 
-    // @protected
     // The internal logger.
+    //
+    // @property logger
+    // @protected
     protected Logger logger;
 
     // Initializes the middleware. This methos is called from Yoke once a middleware is added to the chain.
@@ -64,6 +66,7 @@ public abstract class Middleware {
     }
 
     // When there is a need to identify a middleware to handle errors (error handler) this method should return true.
+    //
     // @method isErrorHandler
     // @getter
     // @return {boolean} true is this middleware will handle errors.
@@ -81,27 +84,29 @@ public abstract class Middleware {
     // @example
     //     // Example that always returns Hello
     //     class HelloMiddleware extends Middleware {
-    //         public void handle(final YokeRequest request, final Handler<Object> next) {
-    //             request.response.end("Hello");
-    //         }
+    //       public void handle(YokeRequest request, Handler<Object> next) {
+    //         request.response.end("Hello");
+    //       }
     //     }
     //
     // @example
     //     // Example that always raises an internal server error
     //     class HelloMiddleware extends Middleware {
-    //         public void handle(final YokeRequest request, final Handler<Object> next) {
-    //             next.handle("Something went wrong!");
-    //         }
+    //       public void handle(YokeRequest request, Handler<Object> next) {
+    //         next.handle("Something went wrong!");
+    //       }
     //     }
     //
     // @example
     //     // Example that passes the control to the next middleware
     //     class HelloMiddleware extends Middleware {
-    //         public void handle(final YokeRequest request, final Handler<Object> next) {
-    //             // when the error is null, then the chain will execute the next Middleware until the chain is complete,
-    //             // when that happens a 404 error is returned since no middleware was found that could handle the request.
-    //             next.handle(null);
-    //         }
+    //       public void handle(YokeRequest request, Handler<Object> next) {
+    //         // when the error is null, then the chain will execute
+    //         // the next Middleware until the chain is complete,
+    //         // when that happens a 404 error is returned since no
+    //         // middleware was found that could handle the request.
+    //         next.handle(null);
+    //       }
     //     }
     public abstract void handle(final YokeRequest request, final Handler<Object> next);
 }
