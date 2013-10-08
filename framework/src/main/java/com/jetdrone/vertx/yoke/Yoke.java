@@ -28,26 +28,41 @@ import java.util.*;
 // Yoke has no extra dependencies than Vert.x itself so it is self contained.
 public class Yoke implements RequestWrapper {
 
-    // The Vert.x instance
+    // Vert.x instance
+    //
     // @private
+    // @property vertx
     private final Vertx vertx;
-    // The internal logger
+
+    // internal logger
+    //
     // @private
+    // @property logger
     private final Logger logger;
-    // The request wrapper in use
+
+    // request wrapper in use
+    //
     // @private
+    // @property requestWrapper
     private final RequestWrapper requestWrapper;
-    // The default context used by all requests
+
+    // default context used by all requests
+    //
     // @private
-    // @default
-    //     {
+    // @property defaultContext
+    //
+    // @example
+    //      {
     //        title: "Yoke",
     //        x-powered-by: true,
     //        trust-proxy: true
-    //     }
+    //      }
     private final Map<String, Object> defaultContext = new HashMap<>();
+
     // The internal registry of [render engines](Engine.html)
+    //
     // @private
+    // @property engineMap
     private final Map<String, Engine> engineMap = new HashMap<>();
 
     // Creates a Yoke instance.
@@ -83,7 +98,8 @@ public class Yoke implements RequestWrapper {
     // @example
     //      public class MyVerticle extends Verticle {
     //          public void start() {
-    //              final Yoke yoke = new Yoke(getVertx(), getContainer().logger());
+    //              final Yoke yoke = new Yoke(getVertx(),
+    //                  getContainer().logger());
     //              ...
     //          }
     //      }
@@ -104,7 +120,9 @@ public class Yoke implements RequestWrapper {
     // @example
     //      public class MyVerticle extends Verticle {
     //          public void start() {
-    //              final Yoke yoke = new Yoke(getVertx(), getContainer().logger(), new RequestWrapper() {...});
+    //              final Yoke yoke = new Yoke(getVertx(),
+    //                  getContainer().logger(),
+    //                  new RequestWrapper() {...});
     //              ...
     //          }
     //      }
@@ -125,18 +143,26 @@ public class Yoke implements RequestWrapper {
 
         // Constructs a new Mounted Middleware
         // @constructor
+        // @private
+        //
         // @param {String} mount Mount path
         // @param {Middleware} middleware Middleware to use on the path.
-        MountedMiddleware(String mount, Middleware middleware) {
+        private MountedMiddleware(String mount, Middleware middleware) {
             this.mount = mount;
             this.middleware = middleware;
         }
     }
 
     // Ordered list of mounted middleware in the chain
-    private final List<MountedMiddleware> middlewareList = new ArrayList<>();
-    // Special middleware used for error handling
+    //
     // @private
+    // @property middlewareList
+    private final List<MountedMiddleware> middlewareList = new ArrayList<>();
+
+    // Special middleware used for error handling
+    //
+    // @private
+    // @property errorHandler
     private Middleware errorHandler;
 
     // Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is
@@ -287,8 +313,10 @@ public class Yoke implements RequestWrapper {
     }
 
     // Starts listening at a already created server.
-    // @return {Yoke}
     //
+    // @method listen
+    // @param {HttpServer} server
+    // @return {Yoke}
     public Yoke listen(final HttpServer server) {
         // is this server HTTPS?
         final boolean secure = server.isSSL();
