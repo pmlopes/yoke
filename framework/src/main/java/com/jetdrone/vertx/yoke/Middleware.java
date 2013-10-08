@@ -8,11 +8,38 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.logging.Logger;
 
+// # Middleware
+//
 // Abstract class that needs to be implemented when creating a new middleware piece.
 // The class provides access to the Vertx object and by default is not marked as a error handler middleware.
 //
 // If there is a need to create a new error handler middleware the isErrorHandler method should be overridden to
 // return true.
+//
+// The current list of Middleware is:
+//
+// * [BasicAuth](middleware/BasicAuth.html)
+// * [BodyParser](middleware/BodyParser.html)
+// * [BridgeSecureHandler](middleware/BridgeSecureHandler.html)
+// * [Compress](middleware/Compress.html)
+// * [CookieParser](middleware/CookieParser.html)
+// * [Csrf](middleware/Csrf.html)
+// * [ErrorHandler](middleware/ErrorHandler.html)
+// * [Favicon](middleware/Favicon.html)
+// * [Limit](middleware/Limit.html)
+// * [Logger](middleware/Logger.html)
+// * [MethodOverride](middleware/MethodOverride.html)
+// * [RequestProxy](middleware/RequestProxy.html)
+// * [ResponseTime](middleware/ResponseTime.html)
+// * [Router](middleware/Router.html)
+// * [Session](middleware/Session.html)
+// * [Static](middleware/Static.html)
+// * [Timeout](middleware/Timeout.html)
+// * [Vhost](middleware/Vhost.html)
+//
+// Using the extras project you get the following extra Middleware:
+//
+// * [JsonRestRouter]
 public abstract class Middleware {
 
     // @protected

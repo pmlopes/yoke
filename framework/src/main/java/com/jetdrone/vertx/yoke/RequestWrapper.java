@@ -8,6 +8,11 @@ import org.vertx.java.core.http.HttpServerRequest;
 
 import java.util.Map;
 
+// # RequestWrapper
+//
+// Interface to wrap request objects to language specific implementations. This is an internal interface and should
+// not be used on a normal Yoke application.
+// @internal
 public interface RequestWrapper {
 
     // For other language bindings this method can be override.

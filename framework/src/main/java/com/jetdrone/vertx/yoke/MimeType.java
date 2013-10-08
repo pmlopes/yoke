@@ -11,6 +11,8 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
+// # MimeType
+//
 // Basic MimeType support inspired by the Apache Http Server project.
 public class MimeType {
 
