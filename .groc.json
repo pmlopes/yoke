@@ -3,7 +3,8 @@
         "README.md",
         "framework/src/main/**/*.java",
         "framework/src/main/**/*.groovy",
-        "framework/src/main/**/*.js"
+        "framework/src/main/**/*.js",
+        "framework/src/main/**/*.md"
     ],
     "github": false
 }
