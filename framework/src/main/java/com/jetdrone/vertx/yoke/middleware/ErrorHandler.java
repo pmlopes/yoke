@@ -1,18 +1,6 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.middleware
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -27,21 +15,55 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// # ErrorHandler
+//
+// Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
 public class ErrorHandler extends Middleware {
 
+    // Flag to enable/disable printing the full stack trace of exceptions.
+    //
+    // @property fullStack
+    // @private
     private final boolean fullStack;
+
+    // Cached template for rendering the html errors
+    //
+    // @property errorTemplate
+    // @private
     private final String errorTemplate;
 
+    // Create a new ErrorHandler allowing to print or not the stack trace. Include stack trace `true` might be useful in
+    // development mode but probably you don't want it in production.
+    //
+    // @constructor
+    // @param {boolean} fullStack
+    //
+    // @example
+    //      Yoke yoke = new Yoke(...);
+    //      yoke.use(new ErrorHandler(true);
     public ErrorHandler(boolean fullStack) {
         this.fullStack = fullStack;
         errorTemplate = Utils.readResourceToBuffer(getClass(), "error.html").toString();
     }
 
+    // Override the Middleware isErrorHandler getter.
+    //
+    // @internal
+    // @method isErrorHandler
+    // @getter
+    // @return {boolean} true
     @Override
     public boolean isErrorHandler() {
         return true;
     }
 
+    // Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
+    // numbers these are handled as Http error codes.
+    //
+    // @method getMessage
+    // @private
+    // @param {Object} error
+    // @return {String}
     private String getMessage(Object error) {
         if (error instanceof Throwable) {
             String message = ((Throwable) error).getMessage();
@@ -64,6 +86,12 @@ public class ErrorHandler extends Middleware {
         }
     }
 
+    // Extracts a single error code from a error Object. This will handle Throwables, Strings and Numbers.
+    //
+    // @method getErrorCode
+    // @private
+    // @param {Object} error
+    // @return {int}
     private int getErrorCode(Object error) {
         if (error instanceof Number) {
             return ((Number) error).intValue();
@@ -74,6 +102,12 @@ public class ErrorHandler extends Middleware {
         }
     }
 
+    // Convert the stack trace to a List in order to be rendered in the error template.
+    //
+    // @method getStackTrace
+    // @private
+    // @param {Object} error
+    // @return {List}
     private List<String> getStackTrace(Object error) {
         if (fullStack && error instanceof Throwable) {
             List<String> stackTrace = new ArrayList<>();

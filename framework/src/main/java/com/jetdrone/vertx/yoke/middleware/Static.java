@@ -1,18 +1,6 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.middleware
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -31,16 +19,54 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+// # Static
+//
+// Static file server with the given ```root``` path. Optionaly will also generate index pages for directory listings.
 public class Static extends Middleware {
 
+    // SimpleDateFormat to format date objects into ISO format.
+    //
+    // @property ISODATE
+    // @private
     private final SimpleDateFormat ISODATE;
+
+    // Cache for the HTML template of the directory listing page
+    //
+    // @property directoryTemplate
+    // @private
     private final String directoryTemplate;
 
+    // Root directory where to look files from
+    // @property root
+    // @private
     private final String root;
+
+    // Max age allowed for cache of resources
+    // @property maxAge
+    // @private
     private final long maxAge;
+
+    // Allow directory listing
+    // @property directoryListing
+    // @private
     private final boolean directoryListing;
+
+    // Include hidden files (Hiden files are files start start with dot (.).
+    // @property includeHidden
+    // @private
     private final boolean includeHidden;
 
+    // Create a new Static File Server Middleware
+    //
+    // @constructor
+    // @param {String} root the root location of the static files in the file system (relative to the main Verticle).
+    // @param {long} maxAge cache-control max-age directive
+    // @param {boolean} directoryListing generate index pages for directories
+    // @param {boolean} includeHidden in the directory listing show dot files
+    //
+    // @example
+    //      new Yoke(...)
+    //        .use(new Static("webroot", 0, true, false));
     public Static(String root, long maxAge, boolean directoryListing, boolean includeHidden) {
         if (root.endsWith("/")) {
             root = root.substring(0, root.length() - 1);
@@ -55,14 +81,38 @@ public class Static extends Middleware {
         ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
+    // Create a new Static File Server Middleware that does not generate directory listings or hidden files
+    //
+    // @constructor
+    // @param {String} root the root location of the static files in the file system (relative to the main Verticle).
+    // @param {long} maxAge cache-control max-age directive
+    //
+    // @example
+    //      new Yoke(...)
+    //        .use(new Static("webroot", 0));
     public Static(String root,long maxAge) {
         this(root, maxAge, false, false);
     }
 
+    // Create a new Static File Server Middleware that does not generate directory listings or hidden files and files
+    // are cache for 1 full day
+    //
+    // @constructor
+    // @param {String} root the root location of the static files in the file system (relative to the main Verticle).
+    //
+    // @example
+    //      new Yoke(...)
+    //        .use(new Static("webroot"));
     public Static(String root) {
         this(root, 86400000, false, false);
     }
 
+    // Create all required header so content can be cache by Caching servers or Browsers
+    //
+    // @method writeHeaders
+    // @param {YokeRequest} request
+    // @param {FileProps} props
+    // @private
     private void writeHeaders(final YokeRequest request, final FileProps props) {
 
         MultiMap headers = request.response().headers();
@@ -84,6 +134,13 @@ public class Static extends Middleware {
         }
     }
 
+    // Write a file into the response body
+    //
+    // @method sendFile
+    // @param {YokeRequest} request
+    // @param {String} file
+    // @param {FileProps} props
+    // @private
     private void sendFile(final YokeRequest request, final String file, final FileProps props) {
         // write content type
         String contentType = MimeType.getMime(file);
@@ -99,6 +156,13 @@ public class Static extends Middleware {
         }
     }
 
+    // Generate Directory listing
+    //
+    // @method sendDirectory
+    // @param {YokeRequest} request
+    // @param {String} dir
+    // @param {Handler} next
+    // @private
     private void sendDirectory(final YokeRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
 
@@ -199,6 +263,13 @@ public class Static extends Middleware {
         });
     }
 
+    // Verify if a resource is fresh, fresh means that its cache headers are validated against the local resource and
+    // etags last-modified headers are still the same.
+    //
+    // @method isFresh
+    // @param {YokeRequest} request
+    // @return {boolean}
+    // @private
     private boolean isFresh(final YokeRequest request) {
         // defaults
         boolean etagMatches = true;

@@ -1,18 +1,6 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.middleware
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -24,14 +12,40 @@ import javax.crypto.Mac;
 import java.util.Set;
 import java.util.TreeSet;
 
+// # CookieParser
+//
+// Parse request cookies both signed or plain.
+//
+// If a cooke value starts with *s:* it means that it is a signed cookie. In this case the value is expected to be
+// *s:<cookie>.<signature>*. The signature is *HMAC + SHA256*.
+//
+// When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.
 public class CookieParser extends Middleware {
 
+    // Message Signer
+    // @property hmacSHA256
+    // @private
     private final Mac hmacSHA256;
 
+    // Instantiates a CookieParser with a given Mac.
+    //
+    // @constructor
+    // @param {Mac} hmacSHA256
+    //
+    // @example
+    //      Yoke yoke = new Yoke(...);
+    //      yoke.use(new CookieParser(Utils.newHmacSHA256("s3cr3t")));
     public CookieParser(Mac hmacSHA256) {
         this.hmacSHA256 = hmacSHA256;
     }
 
+    // Instantiates a CookieParser without a Mac. In this case no cookies will be signed.
+    //
+    // @constructor
+    //
+    // @example
+    //      Yoke yoke = new Yoke(...);
+    //      yoke.use(new CookieParser());
     public CookieParser() {
         this(null);
     }

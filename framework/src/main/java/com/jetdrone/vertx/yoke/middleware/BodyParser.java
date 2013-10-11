@@ -1,18 +1,6 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.middleware
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -24,18 +12,58 @@ import org.vertx.java.core.json.DecodeException;
 
 import java.util.HashMap;
 
+// # BodyParser
+//
+// Parse request bodies, supports *application/json*, *application/x-www-form-urlencoded*, and *multipart/form-data*.
+//
+// Once data has been parsed the result is visible in the field ```body``` of the request. To help there are 2 helper
+// getters for this field:  ```bodyJson()``` returns ```JsonObject``` and ```bodyBuffer()``` returns ```Buffer```.
+//
+// If the content type was *multipart/form-data* and there were uploaded files the files are ```files()``` returns
+// ```Map<String, HttpServerFileUpload>```.
+//
+// ### Limitations
+//
+// Currently when parsing *multipart/form-data* if there are several files uploaded under the same name, only the last
+// is preserved.
 public class BodyParser extends Middleware {
 
+    // Location on the file system to store the uploaded files.
+    // @property uploadDir
+    // @private
     private final String uploadDir;
 
+    // Instantiates a Body parser with a configurable upload directory.
+    //
+    // @constructor
+    // @param {String} uploadDir
+    //
+    // @example
+    //      Yoke yoke = new Yoke(...);
+    //      yoke.use(new BodyParser("/upload"));
     public BodyParser(String uploadDir) {
         this.uploadDir = uploadDir;
     }
 
+    // Instantiates a Body parser using the system default temp directory.
+    //
+    // @constructor
+    //
+    // @example
+    //      Yoke yoke = new Yoke(...);
+    //      yoke.use(new BodyParser());
     public BodyParser() {
         this(System.getProperty("java.io.tmpdir"));
     }
 
+    // Internal method to parse JSON requests directly to the YokeRequest object
+    //
+    // @method parseJSON
+    // @private
+    // @asynchronous
+    // @param {YokeRequest} request
+    // @param {Buffer} buffer
+    // @param {Handler} next
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
             String content = buffer.toString();
@@ -62,6 +90,14 @@ public class BodyParser extends Middleware {
         }
     }
 
+    // Handler for the parser. When the request method is GET or HEAD this is a Noop middleware.
+    // If not the middleware verifies if there is a body and according to its headers tries to
+    // parse it as JSON, form data or multi part upload.
+    //
+    // @method handle
+    // @asynchronous
+    // @param {YokeRequest} request
+    // @param {Handler} next
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
         final String method = request.method();
