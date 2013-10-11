@@ -505,6 +505,43 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /**
+     * Allow getting form parameters in a generified way.
+     *
+     * @param name The key to get
+     * @return The found object
+     */
+    public String getFormParameter(String name) {
+        return formAttributes().get(name);
+    }
+
+    /**
+     * Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
+     * @return The found object
+     */
+    public String getFormParameter(String name, String defaultValue) {
+        String value = getParameter(name);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return value;
+    }
+
+    /**
+     * Allow getting form parameters in a generified way.
+     *
+     * @param name The key to get
+     * @return The found object
+     */
+    public List<String> getFormParameterList(String name) {
+        return params().getAll(name);
+    }
+
+    /**
      * Return the real request
      */
     public HttpServerRequest vertxHttpServerRequest() {
