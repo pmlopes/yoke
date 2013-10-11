@@ -32,6 +32,16 @@ public class YokeException extends Throwable {
         this.code = code;
     }
 
+    public YokeException(Number code, String message, Throwable cause) {
+        super(message, cause);
+        this.code = code;
+    }
+
+    public YokeException(Number code, String message, String cause) {
+        super(message, new Throwable(cause));
+        this.code = code;
+    }
+
     public YokeException(String message) {
         super(message);
         this.code = 500;
