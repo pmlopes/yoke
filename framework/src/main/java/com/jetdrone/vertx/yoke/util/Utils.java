@@ -39,6 +39,19 @@ public final class Utils {
     // no instantiation
     private Utils () {}
 
+    private final static char[] HEXARRAY = "0123456789ABCDEF".toCharArray();
+
+    public static String hex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        int v;
+        for ( int j = 0; j < bytes.length; j++ ) {
+            v = bytes[j] & 0xFF;
+            hexChars[j * 2] = HEXARRAY[v >>> 4];
+            hexChars[j * 2 + 1] = HEXARRAY[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
+
     private static final String BASE64ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
     private static byte[] zeroPad(final int length, final byte[] bytes) {
