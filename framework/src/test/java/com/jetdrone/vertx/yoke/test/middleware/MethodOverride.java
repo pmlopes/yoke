@@ -61,7 +61,7 @@ public class MethodOverride extends TestVerticle {
         headers.add("content-type", "application/x-www-form-urlencoded");
         headers.add("content-length", Integer.toString(body.length()));
 
-        yoke.request("POST", "/upload", headers, true, body, new Handler<Response>() {
+        yoke.request("POST", "/upload", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

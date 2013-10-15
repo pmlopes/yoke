@@ -48,19 +48,17 @@ public class YokeTester extends Yoke {
     }
 
     public void request(final String method, final String url, final Handler<Response> handler) {
-        request(method, url, new CaseInsensitiveMultiMap(), false, new Buffer(0), handler);
+        request(method, url, new CaseInsensitiveMultiMap(), new Buffer(0), handler);
     }
 
     public void request(final String method, final String url, final MultiMap headers, final Handler<Response> handler) {
-        request(method, url, headers, false, new Buffer(0), handler);
-    }
-    public void request(final String method, final String url, final MultiMap headers, final Buffer body, final Handler<Response> handler) {
-        request(method, url, headers, false, body, handler);
+        request(method, url, headers, new Buffer(0), handler);
     }
 
-    public void request(final String method, final String url, final MultiMap headers, final boolean urlEncoded, final Buffer body, final Handler<Response> handler) {
+    public void request(final String method, final String url, final MultiMap headers, final Buffer body, final Handler<Response> handler) {
         try {
             final URI uri = new URI(url);
+            final boolean urlEncoded = "application/x-www-form-urlencoded".equalsIgnoreCase(headers.get("content-type"));
 
             final Response response = new Response(vertx, handler);
 

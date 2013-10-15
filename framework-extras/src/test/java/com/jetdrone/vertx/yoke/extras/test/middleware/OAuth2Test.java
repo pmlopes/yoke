@@ -45,7 +45,7 @@ public class OAuth2Test extends TestVerticle {
         headers.add("content-length", Integer.toString(body.length()));
 
 
-        yoke.request("POST", "/oauth/token", headers, true, body, new Handler<Response>() {
+        yoke.request("POST", "/oauth/token", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 System.out.println(resp.getStatusMessage());
