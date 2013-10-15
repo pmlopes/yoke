@@ -8,24 +8,25 @@ import com.jetdrone.vertx.yoke.util.YokeException;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OAuth2 extends Middleware {
 
+    private final SimpleDateFormat ISODATE;
+
     private Model model;
-    private List<?> allow;
+    private List<Allow> allow;
     private List<String> grants;
-    private boolean debug;
-    private boolean passthroughErrors;
     private long accessTokenLifetime;
     private long refreshTokenLifetime;
     private long authCodeLifetime;
@@ -35,8 +36,6 @@ public class OAuth2 extends Middleware {
 
     // state
 
-    private List<?> allowed;
-    private boolean allowedIsArray;
     private Allow allowCache;
     private Date now;
     private Authorise authorise;
@@ -59,23 +58,41 @@ public class OAuth2 extends Middleware {
         return sb.toString();
     }
 
-    public OAuth2(List<?> allow, List<String> grants, boolean debug, boolean passthroughErrors, long accessTokenLifetime, long refreshTokenLifetime, long authCodeLifetime, Pattern clientIdPattern) {
+    private Date parseISODate(String field) {
+        if (field == null) {
+            return null;
+        }
 
-        this.allow = allow; // default [];
-        this.grants = grants; // default [];
-        this.debug = debug; // default false;
-        this.passthroughErrors = passthroughErrors;
+        try {
+            return ISODATE.parse(field);
+        } catch (ParseException e) {
+            return null;
+        }
+    }
 
-        this.accessTokenLifetime = accessTokenLifetime; // default 3600;
-        this.refreshTokenLifetime = refreshTokenLifetime; // default 1209600;
-        this.authCodeLifetime = authCodeLifetime; // default 30;
+    // TODO: request.put(user,...) should be consistent
+    public OAuth2(Model model) {
+        this(model, 3600, 1209600, 30, Pattern.compile("^[a-z0-9-_]{3,40}$", Pattern.CASE_INSENSITIVE));
+    }
 
-        this.clientIdPattern = clientIdPattern; // default /^[a-z0-9-_]{3,40}$/i;
+    public OAuth2(Model model, long accessTokenLifetime, long refreshTokenLifetime, long authCodeLifetime, Pattern clientIdPattern) {
+
+        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
+        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        this.allow = new ArrayList<>();
+        this.grants = new ArrayList<>();
+
+        this.model = model;
+
+        this.accessTokenLifetime = accessTokenLifetime;
+        this.refreshTokenLifetime = refreshTokenLifetime;
+        this.authCodeLifetime = authCodeLifetime;
+
+        this.clientIdPattern = clientIdPattern;
         this.grantTypePattern = Pattern.compile("^(" + join(this.grants, "|") + ")$", Pattern.CASE_INSENSITIVE);
 
         // state
-        this.allowed = this.allow;
-        this.allowedIsArray = true;
         this.allowCache = null;
 
         this.authorise = new Authorise();
@@ -88,14 +105,7 @@ public class OAuth2 extends Middleware {
         }
     }
 
-    public static class OAuthToken {
-        Date expires;
-        String user_id;
-        String client_id;
-        Object user;
-    }
-
-    public static class Credentials {
+    private static class Credentials {
         Credentials(String client_id, String client_secret) {
             this.client_id = client_id;
             this.client_secret = client_secret;
@@ -105,35 +115,23 @@ public class OAuth2 extends Middleware {
         String client_secret;
     }
 
-    public static class Client {
-        String client_id;
-    }
-
-    // TODO: this must be a JsonObject
-    public static class AccessToken {
-        String access_token;
-        String refresh_token;
-        String token_type;
-        long expires_in;
-    }
-
-    // TODO: this must be a JsonObject
+    // TODO: this should be a JsonObject
     public static class OAuth {
-        OAuthToken token;
-        AccessToken accessToken;
+        JsonObject token;
+        JsonObject accessToken;
         String grantType;
-        Client client;
+        JsonObject client;
     }
 
     public interface Model {
-        void getAccessToken(String bearerToken, AsyncResultHandler<OAuthToken> handler);
-        void getClient(String client_id, String client_secret, AsyncResultHandler<Client> handler);
-        void grantTypeAllowed(String cliend_id, String grant_type, AsyncResultHandler<Boolean> handler);
-        void getUser(String username, String password, AsyncResultHandler<?> handler);
-        void getRefreshToken(String refresh_token, AsyncResultHandler<OAuthToken> handler);
-        void revokeRefreshToken(String refresh_token, AsyncResultHandler<OAuthToken> handler);
-        void saveAccessToken(String access_token, String client_id, String user_id, Date expires, AsyncResultHandler<Void> handler);
-        void saveRefreshToken(String refresh_token, String client_id, String user_id, Date expires, AsyncResultHandler<Void> handler);
+        void getAccessToken(String bearerToken, AsyncResultHandler<JsonObject> handler);
+        void getClient(String client_id, String client_secret, AsyncResultHandler<JsonObject> handler);
+        void grantTypeAllowed(String client_id, String grant_type, AsyncResultHandler<Boolean> handler);
+        void getUser(String username, String password, AsyncResultHandler<JsonObject> handler);
+        void getRefreshToken(String refresh_token, AsyncResultHandler<JsonObject> handler);
+        void revokeRefreshToken(String refresh_token, AsyncResultHandler<Void> handler);
+        void saveAccessToken(String access_token, String client_id, String user_id, String expires, AsyncResultHandler<Void> handler);
+        void saveRefreshToken(String refresh_token, String client_id, String user_id, String expires, AsyncResultHandler<Void> handler);
     }
 
     private static class Allow {
@@ -143,39 +141,41 @@ public class OAuth2 extends Middleware {
 
 
     private class Authorise {
+
         void handle(final YokeRequest request, final Handler<Object> next) {
             // Get token
             getBearerToken(request, new AsyncResultHandler<String>() {
                 @Override
-                public void handle(AsyncResult<String> asyncResult) {
-                    if (asyncResult.failed()) {
-                        next.handle(asyncResult.cause());
+                public void handle(AsyncResult<String> getBearerToken) {
+                    if (getBearerToken.failed()) {
+                        next.handle(getBearerToken.cause());
                         return;
                     }
 
-                    OAuth2.this.model.getAccessToken(asyncResult.result(), new AsyncResultHandler<OAuthToken>() {
+                    OAuth2.this.model.getAccessToken(getBearerToken.result(), new AsyncResultHandler<JsonObject>() {
                         @Override
-                        public void handle(AsyncResult<OAuthToken> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(new YokeException(503, "server_error", asyncResult.cause()));
+                        public void handle(AsyncResult<JsonObject> getAccessToken) {
+                            if (getAccessToken.failed()) {
+                                next.handle(new YokeException(503, "server_error", getAccessToken.cause()));
                                 return;
                             }
 
-                            authorise.validateAccessToken(asyncResult.result(), request, next);
+                            authorise.validateAccessToken(getAccessToken.result(), request, next);
                         }
                     });
                 }
             });
         }
 
-        void validateAccessToken(OAuthToken token, YokeRequest request, Handler<Object> next) {
+        void validateAccessToken(JsonObject token, YokeRequest request, Handler<Object> next) {
             if (token == null) {
                 next.handle(new YokeException(400, "invalid_grant", "The access token provided is invalid."));
                 return;
             }
 
             // Check it's valid
-            if (token.expires == null || token.expires.before(OAuth2.this.now)) {
+            Date expires = parseISODate(token.getString("expires"));
+            if (expires == null || expires.before(OAuth2.this.now)) {
                 next.handle(new YokeException(400, "invalid_grant", "The access token provided has expired."));
                 return;
             }
@@ -183,7 +183,7 @@ public class OAuth2 extends Middleware {
             // Expose params
             OAuth oauth = request.get("oauth");
             oauth.token = token;
-            request.put("user", token.user != null ? token.user : token.user_id);
+            request.put("user", token.getString("user_id"));
 
             next.handle(null); // Exit point
         }
@@ -279,15 +279,15 @@ public class OAuth2 extends Middleware {
             }
 
             // Check credentials against model
-            OAuth2.this.model.getClient(creds.client_id, creds.client_secret, new AsyncResultHandler<Client>() {
+            OAuth2.this.model.getClient(creds.client_id, creds.client_secret, new AsyncResultHandler<JsonObject>() {
                 @Override
-                public void handle(AsyncResult<Client> getClient) {
+                public void handle(AsyncResult<JsonObject> getClient) {
                     if (getClient.failed()) {
                         next.handle(new YokeException(503, "server_error", getClient.cause()));
                         return;
                     }
 
-                    Client client = getClient.result();
+                    JsonObject client = getClient.result();
 
                     if (client == null) {
                         next.handle(new YokeException(400, "invalid_client", "The client credentials are invalid"));
@@ -296,7 +296,7 @@ public class OAuth2 extends Middleware {
 
                     o.client = client;
 
-                    OAuth2.this.model.grantTypeAllowed(client.client_id, o.grantType, new AsyncResultHandler<Boolean>() {
+                    OAuth2.this.model.grantTypeAllowed(client.getString("client_id"), o.grantType, new AsyncResultHandler<Boolean>() {
                         @Override
                         public void handle(AsyncResult<Boolean> grantTypeAllowed) {
                             if (grantTypeAllowed.failed()) {
@@ -347,23 +347,6 @@ public class OAuth2 extends Middleware {
 
             final OAuth o = request.get("oauth");
 
-//            if (req.oauth.grantType.match(/^http(s|):\/\//) && this.model.extendedGrant) {
-//            return this.model.extendedGrant(req, function (err, supported, user) {
-//                if (err && err.error && err.description) {
-//                    return next(error(err.error, err.description));
-//                }
-//                if (err) return next(err);
-//                if (!supported) return invalid();
-//
-//                if (!user || user.id === undefined) {
-//                    return next(error('invalid_request', 'Invalid request.'));
-//                }
-//
-//                req.user = user;
-//                token.grantAccessToken.call(oauth, req, res, next);
-//            });
-//        }
-
             switch (o.grantType) {
                 case "password":
                     // User credentials
@@ -375,15 +358,15 @@ public class OAuth2 extends Middleware {
                         return;
                     }
 
-                    OAuth2.this.model.getUser(uname, pword, new AsyncResultHandler<Object>() {
+                    OAuth2.this.model.getUser(uname, pword, new AsyncResultHandler<JsonObject>() {
                         @Override
-                        public void handle(AsyncResult<Object> getUser) {
+                        public void handle(AsyncResult<JsonObject> getUser) {
                             if (getUser.failed()) {
                                 next.handle(new YokeException(503, "server_error", getUser.cause()));
                                 return;
                             }
 
-                            Object user = getUser.result();
+                            JsonObject user = getUser.result();
 
                             if (user != null) {
                                 request.put("user", user);
@@ -402,34 +385,37 @@ public class OAuth2 extends Middleware {
                         return;
                     }
 
-                    OAuth2.this.model.getRefreshToken(refresh_token, new AsyncResultHandler<OAuthToken>() {
+                    OAuth2.this.model.getRefreshToken(refresh_token, new AsyncResultHandler<JsonObject>() {
                         @Override
-                        public void handle(AsyncResult<OAuthToken> getRefreshToken) {
+                        public void handle(AsyncResult<JsonObject> getRefreshToken) {
                             if (getRefreshToken.failed()) {
                                 next.handle(new YokeException(503, "server_error", getRefreshToken.cause()));
                                 return;
                             }
 
-                            OAuthToken refreshToken = getRefreshToken.result();
+                            JsonObject refreshToken = getRefreshToken.result();
 
-                            if (refreshToken == null || !refreshToken.client_id.equals(o.client.client_id)) {
+                            if (refreshToken == null || !refreshToken.getString("client_id").equals(o.client.getString("client_id"))) {
                                 next.handle(new YokeException(400, "invalid_grant", "Invalid refresh token"));
                                 return;
-                            } else if (refreshToken.expires != null && refreshToken.expires.before(OAuth2.this.now)) {
-                                next.handle(new YokeException(400, "invalid_grant", "Refresh token has expired"));
-                                return;
+                            } else {
+                                Date expires = parseISODate(refreshToken.getString("expires"));
+                                if (expires != null && expires.before(OAuth2.this.now)) {
+                                    next.handle(new YokeException(400, "invalid_grant", "Refresh token has expired"));
+                                    return;
+                                }
                             }
 
-                            if (refreshToken.user_id != null) {
-                                request.put("user", refreshToken.user_id);
+                            if (refreshToken.getString("user_id") != null) {
+                                request.put("user", refreshToken.getString("user_id"));
                             } else {
                                 next.handle(new YokeException(503, "server_error", "No user/user_id parameter returned from getRefreshToken"));
                                 return;
                             }
 
-                            OAuth2.this.model.revokeRefreshToken(refresh_token, new AsyncResultHandler<OAuthToken>() {
+                            OAuth2.this.model.revokeRefreshToken(refresh_token, new AsyncResultHandler<Void>() {
                                 @Override
-                                public void handle(AsyncResult<OAuthToken> revokeRefreshToken) {
+                                public void handle(AsyncResult<Void> revokeRefreshToken) {
                                     if (revokeRefreshToken.failed()) {
                                         next.handle(new YokeException(503, "server_error", revokeRefreshToken.cause()));
                                         return;
@@ -451,14 +437,14 @@ public class OAuth2 extends Middleware {
             final OAuth o = request.get("oauth");
             final String accessToken = generateToken("accessToken");
 
-            o.accessToken.access_token = accessToken;
+            o.accessToken.putString("access_token", accessToken);
 
             Date expires = null;
             if (OAuth2.this.accessTokenLifetime != 0) {
                 expires = new Date(OAuth2.this.now.getTime() + OAuth2.this.accessTokenLifetime * 1000);
             }
 
-            OAuth2.this.model.saveAccessToken(accessToken, o.client.client_id, (String) request.get("user"), expires, new AsyncResultHandler<Void>() {
+            OAuth2.this.model.saveAccessToken(accessToken, o.client.getString("client_id"), (String) request.get("user"), ISODATE.format(expires), new AsyncResultHandler<Void>() {
                 @Override
                 public void handle(AsyncResult<Void> saveAccessToken) {
                     if (saveAccessToken.failed()) {
@@ -468,15 +454,14 @@ public class OAuth2 extends Middleware {
 
                     // Are we issuing refresh tokens?
                     if (OAuth2.this.grants.indexOf("refresh_token") >= 0) {
-                        final String refreshToken = generateToken("refreshToken");
-                        o.accessToken.refresh_token = refreshToken;
+                        o.accessToken.putString("refresh_token", generateToken("refreshToken"));
 
                         Date expires = null;
                         if (OAuth2.this.refreshTokenLifetime != 0) {
                             expires = new Date(OAuth2.this.now.getTime() + OAuth2.this.refreshTokenLifetime);
                         }
 
-                        OAuth2.this.model.saveRefreshToken(o.accessToken.refresh_token, o.client.client_id, (String) request.get("user"), expires, new AsyncResultHandler<Void>() {
+                        OAuth2.this.model.saveRefreshToken(o.accessToken.getString("refresh_token"), o.client.getString("client_id"), (String) request.get("user"), ISODATE.format(expires), new AsyncResultHandler<Void>() {
                             @Override
                             public void handle(AsyncResult<Void> saveRefreshToken) {
                                 if (saveRefreshToken.failed()) {
@@ -497,17 +482,15 @@ public class OAuth2 extends Middleware {
         private void issueToken(final YokeRequest request, final Handler<Object> next) {
             final OAuth o = request.get("oauth");
             // Prepare for output
-            o.accessToken.token_type = "bearer";
+            o.accessToken.putString("token_type", "bearer");
             if (OAuth2.this.accessTokenLifetime != 0) {
-                o.accessToken.expires_in = OAuth2.this.accessTokenLifetime;
+                o.accessToken.putNumber("expires_in", OAuth2.this.accessTokenLifetime);
             }
 
             // That's it!
             request.response().putHeader("Cache-Control", "no-cache");
             request.response().putHeader("Pragme", "no-cache");
-            // TODO: once the type is JsonObject this works
-//            request.response().jsonp(o.accessToken);
-            request.response().jsonp("");
+            request.response().end(o.accessToken);
         }
 
         private String generateToken(String type) {
@@ -526,8 +509,8 @@ public class OAuth2 extends Middleware {
         // Build allow object this method if haven't yet already
         if (allow == null) {
             allow = new Allow();
-            allow.len = allowed.size();
-            allow.pattern = Pattern.compile("^(" + join(allowed, "|") + ")$");
+            allow.len = this.allow.size();
+            allow.pattern = Pattern.compile("^(" + join(this.allow, "|") + ")$");
 
             allowCache = allow;
         }

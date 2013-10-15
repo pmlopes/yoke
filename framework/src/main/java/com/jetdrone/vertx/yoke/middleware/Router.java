@@ -16,6 +16,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// # Router
+//
+// Route request by path or regular expression. All *HTTP* verbs are available:
+//
+// ```GET```,```PUT```, ```POST```, ```DELETE```, ```OPTIONS```, ```HEAD```, ```TRACE```, ```CONNECT```. ```PATCH```
 public class Router extends Middleware {
 
     private final List<PatternBinding> getBindings = new ArrayList<>();
@@ -27,6 +32,18 @@ public class Router extends Middleware {
     private final List<PatternBinding> traceBindings = new ArrayList<>();
     private final List<PatternBinding> connectBindings = new ArrayList<>();
     private final List<PatternBinding> patchBindings = new ArrayList<>();
+
+    // @example
+    //      new Router() {{
+    //        get("/hello", new Handler<YokeRequest>() {
+    //          public void handle(YokeRequest request) {
+    //            request.response().end("Hello World!");
+    //          }
+    //        });
+    //      }}
+    public Router() {
+
+    }
 
     @Override
     public Middleware init(Vertx vertx, Logger logger) {
