@@ -29,7 +29,6 @@ public class OAuth2 extends Middleware {
     private List<String> grants;
     private long accessTokenLifetime;
     private long refreshTokenLifetime;
-    private long authCodeLifetime;
 
     private Pattern clientIdPattern;
     private Pattern grantTypePattern;
@@ -70,24 +69,24 @@ public class OAuth2 extends Middleware {
         }
     }
 
-    // TODO: request.put(user,...) should be consistent
     public OAuth2(Model model) {
-        this(model, 3600, 1209600, 30, Pattern.compile("^[a-z0-9-_]{3,40}$", Pattern.CASE_INSENSITIVE));
+        this(model, 3600, 1209600, Pattern.compile("^[a-z0-9-_]{3,40}$", Pattern.CASE_INSENSITIVE));
     }
 
-    public OAuth2(Model model, long accessTokenLifetime, long refreshTokenLifetime, long authCodeLifetime, Pattern clientIdPattern) {
+    public OAuth2(Model model, long accessTokenLifetime, long refreshTokenLifetime, Pattern clientIdPattern) {
 
         ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
         ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         this.allow = new ArrayList<>();
         this.grants = new ArrayList<>();
+        this.grants.add("password");
+        this.grants.add("refresh_token");
 
         this.model = model;
 
         this.accessTokenLifetime = accessTokenLifetime;
         this.refreshTokenLifetime = refreshTokenLifetime;
-        this.authCodeLifetime = authCodeLifetime;
 
         this.clientIdPattern = clientIdPattern;
         this.grantTypePattern = Pattern.compile("^(" + join(this.grants, "|") + ")$", Pattern.CASE_INSENSITIVE);
@@ -369,7 +368,7 @@ public class OAuth2 extends Middleware {
                             JsonObject user = getUser.result();
 
                             if (user != null) {
-                                request.put("user", user);
+                                request.put("user", user.getString("user_id"));
                                 grantAccessToken(request, next);
                             } else {
                                 next.handle(new YokeException(400, "invalid_grant", "User credentials are invalid"));
@@ -437,7 +436,7 @@ public class OAuth2 extends Middleware {
             final OAuth o = request.get("oauth");
             final String accessToken = generateToken("accessToken");
 
-            o.accessToken.putString("access_token", accessToken);
+            o.accessToken = new JsonObject().putString("access_token", accessToken);
 
             Date expires = null;
             if (OAuth2.this.accessTokenLifetime != 0) {
@@ -516,8 +515,7 @@ public class OAuth2 extends Middleware {
         }
 
         // Setup request params
-        OAuth o = request.get("oauth");
-        request.put("oauth", o);
+        request.put("oauth", new OAuth());
         this.now = new Date();
 
         if ("/oauth/token".equals(request.path())) {

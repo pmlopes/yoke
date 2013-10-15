@@ -511,7 +511,7 @@ public class YokeRequest implements HttpServerRequest {
      * @return The found object
      */
     public String getFormParameter(String name) {
-        return formAttributes().get(name);
+        return request.formAttributes().get(name);
     }
 
     /**
@@ -522,7 +522,7 @@ public class YokeRequest implements HttpServerRequest {
      * @return The found object
      */
     public String getFormParameter(String name, String defaultValue) {
-        String value = getParameter(name);
+        String value = request.formAttributes().get(name);
 
         if (value == null) {
             return defaultValue;
@@ -538,7 +538,7 @@ public class YokeRequest implements HttpServerRequest {
      * @return The found object
      */
     public List<String> getFormParameterList(String name) {
-        return params().getAll(name);
+        return request.formAttributes().getAll(name);
     }
 
     /**
