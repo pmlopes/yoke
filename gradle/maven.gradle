@@ -18,10 +18,10 @@ apply plugin: 'maven'
 apply plugin: 'signing'
 
 if (!hasProperty('sonatypeUsername')) {
-  ext.sonatypeUsername = ''
+	ext.sonatypeUsername = ''
 }
 if (!hasProperty('sonatypePassword')) {
-  ext.sonatypePassword = ''
+	ext.sonatypePassword = ''
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -30,36 +30,35 @@ if (!hasProperty('sonatypePassword')) {
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 signing {
-  required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
-  sign configurations.archives
+	required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
+	sign configurations.archives
 }
 
 uploadArchives {
-  if (!modname.startsWith("example")) {
-    group 'build'
-    description = "Does a maven deploy of archives artifacts"
+	group 'build'
+	description = "Does a maven deploy of archives artifacts"
 
-    repositories {
-      mavenDeployer {
-        // setUniqueVersion(false)
-        configuration = configurations.archives
+	repositories {
+		mavenDeployer {
+            // setUniqueVersion(false)
 
-        repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-          authentication(userName: sonatypeUsername, password: sonatypePassword)
-        }
+			configuration = configurations.archives
 
-        snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-          authentication(userName: sonatypeUsername, password: sonatypePassword)
-        }
+			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
 
-        if (isReleaseVersion) {
-          beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-        }
+			snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+				authentication(userName: sonatypeUsername, password: sonatypePassword)
+			}
 
-        configurePom(pom)
-      }
-    }
-  }
+			if (isReleaseVersion) {
+				beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+			}
+
+			configurePom(pom)
+		}
+	}
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

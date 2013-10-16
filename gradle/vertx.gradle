@@ -1,10 +1,4 @@
-import org.vertx.java.core.AsyncResult
-import org.vertx.java.core.AsyncResultHandler
-import org.vertx.java.platform.PlatformLocator
-import org.vertx.java.platform.impl.ModuleClassLoader
-
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
+import org.vertx.java.platform.impl.cli.Starter
 
 /*
  * Copyright 2012 the original author or authors.
@@ -26,6 +20,8 @@ apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+
+def cpSeparator = System.getProperty("path.separator")
 
 // We  have to explicitly load props from the user home dir - on CI we set
 // GRADLE_USER_HOME to a different dir to avoid problems with concurrent builds corrupting
@@ -58,7 +54,8 @@ repositories {
   }
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   mavenCentral()
-  // extra reppo
+  // extra repositories
+  // jade4j
   maven { url "https://raw.github.com/neuland/jade4j/master/releases" }
 }
 
@@ -86,6 +83,8 @@ buildscript {
   dependencies {
     classpath "io.vertx:vertx-core:$vertxVersion"
     classpath "io.vertx:vertx-platform:$vertxVersion"
+    // classpath "io.vertx:vertx-hazelcast:$vertxVersion"
+    classpath files(['src/main/resources'])
   }
 }
 
@@ -96,7 +95,7 @@ sourceSets {
 }
 
 task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module into the local mods directory' ) {
-  into "build/mods/$moduleName"
+  into "$projectDir/build/mods/$moduleName"
   from compileJava
   from 'src/main/resources'
   into( 'lib' ) {
@@ -108,28 +107,30 @@ task modZip( type: Zip, dependsOn: 'pullInDeps', description: 'Package the modul
   group = 'vert.x'
   classifier = "mod"
   description = "Assembles a vert.x module"
-  destinationDir = project.file('build/libs')
+  destinationDir = project.file("$projectDir/build/libs")
   archiveName = "${modname}-${version}" + ".zip"
   from copyMod
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-  from sourceSets.main.allSource
+task sourceJar(type: Jar) {
+  description = 'Builds a source jar artifact suitable for maven deployment.'
   classifier = 'sources'
+  from sourceSets.main.java
 }
 
-javadoc.classpath += configurations.provided
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+task javadocJar(type: Jar) {
+  description = 'Builds a javadoc jar artifact suitable for maven deployment.'
+  classifier = 'javadoc'
+  from javadoc.destinationDir
 }
+javadocJar.dependsOn javadoc
+
+build.dependsOn sourceJar, javadocJar
 
 artifacts {
-  archives modZip
-  archives sourcesJar
-  archives javadocJar
+  archives sourceJar, javadocJar, modZip
 }
+
 
 test {
   dependsOn copyMod
@@ -142,83 +143,65 @@ test {
 
   testLogging { exceptionFormat "full" }
 
-  systemProperty 'vertx.mods', "build/mods"
+  systemProperty 'vertx.mods', "$projectDir/build/mods"
 }
 
 task runModIDEA(dependsOn: copyMod, description: 'Run the module from the resources in IntelliJ') << {
-  def classpath = [ new URL('file:src/main/resources/'), new URL('file:src/test/resources/'),
-      new URL("file:out/production/${project.name}/"), new URL("file:out/test/${project.name}/")] as URL[]
-
-  println "file:out/production/${project.name}"
-  runModWithClasspath(classpath)
+  runModWithClasspath("file:src/main/resources/${cpSeparator}file:src/test/resources/${cpSeparator}" +
+                      "file:out/production/${project.name}/${cpSeparator}file:out/test/${project.name}/");
 }
 
 task runModEclipse(dependsOn: copyMod, description: 'Run the module from the resources in Eclipse') << {
-  def classpath = [ new URL('file:src/main/resources/'), new URL('file:src/test/resources/'), new URL('file:bin/')] as URL[]
-  runModWithClasspath(classpath)
+  runModWithClasspath("file:src/main/resources/${cpSeparator}file:src/test/resources/${cpSeparator}file:bin/");
 }
 
-def runModWithClasspath(URL[] classpath) {
+def runModWithClasspath(String classpath) {
   setSysProps()
-  def pm = PlatformLocator.factory.createPlatformManager()
-  def latch = new CountDownLatch(1)
-  pm.deployModuleFromClasspath(moduleName, null, 1, classpath, new
-  AsyncResultHandler<String>() {
-    public void handle(AsyncResult<String> asyncResult) {
-      if (asyncResult.succeeded()) {
-        println "CTRL-C to stop server"
-      } else {
-        println "Failed to deploy module"
-        asyncResult.cause().printStackTrace()
-        latch.countDown()
-      }
+  def args = ['runmod', moduleName]
+  def args2 = runModArgs.split("\\s+")
+  // Ignore any -cp
+  boolean ignoring = false
+  for (String arg: args2) {
+    if (arg == '-cp') {
+      ignoring = true
+    } else if (!ignoring) {
+      args.add(arg)
+    } else {
+      ignoring = false
     }
-  });
-  latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+  }
+  args.add('-cp')
+  args.add(classpath)
+  Starter.main(args as String[])
 }
 
 task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
   setSysProps()
-  def pm = PlatformLocator.factory.createPlatformManager()
-  def latch = new CountDownLatch(1)
-  pm.deployModule(moduleName, null, 1, new AsyncResultHandler<String>() {
-    public void handle(AsyncResult<String> asyncResult) {
-      if (asyncResult.succeeded()) {
-        println "CTRL-C to stop server"
-      } else {
-        println "Failed to deploy module"
-        asyncResult.cause().printStackTrace()
-        latch.countDown()
-      }
-    }
-  });
-  latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+  def args = ['runmod', moduleName]
+  def args2 = runModArgs.split("\\s+")
+  args.addAll(args2)
+  Starter.main(args as String[])
 }
 
 task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module dependencies for the module into the nested mods directory') << {
   if (pullInDeps == 'true') {
     setSysProps()
-    def pm = PlatformLocator.factory.createPlatformManager()
-    def latch = new CountDownLatch(1)
-    println "Pulling in dependencies for module $moduleName. Please wait"
-    pm.pullInDependencies(moduleName, new AsyncResultHandler<Void>() {
-      public void handle(AsyncResult<Void> asyncResult) {
-        if (asyncResult.succeeded()) {
-          println "Dependencies pulled in successfully"
-          latch.countDown()
-        } else {
-          println "Failed to pull in dependencies"
-          asyncResult.cause().printStackTrace()
-          latch.countDown()
-        }
-      }
-    })
-    latch.await(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
+    def args = ['pulldeps', moduleName]
+    Starter.main(args as String[])
+  }
+}
+
+task fatJar(dependsOn: modZip, description: 'Creates a fat executable jar which contains everything needed to run the module') << {
+  if (createFatJar == 'true') {
+    setSysProps()
+    def args = ['fatjar', moduleName, '-d', "$projectDir/build/libs"]
+    Starter.main(args as String[])
   }
 }
 
 def setSysProps() {
-  System.setProperty("vertx.mods", "build/mods")
+  System.setProperty("vertx.clusterManagerFactory", "org.vertx.java.spi.cluster.impl.hazelcast.HazelcastClusterManagerFactory")
+  System.setProperty("vertx.mods", "$projectDir/build/mods")
 }
 
 def loadProperties(String sourceFileName) {

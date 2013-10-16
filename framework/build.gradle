@@ -15,7 +15,8 @@ idea - generate a skeleton IntelliJ IDEA project
 
 eclipse - generate a skeleton Eclipse IDE project
 
-assemble - builds the outputs, by default this is the module zip and jar files. Outputs are created in build/libs.
+assemble - builds the outputs, by default this is the module zip file. It can also include a jar file if produceJar
+          in gradle.properties is set to true. Outputs are created in build/libs.
           if pullInDeps in gradle.properties is set to 'true' then the modules dependencies will be
           automatically pulled into a nested mods directory inside the module during the build
 
@@ -31,6 +32,12 @@ test - runs the tests. An nice html test report is created in build/reports/test
 runMod - runs the module. This is similar to executing vertx runmod from the command line except that it does
          not use the version of Vert.x installed and on the PATH to run it. Instead it uses the version of Vert.x
          that the module was compiled and tested against.
+
+runModIDEA - run the module from the project resources in IDEA. This allows you to run the module without building it
+first!
+
+runModEclipse - run the module from the project resources in Eclipse. This allows you to run the module without
+building it  first!
 
 pullInDeps - pulls in all dependencies of the module into a nested module directory
 
@@ -53,6 +60,7 @@ dependencies {
   // If you're creating Groovy compiled verticles you may need the following dependencies
   provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
+
 }
 
 test {
@@ -60,6 +68,7 @@ test {
   include 'org/foo/**'
   exclude 'org/boo/**'
   */
+
 }
 
 /*
