@@ -2,4 +2,9 @@ language: java
 jdk:
   - openjdk7
   - oraclejdk7
-script: ./gradlew check
+script: ./gradlew clean test uploadArchives -S
+
+env:
+  global:
+    - secure: "dDxDBHqsT0dlJ3HzCTo/SCyiwNtvnW2YkclfUOrHDawluwdvmt8M9sv0y5+ACoA7gGz0mw1oFZRoT0ct34SUokk+W7EmGHy2NUxSL1yZGdwroPb+9l1rB8cIzqGjtgvUv9hIwS5qQ4ZLMFBk7xiMAextZrjJwBo5j7s00C4tEnM="
+    - secure: "cNBgvuUXFmfs+B6ds7LalaGsTv1aPZeVrGu6lYUyKy0NvtnBpq+lTj83Sl2aUR0aPqLBXkvGvBBXl6+MyOtseFAU1ZjSX33VLnchfpG3GSipOIIwgZRslMFAbq2M/3ischXhb/pfgbNmM3BSoA7DwPNkFkuX+M/KmfnTxS0JJ/k="
