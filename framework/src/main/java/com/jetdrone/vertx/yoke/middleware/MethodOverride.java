@@ -30,29 +30,32 @@ public class MethodOverride extends Middleware {
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
 
-        // expect multipart
-        request.expectMultiPart(true);
+        // other methods than GET, HEAD and OPTIONS may have body
+        if (!"GET".equals(request.method()) && !"HEAD".equals(request.method()) && !"OPTIONS".equals(request.method())) {
+            // expect multipart
+            request.expectMultiPart(true);
 
-        final MultiMap urlEncoded = request.formAttributes();
+            final MultiMap urlEncoded = request.formAttributes();
 
-        if (urlEncoded != null) {
-            String method = urlEncoded.get(key);
-            if (method != null) {
-                urlEncoded.remove(key);
-                request.setMethod(method);
-                next.handle(null);
-                return;
+            if (urlEncoded != null) {
+                String method = urlEncoded.get(key);
+                if (method != null) {
+                    urlEncoded.remove(key);
+                    request.setMethod(method);
+                    next.handle(null);
+                    return;
+                }
             }
-        }
 
-        final JsonObject json = request.jsonBody();
-        if (json != null) {
-            String method = json.getString(key);
-            if (method != null) {
-                json.removeField(key);
-                request.setMethod(method);
-                next.handle(null);
-                return;
+            final JsonObject json = request.jsonBody();
+            if (json != null) {
+                String method = json.getString(key);
+                if (method != null) {
+                    json.removeField(key);
+                    request.setMethod(method);
+                    next.handle(null);
+                    return;
+                }
             }
         }
 

@@ -7,7 +7,9 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import com.jetdrone.vertx.yoke.util.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
@@ -281,7 +283,17 @@ public class Yoke implements RequestWrapper {
     // @param {int} port the server TCP port
     // @return {Yoke}
     public Yoke listen(int port) {
-        return listen(port, "0.0.0.0");
+        return listen(port, "0.0.0.0", null);
+    }
+
+    // Starts the server listening at a given port bind to all available interfaces.
+    //
+    // @method listen
+    // @param {int} port the server TCP port
+    // @param {Handler} handler for asynchronous result of the listen operation
+    // @return {Yoke}
+    public Yoke listen(int port, Handler<Boolean> handler) {
+        return listen(port, "0.0.0.0", handler);
     }
 
     // Starts the server listening at a given port and given address.
@@ -290,11 +302,30 @@ public class Yoke implements RequestWrapper {
     // @param {int} port the server TCP port
     // @return {Yoke}
     public Yoke listen(int port, String address) {
+        return listen(port, address, null);
+    }
+
+    // Starts the server listening at a given port and given address.
+    //
+    // @method listen
+    // @param {int} port the server TCP port
+    // @param {Handler} handler for asynchronous result of the listen operation
+    // @return {Yoke}
+    public Yoke listen(int port, String address, final Handler<Boolean> handler) {
         HttpServer server = vertx.createHttpServer();
 
         listen(server);
 
-        server.listen(port, address);
+        if (handler != null) {
+            server.listen(port, address, new Handler<AsyncResult<HttpServer>>() {
+                @Override
+                public void handle(AsyncResult<HttpServer> listen) {
+                    handler.handle(listen.succeeded());
+                }
+            });
+        } else {
+            server.listen(port, address);
+        }
         return this;
     }
 
@@ -366,7 +397,6 @@ public class Yoke implements RequestWrapper {
                             if (errorHandler != null) {
                                 errorHandler.handle(request, null);
                             } else {
-                                // TODO: handle YokeException
                                 HttpServerResponse response = request.response();
 
                                 int errorCode;
