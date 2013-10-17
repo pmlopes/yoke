@@ -1,0 +1,111 @@
+apply from: "gradle/vertx.gradle"
+
+/*
+Usage:
+
+./gradlew task_name
+
+(or gradlew.bat task_name if you have the misfortune to have to use Windows)
+
+If no task name is specified then the default task 'assemble' is run
+
+Task names are:
+
+idea - generate a skeleton IntelliJ IDEA project
+
+eclipse - generate a skeleton Eclipse IDE project
+
+assemble - builds the outputs, by default this is the module zip file. It can also include a jar file if produceJar
+          in gradle.properties is set to true. Outputs are created in build/libs.
+          if pullInDeps in gradle.properties is set to 'true' then the modules dependencies will be
+          automatically pulled into a nested mods directory inside the module during the build
+
+copyMod - builds and copies the module to the local 'mods' directory so you can execute vertx runmod (etc)
+          directly from the command line
+
+modZip - creates the module zip into build/libs
+
+clean - cleans everything up
+
+test - runs the tests. An nice html test report is created in build/reports/tests (index.html)
+
+runMod - runs the module. This is similar to executing vertx runmod from the command line except that it does
+         not use the version of Vert.x installed and on the PATH to run it. Instead it uses the version of Vert.x
+         that the module was compiled and tested against.
+
+runModIDEA - run the module from the project resources in IDEA. This allows you to run the module without building it
+first!
+
+runModEclipse - run the module from the project resources in Eclipse. This allows you to run the module without
+building it  first!
+
+pullInDeps - pulls in all dependencies of the module into a nested module directory
+
+uploadArchives - upload the module zip file (and jar if one has been created) to Nexus. You will need to
+                 configure sonatypeUsername and sonatypePassword in ~/.gradle/gradle.properties.
+
+install - install any jars produced to the local Maven repository (.m2)
+
+ */
+
+dependencies {
+  /*
+  Add your module jar dependencies here
+  E.g.
+  compile "com.foo:foo-lib:1.0.1" - for compile time deps - this will end up in your module too!
+  testCompile "com.foo:foo-lib:1.0.1" - for test time deps
+  provided "com.foo:foo-lib:1.0.1" - if you DON'T want it to be packaged in the module zip
+  */
+
+  // If you're creating Groovy compiled verticles you may need the following dependencies
+  provided "org.codehaus.groovy:groovy-all:$groovyVersion"
+  provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
+
+}
+
+test {
+  /* Configure which tests are included
+  include 'org/foo/**'
+  exclude 'org/boo/**'
+  */
+
+}
+
+/*
+If you're uploading stuff to Maven, Gradle needs to generate a POM.
+Please edit the details below.
+ */
+def configurePom(def pom) {
+  pom.project {
+    name rootProject.name
+    description 'Description of your module here'
+    inceptionYear '2013'
+    packaging 'jar'
+
+    url 'Your project url'
+
+    developers {
+      developer {
+        id 'developer id (e.g. github username)'
+        name 'developer name'
+        email 'developer email'
+      }
+    }
+
+    scm {
+      url 'url to your repo - e.g. github repo url'
+    }
+
+    licenses {
+      license {
+        name 'The name of the license used, e.g.: The Apache Software License, Version 2.0'
+        url 'URl to the license, e.g.: http://www.apache.org/licenses/LICENSE-2.0.txt'
+        distribution 'repo'
+      }
+    }
+
+    properties {
+      setProperty('project.build.sourceEncoding', 'UTF8')
+    }
+  }
+}

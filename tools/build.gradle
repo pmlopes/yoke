@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin:'application'
+
+mainClassName = 'com.jetdrone.yoke.tools.Tools'
+
+project.group = "com.jetdrone"
+archivesBaseName = "yoke-tools"
+project.version = "1.0"
+
+sourceCompatibility=1.7
+targetCompatibility=1.7
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+}
+
+// Create the executable jar and exclude some certificates
+jar {
+    manifest {
+        attributes "Implementation-Version": version
+        attributes "Main-Class" : mainClassName
+    }
+}

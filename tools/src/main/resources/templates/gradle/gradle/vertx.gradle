@@ -1,0 +1,225 @@
+import org.vertx.java.platform.impl.cli.Starter
+
+/*
+ * Copyright 2012 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+def cpSeparator = System.getProperty("path.separator")
+
+// We  have to explicitly load props from the user home dir - on CI we set
+// GRADLE_USER_HOME to a different dir to avoid problems with concurrent builds corrupting
+// a shared Maven local and using Gradle wrapper concurrently
+loadProperties("${System.getProperty('user.home')}/.gradle/gradle.properties")
+
+apply from: "gradle/maven.gradle"
+
+group = modowner
+archivesBaseName = modname
+
+defaultTasks = ['assemble']
+
+sourceCompatibility = '1.7'
+targetCompatibility = '1.7'
+
+project.ext.moduleName = "$modowner~$modname~$version"
+
+configurations {
+  provided
+  testCompile.extendsFrom provided
+}
+
+repositories {
+  if (System.getenv("VERTX_DISABLE_MAVENLOCAL") == null) {
+    // We don't want to use mavenLocal when running on CI - mavenLocal is only useful in Gradle for
+    // publishing artifacts locally for development purposes - maven local is also not threadsafe when there
+    // are concurrent builds
+    mavenLocal()
+  }
+  maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+  mavenCentral()
+}
+
+dependencies {
+  provided "io.vertx:vertx-core:$vertxVersion"
+  provided "io.vertx:vertx-platform:$vertxVersion"
+  testCompile "junit:junit:$junitVersion"
+  testCompile "io.vertx:testtools:$toolsVersion"
+}
+
+// This sets up the classpath for the script itself
+buildscript {
+
+  repositories {
+    if (System.getenv("VERTX_DISABLE_MAVENLOCAL") == null) {
+      // We don't want to use mavenLocal when running on CI - mavenLocal is only useful in Gradle for
+      // publishing artifacts locally for development purposes - maven local is also not threadsafe when there
+      // are concurrent builds
+      mavenLocal()
+    }
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    mavenCentral()
+  }
+
+  dependencies {
+    classpath "io.vertx:vertx-core:$vertxVersion"
+    classpath "io.vertx:vertx-platform:$vertxVersion"
+    // classpath "io.vertx:vertx-hazelcast:$vertxVersion"
+    classpath files(['src/main/resources'])
+  }
+}
+
+sourceSets {
+  main {
+    compileClasspath = compileClasspath + configurations.provided
+  }
+}
+
+task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module into the local mods directory' ) {
+  into "build/mods/$moduleName"
+  from compileJava
+  from 'src/main/resources'
+  into( 'lib' ) {
+    from configurations.compile
+  }
+}
+
+task modZip( type: Zip, dependsOn: 'pullInDeps', description: 'Package the module .zip file') {
+  group = 'vert.x'
+  classifier = "mod"
+  description = "Assembles a vert.x module"
+  destinationDir = project.file('build/libs')
+  archiveName = "${modname}-${version}" + ".zip"
+  from copyMod
+}
+
+task sourceJar(type: Jar) {
+  description = 'Builds a source jar artifact suitable for maven deployment.'
+  classifier = 'sources'
+  from sourceSets.main.java
+}
+
+task javadocJar(type: Jar) {
+  description = 'Builds a javadoc jar artifact suitable for maven deployment.'
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+javadocJar.dependsOn javadoc
+
+build.dependsOn sourceJar, javadocJar
+
+artifacts {
+  archives sourceJar, javadocJar, modZip
+}
+
+
+test {
+  dependsOn copyMod
+
+  // Make sure tests are always run!
+  outputs.upToDateWhen { false }
+
+  // Show output
+  testLogging.showStandardStreams = true
+
+  testLogging { exceptionFormat "full" }
+
+  systemProperty 'vertx.mods', "build/mods"
+}
+
+task runModIDEA(dependsOn: copyMod, description: 'Run the module from the resources in IntelliJ') << {
+  runModWithClasspath("file:src/main/resources/${cpSeparator}file:src/test/resources/${cpSeparator}" +
+                      "file:out/production/${project.name}/${cpSeparator}file:out/test/${project.name}/");
+}
+
+task runModEclipse(dependsOn: copyMod, description: 'Run the module from the resources in Eclipse') << {
+  runModWithClasspath("file:src/main/resources/${cpSeparator}file:src/test/resources/${cpSeparator}file:bin/");
+}
+
+def runModWithClasspath(String classpath) {
+  setSysProps()
+  def args = ['runmod', moduleName]
+  def args2 = runModArgs.split("\\s+")
+  // Ignore any -cp
+  boolean ignoring = false
+  for (String arg: args2) {
+    if (arg == '-cp') {
+      ignoring = true
+    } else if (!ignoring) {
+      args.add(arg)
+    } else {
+      ignoring = false
+    }
+  }
+  args.add('-cp')
+  args.add(classpath)
+  Starter.main(args as String[])
+}
+
+task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
+  setSysProps()
+  def args = ['runmod', moduleName]
+  def args2 = runModArgs.split("\\s+")
+  args.addAll(args2)
+  Starter.main(args as String[])
+}
+
+task pullInDeps(dependsOn: copyMod, description: 'Pull in all the module dependencies for the module into the nested mods directory') << {
+  if (pullInDeps == 'true') {
+    setSysProps()
+    def args = ['pulldeps', moduleName]
+    Starter.main(args as String[])
+  }
+}
+
+task fatJar(dependsOn: modZip, description: 'Creates a fat executable jar which contains everything needed to run the module') << {
+  if (createFatJar == 'true') {
+    setSysProps()
+    def args = ['fatjar', moduleName, '-d', 'build/libs']
+    Starter.main(args as String[])
+  }
+}
+
+def setSysProps() {
+  System.setProperty("vertx.clusterManagerFactory", "org.vertx.java.spi.cluster.impl.hazelcast.HazelcastClusterManagerFactory")
+  System.setProperty("vertx.mods", "build/mods")
+}
+
+def loadProperties(String sourceFileName) {
+  def config = new Properties()
+  def propFile = new File(sourceFileName)
+  if (propFile.canRead()) {
+    config.load(new FileInputStream(propFile))
+    for (Map.Entry property in config) {
+      project.ext[property.key] = property.value;
+    }
+  }
+}
+
+// Map the 'provided' dependency configuration to the appropriate IDEA visibility scopes.
+plugins.withType(IdeaPlugin) {
+  idea {
+    module {
+      scopes.PROVIDED.plus += configurations.provided
+      scopes.COMPILE.minus += configurations.provided
+      scopes.TEST.minus += configurations.provided
+      scopes.RUNTIME.minus += configurations.provided
+    }
+  }
+}

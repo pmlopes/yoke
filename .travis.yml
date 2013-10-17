@@ -2,7 +2,7 @@ language: java
 jdk:
   - openjdk7
 
-script: gradle check uploadArchives -S
+script: ./gradlew check uploadArchives -S
 
 env:
   global:
