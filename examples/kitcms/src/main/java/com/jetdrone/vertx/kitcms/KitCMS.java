@@ -5,6 +5,7 @@ import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine;
 import com.jetdrone.vertx.yoke.middleware.*;
+import io.vertx.java.redis.RedisClient;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -24,11 +25,9 @@ public class KitCMS extends Verticle {
         final EventBus eb = vertx.eventBus();
         final FileSystem fileSystem = vertx.fileSystem();
 
-        // deploy redis module
-        container.deployModule("com.jetdrone~mod-redis-io~1.1.0", config.getRedisConfig());
+        final RedisClient db = new RedisClient(eb, Config.REDIS_ADDRESS);
 
-        // db access
-        final Db db = new Db(eb, Config.REDIS_ADDRESS);
+        db.deployModule(container, config.dbServer, config.dbPort);
 
         final Yoke yoke = new Yoke(this);
         // register jMustache render engine
@@ -56,7 +55,7 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
+                    db.keys(domain.namespace + "&*", new AsyncResultHandler<JsonArray>() {
                         @Override
                         public void handle(AsyncResult<JsonArray> asyncResult) {
                             if (asyncResult.failed()) {
@@ -85,7 +84,7 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
+                    db.keys(domain.namespace + "&*", new AsyncResultHandler<JsonArray>() {
                         @Override
                         public void handle(AsyncResult<JsonArray> asyncResult) {
                             if (asyncResult.failed()) {
@@ -108,7 +107,7 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    db.get(domain.namespace, key, new AsyncResultHandler<String>() {
+                    db.get(domain.namespace + "&" + key, new AsyncResultHandler<String>() {
                         @Override
                         public void handle(AsyncResult<String> asyncResult) {
                             if (asyncResult.failed()) {
@@ -142,7 +141,7 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    db.set(domain.namespace, key, value, new AsyncResultHandler<Void>() {
+                    db.set(domain.namespace + "&" + key, value, new AsyncResultHandler<Void>() {
                         @Override
                         public void handle(AsyncResult<Void> asyncResult) {
                             if (asyncResult.failed()) {
@@ -169,7 +168,7 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    db.unset(domain.namespace, key, new AsyncResultHandler<Void>() {
+                    db.del(domain.namespace + "&" + key, new AsyncResultHandler<Void>() {
                         @Override
                         public void handle(AsyncResult<Void> asyncResult) {
                             if (asyncResult.failed()) {
@@ -187,7 +186,7 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    db.keys(domain.namespace, new AsyncResultHandler<JsonArray>() {
+                    db.keys(domain.namespace + "&*", new AsyncResultHandler<JsonArray>() {
                         @Override
                         public void handle(AsyncResult<JsonArray> asyncResult) {
                             if (asyncResult.failed()) {
@@ -202,7 +201,7 @@ public class KitCMS extends Verticle {
                                     public void handle(Object o) {
                                         if (!isEnd()) {
                                             final String key = (String) o;
-                                            db.get(domain.namespace, key, new AsyncResultHandler<String>() {
+                                            db.get(domain.namespace + "&" + key, new AsyncResultHandler<String>() {
                                                 @Override
                                                 public void handle(AsyncResult<String> asyncResult) {
                                                     if (asyncResult.failed()) {
@@ -252,7 +251,7 @@ public class KitCMS extends Verticle {
                                 public void handle(Object o) {
                                     if (!isEnd()) {
                                         final JsonObject json = (JsonObject) o;
-                                        db.set(domain.namespace, json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
+                                        db.set(domain.namespace + "&" + json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
                                             @Override
                                             public void handle(AsyncResult<Void> asyncResult) {
                                                 if (asyncResult.failed()) {
@@ -279,7 +278,7 @@ public class KitCMS extends Verticle {
                 final Config.Domain domain = request.get("domain");
                 final String file = request.path().toLowerCase();
 
-                db.get(domain.namespace, file, new AsyncResultHandler<String>() {
+                db.get(domain.namespace + "&" + file, new AsyncResultHandler<String>() {
                     @Override
                     public void handle(AsyncResult<String> asyncResult) {
                         if (asyncResult.failed()) {

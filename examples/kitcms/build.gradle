@@ -55,6 +55,7 @@ dependencies {
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   // get yoke jar for parent
   provided project(':framework')
+  provided "io.vertx:mod-redis-client:1.1.2"
 }
 
 test {
