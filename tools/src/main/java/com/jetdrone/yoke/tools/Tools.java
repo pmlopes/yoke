@@ -1,15 +1,13 @@
 package com.jetdrone.yoke.tools;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Arrays;
 
 public class Tools {
 
     private static String language;
     private static String owner;
     private static String module;
-    private static String app;
     private static String version;
 
     static void write(String path, String value) {
@@ -83,65 +81,65 @@ public class Tools {
         }
     }
 
-    static String getArgument(String name, String[] args, String error) {
-        for (int i = 0; i < args.length; i+=2) {
-            if (args[i].startsWith("--")) {
-                if (args[i].equals("--" + name)) {
-                    String result = args[i + 1];
-                    if (result.startsWith("--")) {
-                        break;
-                    } else {
-                        return result;
-                    }
-                }
-            }
-        }
-
-        if (error != null) {
-            abort("Error: '--" + name + " <value>' " + error);
-        }
-        return null;
-    }
-
     static void printUsage() {
-        System.out.println("Usage: --owner com.jetdrone --module app [--app yoke-app] [--version 1.0.0]");
+        System.out.println("Usage: --[java|groovy|js] group:artifact:version");
+        System.out.println("  Group:    the owner of the project usually your reverse domain name");
+        System.out.println("            e.g.: com.mycompany");
+        System.out.println("  Artifact: the module name, usually your app name without special chars");
+        System.out.println("             e.g.: mymodule");
+        System.out.println("  Version:  app version");
+        System.out.println("            e.g.: 1.0.0-SNAPSHOT");
+        System.out.println();
     }
 
     public static void main(String[] args) throws IOException {
 
-        language = "java";
-        owner = getArgument("owner", args, "Owner e.g.: 'com.jetdrone'");
-        module = getArgument("module", args, "Module name e.g.: 'app'");
-        app = getArgument("app", args, null);
-        if (app == null) {
-            app = module;
-        }
-        version = getArgument("version", args, null);
-        if (version == null) {
-            version = "1.0.0-SNAPSHOT";
-        }
+        try {
+            language = Args.getArgumentFlag(Arrays.asList(new String[] {"java", "groovy", "js"}), args);
 
-        String help = getArgument("help", args, null);
-        if (help != null) {
+            if (language == null) {
+                throw new RuntimeException("ERROR: Language is required!");
+            }
+
+            if (args.length < 2) {
+                throw new RuntimeException("ERROR: Invalid number of arguments");
+            }
+
+            String[] gav = args[1].split(":");
+
+            owner = gav[0];
+            module = gav[1];
+            version = gav[2];
+
+            String help = Args.getArgument("help", args);
+            if (help != null) {
+                printUsage();
+                System.exit(0);
+            }
+        } catch (RuntimeException re) {
             printUsage();
-            System.exit(0);
+            abort(re.getMessage());
         }
 
         // init check
         check();
-        // setup gradle
-        copyBaseTemplate();
         // create template based on language
         switch (language) {
             case "java":
+                // setup gradle
+                copyBaseTemplate();
                 createJava();
                 break;
             case "groovy":
-                throw new RuntimeException("Not implemented yet");
-//                break;
-            case "javascript":
-                throw new RuntimeException("Not implemented yet");
-//                break;
+                // setup gradle
+                copyBaseTemplate();
+                createGroovy();
+                break;
+            case "js":
+                // setup gradle
+                copyBaseTemplate();
+                createJS();
+                break;
             default:
                 abort("Unsupported language: '" + language + "'");
         }
@@ -150,17 +148,17 @@ public class Tools {
     }
 
     static void check() {
-        File f = new File(app);
+        File f = new File(module);
         if (f.exists() && f.isDirectory()) {
-            abort("Directory '" + app + "' already exists!");
+            abort("Directory '" + module + "' already exists!");
         }
         // create the base app directory
-        mkdir(app);
+        mkdir(module);
     }
 
     static void copyBaseTemplate() throws IOException {
 
-        copy(app + "/README.md", "templates/gradle/README.md");
+        copy(module + "/README.md", "templates/gradle/README.md");
 
         String props =
                 "# E.g. your domain name\n" +
@@ -170,61 +168,100 @@ public class Tools {
                 "# Your module version\n" +
                 "version=" + version + "\n\n" + readResourceToString("templates/gradle/gradle.properties");
 
-        write(app + "/gradle.properties", props);
-        copy(app + "/conf.json", "templates/gradle/conf.json");
-        copy(app + "/LICENSE.txt", "templates/gradle/LICENSE.txt");
-        copy(app + "/gradlew.bat", "templates/gradle/gradlew.bat");
-        copy(app + "/gradlew", "templates/gradle/gradlew");
+        write(module + "/gradle.properties", props);
+        copy(module + "/conf.json", "templates/gradle/conf.json");
+        copy(module + "/LICENSE.txt", "templates/gradle/LICENSE.txt");
+        copy(module + "/gradlew.bat", "templates/gradle/gradlew.bat");
+        copy(module + "/gradlew", "templates/gradle/gradlew");
         // need to set the *nix to executable
-        new File(app + "/gradlew").setExecutable(true);
-        copy(app + "/build.gradle", "templates/gradle/build.gradle");
+        new File(module + "/gradlew").setExecutable(true);
+        copy(module + "/build.gradle", "templates/gradle/build.gradle");
 
-        mkdir(app + "/gradle");
-        copy(app + "/gradle/vertx.gradle", "templates/gradle/gradle/vertx.gradle");
-        copy(app + "/gradle/setup.gradle", "templates/gradle/gradle/setup.gradle");
-        copy(app + "/gradle/maven.gradle", "templates/gradle/gradle/maven.gradle");
+        mkdir(module + "/gradle");
+        copy(module + "/gradle/vertx.gradle", "templates/gradle/gradle/vertx.gradle");
+        copy(module + "/gradle/setup.gradle", "templates/gradle/gradle/setup.gradle");
+        copy(module + "/gradle/maven.gradle", "templates/gradle/gradle/maven.gradle");
 
-        mkdir(app + "/gradle/wrapper");
-        copy(app + "/gradle/wrapper/gradle-wrapper.properties", "templates/gradle/gradle/wrapper/gradle-wrapper.properties");
-        copy(app + "/gradle/wrapper/gradle-wrapper.jar", "templates/gradle/gradle/wrapper/gradle-wrapper.jar");
+        mkdir(module + "/gradle/wrapper");
+        copy(module + "/gradle/wrapper/gradle-wrapper.properties", "templates/gradle/gradle/wrapper/gradle-wrapper.properties");
+        copy(module + "/gradle/wrapper/gradle-wrapper.jar", "templates/gradle/gradle/wrapper/gradle-wrapper.jar");
     }
 
     static void createJava() {
         // base source code
-        mkdir(app + "/src/main/java");
+        mkdir(module + "/src/main/java");
         String modulePath = owner.replace('.', '/') + "/" + module.replace('.', '/');
         // expand package
-        mkdir(app + "/src/main/java/" + modulePath);
+        mkdir(module + "/src/main/java/" + modulePath);
 
-        write(app + "/src/main/java/" + modulePath + "/App.java",
+        write(module + "/src/main/java/" + modulePath + "/App.java",
                 "package " + owner + "." + module + ";\n\n" +
                         readResourceToString("templates/java/App.java"));
 
-        mkdir(app + "/src/main/resources");
+        mkdir(module + "/src/main/resources");
         // write resources
-        mkdir(app + "/src/main/resources/public");
-        mkdir(app + "/src/main/resources/public/stylesheets");
-        copy(app + "/src/main/resources/public/stylesheets/style.css", "templates/java/style.css");
-        mkdir(app + "/src/main/resources/views");
-        copy(app + "/src/main/resources/views/index.html", "templates/java/index.html");
+        mkdir(module + "/src/main/resources/public");
+        mkdir(module + "/src/main/resources/public/stylesheets");
+        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/java/style.css");
+        mkdir(module + "/src/main/resources/views");
+        copy(module + "/src/main/resources/views/index.html", "templates/java/index.html");
         // write mod.json
-        write(app + "/src/main/resources/mod.json",
+        write(module + "/src/main/resources/mod.json",
                 "{\n" +
                 "  \"main\": \"" + owner + "." + module + ".App\",\n" +
                 "  \"includes\": \"com.jetdrone~yoke~1.0.2-SNAPSHOT\"\n" +
                 "}\n");
 
-        mkdir(app + "/src/test/java");
+        mkdir(module + "/src/test/java");
         // expand package
-        mkdir(app + "/src/test/java/" + modulePath);
+        mkdir(module + "/src/test/java/" + modulePath);
+        write(module + "/src/test/java/" + modulePath + "/AppTest.java",
+                "package " + owner + "." + module + ";\n\n" +
+                        readResourceToString("templates/java/AppTest.java"));
 
-        mkdir(app + "/src/test/resources");
+        mkdir(module + "/src/test/resources");
+    }
+
+    static void createGroovy() {
+        // base source code
+        mkdir(module + "/src/main/resources");
+        write(module + "/src/main/resources/App.groovy", readResourceToString("templates/groovy/App.groovy"));
+        // write resources
+        mkdir(module + "/src/main/resources/public");
+        mkdir(module + "/src/main/resources/public/stylesheets");
+        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/groovy/style.css");
+        mkdir(module + "/src/main/resources/views");
+        copy(module + "/src/main/resources/views/index.html", "templates/groovy/index.html");
+        // write mod.json
+        write(module + "/src/main/resources/mod.json",
+                "{\n" +
+                        "  \"main\": \"App.groovy\",\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~1.0.2-SNAPSHOT\"\n" +
+                        "}\n");
+    }
+
+    static void createJS() {
+        // base source code
+        mkdir(module + "/src/main/resources");
+        write(module + "/src/main/resources/App.js", readResourceToString("templates/javascript/App.js"));
+        // write resources
+        mkdir(module + "/src/main/resources/public");
+        mkdir(module + "/src/main/resources/public/stylesheets");
+        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/javascript/style.css");
+        mkdir(module + "/src/main/resources/views");
+        copy(module + "/src/main/resources/views/index.html", "templates/javascript/index.html");
+        // write mod.json
+        write(module + "/src/main/resources/mod.json",
+                "{\n" +
+                        "  \"main\": \"App.js\",\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~1.0.2-SNAPSHOT\"\n" +
+                        "}\n");
     }
 
     static void printDone() {
         System.out.println();
         System.out.println("Go to your new app:");
-        System.out.println("  cd " + app);
+        System.out.println("  cd " + module);
         System.out.println();
         System.out.println("Compile your app:");
         System.out.println("  ./gradlew[.bat] check");

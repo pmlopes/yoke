@@ -115,6 +115,8 @@ task sourceJar(type: Jar) {
   from sourceSets.main.java
 }
 
+javadoc.classpath += configurations.provided
+
 task javadocJar(type: Jar) {
   description = 'Builds a javadoc jar artifact suitable for maven deployment.'
   classifier = 'javadoc'
