@@ -263,6 +263,16 @@ public class YokeTester extends Yoke {
         }
 
         @Override
+        public HttpServer setCompressionSupported(boolean compressionSupported) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean isCompressionSupported() {
+            return false;
+        }
+
+        @Override
         public HttpServer setClientAuthRequired(boolean required) {
             throw new UnsupportedOperationException();
         }

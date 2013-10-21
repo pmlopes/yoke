@@ -259,15 +259,26 @@ public class Tools {
     }
 
     static void printDone() {
+
+        String OS = System.getProperty("os.name").toLowerCase();
+
         System.out.println();
         System.out.println("Go to your new app:");
         System.out.println("  cd " + module);
         System.out.println();
         System.out.println("Compile your app:");
-        System.out.println("  ./gradlew[.bat] check");
+        if (OS.contains("win")) {
+            System.out.println("  gradlew.bat check");
+        } else {
+            System.out.println("  ./gradlew check");
+        }
         System.out.println();
         System.out.println("Run your app:");
-        System.out.println("  ./gradlew[.bat] runMod");
+        if (OS.contains("win")) {
+            System.out.println("  gradlew.bat runMod");
+        } else {
+            System.out.println("  ./gradlew runMod");
+        }
         System.out.println();
     }
 }
