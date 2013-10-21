@@ -82,7 +82,7 @@ public class Tools {
     }
 
     static void printUsage() {
-        System.out.println("Usage: --[java|groovy|js] group:artifact:version");
+        System.out.println("Usage: [--help] --[java|groovy|js] group:artifact:version");
         System.out.println("  Group:    the owner of the project usually your reverse domain name");
         System.out.println("            e.g.: com.mycompany");
         System.out.println("  Artifact: the module name, usually your app name without special chars");

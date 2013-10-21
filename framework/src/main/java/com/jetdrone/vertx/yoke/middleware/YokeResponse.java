@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
+import com.jetdrone.vertx.yoke.util.YokeException;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
@@ -110,6 +111,8 @@ public class YokeResponse implements HttpServerResponse {
                         // if it was set as the error object use it
                         if (error instanceof Number) {
                             errorCode = ((Number) error).intValue();
+                        } else if (error instanceof YokeException) {
+                            errorCode = ((YokeException) error).getErrorCode().intValue();
                         } else {
                             // default error code
                             errorCode = 500;
