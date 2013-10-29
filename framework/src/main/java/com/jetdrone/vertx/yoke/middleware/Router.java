@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
+import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.logging.Logger;
@@ -32,6 +33,8 @@ public class Router extends Middleware {
     private final List<PatternBinding> traceBindings = new ArrayList<>();
     private final List<PatternBinding> connectBindings = new ArrayList<>();
     private final List<PatternBinding> patchBindings = new ArrayList<>();
+
+    private final Map<String, Middleware> paramProcessors = new HashMap<>();
 
     // @example
     //      new Router() {{
@@ -627,6 +630,29 @@ public class Router extends Middleware {
         return this;
     }
 
+    public Router param(final String paramName, final Middleware handler) {
+        // also pass the vertx object to the routes
+        handler.init(vertx, logger);
+        paramProcessors.put(paramName, handler);
+        return this;
+    }
+
+    public Router param(final String paramName, final Pattern regex) {
+        paramProcessors.put(paramName, new Middleware() {
+            @Override
+            public void handle(final YokeRequest request, final Handler<Object> next) {
+                if (!regex.matcher(request.params().get(paramName)).matches()) {
+                    // Bad Request
+                    next.handle(400);
+                    return;
+                }
+
+                next.handle(null);
+            }
+        });
+        return this;
+    }
+
     private void addPattern(String input, Middleware handler, List<PatternBinding> bindings) {
         // We need to search for any :<token name> tokens in the String and replace them with named capture groups
         Matcher m =  Pattern.compile(":([A-Za-z][A-Za-z0-9_]*)").matcher(input);
@@ -655,24 +681,51 @@ public class Router extends Middleware {
         bindings.add(binding);
     }
 
-    private void route(YokeRequest request, Handler<Object> next, List<PatternBinding> bindings) {
-        for (PatternBinding binding: bindings) {
+    private void route(final YokeRequest request, final Handler<Object> next, final List<PatternBinding> bindings) {
+        for (final PatternBinding binding: bindings) {
             Matcher m = binding.pattern.matcher(request.path());
             if (m.matches()) {
                 Map<String, String> params = new HashMap<>(m.groupCount());
                 if (binding.paramNames != null) {
+                    List<Middleware> paramProcessors = new ArrayList<>();
                     // Named params
                     for (String param: binding.paramNames) {
                         params.put(param, m.group(param));
+                        Middleware paramMiddleware = this.paramProcessors.get(param);
+                        if (paramMiddleware != null) {
+                            paramProcessors.add(paramMiddleware);
+                        }
                     }
+                    request.params().add(params);
+                    // process params
+                    new AsyncIterator<Middleware>(paramProcessors) {
+                        final Handler<Object> itHandler = new Handler<Object>() {
+                            @Override
+                            public void handle(Object err) {
+                                if (err == null) {
+                                    next();
+                                } else {
+                                    next.handle(err);
+                                }
+                            }
+                        };
+                        @Override
+                        public void handle(Middleware middleware) {
+                            if (!isEnd()) {
+                                middleware.handle(request, itHandler);
+                            } else {
+                                binding.middleware.handle(request, next);
+                            }
+                        }
+                    };
                 } else {
                     // Un-named params
                     for (int i = 0; i < m.groupCount(); i++) {
                         params.put("param" + i, m.group(i + 1));
                     }
+                    request.params().add(params);
+                    binding.middleware.handle(request, next);
                 }
-                request.params().add(params);
-                binding.middleware.handle(request, next);
                 return;
             }
         }

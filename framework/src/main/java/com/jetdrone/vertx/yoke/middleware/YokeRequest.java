@@ -19,6 +19,8 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.*;
 
+// YokeRequest is an extension to Vert.x *HttpServerRequest* with some helper methods to make it easier to perform common
+// tasks related to web application development.
 public class YokeRequest implements HttpServerRequest {
 
     private static final Comparator<String> ACCEPT_X_COMPARATOR = new Comparator<String>() {

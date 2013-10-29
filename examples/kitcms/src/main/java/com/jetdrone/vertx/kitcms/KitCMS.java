@@ -5,6 +5,7 @@ import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine;
 import com.jetdrone.vertx.yoke.middleware.*;
+import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import io.vertx.java.redis.RedisClient;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.AsyncResult;

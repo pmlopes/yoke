@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.kitcms;
+package com.jetdrone.vertx.yoke.util;
 
 import org.vertx.java.core.Handler;
 
