@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.logging.Logger;
 
@@ -638,7 +639,7 @@ public class Router extends Middleware {
     }
 
     public Router param(final String paramName, final Pattern regex) {
-        paramProcessors.put(paramName, new Middleware() {
+        return param(paramName, new Middleware() {
             @Override
             public void handle(final YokeRequest request, final Handler<Object> next) {
                 if (!regex.matcher(request.params().get(paramName)).matches()) {
@@ -650,7 +651,6 @@ public class Router extends Middleware {
                 next.handle(null);
             }
         });
-        return this;
     }
 
     private void addPattern(String input, Middleware handler, List<PatternBinding> bindings) {
@@ -683,22 +683,13 @@ public class Router extends Middleware {
 
     private void route(final YokeRequest request, final Handler<Object> next, final List<PatternBinding> bindings) {
         for (final PatternBinding binding: bindings) {
-            Matcher m = binding.pattern.matcher(request.path());
+            final Matcher m = binding.pattern.matcher(request.path());
             if (m.matches()) {
-                Map<String, String> params = new HashMap<>(m.groupCount());
+                final MultiMap params = request.params();
+
                 if (binding.paramNames != null) {
-                    List<Middleware> paramProcessors = new ArrayList<>();
                     // Named params
-                    for (String param: binding.paramNames) {
-                        params.put(param, m.group(param));
-                        Middleware paramMiddleware = this.paramProcessors.get(param);
-                        if (paramMiddleware != null) {
-                            paramProcessors.add(paramMiddleware);
-                        }
-                    }
-                    request.params().add(params);
-                    // process params
-                    new AsyncIterator<Middleware>(paramProcessors) {
+                    new AsyncIterator<String>(binding.paramNames) {
                         final Handler<Object> itHandler = new Handler<Object>() {
                             @Override
                             public void handle(Object err) {
@@ -710,9 +701,15 @@ public class Router extends Middleware {
                             }
                         };
                         @Override
-                        public void handle(Middleware middleware) {
+                        public void handle(String param) {
                             if (!isEnd()) {
-                                middleware.handle(request, itHandler);
+                                params.add(param, m.group(param));
+                                Middleware paramMiddleware = paramProcessors.get(param);
+                                if (paramMiddleware != null) {
+                                    paramMiddleware.handle(request, itHandler);
+                                } else {
+                                    next();
+                                }
                             } else {
                                 binding.middleware.handle(request, next);
                             }
@@ -721,9 +718,8 @@ public class Router extends Middleware {
                 } else {
                     // Un-named params
                     for (int i = 0; i < m.groupCount(); i++) {
-                        params.put("param" + i, m.group(i + 1));
+                        params.add("param" + i, m.group(i + 1));
                     }
-                    request.params().add(params);
                     binding.middleware.handle(request, next);
                 }
                 return;
