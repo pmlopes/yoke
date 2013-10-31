@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
+import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.GET;
 import com.jetdrone.vertx.yoke.annotations.Path;
 import com.jetdrone.vertx.yoke.annotations.Produces;
@@ -53,6 +54,35 @@ public class Router extends TestVerticle {
         yoke.use(com.jetdrone.vertx.yoke.middleware.Router.from(new TestRouter2()));
 
         yoke.request("GET", "/ws", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
+                assertEquals("Hello ws!", resp.body.toString());
+                testComplete();
+            }
+        });
+    }
+
+    @Test
+    public void testRouterWithParams() {
+        YokeTester yoke = new YokeTester(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
+            get("/api/:id", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+                    request.response().end("OK");
+                }
+            });
+            param("id", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+                    System.err.println(request.params().get("id"));
+                    next.handle(null);
+                }
+            });
+        }});
+
+        yoke.request("GET", "/api/1", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
