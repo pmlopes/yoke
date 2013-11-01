@@ -24,6 +24,7 @@ public class OAuth2Test extends TestVerticle {
     public void oauthTest() {
 
         // populate the shared data
+
         // {client_id: String, client_secret: String, redirect_uri: String}
         Set<String> oauth_clients = vertx.sharedData().getSet("yoke.oauth.clients");
         // {user_id: String, username: String, password: String}
