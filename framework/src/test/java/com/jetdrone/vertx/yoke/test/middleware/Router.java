@@ -9,10 +9,12 @@ import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
-import static org.vertx.testtools.VertxAssert.assertEquals;
-import static org.vertx.testtools.VertxAssert.testComplete;
+import java.util.regex.Pattern;
+
+import static org.vertx.testtools.VertxAssert.*;
 
 public class Router extends TestVerticle {
 
@@ -67,16 +69,21 @@ public class Router extends TestVerticle {
     public void testRouterWithParams() {
         YokeTester yoke = new YokeTester(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
-            get("/api/:id", new Middleware() {
+            get("/api/:userId", new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
+
+                    assertNotNull(request.get("user"));
+                    assertTrue(request.get("user") instanceof JsonObject);
                     request.response().end("OK");
                 }
             });
-            param("id", new Middleware() {
+            param("userId", new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
-                    System.err.println(request.params().get("id"));
+                    assertEquals("1", request.params().get("userId"));
+                    // pretend that we went on some DB and got a json object representing the user
+                    request.put("user", new JsonObject("{\"id\":" + request.params().get("userId") + "}"));
                     next.handle(null);
                 }
             });
@@ -86,7 +93,53 @@ public class Router extends TestVerticle {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
-                assertEquals("Hello ws!", resp.body.toString());
+                assertEquals("OK", resp.body.toString());
+                testComplete();
+            }
+        });
+    }
+
+    @Test
+    public void testRouterWithRegExParamsFail() {
+        YokeTester yoke = new YokeTester(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
+            get("/api/:userId", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+                    request.response().end("OK");
+                }
+            });
+            param("userId", Pattern.compile("[1-9][0-9]"));
+        }});
+
+        // the pattern expects 2 digits
+        yoke.request("GET", "/api/1", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(400, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
+
+    @Test
+    public void testRouterWithRegExParamsPass() {
+        YokeTester yoke = new YokeTester(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
+            get("/api/:userId", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+                    request.response().end("OK");
+                }
+            });
+            param("userId", Pattern.compile("[1-9][0-9]"));
+        }});
+
+        // the pattern expects 2 digits
+        yoke.request("GET", "/api/10", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
                 testComplete();
             }
         });

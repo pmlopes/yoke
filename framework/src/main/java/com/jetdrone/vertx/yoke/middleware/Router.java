@@ -690,23 +690,22 @@ public class Router extends Middleware {
                 if (binding.paramNames != null) {
                     // Named params
                     new AsyncIterator<String>(binding.paramNames) {
-                        final Handler<Object> itHandler = new Handler<Object>() {
-                            @Override
-                            public void handle(Object err) {
-                                if (err == null) {
-                                    next();
-                                } else {
-                                    next.handle(err);
-                                }
-                            }
-                        };
                         @Override
                         public void handle(String param) {
                             if (!isEnd()) {
                                 params.add(param, m.group(param));
                                 Middleware paramMiddleware = paramProcessors.get(param);
                                 if (paramMiddleware != null) {
-                                    paramMiddleware.handle(request, itHandler);
+                                    paramMiddleware.handle(request, new Handler<Object>() {
+                                        @Override
+                                        public void handle(Object err) {
+                                            if (err == null) {
+                                                next();
+                                            } else {
+                                                next.handle(err);
+                                            }
+                                        }
+                                    });
                                 } else {
                                     next();
                                 }
