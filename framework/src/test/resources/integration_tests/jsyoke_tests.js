@@ -43,5 +43,32 @@ function testJSListenToServer() {
     });
 }
 
+var Router  = require('yoke/middleware/Router');
+
+function testJSListenToServer() {
+
+    var server = vertx.createHttpServer();
+    var yoke = new Yoke();
+
+    var router = new Router();
+    yoke.use(router);
+
+    router.get('/api/:userId', function (req, next) {
+        req.response().end('OK');
+    });
+
+    router.param('userId', /[1-9][0-9]/);
+
+    yoke.listen(server);
+    server.listen(8888);
+
+    // the pattern expects 2 digits
+    vertx.createHttpClient().port(8888).getNow('/api/10', function(resp) {
+        vassert.assertTrue(200 == resp.statusCode());
+        vassert.testComplete();
+    });
+}
+
+
 vertxTests.startTests(this);
 

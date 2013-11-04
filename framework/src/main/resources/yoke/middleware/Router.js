@@ -91,4 +91,20 @@ JSRouter.prototype.all = function (pattern, callback) {
     return this;
 };
 
+JSRouter.prototype.param = function (paramName, regexOrCallback) {
+    if (regexOrCallback instanceof RegExp) {
+        this.jMiddleware.param(paramName, wrap(function (req, next) {
+            if (!regexOrCallback.test(req.params().get(paramName))) {
+                // Bad Request
+                next(400);
+                return;
+            }
+            next(null);
+        }));
+    } else {
+        this.jMiddleware.param(paramName, wrap(regexOrCallback));
+    }
+    return this;
+};
+
 module.exports = JSRouter;
