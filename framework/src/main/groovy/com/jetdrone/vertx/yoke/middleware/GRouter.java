@@ -249,6 +249,26 @@ public class GRouter extends Middleware {
         return this;
     }
 
+    /**
+     * Specify a middleware that will be called for all HTTP methods
+     * @param param The simple pattern
+     * @param handler The middleware to call
+     */
+    public GRouter param(String param, Closure handler) {
+        jRouter.param(param, wrapClosure(handler));
+        return this;
+    }
+
+    /**
+     * Specify a middleware that will be called for all HTTP methods
+     * @param param The simple pattern
+     * @param pattern The RegExp to validate the param
+     */
+    public GRouter param(String param, Pattern pattern) {
+        jRouter.param(param, pattern);
+        return this;
+    }
+
     private static String getPath(Object o, Field f) {
         // read the closure one
         Path p = f.getAnnotation(Path.class);
