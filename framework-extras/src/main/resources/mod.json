@@ -1,5 +1,5 @@
 {
-  "includes": "com.jetdrone~yoke~1.0.2",
+  "includes": "com.jetdrone~yoke~1.0.3-SNAPSHOT",
 
   "description": "Extras for Yoke a middleware framework for Vert.x",
   "licenses": ["The Apache Software License Version 2.0"],
