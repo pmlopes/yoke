@@ -262,12 +262,12 @@ public class YokeTester extends Yoke {
             throw new UnsupportedOperationException();
         }
 
-        @Override
+        //@Override
         public HttpServer setCompressionSupported(boolean compressionSupported) {
             throw new UnsupportedOperationException();
         }
 
-        @Override
+        //@Override
         public boolean isCompressionSupported() {
             return false;
         }
