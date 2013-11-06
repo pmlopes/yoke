@@ -1,4 +1,4 @@
 {
   "main": "com.jetdrone.vertx.extras.ExtrasExample",
-  "includes": "com.jetdrone~yoke~1.0.3,com.jetdrone~yoke-extras~1.0.3"
+  "includes": "com.jetdrone~yoke~1.0.4-SNAPSHOT,com.jetdrone~yoke-extras~1.0.4-SNAPSHOT"
 }
