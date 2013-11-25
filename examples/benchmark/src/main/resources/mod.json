@@ -1,4 +1,4 @@
 {
   "main": "com.jetdrone.vertx.bench.YokeBench",
-  "includes": "com.jetdrone~yoke~1.0.2-SNAPSHOT"
+  "includes": "com.jetdrone~yoke~1.0.4-SNAPSHOT"
 }
