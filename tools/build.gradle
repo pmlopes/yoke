@@ -18,6 +18,8 @@ repositories {
 dependencies {
 }
 
+ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
+
 signing {
     required { isReleaseVersion && gradle.taskGraph.hasTask("uploadArchives") }
     sign configurations.archives
