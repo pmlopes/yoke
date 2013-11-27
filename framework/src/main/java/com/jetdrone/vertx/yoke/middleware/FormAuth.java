@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
@@ -19,14 +20,29 @@ public class FormAuth extends Middleware {
     private String loginURI;
     private String logoutURI;
 
+    private String loginTemplate;
+    private String userLoginTemplate;
+
     private final boolean forceSSL;
 
-    public FormAuth() {
-        // allow configure paths /login, /logout
-        authHandler = null;
-        loginURI = "/login";
-        logoutURI = "/logout";
-        forceSSL = false;
+    public FormAuth(AuthHandler authHandler) {
+        this(authHandler, false);
+    }
+
+    public FormAuth(AuthHandler authHandler, boolean forceSSL) {
+        this(authHandler, forceSSL, "/login", "/logout", null);
+    }
+
+    public FormAuth(AuthHandler authHandler, boolean forceSSL, String loginURI, String logoutURI, String loginTemplate) {
+        this.authHandler = authHandler;
+        this.loginURI = loginURI;
+        this.logoutURI = logoutURI;
+        this.userLoginTemplate = loginTemplate;
+        this.forceSSL = forceSSL;
+
+        if (this.userLoginTemplate == null) {
+            this.loginTemplate = Utils.readResourceToBuffer(getClass(), "login.html").toString();
+        }
     }
 
     @Override
@@ -42,8 +58,17 @@ public class FormAuth extends Middleware {
     public void handle(final YokeRequest request, final Handler<Object> next) {
         if (request.path().equals(loginURI)) {
             if ("GET".equals(request.method())) {
-                // render login
-                request.response().render("login", next);
+                if (loginTemplate != null) {
+                    // render internal login
+                    request.response().setContentType("text/html");
+                    request.response().end(
+                            loginTemplate.replace("{title}", (String) request.get("title"))
+                                    .replace("{action}", loginURI + "?redirect_url=" + request.getParameter("redirect_url", "/"))
+                                    .replace("{message}", ""));
+                } else {
+                    // render login
+                    request.response().render(userLoginTemplate, next);
+                }
                 return;
             }
 
@@ -69,9 +94,7 @@ public class FormAuth extends Middleware {
 
                             request.response().redirect(redirect);
                         } else {
-                            // TODO: how to handle errors in a nicer way?
                             next.handle(401);
-                            return;
                         }
                     }
                 });
