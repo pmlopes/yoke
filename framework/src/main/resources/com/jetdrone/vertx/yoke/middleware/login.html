@@ -68,11 +68,20 @@
 <body>
 <div id="wrapper">
     <form id="login" method="POST" action="{action}">
-        <label for="username">User Name</label>
-        <input id="username" name="username" type="text">
-        <label for="password">Password</label>
-        <input id="password" name="password" type="password">
-        <input type="submit" value="Log In">
+        <table>
+            <tr>
+                <td align="right"><label for="username">User Name</label></td>
+                <td align="left"><input id="username" name="username" type="text"></td>
+            </tr>
+            <tr>
+                <td align="right"><label for="password">Password</label></td>
+                <td align="left"><input id="password" name="password" type="password"></td>
+            </tr>
+            <tr>
+                <td align="right"><input type="submit" value="Log In"></td>
+                <td align="left"><input type="reset" value="Reset"></td>
+            </tr>
+        </table>
     </form>
     <h1>{message}</h1>
 </div>
