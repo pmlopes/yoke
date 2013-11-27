@@ -13,6 +13,7 @@ import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -56,14 +57,14 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    db.keys(domain.namespace + "&*", new AsyncResultHandler<JsonArray>() {
+                    db.keys(domain.namespace + "&*", new Handler<Message<JsonObject>>() {
                         @Override
-                        public void handle(AsyncResult<JsonArray> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
+                        public void handle(Message<JsonObject> message) {
+                            if (!"ok".equals(message.body().getString("status"))) {
+                                next.handle(message.body().getString("message"));
                             } else {
                                 StringBuilder keys = new StringBuilder();
-                                JsonArray json = asyncResult.result();
+                                JsonArray json = message.body().getArray("value");
 
                                 for (int i = 0; i < json.size(); i++) {
                                     keys.append("<li data-value=\"");
@@ -85,13 +86,13 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    db.keys(domain.namespace + "&*", new AsyncResultHandler<JsonArray>() {
+                    db.keys(domain.namespace + "&*", new Handler<Message<JsonObject>>() {
                         @Override
-                        public void handle(AsyncResult<JsonArray> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
+                        public void handle(Message<JsonObject> message) {
+                            if (!"ok".equals(message.body().getString("status"))) {
+                                next.handle(message.body().getString("message"));
                             } else {
-                                request.response().end(asyncResult.result());
+                                request.response().end(message.body().getString("value"));
                             }
                         }
                     });
@@ -108,15 +109,15 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    db.get(domain.namespace + "&" + key, new AsyncResultHandler<String>() {
+                    db.get(domain.namespace + "&" + key, new Handler<Message<JsonObject>>() {
                         @Override
-                        public void handle(AsyncResult<String> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
+                        public void handle(Message<JsonObject> message) {
+                            if (!"ok".equals(message.body().getString("status"))) {
+                                next.handle(message.body().getString("message"));
                             } else {
                                 request.response().setContentType("application/json");
                                 // TODO: escape
-                                request.response().end("\"" + asyncResult.result() + "\"");
+                                request.response().end("\"" + message.body().getString("value") + "\"");
                             }
                         }
                     });
@@ -142,11 +143,11 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    db.set(domain.namespace + "&" + key, value, new AsyncResultHandler<Void>() {
+                    db.set(domain.namespace + "&" + key, value, new Handler<Message<JsonObject>>() {
                         @Override
-                        public void handle(AsyncResult<Void> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
+                        public void handle(Message<JsonObject> message) {
+                            if (!"ok".equals(message.body().getString("status"))) {
+                                next.handle(message.body().getString("message"));
                             } else {
                                 request.response().setContentType("application/json");
                                 request.response().end("\"OK\"");
@@ -169,11 +170,11 @@ public class KitCMS extends Verticle {
                         return;
                     }
 
-                    db.del(domain.namespace + "&" + key, new AsyncResultHandler<Void>() {
+                    db.del(domain.namespace + "&" + key, new Handler<Message<JsonObject>>() {
                         @Override
-                        public void handle(AsyncResult<Void> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
+                        public void handle(Message<JsonObject> message) {
+                            if (!"ok".equals(message.body().getString("status"))) {
+                                next.handle(message.body().getString("message"));
                             } else {
                                 request.response().setContentType("application/json");
                                 request.response().end("\"OK\"");
@@ -187,14 +188,14 @@ public class KitCMS extends Verticle {
                 public void handle(final YokeRequest request, final Handler<Object> next) {
                     final Config.Domain domain = request.get("domain");
 
-                    db.keys(domain.namespace + "&*", new AsyncResultHandler<JsonArray>() {
+                    db.keys(domain.namespace + "&*", new Handler<Message<JsonObject>>() {
                         @Override
-                        public void handle(AsyncResult<JsonArray> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
+                        public void handle(Message<JsonObject> message) {
+                            if (!"ok".equals(message.body().getString("status"))) {
+                                next.handle(message.body().getString("message"));
                             } else {
                                 // need to iterate all json array elements and get from redis
-                                new AsyncIterator<Object>(asyncResult.result()) {
+                                new AsyncIterator<Object>(message.body().getArray("value")) {
 
                                     final JsonArray buffer = new JsonArray();
 
@@ -202,15 +203,15 @@ public class KitCMS extends Verticle {
                                     public void handle(Object o) {
                                         if (!isEnd()) {
                                             final String key = (String) o;
-                                            db.get(domain.namespace + "&" + key, new AsyncResultHandler<String>() {
+                                            db.get(domain.namespace + "&" + key, new Handler<Message<JsonObject>>() {
                                                 @Override
-                                                public void handle(AsyncResult<String> asyncResult) {
-                                                    if (asyncResult.failed()) {
-                                                        next.handle(asyncResult.cause());
+                                                public void handle(Message<JsonObject> message) {
+                                                    if (!"ok".equals(message.body().getString("status"))) {
+                                                        next.handle(message.body().getString("message"));
                                                     } else {
                                                         JsonObject json = new JsonObject();
                                                         json.putString("key", key);
-                                                        json.putString("value", asyncResult.result());
+                                                        json.putString("value", message.body().getString("value"));
                                                         buffer.addObject(json);
 
                                                         next();
@@ -252,11 +253,11 @@ public class KitCMS extends Verticle {
                                 public void handle(Object o) {
                                     if (!isEnd()) {
                                         final JsonObject json = (JsonObject) o;
-                                        db.set(domain.namespace + "&" + json.getString("key"), json.getString("value"), new AsyncResultHandler<Void>() {
+                                        db.set(domain.namespace + "&" + json.getString("key"), json.getString("value"), new Handler<Message<JsonObject>>() {
                                             @Override
-                                            public void handle(AsyncResult<Void> asyncResult) {
-                                                if (asyncResult.failed()) {
-                                                    next.handle(asyncResult.cause());
+                                            public void handle(Message<JsonObject> message) {
+                                                if (!"ok".equals(message.body().getString("status"))) {
+                                                    next.handle(message.body().getString("message"));
                                                 } else {
                                                     next();
                                                 }
@@ -279,18 +280,18 @@ public class KitCMS extends Verticle {
                 final Config.Domain domain = request.get("domain");
                 final String file = request.path().toLowerCase();
 
-                db.get(domain.namespace + "&" + file, new AsyncResultHandler<String>() {
+                db.get(domain.namespace + "&" + file, new Handler<Message<JsonObject>>() {
                     @Override
-                    public void handle(AsyncResult<String> asyncResult) {
-                        if (asyncResult.failed()) {
-                            next.handle(asyncResult.cause());
+                    public void handle(Message<JsonObject> message) {
+                        if (!"ok".equals(message.body().getString("status"))) {
+                            next.handle(message.body().getString("message"));
                         } else {
-                            if (asyncResult.result() == null) {
+                            if (message.body().getValue("value") == null) {
                                 // if nothing is found on the database proceed with the chain
                                 next.handle(null);
                             } else {
                                 request.response().setContentType(MimeType.getMime(file, "text/html"));
-                                request.response().end(asyncResult.result());
+                                request.response().end(message.body().getString("value"));
                             }
                         }
                     }

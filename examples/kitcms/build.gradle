@@ -53,9 +53,9 @@ dependencies {
   // If you're creating Groovy compiled verticles you may need the following dependencies
   //provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
-  // get yoke jar for parent
+  // get yoke jar from parent
   provided project(':framework')
-  provided "io.vertx:mod-redis-client:1.1.2"
+  provided "io.vertx:mod-redis-client:1.1.3"
 }
 
 test {

@@ -1,3 +1,4 @@
 {
-  "main": "example.js"
+  "main": "example.js",
+  "includes": "com.jetdrone~yoke~1.0.4-SNAPSHOT"
 }
