@@ -94,7 +94,17 @@ public class FormAuth extends Middleware {
 
                             request.response().redirect(redirect);
                         } else {
-                            next.handle(401);
+                            if (loginTemplate != null) {
+                                // render internal login
+                                request.response().setContentType("text/html");
+                                request.response().setStatusCode(401);
+                                request.response().end(
+                                        loginTemplate.replace("{title}", (String) request.get("title"))
+                                                .replace("{action}", loginURI + "?redirect_url=" + request.getParameter("redirect_url", "/"))
+                                                .replace("{message}", "Invalid username and/or password, please try again."));
+                            } else {
+                                next.handle(401);
+                            }
                         }
                     }
                 });
