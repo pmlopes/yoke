@@ -52,15 +52,23 @@ public abstract class Middleware {
     // @protected
     protected Logger logger;
 
+    // The configured mount point for this middleware.
+    //
+    // @property mount
+    // @protected
+    protected String mount;
+
     // Initializes the middleware. This methos is called from Yoke once a middleware is added to the chain.
     //
     // @method init
     // @param {Vertx} vertx the local Vert.x instance.
     // @param {Logger} logger the current logger.
+    // @param {String} mount the configured mount path.
     // @return {Middleware}
-    public Middleware init(Vertx vertx, Logger logger) {
+    public Middleware init(Vertx vertx, Logger logger, String mount) {
         this.vertx = vertx;
         this.logger = logger;
+        this.mount = mount;
 
         return this;
     }

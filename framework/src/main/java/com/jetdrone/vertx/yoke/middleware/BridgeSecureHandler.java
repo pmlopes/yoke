@@ -28,8 +28,8 @@ public class BridgeSecureHandler extends Middleware {
     private final String sessionStorage;
 
     @Override
-    public Middleware init(final Vertx vertx, final Logger logger) {
-        super.init(vertx, logger);
+    public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
+        super.init(vertx, logger, mount);
 
         vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
             @Override

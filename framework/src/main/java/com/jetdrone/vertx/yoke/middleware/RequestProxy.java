@@ -28,8 +28,8 @@ public class RequestProxy extends Middleware {
     private final boolean secure;
 
     @Override
-    public Middleware init(final Vertx vertx, final Logger logger) {
-        super.init(vertx, logger);
+    public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
+        super.init(vertx, logger, mount);
         return this;
     }
 

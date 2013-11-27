@@ -4,19 +4,12 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.middleware.filters.AbstractWriterFilter;
 import com.jetdrone.vertx.yoke.middleware.filters.DeflateWriterFilter;
 import com.jetdrone.vertx.yoke.middleware.filters.GZipWriterFilter;
-import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.regex.Pattern;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class Compress extends Middleware {
 

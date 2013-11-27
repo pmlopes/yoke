@@ -189,7 +189,7 @@ public class Yoke implements RequestWrapper {
         }
 
         // initialize the middleware with the current Vert.x and Logger
-        middleware.init(vertx, logger);
+        middleware.init(vertx, logger, route);
         return this;
     }
 
