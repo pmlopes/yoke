@@ -13,24 +13,35 @@ import org.vertx.java.core.logging.Logger;
 
 import java.util.concurrent.ConcurrentMap;
 
-/**
-* Use it to secure EventBus Bridge. The message is authorised if sessionID
-* is in the storage. You can manage the session storage at your proposal, 
-* currently it only support shared Map.<p>
-*
-* Please see vert.x doc on how to use secured EventBus Bridge.<p>
-*/
+// # BridgeSecureHandler
+//
+// Use it to secure EventBus Bridge. The message is authorised if sessionID
+// is in the storage. You can manage the session storage at your proposal,
+// currently it only support shared Map.<p>
+//
+// Please see vert.x doc on how to use secured EventBus Bridge.<p>
 public class BridgeSecureHandler extends Middleware {
 
+    // Default Address if none specified
+    // @property DEFAULT_AUTH_ADDRESS
+    // @private
     private static final String DEFAULT_AUTH_ADDRESS = "yoke.basicauthmanager.authorise";
 
+    // The address the bridge is listening
+    // @property authAddress
+    // @private
     private final String authAddress;
+
+    // Session storage key
+    // @property sessionStorage
+    // @private
     private final String sessionStorage;
 
     @Override
     public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
         super.init(vertx, logger, mount);
 
+        // register a new handler for the configured address
         vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> message) {
@@ -53,11 +64,18 @@ public class BridgeSecureHandler extends Middleware {
         return this;
     }
 
+    // Creates a new BridgeSecureHandler
+    // @constructor
+    // @param {String} authAddress
+    // @param {String} sessionStorage
     public BridgeSecureHandler(final String authAddress, final String sessionStorage) {
         this.authAddress = authAddress;
         this.sessionStorage = sessionStorage;
     }
 
+    // Creates a new BridgeSecureHandler using the default auth address
+    // @constructor
+    // @param {String} sessionStorage
     public BridgeSecureHandler(final String sessionStorage) {
         this(DEFAULT_AUTH_ADDRESS, sessionStorage);
     }

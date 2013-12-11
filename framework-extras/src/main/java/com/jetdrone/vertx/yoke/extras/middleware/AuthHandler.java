@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.extras.middleware;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
