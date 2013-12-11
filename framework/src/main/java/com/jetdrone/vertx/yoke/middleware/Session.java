@@ -8,6 +8,7 @@ import org.vertx.java.core.Handler;
 
 import javax.crypto.Mac;
 
+// # Session
 public class Session extends Middleware {
 
     private final Mac hmacSHA256;

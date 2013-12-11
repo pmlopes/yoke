@@ -13,13 +13,13 @@ import org.vertx.java.core.http.HttpClientResponse;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.logging.Logger;
 
-/**
-* RequestProxy provides web client a simple way to interact with other REST service
-* providers via Yoke, meanwhile Yoke could pre-handle authentication, logging and etc.<p>
-*
-* In order to handler the proxy request properly, Bodyparser should be disabled for the
-* path matched by RequestProxy.<p>
-*/
+// # RequestProxy
+//
+// RequestProxy provides web client a simple way to interact with other REST service
+// providers via Yoke, meanwhile Yoke could pre-handle authentication, logging and etc.
+//
+// In order to handler the proxy request properly, Bodyparser should be disabled for the
+// path matched by RequestProxy.
 public class RequestProxy extends Middleware {
 
     private final String prefix;

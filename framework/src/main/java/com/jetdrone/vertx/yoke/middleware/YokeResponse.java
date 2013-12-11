@@ -24,6 +24,7 @@ import org.vertx.java.core.streams.ReadStream;
 
 import java.util.*;
 
+// # YokeResponse
 public class YokeResponse implements HttpServerResponse {
     // the original request
     private final HttpServerResponse response;
