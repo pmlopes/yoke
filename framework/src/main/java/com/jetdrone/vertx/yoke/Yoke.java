@@ -174,22 +174,24 @@ public class Yoke implements RequestWrapper {
     //
     // @method use
     // @param {String} route The route prefix for the middleware
-    // @param {Middleware} middleware The middleware add to the chain
+    // @param {Middleware[]} middleware The middleware add to the chain
     //
     // @example
     //     yoke.use("/login", new CustomLoginMiddleware());
-    public Yoke use(String route, Middleware middleware) {
-        // when the type of middleware is error handler then the route is ignored and
-        // the middleware is extracted from the execution chain into a special placeholder
-        // for error handling
-        if (middleware.isErrorHandler()) {
-            errorHandler = middleware;
-        } else {
-            middlewareList.add(new MountedMiddleware(route, middleware));
-        }
+    public Yoke use(String route, Middleware... middleware) {
+        for (Middleware m : middleware) {
+            // when the type of middleware is error handler then the route is ignored and
+            // the middleware is extracted from the execution chain into a special placeholder
+            // for error handling
+            if (m.isErrorHandler()) {
+                errorHandler = m;
+            } else {
+                middlewareList.add(new MountedMiddleware(route, m));
+            }
 
-        // initialize the middleware with the current Vert.x and Logger
-        middleware.init(vertx, logger, route);
+            // initialize the middleware with the current Vert.x and Logger
+            m.init(vertx, logger, route);
+        }
         return this;
     }
 
@@ -197,7 +199,7 @@ public class Yoke implements RequestWrapper {
     // @method use
     // @param {Middleware} middleware The middleware add to the chain
     //
-    public Yoke use(Middleware middleware) {
+    public Yoke use(Middleware... middleware) {
         return use("/", middleware);
     }
 

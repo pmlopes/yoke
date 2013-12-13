@@ -499,6 +499,26 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
+        // TODO: filter file?
+        hasBody = true;
+        filter = null;
+        triggerHeadersHandlers();
+        response.sendFile(filename, resultHandler);
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse sendFile(String filename, String notFoundFile, Handler<AsyncResult<Void>> resultHandler) {
+        // TODO: filter file?
+        hasBody = true;
+        filter = null;
+        triggerHeadersHandlers();
+        response.sendFile(filename, notFoundFile, resultHandler);
+        return this;
+    }
+
+    @Override
     public void close() {
         response.close();
     }

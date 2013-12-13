@@ -15,11 +15,12 @@
  */
 package com.jetdrone.vertx.yoke.test;
 
-import org.vertx.java.core.impl.CaseInsensitiveMultiMap;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.http.HttpServerResponse;
 
 public class Response implements HttpServerResponse {
@@ -172,6 +173,38 @@ public class Response implements HttpServerResponse {
     @Override
     public HttpServerResponse sendFile(String filename, String notFoundFile) {
         throw new UnsupportedOperationException("This mock does not support sendFile with 2 args");
+    }
+
+    @Override
+    public HttpServerResponse sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
+        body.appendBuffer(vertx.fileSystem().readFileSync(filename));
+        resultHandler.handle(new AsyncResult<Void>() {
+            @Override
+            public Void result() {
+                return null;
+            }
+
+            @Override
+            public Throwable cause() {
+                return null;
+            }
+
+            @Override
+            public boolean succeeded() {
+                return true;
+            }
+
+            @Override
+            public boolean failed() {
+                return false;
+            }
+        });
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse sendFile(String filename, String notFoundFile, Handler<AsyncResult<Void>> resultHandler) {
+        throw new UnsupportedOperationException("This mock does not support sendFile with 2 args + Handler");
     }
 
     @Override

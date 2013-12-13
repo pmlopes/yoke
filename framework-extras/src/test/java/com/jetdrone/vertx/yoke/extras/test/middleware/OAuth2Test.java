@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.impl.CaseInsensitiveMultiMap;
+import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.testtools.TestVerticle;
 
 import java.util.Set;

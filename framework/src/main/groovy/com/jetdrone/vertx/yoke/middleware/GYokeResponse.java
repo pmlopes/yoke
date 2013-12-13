@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Engine;
 import groovy.lang.Closure;
 import org.vertx.groovy.core.impl.DefaultMultiMap;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.groovy.core.MultiMap;
 import org.vertx.java.core.http.HttpServerResponse;
@@ -155,5 +156,25 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
         }
 
         jsonp(callback, body);
+    }
+
+    public HttpServerResponse sendFile(String filename, final Closure resultHandler) {
+        sendFile(filename, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> event) {
+                resultHandler.call(event);
+            }
+        });
+        return this;
+    }
+
+    public HttpServerResponse sendFile(String filename, String notFoundFile, final Closure resultHandler) {
+        sendFile(filename, notFoundFile, new Handler<AsyncResult<Void>>() {
+            @Override
+            public void handle(AsyncResult<Void> event) {
+                resultHandler.call(event);
+            }
+        });
+        return this;
     }
 }

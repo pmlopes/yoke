@@ -723,4 +723,9 @@ public class YokeRequest implements HttpServerRequest {
         request.exceptionHandler(handler);
         return this;
     }
+
+    @Override
+    public InetSocketAddress localAddress() {
+        return request.localAddress();
+    }
 }

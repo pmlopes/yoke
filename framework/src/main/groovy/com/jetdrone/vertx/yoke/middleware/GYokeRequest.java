@@ -333,4 +333,9 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     public String getIp() {
         return ip();
     }
+
+    public InetSocketAddress getLocalAddress() {
+        return localAddress();
+    }
+
 }

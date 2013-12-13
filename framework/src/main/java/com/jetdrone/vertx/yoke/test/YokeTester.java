@@ -18,7 +18,6 @@ package com.jetdrone.vertx.yoke.test;
 import com.jetdrone.vertx.yoke.Yoke;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.vertx.java.core.*;
-import org.vertx.java.core.impl.CaseInsensitiveMultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.*;
 import org.vertx.java.core.net.NetSocket;
@@ -121,6 +120,11 @@ public class YokeTester extends Yoke {
 
                 @Override
                 public InetSocketAddress remoteAddress() {
+                    return new InetSocketAddress("127.0.0.1", 80);
+                }
+
+                @Override
+                public InetSocketAddress localAddress() {
                     return new InetSocketAddress("127.0.0.1", 80);
                 }
 
@@ -270,6 +274,16 @@ public class YokeTester extends Yoke {
         //@Override
         public boolean isCompressionSupported() {
             return false;
+        }
+
+        @Override
+        public HttpServer setMaxWebSocketFrameSize(int maxSize) {
+            return this;
+        }
+
+        @Override
+        public int getMaxWebSocketFrameSize() {
+            throw new UnsupportedOperationException();
         }
 
         @Override

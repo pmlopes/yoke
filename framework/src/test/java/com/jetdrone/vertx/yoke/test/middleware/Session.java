@@ -7,7 +7,7 @@ import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.junit.Test;
-import org.vertx.java.core.impl.CaseInsensitiveMultiMap;
+import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.testtools.TestVerticle;
