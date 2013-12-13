@@ -58,7 +58,9 @@ public class GYoke {
 
         jYoke = new Yoke(this.vertx, logger, new RequestWrapper() {
             @Override
-            public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines) {
+            public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Engine> engines) {
+                // the context map is shared with all middlewares
+                final Map<String, Object> context = new Context(jYoke.defaultContext);
                 GYokeResponse response = new GYokeResponse(request.response(), context, engines);
                 return new GYokeRequest(request, response, secure, context);
             }

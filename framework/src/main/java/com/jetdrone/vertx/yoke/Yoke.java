@@ -58,7 +58,7 @@ public class Yoke implements RequestWrapper {
     //        x-powered-by: true,
     //        trust-proxy: true
     //      }
-    private final Map<String, Object> defaultContext = new HashMap<>();
+    protected final Map<String, Object> defaultContext = new HashMap<>();
 
     // The internal registry of [render engines](Engine.html)
     //
@@ -337,7 +337,9 @@ public class Yoke implements RequestWrapper {
     // @param {Map} context
     // @param {Map} engines
     @Override
-    public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines) {
+    public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Engine> engines) {
+        // the context map is shared with all middlewares
+        final Map<String, Object> context = new Context(defaultContext);
         YokeResponse response = new YokeResponse(request.response(), context, engines);
         return new YokeRequest(request, response, secure, context);
     }
@@ -354,13 +356,11 @@ public class Yoke implements RequestWrapper {
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest req) {
-                // the context map is shared with all middlewares
-                final Map<String, Object> context = new HashMap<>(defaultContext);
-                final YokeRequest request = requestWrapper.wrap(req, secure, context, engineMap);
+                final YokeRequest request = requestWrapper.wrap(req, secure, engineMap);
 
                 // add x-powered-by header is enabled
-                Object poweredBy = context.get("x-powered-by");
-                if (poweredBy != null && (Boolean) poweredBy) {
+                Boolean poweredBy = request.get("x-powered-by");
+                if (poweredBy != null && poweredBy) {
                     request.response().putHeader("x-powered-by", "yoke");
                 }
 

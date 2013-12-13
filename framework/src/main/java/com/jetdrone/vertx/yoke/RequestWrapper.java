@@ -20,8 +20,7 @@ public interface RequestWrapper {
     // @method wrap
     // @param {HttpServerRequest} request The Vertx HttpServerRequest
     // @param {boolean} secure Is the server SSL?
-    // @param {Map} context The shared context between request and response
     // @param {Map} engines the current list of render engines (this is an unmodifiable map)
     // @return {YokeRequest} an Implementation of YokeRequest
-    YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines);
+    YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Engine> engines);
 }

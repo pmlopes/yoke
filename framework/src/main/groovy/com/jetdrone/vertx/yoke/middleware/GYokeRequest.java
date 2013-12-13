@@ -36,6 +36,31 @@ import java.util.Map;
 
 public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core.http.HttpServerRequest*/ {
 
+    /**
+     * Allow getting properties in a generified way.
+     *
+     * @param name The key to get
+     * @param <R> The type of the return
+     * @return The found object
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R getAt(String name) {
+        return get(name);
+    }
+
+    /**
+     * Allows putting a value into the context
+     *
+     * @param name the key to store
+     * @param value the value to store
+     * @param <R> the type of the previous value if present
+     * @return the previous value or null
+     */
+    @SuppressWarnings("unchecked")
+    public <R> R putAt(String name, R value) {
+        return put(name, value);
+    }
+
     private Map<String, GYokeFileUpload> files;
 
     public GYokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context) {
@@ -226,6 +251,11 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
 
     public MultiMap getParams() {
         return params();
+    }
+
+    public GYokeRequest setExpectMultiPart(boolean expect) {
+        expectMultiPart(expect);
+        return this;
     }
 
     public InetSocketAddress getRemoteAddress() {
