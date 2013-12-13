@@ -29,9 +29,9 @@ in the server classpath.
 
 Yoke is a polyglot framework so you should choose a trail to follow with your favourite language:
 
-* [Java](java/com/jetdrone/vertx/yoke/Yoke.html)
-* [Groovy](groovy/com/jetdrone/vertx/yoke/GYoke.html)
-* [JavaScript](resources/yoke/Yoke.html)
+* [Java](java/Readme.html)
+* [Groovy](groovy/Readme.html)
+* [JavaScript](resources/Readme.html)
 
 You can also get tutorials:
 

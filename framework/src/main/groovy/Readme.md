@@ -13,19 +13,15 @@ to know *gradle* since we are using this template project.
 
 Start by downloading the [yoke-gradle-template](yoke-gradle-template.tar.gz) to your local development work directory.
 
-```
-pmlopes@jetdrone:~/Projects$ curl -0 http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
-pmlopes@jetdrone:~/Projects$
-```
+    ~/Projects$ curl -0 http://pmlopes.github.io/yoke/yoke-gradle-template.tar.gz | tar -zx
+    ~/Projects$
 
 The extracted project lives under the directory *yoke-gradle-template* it should be expected to be renamed to a better
 suitable name describing the project to be implemented.
 
-```
-pmlopes@jetdrone:~/Projects$ mv yoke-gradle-template yoke-tutorial
-pmlopes@jetdrone:~/Projects$ cd yoke-tutorial
-pmlopes@jetdrone:~/Projects/yoke-tutorial$
-```
+    ~/Projects$ mv yoke-gradle-template yoke-tutorial
+    ~/Projects$ cd yoke-tutorial
+    ~/Projects/yoke-tutorial$
 
 
 ## Introduction
@@ -51,21 +47,19 @@ The API of Yoke is quite simple, in fact it consist only of 4 methods:
 
 You register middleware onto it using the ```use``` method, you might call the method with the following signatures:
 
-``` java
-// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
-// This middleware will run on every request path
-use(Middleware middlewareImplementation);
+    // Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
+    // This middleware will run on every request path
+    use(Middleware middlewareImplementation);
 
-// Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
-// This middleware will run only on requests which path starts with the route you specify. A tipical use case is when
-// you want to do authentication on a specific route e.g.: all requests starting with /secure
-use(String route, Middleware middlewareImplementation);
+    // Adds a Middleware (either from Yoke Middleware collection or your own to the chain.
+    // This middleware will run only on requests which path starts with the route you specify. A tipical use case is when
+    // you want to do authentication on a specific route e.g.: all requests starting with /secure
+    use(String route, Middleware middlewareImplementation);
 
-// Alternatively you can use handlers in the same way you would on Vert.x, internally these Handlers are handled as
-// Middleware classes and processed accordingly.
-use(Closure handler);
-use(String route, Closure handler);
-```
+    // Alternatively you can use handlers in the same way you would on Vert.x, internally these Handlers are handled as
+    // Middleware classes and processed accordingly.
+    use(Closure handler);
+    use(String route, Closure handler);
 
 You can registeras many middleware as you want, but keep in mind that the order you used to register is the order that
 is used to process a request. In other words If you need to consume the request body of a request you need to use the
@@ -76,16 +70,14 @@ The difference between the Middleware abstract class and the
 to define the "next" on the middleware itself but yoke takes care of it. An implementation of Middleware requires you
 to implement the following closure:
 
-``` java
-/**
- * Handles a request.
- *
- * @param request A YokeRequest which in practice is a extended HttpServerRequest
- * @param next The callback to inform that the next middleware in the chain should be used. A value different from
- *             null represents an error and in that case the error handler middleware will be executed.
- */
-{ request, next -> };
-```
+    /**
+     * Handles a request.
+     *
+     * request A YokeRequest which in practice is a extended HttpServerRequest
+     * next The callback to inform that the next middleware in the chain should be used. A value different from
+     *             null represents an error and in that case the error handler middleware will be executed.
+     */
+    { request, next -> };
 
 The ```next``` parameter is a [callback](http://en.wikipedia.org/wiki/Callback_%28computer_programming%29). The reason
 for using callbacks is to allow asynchronous execution of tasks. So in your code you can call ```next.handle(object)```
@@ -119,16 +111,14 @@ simple *GroovyTemplate* that allows you to use the powerful GroovyTemplate class
 Of course this is a very naive engine so you can add your own or use other ones provided by the community. If you need
 to implement one yourself all you need to implement is the following method:
 
-``` java
-/**
- * The required to implement method.
- *
- * @param filename - String representing the file path to the template
- * @param context - Map with key values that might get substituted in the template
- * @param handler - The future result handler with a Buffer in case of success
- */
-public void render(String filename, Map<String, Object> context, AsyncResultHandler<String> handler);
-```
+    /**
+     * The required to implement method.
+     *
+     * filename - String representing the file path to the template
+     * context - Map with key values that might get substituted in the template
+     * handler - The future result handler with a Buffer in case of success
+     */
+    public void render(String filename, Map<String, Object> context, AsyncResultHandler<String> handler);
 
 The context is passed from the request directly and in fact is the same Map that was described on the ```set``` method.
 
@@ -153,36 +143,28 @@ script: ```HelloWorldVerticle.groovy``` under ```src/main/resources```. At this 
 The reason we have a *Verticle* class is because Yoke does not forces you to use any special classes, you still code
 like you would on Vert.x. So we start by creating a Verticle the same way we would on any other Vert.x application:
 
-``` groovy
-println "Nothing here!"
-```
+    println "Nothing here!"
 
 This is the bare minimal Verticle code you need to write. Of course this code does not do anything fancy, in fact it
 just do nothing. So lets make a *HTTP* web server that listens on port *8080*.
 
-``` groovy
-def yoke = new GYoke(vertx)
-yoke.listen(8080)
-```
+    def yoke = new GYoke(vertx)
+    yoke.listen(8080)
 
 And you can quickly test your new Verticle by running:
 
-```
-pmlopes@jetdrone:~/Projects/yoke-tutorial$ ./gradlew runMod
-pmlopes@jetdrone:~/Projects/yoke-tutorial$
-```
+    ~/Projects/yoke-tutorial$ ./gradlew runMod
+    ~/Projects/yoke-tutorial$
 
 If you open a web browser and navigate to your localhost at port 8080 you will get a *404* *Not Found* error message.
 This is expected since you have a server running but no middleware is handling your requests. So lets install a handler
 for all request paths to respond with "Hello World".
 
-``` groovy
-def yoke = new GYoke(vertx)
-yoke.use { request ->
-  request.response.end("Hello World!")
-}
-yoke.listen(8080)
-```
+    def yoke = new GYoke(vertx)
+    yoke.use { request ->
+      request.response.end("Hello World!")
+    }
+    yoke.listen(8080)
 
 If you restart your verticle running the gradle command from before and reload your web browser you will see the text
 "Hello World" on it.
