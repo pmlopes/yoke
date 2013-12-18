@@ -1,9 +1,8 @@
 package com.jetdrone.vertx.yoke.store;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-
-import java.util.Set;
 
 public interface SessionStore {
 
@@ -11,16 +10,16 @@ public interface SessionStore {
     void get(String sid, Handler<JsonObject> callback);
 
     // Commit the given `sess` object associated with the given `sid`.
-    void set(String sid, JsonObject sess, Handler<Boolean> callback);
+    void set(String sid, JsonObject sess, Handler<String> callback);
 
     // Destroy the session associated with the given `sid`.
-    void destroy(String sid, Handler<Boolean> callback);
+    void destroy(String sid, Handler<String> callback);
 
     // Invoke the given callback `fn` with all active sessions.
-    void all(Handler<Set<JsonObject>> callback);
+    void all(Handler<JsonArray> callback);
 
     // Clear all sessions.
-    void clear(Handler<Boolean> callback);
+    void clear(Handler<String> callback);
 
     // Fetch number of sessions.
     void length(Handler<Integer> callback);

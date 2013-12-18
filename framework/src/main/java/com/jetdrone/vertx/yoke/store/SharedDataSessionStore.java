@@ -2,10 +2,9 @@ package com.jetdrone.vertx.yoke.store;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 public class SharedDataSessionStore implements SessionStore {
@@ -29,20 +28,20 @@ public class SharedDataSessionStore implements SessionStore {
     }
 
     @Override
-    public void set(String sid, JsonObject sess, Handler<Boolean> callback) {
+    public void set(String sid, JsonObject sess, Handler<String> callback) {
         storage.put(sid, sess.encode());
-        callback.handle(true);
+        callback.handle("ok");
     }
 
     @Override
-    public void destroy(String sid, Handler<Boolean> callback) {
+    public void destroy(String sid, Handler<String> callback) {
         storage.remove(sid);
-        callback.handle(true);
+        callback.handle("ok");
     }
 
     @Override
-    public void all(Handler<Set<JsonObject>> callback) {
-        Set<JsonObject> items = new HashSet<>();
+    public void all(Handler<JsonArray> callback) {
+        JsonArray items = new JsonArray();
         for (String s : storage.values()) {
             items.add(new JsonObject(s));
         }
@@ -50,9 +49,9 @@ public class SharedDataSessionStore implements SessionStore {
     }
 
     @Override
-    public void clear(Handler<Boolean> callback) {
+    public void clear(Handler<String> callback) {
         storage.clear();
-        callback.handle(true);
+        callback.handle("ok");
     }
 
     @Override
