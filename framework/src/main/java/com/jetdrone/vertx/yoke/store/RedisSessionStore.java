@@ -6,17 +6,15 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import java.util.Set;
+import java.util.Iterator;
 
 public class RedisSessionStore implements SessionStore {
 
     private final EventBus eventBus;
 
-    private final Integer ttl;
+    private final int ttl;
     private final String prefix;
     private final String redisAddress;
-
-    private static final int ONE_DAY = 86400;
 
     public RedisSessionStore(EventBus eventBus, String redisAddress, String prefix, Integer ttl) {
         this.redisAddress = redisAddress;
@@ -25,6 +23,9 @@ public class RedisSessionStore implements SessionStore {
         this.eventBus = eventBus;
     }
 
+    public RedisSessionStore(EventBus eventBus, String redisAddress, String prefix) {
+        this(eventBus, redisAddress, prefix, 86400);
+    }
 
     @Override
     public void get(String sid, final Handler<JsonObject> callback) {
@@ -65,14 +66,10 @@ public class RedisSessionStore implements SessionStore {
         String session = sess.encode();
         int ttl;
 
-        if (this.ttl != null) {
-            ttl = this.ttl;
+        if (maxAge != null) {
+            ttl = maxAge / 1000;
         } else {
-            if (maxAge != null) {
-                ttl = maxAge / 1000;
-            } else {
-                ttl = ONE_DAY;
-            }
+            ttl = this.ttl;
         }
 
         JsonObject redis = new JsonObject();
@@ -83,7 +80,7 @@ public class RedisSessionStore implements SessionStore {
             @Override
             public void handle(Message<JsonObject> reply) {
                 if ("ok".equals(reply.body().getString("status"))) {
-                    callback.handle("ok");
+                    callback.handle(null);
                 } else {
                     callback.handle(reply.body().getString("message"));
                 }
@@ -103,7 +100,7 @@ public class RedisSessionStore implements SessionStore {
             @Override
             public void handle(Message<JsonObject> reply) {
                 if ("ok".equals(reply.body().getString("status"))) {
-                    callback.handle("ok");
+                    callback.handle(null);
                 } else {
                     callback.handle(reply.body().getString("message"));
                 }
@@ -113,16 +110,52 @@ public class RedisSessionStore implements SessionStore {
 
     @Override
     public void all(Handler<JsonArray> callback) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // REDIS keys prefix *
+        // for each fetch
+        throw new RuntimeException("Not implemented!");
     }
 
     @Override
     public void clear(Handler<String> callback) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // REDIS keys prefix *
+        // for each DEL
+        throw new RuntimeException("Not implemented!");
     }
 
     @Override
     public void length(Handler<Integer> callback) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        // REDIS keys prefix *
+        // return length
+        throw new RuntimeException("Not implemented!");
+    }
+
+
+    private void getKeys(final Handler<JsonArray> next) {
+
+        JsonObject redis = new JsonObject();
+        redis.putString("command", "keys");
+        redis.putArray("args", new JsonArray().add(prefix + "*"));
+
+        eventBus.send(redisAddress, redis, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> message) {
+                if (!"ok".equals(message.body().getString("status"))) {
+                    next.handle(new JsonArray());
+                } else {
+                    JsonArray keys = message.body().getArray("value");
+
+                    JsonArray result = new JsonArray();
+                    int len = prefix.length();
+
+                    for (Object o : keys) {
+                        String key = (String) o;
+                        result.add(key.substring(len));
+                    }
+
+                    next.handle(result);
+                }
+            }
+        });
+
     }
 }
