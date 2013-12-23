@@ -1,20 +1,24 @@
 package com.jetdrone.vertx.oauth2;
 
+import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.extras.middleware.OAuth2Provider;
-import com.jetdrone.vertx.yoke.middleware.BodyParser;
-import com.jetdrone.vertx.yoke.middleware.CookieParser;
+import com.jetdrone.vertx.yoke.middleware.*;
+import com.jetdrone.vertx.yoke.store.SessionStore;
+import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
+import com.jetdrone.vertx.yoke.util.Utils;
+import org.vertx.java.core.Handler;
 import org.vertx.java.platform.Verticle;
+
+import javax.crypto.Mac;
 
 public class Oauth2 extends Verticle {
 
     @Override
     public void start() {
 
-//var OAuth2Provider = require('../index'),
-//	express = require('express'),
-//	MemoryStore = express.session.MemoryStore;
-
+        SessionStore sessionStore = new SharedDataSessionStore(vertx, "oauth2");
+        Mac mac = Utils.newHmacSHA256("abracadabra");
         OAuth2Provider oauthProvider = new OAuth2Provider("signing-secret");
 
 //oauthProvider.on('authorizeParamMissing', function(req, res, callback) {
@@ -66,51 +70,66 @@ public class Oauth2 extends Verticle {
 
         final Yoke app = new Yoke(this);
 
-        // app.use(express.logger());
+        app.use(new Logger());
         app.use(new BodyParser());
         app.use(new CookieParser());
-//        app.use(express.session({store: new MemoryStore({reapInterval: 5 * 60 * 1000}), secret: 'abracadabra'}));
-//        app.use(oauthProvider.oauth());
-//
-//app.get('/', function(req, res, next) {
-//	console.dir(req.session);
-//	res.end('home, logged in? ' + !!req.session.user);
-//});
-//
-//app.get('/login', function(req, res, next) {
-//	if(req.session.user) {
-//		res.writeHead(303, {Location: '/'});
-//		return res.end();
-//	}
-//
-//	var next_url = req.query.next ? req.query.next : '/';
-//	res.end('<html><form method="post" action="/login"><input type="hidden" name="next" value="' + next_url + '"><input type="text" placeholder="username" name="username"><input type="password" placeholder="password" name="password"><button type="submit">Login</button></form>');
-//});
-//
-//app.post('/login', function(req, res, next) {
-//	req.session.user = req.body.username;
-//	res.writeHead(303, {Location: req.body.next || '/'});
-//	res.end();
-//});
-//
-//app.get('/logout', function(req, res, next) {
-//	req.session.destroy(function(err) {
-//		res.writeHead(303, {Location: '/'});
-//		res.end();
-//	});
-//});
-//
-//app.get('/protected_resource', function(req, res, next) {
-//	if(req.query.access_token) {
-//		var accessToken = req.query.access_token;
-//		res.json(accessToken);
-//	} else {
-//		res.writeHead(403);
-//		res.end('no token found');
-//	}
-//});
-//
-//app.listen(8081);
+        app.use(new Session(mac));
+        app.use(oauthProvider);
+        app.use(new Router() {{
+            get("/", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+//                        console.dir(req.session);
+//                        res.end('home, logged in? ' + !!req.session.user);
+                }
+            });
 
+            get("/login", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+//                        if (req.session.user) {
+//                            res.writeHead(303, {Location:'/'});
+//                            return res.end();
+//                        }
+//
+//                        var next_url = req.query.next ? req.query.next : '/';
+//                        res.end('<html><form method="post" action="/login"><input type="hidden" name="next" value="' + next_url + '"><input type="text" placeholder="username" name="username"><input type="password" placeholder="password" name="password"><button type="submit">Login</button></form>');
+                }
+            });
+
+            post("/login", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+//                        req.session.user = req.body.username;
+//                        res.writeHead(303, {Location:req.body.next || '/'});
+//                        res.end();
+                }
+            });
+
+            get("/logout", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+//                        req.session.destroy(function(err) {
+//                            res.writeHead(303, {Location:'/'});
+//                            res.end();
+//                        });
+                }
+            });
+
+            get("/protected_resource", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+//                        if (req.query.access_token) {
+//                            var accessToken = req.query.access_token;
+//                            res.json(accessToken);
+//                        } else {
+//                            res.writeHead(403);
+//                            res.end('no token found');
+//                        }
+                }
+            });
+        }});
+
+        app.listen(8081);
     }
 }

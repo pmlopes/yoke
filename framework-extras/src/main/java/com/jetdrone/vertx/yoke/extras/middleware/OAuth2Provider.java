@@ -1,6 +1,10 @@
 package com.jetdrone.vertx.yoke.extras.middleware;
 
-public class OAuth2Provider {
+import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import org.vertx.java.core.Handler;
+
+public class OAuth2Provider extends Middleware {
 
     private String cryptSecret;
 
@@ -169,7 +173,8 @@ public class OAuth2Provider {
 //        });
     }
 
-    public void oauth() {
+    @Override
+    public void handle(YokeRequest request, Handler<Object> next) {
 //        var self = this;
 //        return function(req, res, next) {
 //                var uri = ~req.url.indexOf('?') ? req.url.substr(0, req.url.indexOf('?')) : req.url;
