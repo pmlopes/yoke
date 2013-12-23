@@ -667,6 +667,10 @@ public class Router extends Middleware {
             groups.add(group);
         }
         m.appendTail(sb);
+        // ignore tailing slash if not part of the input, not really REST but common on other frameworks
+        if (sb.charAt(sb.length() - 1) != '/') {
+            sb.append("\\/?$");
+        }
         String regex = sb.toString();
         PatternBinding binding = new PatternBinding(Pattern.compile(regex), groups, handler);
         // also pass the vertx object to the routes
