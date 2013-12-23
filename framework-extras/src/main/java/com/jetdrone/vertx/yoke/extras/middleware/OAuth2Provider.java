@@ -53,7 +53,7 @@ public class OAuth2Provider extends Middleware {
 //        callback(null, tokenData);
     }
 
-    private void get_oauth(Object req, Object res, Object next) {
+    private void getOauth(YokeRequest request, Handler<Object> next) {
 //        var self = this,
 //                clientId = req.query.client_id,
 //                redirectUri = req.query.redirect_uri,
@@ -85,7 +85,7 @@ public class OAuth2Provider extends Middleware {
 //        });
     }
 
-    private void post_oauth(Object req, Object res, Object next) {
+    private void postOauth(YokeRequest request, Handler<Object> next) {
 //        var self = this;
 //
 //        var clientId = req.query.client_id,
@@ -152,7 +152,7 @@ public class OAuth2Provider extends Middleware {
 //        return res.end();
     }
 
-    private void post_access_token(Object req, Object res, Object next) {
+    private void postAccessToken(YokeRequest request, Handler<Object> next) {
 //        var self = this,
 //                clientId = req.body.client_id,
 //                clientSecret = req.body.client_secret,
@@ -175,18 +175,14 @@ public class OAuth2Provider extends Middleware {
 
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
-//        var self = this;
-//        return function(req, res, next) {
-//                var uri = ~req.url.indexOf('?') ? req.url.substr(0, req.url.indexOf('?')) : req.url;
-//                if(req.method === 'GET' && uri === '/oauth/authorize') {
-//                        self._get_oauth(req, res, next);
-//                } else if(req.method === 'POST' && uri === '/oauth/authorize') {
-//                        self._post_oauth(req, res, next);
-//                } else if(req.method === 'POST' && uri === '/oauth/access_token') {
-//                        self._post_access_token(req, res, next);
-//                } else {
-//                        next();
-//                }
-//        };
+        if ("GET".equals(request.method()) && "/oauth/authorize".equals(request.path())) {
+            getOauth(request, next);
+        } else if ("POST".equals(request.method()) && "/oauth/authorize".equals(request.path())) {
+            postOauth(request, next);
+        } else if ("POST".equals(request.method()) && "/oauth/access_token".equals(request.path())) {
+            postAccessToken(request, next);
+        } else {
+            next.handle(null);
+        }
     }
 }
