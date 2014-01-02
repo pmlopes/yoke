@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke;
 import com.jetdrone.vertx.yoke.middleware.GYokeRequest;
 import com.jetdrone.vertx.yoke.middleware.GYokeResponse;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
@@ -62,9 +63,20 @@ public class GYoke {
                 // the context map is shared with all middlewares
                 final Map<String, Object> context = new Context(jYoke.defaultContext);
                 GYokeResponse response = new GYokeResponse(request.response(), context, engines);
-                return new GYokeRequest(request, response, secure, context);
+                return new GYokeRequest(request, response, secure, context, store);
             }
         });
+    }
+
+    // Special store engine used for accessing session data
+    //
+    // @private
+    // @property store
+    private SessionStore store;
+
+    public GYoke store(SessionStore store) {
+        this.store = store;
+        return this;
     }
 
     /**
@@ -96,7 +108,7 @@ public class GYoke {
 
     /**
      * Adds a middleware to the chain with the prefix "/".
-     * @see Yoke#use(String, Middleware)
+     * @see Yoke#use(String, Middleware...)
      * @param closure The closure add to the chain
      */
     public GYoke use(Closure closure) {
@@ -113,17 +125,17 @@ public class GYoke {
      * @param route The route prefix for the middleware
      * @param middleware The middleware add to the chain
      */
-    public GYoke use(String route, Middleware middleware) {
+    public GYoke use(String route, Middleware... middleware) {
         jYoke.use(route, middleware);
         return this;
     }
 
     /**
      * Adds a middleware to the chain with the prefix "/".
-     * @see Yoke#use(String, Middleware)
+     * @see Yoke#use(String, Middleware...)
      * @param middleware The middleware add to the chain
      */
-    public GYoke use(Middleware middleware) {
+    public GYoke use(Middleware... middleware) {
         return use("/", middleware);
     }
 

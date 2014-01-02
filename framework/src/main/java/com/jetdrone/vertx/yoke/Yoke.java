@@ -5,6 +5,8 @@ package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
+import com.jetdrone.vertx.yoke.store.SessionStore;
+import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.util.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.AsyncResult;
@@ -134,6 +136,7 @@ public class Yoke implements RequestWrapper {
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
         defaultContext.put("trust-proxy", true);
+        store = new SharedDataSessionStore(vertx, "yoke.sessiondata");
     }
 
     // Mounted middleware represents a binding of a Middleware instance to a specific url path.
@@ -261,6 +264,17 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
+    // Special store engine used for accessing session data
+    //
+    // @private
+    // @property store
+    private SessionStore store;
+
+    public Yoke store(SessionStore store) {
+        this.store = store;
+        return this;
+    }
+
     // When you need to share global properties with your requests you can add them
     // to Yoke and on every request they will be available as request.get(String)
     //
@@ -343,7 +357,7 @@ public class Yoke implements RequestWrapper {
         // the context map is shared with all middlewares
         final Map<String, Object> context = new Context(defaultContext);
         YokeResponse response = new YokeResponse(request.response(), context, engines);
-        return new YokeRequest(request, response, secure, context);
+        return new YokeRequest(request, response, secure, context, store);
     }
 
     // Starts listening at a already created server.

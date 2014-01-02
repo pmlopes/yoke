@@ -15,6 +15,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import groovy.json.JsonSlurper;
 import org.vertx.groovy.core.http.HttpServerFileUpload;
@@ -63,8 +64,8 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
 
     private Map<String, GYokeFileUpload> files;
 
-    public GYokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context) {
-        super(request, response, secure, context);
+    public GYokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
+        super(request, response, secure, context, store);
     }
 
     private HttpServerFileUpload wrap(final org.vertx.java.core.http.HttpServerFileUpload jHttpServerFileUpload) {

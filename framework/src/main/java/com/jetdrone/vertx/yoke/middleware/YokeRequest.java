@@ -3,6 +3,7 @@
 // @package com.jetdrone.vertx.yoke.middleware
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
@@ -61,6 +62,8 @@ public class YokeRequest implements HttpServerRequest {
     private final Map<String, Object> context;
     // is this request secure
     private final boolean secure;
+    // session data store
+    private final SessionStore store;
 
     // we can overrride the setMethod
     private String method;
@@ -72,12 +75,13 @@ public class YokeRequest implements HttpServerRequest {
     // control flags
     private boolean expectMultiPartCalled = false;
 
-    public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context) {
+    public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
         this.context = context;
         this.request = request;
         this.method = request.method();
         this.response = response;
         this.secure = secure;
+        this.store = store;
     }
 
     /**
