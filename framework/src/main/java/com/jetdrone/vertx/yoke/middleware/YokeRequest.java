@@ -344,8 +344,7 @@ public class YokeRequest implements HttpServerRequest {
 
     public void saveSessionData(JsonObject sessionData, Handler<String> handler) {
         if (sessionId == null) {
-            handler.handle("no session");
-            return;
+            createSession();
         }
 
         store.set(sessionId, sessionData, handler);

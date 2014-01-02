@@ -4,10 +4,9 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.extras.middleware.OAuth2Provider;
 import com.jetdrone.vertx.yoke.middleware.*;
-import com.jetdrone.vertx.yoke.store.SessionStore;
-import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
 import javax.crypto.Mac;
@@ -17,7 +16,6 @@ public class Oauth2 extends Verticle {
     @Override
     public void start() {
 
-        SessionStore sessionStore = new SharedDataSessionStore(vertx, "oauth2");
         Mac mac = Utils.newHmacSHA256("abracadabra");
         OAuth2Provider oauthProvider = new OAuth2Provider("signing-secret");
 
@@ -70,6 +68,8 @@ public class Oauth2 extends Verticle {
 
         final Yoke app = new Yoke(this);
 
+        app.use(new ErrorHandler(true));
+
         app.use(new Logger());
         app.use(new BodyParser());
         app.use(new CookieParser());
@@ -78,54 +78,76 @@ public class Oauth2 extends Verticle {
         app.use(new Router() {{
             get("/", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
-//                        console.dir(req.session);
-//                        res.end('home, logged in? ' + !!req.session.user);
+                public void handle(final YokeRequest request, final Handler<Object> next) {
+                    request.loadSessionData(new Handler<JsonObject>() {
+                        @Override
+                        public void handle(JsonObject session) {
+                            if (session == null) {
+                                request.response().end("home, logged in? false");
+                            } else {
+                                System.out.println(session.encodePrettily());
+                                request.response().end("home, logged in? " + (session.getString("user") != null));
+                            }
+                        }
+                    });
                 }
             });
 
             get("/login", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
-//                        if (req.session.user) {
-//                            res.writeHead(303, {Location:'/'});
-//                            return res.end();
-//                        }
-//
-//                        var next_url = req.query.next ? req.query.next : '/';
-//                        res.end('<html><form method="post" action="/login"><input type="hidden" name="next" value="' + next_url + '"><input type="text" placeholder="username" name="username"><input type="password" placeholder="password" name="password"><button type="submit">Login</button></form>');
+                public void handle(final YokeRequest request, Handler<Object> next) {
+                    request.loadSessionData(new Handler<JsonObject>() {
+                        @Override
+                        public void handle(JsonObject session) {
+                            if (session != null && session.getString("user") != null) {
+                                request.response().redirect(303, "/");
+                                return;
+                            }
+
+                            String next_url = request.getParameter("next", "/");
+                            request.response().end("<html><form method=\"post\" action=\"/login\"><input type=\"hidden\" name=\"next\" value=\"" + next_url + "\"><input type=\"text\" placeholder=\"username\" name=\"username\"><input type=\"password\" placeholder=\"password\" name=\"password\"><button type=\"submit\">Login</button></form>");
+                        }
+                    });
                 }
             });
 
             post("/login", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
-//                        req.session.user = req.body.username;
-//                        res.writeHead(303, {Location:req.body.next || '/'});
-//                        res.end();
+                public void handle(final YokeRequest request, final Handler<Object> next) {
+                    JsonObject session = new JsonObject();
+                    session.putString("user", request.getFormParameter("username"));
+
+                    request.saveSessionData(session, new Handler<String>() {
+                        @Override
+                        public void handle(String status) {
+                            if (!"ok".equals(status)) {
+                                next.handle(status);
+                                return;
+                            }
+                            request.response().redirect(303, request.getFormParameter("next", "/"));
+                        }
+                    });
                 }
             });
 
             get("/logout", new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
-//                        req.session.destroy(function(err) {
-//                            res.writeHead(303, {Location:'/'});
-//                            res.end();
-//                        });
+                    request.destroySession();
+                    request.response().redirect(303, "/");
                 }
             });
 
             get("/protected_resource", new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
-//                        if (req.query.access_token) {
-//                            var accessToken = req.query.access_token;
-//                            res.json(accessToken);
-//                        } else {
-//                            res.writeHead(403);
-//                            res.end('no token found');
-//                        }
+                        if (request.getParameter("access_token") != null) {
+                            String accessToken = request.getParameter("access_token");
+                            request.response().end(new JsonObject().putString("access_token", accessToken));
+                        } else {
+                            // no token found
+                            next.handle(403);
+                        }
                 }
             });
         }});

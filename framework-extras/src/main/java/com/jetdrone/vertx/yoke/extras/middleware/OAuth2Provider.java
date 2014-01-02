@@ -34,9 +34,8 @@ public class OAuth2Provider extends Middleware {
     }
 
     private String decodeUrlSaveBase64(String str) {
-        // str = (str + '===').slice(0, str.length + (str.length % 4));
-        //return str.replace(/-/g, '+').replace(/_/g, '/');
-        return null;
+        str = (str + "===").substring(0, str.length() + (str.length() % 4));
+        return str.replaceAll("-", "+").replaceAll("_", "/");
     }
 
     private String encrypt(String data) {
@@ -50,11 +49,15 @@ public class OAuth2Provider extends Middleware {
     }
 
     private String decrypt(String data) {
-//        var str = this._decodeUrlSaveBase64(data);
-//        var decipher = crypto.createDecipher("aes256", this.cryptSecret);
-//        str = decipher.update(str, 'base64', 'utf8') + decipher.final('base64');
-//        return str;
-        return null;
+        String str = decodeUrlSaveBase64(data);
+
+        try {
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.DECRYPT_MODE, cryptSecret);
+            return new String(c.doFinal(str.getBytes()));
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void validateToken(String token, Object callback) {

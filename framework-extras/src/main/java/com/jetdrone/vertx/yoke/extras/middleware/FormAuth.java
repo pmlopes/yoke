@@ -44,9 +44,12 @@ public class FormAuth extends Middleware {
     public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
         super.init(vertx, logger, mount);
         // trim the initial slash
-        // TODO: i think the trim is on the wrong place
-        loginURI = mount.substring(1) + loginURI;
-        logoutURI = mount.substring(1) + logoutURI;
+        String correctedMount = mount;
+        if (mount.endsWith("/")) {
+            correctedMount = correctedMount.substring(0, correctedMount.length() - 1);
+        }
+        loginURI = correctedMount + loginURI;
+        logoutURI = correctedMount + logoutURI;
         return this;
     }
 
@@ -80,8 +83,6 @@ public class FormAuth extends Middleware {
                     public void handle(JsonObject user) {
                         if (user != null) {
                             request.createSession();
-                            // TODO: save it and associate to the user id
-
                             // get the redirect_url parameter
                             String redirect = request.getParameter("redirect_url", "/");
 

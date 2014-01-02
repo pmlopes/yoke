@@ -55,7 +55,7 @@ dependencies {
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   // get yoke jar for parent
   provided project(':framework')
-  // get yoke jar for extras
+  // get yoke-extras jar for extras
   provided project(':framework-extras')
 }
 
