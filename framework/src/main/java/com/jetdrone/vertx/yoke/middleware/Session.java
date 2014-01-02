@@ -51,7 +51,7 @@ public class Session extends Middleware {
         cookie.setMaxAge(maxAge);
 
         // path validation mismatch
-        if (request.path().indexOf(cookie.getPath()) != 0) {
+        if (request.normalizedPath().indexOf(cookie.getPath()) != 0) {
             next.handle(null);
             return;
         }

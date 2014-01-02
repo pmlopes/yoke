@@ -30,4 +30,18 @@ public class YokeRequestTest extends TestVerticle {
 
         yoke.request("GET", "/", headers, null);
     }
+
+    @Test
+    public void testNormalizedPath() {
+        final YokeTester yoke = new YokeTester(this);
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                assertEquals("/pom.xml", request.normalizedPath());
+                testComplete();
+            }
+        });
+
+        yoke.request("GET", "/./me/../pom.xml", null);
+    }
 }

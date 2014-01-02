@@ -323,7 +323,7 @@ public class Static extends Middleware {
         if (!"GET".equals(request.method()) && !"HEAD".equals(request.method())) {
             next.handle(null);
         } else {
-            final String file = root + request.path();
+            final String file = root + request.normalizedPath();
 
             if (!includeHidden) {
                 int idx = file.lastIndexOf('/');

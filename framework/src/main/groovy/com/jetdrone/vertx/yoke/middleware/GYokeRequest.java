@@ -339,4 +339,7 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return localAddress();
     }
 
+    public String getNormalizedPath() {
+        return normalizedPath();
+    }
 }

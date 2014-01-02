@@ -586,6 +586,49 @@ public class YokeRequest implements HttpServerRequest {
         return request.path();
     }
 
+    private String cachedNormalizedPath = null;
+
+    public String normalizedPath() {
+        if (cachedNormalizedPath != null) {
+            return cachedNormalizedPath;
+        }
+
+        String path = request.path();
+        // path should start with / so we should ignore it
+        if (path.charAt(0) == '/') {
+            path = path().substring(1);
+        }
+
+        String[] parts = path.split("/");
+        Deque<String> resolved = new LinkedList<>();
+
+        for (String p : parts) {
+            if (".".equals(p)) {
+                continue;
+            }
+            if ("..".equals(p)) {
+                // if there is no entry the path is trying to jump outside the root
+                if (resolved.pollLast() == null) {
+                    return null;
+                }
+                continue;
+            }
+
+            resolved.offerLast(p);
+        }
+
+        // re assemble the path
+        StringBuilder sb = new StringBuilder();
+
+        for (String s : resolved) {
+            sb.append("/");
+            sb.append(s);
+        }
+
+        cachedNormalizedPath = sb.toString();
+        return cachedNormalizedPath;
+    }
+
     /**
      * @see org.vertx.java.core.http.HttpServerRequest#query()
      */

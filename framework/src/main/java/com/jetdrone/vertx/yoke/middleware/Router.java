@@ -723,6 +723,7 @@ public class Router extends Middleware {
 
     private void route(final YokeRequest request, final Handler<Object> next, final List<PatternBinding> bindings) {
         for (final PatternBinding binding: bindings) {
+            // TODO: use normalized path?
             final Matcher m = binding.pattern.matcher(request.path());
             if (m.matches()) {
                 final MultiMap params = request.params();

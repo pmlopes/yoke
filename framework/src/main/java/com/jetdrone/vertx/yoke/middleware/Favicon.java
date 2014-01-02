@@ -139,7 +139,7 @@ public class Favicon extends Middleware {
 
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
-        if ("/favicon.ico".equals(request.path())) {
+        if ("/favicon.ico".equals(request.normalizedPath())) {
             request.response().headers().set(icon.headers);
             request.response().end(icon.body);
         } else {
