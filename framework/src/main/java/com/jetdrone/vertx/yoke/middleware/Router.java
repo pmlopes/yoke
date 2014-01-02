@@ -130,10 +130,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP GET
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router get(String pattern, Middleware handler) {
-        addPattern(pattern, handler, getBindings);
+    public Router get(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, getBindings);
+        }
         return this;
     }
 
@@ -154,10 +156,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP PUT
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router put(String pattern, Middleware handler) {
-        addPattern(pattern, handler, putBindings);
+    public Router put(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, putBindings);
+        }
         return this;
     }
 
@@ -178,10 +182,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP POST
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router post(String pattern, Middleware handler) {
-        addPattern(pattern, handler, postBindings);
+    public Router post(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, postBindings);
+        }
         return this;
     }
 
@@ -202,10 +208,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP DELETE
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router delete(String pattern, Middleware handler) {
-        addPattern(pattern, handler, deleteBindings);
+    public Router delete(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, deleteBindings);
+        }
         return this;
     }
 
@@ -226,10 +234,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP OPTIONS
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router options(String pattern, Middleware handler) {
-        addPattern(pattern, handler, optionsBindings);
+    public Router options(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, optionsBindings);
+        }
         return this;
     }
 
@@ -250,10 +260,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP HEAD
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router head(String pattern, Middleware handler) {
-        addPattern(pattern, handler, headBindings);
+    public Router head(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, headBindings);
+        }
         return this;
     }
 
@@ -274,10 +286,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP TRACE
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router trace(String pattern, Middleware handler) {
-        addPattern(pattern, handler, traceBindings);
+    public Router trace(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, traceBindings);
+        }
         return this;
     }
 
@@ -298,10 +312,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP CONNECT
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router connect(String pattern, Middleware handler) {
-        addPattern(pattern, handler, connectBindings);
+    public Router connect(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, connectBindings);
+        }
         return this;
     }
 
@@ -322,10 +338,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP PATCH
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router patch(String pattern, Middleware handler) {
-        addPattern(pattern, handler, patchBindings);
+    public Router patch(String pattern, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addPattern(pattern, handler, patchBindings);
+        }
         return this;
     }
 
@@ -348,7 +366,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router all(String pattern, Middleware handler) {
+    public Router all(String pattern, Middleware... handler) {
         get(pattern, handler);
         put(pattern, handler);
         post(pattern, handler);
@@ -382,10 +400,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP GET
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router get(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, getBindings);
+    public Router get(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, getBindings);
+        }
         return this;
     }
 
@@ -406,10 +426,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP PUT
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router put(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, putBindings);
+    public Router put(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, putBindings);
+        }
         return this;
     }
 
@@ -430,10 +452,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP POST
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router post(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, postBindings);
+    public Router post(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, postBindings);
+        }
         return this;
     }
 
@@ -454,10 +478,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP DELETE
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router delete(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, deleteBindings);
+    public Router delete(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, deleteBindings);
+        }
         return this;
     }
 
@@ -478,10 +504,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP OPTIONS
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router options(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, optionsBindings);
+    public Router options(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, optionsBindings);
+        }
         return this;
     }
 
@@ -502,10 +530,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP HEAD
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router head(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, headBindings);
+    public Router head(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, headBindings);
+        }
         return this;
     }
 
@@ -526,10 +556,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP TRACE
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router trace(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, traceBindings);
+    public Router trace(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, traceBindings);
+        }
         return this;
     }
 
@@ -550,10 +582,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP CONNECT
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router connect(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, connectBindings);
+    public Router connect(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, connectBindings);
+        }
         return this;
     }
 
@@ -574,10 +608,12 @@ public class Router extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP PATCH
      * @param regex A regular expression
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public Router patch(Pattern regex, Middleware handler) {
-        addRegEx(regex, handler, patchBindings);
+    public Router patch(Pattern regex, Middleware... handlers) {
+        for (Middleware handler : handlers) {
+            addRegEx(regex, handler, patchBindings);
+        }
         return this;
     }
 
@@ -600,7 +636,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router all(Pattern regex, Middleware handler) {
+    public Router all(Pattern regex, Middleware... handler) {
         get(regex, handler);
         put(regex, handler);
         post(regex, handler);

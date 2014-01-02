@@ -52,210 +52,252 @@ public class GRouter extends Middleware {
     /**
      * Specify a middleware that will be called for a matching HTTP GET
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter get(String pattern, Closure handler) {
-        jRouter.get(pattern, wrapClosure(handler));
+    public GRouter get(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.get(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP PUT
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter put(String pattern, Closure handler) {
-        jRouter.put(pattern, wrapClosure(handler));
+    public GRouter put(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.put(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP POST
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter post(String pattern, Closure handler) {
-        jRouter.post(pattern, wrapClosure(handler));
+    public GRouter post(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.post(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP DELETE
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter delete(String pattern, Closure handler) {
-        jRouter.delete(pattern, wrapClosure(handler));
+    public GRouter delete(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.delete(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP OPTIONS
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter options(String pattern, Closure handler) {
-        jRouter.options(pattern, wrapClosure(handler));
+    public GRouter options(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.options(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP HEAD
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter head(String pattern, Closure handler) {
-        jRouter.head(pattern, wrapClosure(handler));
+    public GRouter head(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.head(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP TRACE
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter trace(String pattern, Closure handler) {
-        jRouter.trace(pattern, wrapClosure(handler));
+    public GRouter trace(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.trace(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP CONNECT
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter connect(String pattern, Closure handler) {
-        jRouter.trace(pattern, wrapClosure(handler));
+    public GRouter connect(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.trace(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP PATCH
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter patch(String pattern, Closure handler) {
-        jRouter.trace(pattern, wrapClosure(handler));
+    public GRouter patch(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.trace(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for all HTTP methods
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter all(String pattern, Closure handler) {
-        jRouter.all(pattern, wrapClosure(handler));
+    public GRouter all(String pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.all(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP GET
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter get(Pattern pattern, Closure handler) {
-        jRouter.get(pattern, wrapClosure(handler));
+    public GRouter get(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.get(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP PUT
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter put(Pattern pattern, Closure handler) {
-        jRouter.put(pattern, wrapClosure(handler));
+    public GRouter put(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.put(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP POST
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter post(Pattern pattern, Closure handler) {
-        jRouter.post(pattern, wrapClosure(handler));
+    public GRouter post(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.post(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP DELETE
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter delete(Pattern pattern, Closure handler) {
-        jRouter.delete(pattern, wrapClosure(handler));
+    public GRouter delete(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.delete(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP OPTIONS
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter options(Pattern pattern, Closure handler) {
-        jRouter.options(pattern, wrapClosure(handler));
+    public GRouter options(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.options(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP HEAD
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter head(Pattern pattern, Closure handler) {
-        jRouter.head(pattern, wrapClosure(handler));
+    public GRouter head(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.head(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP TRACE
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter trace(Pattern pattern, Closure handler) {
-        jRouter.trace(pattern, wrapClosure(handler));
+    public GRouter trace(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.trace(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP CONNECT
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter connect(Pattern pattern, Closure handler) {
-        jRouter.trace(pattern, wrapClosure(handler));
+    public GRouter connect(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.trace(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for a matching HTTP PATCH
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter patch(Pattern pattern, Closure handler) {
-        jRouter.trace(pattern, wrapClosure(handler));
+    public GRouter patch(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.trace(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for all HTTP methods
      * @param pattern The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter all(Pattern pattern, Closure handler) {
-        jRouter.all(pattern, wrapClosure(handler));
+    public GRouter all(Pattern pattern, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.all(pattern, wrapClosure(handler));
+        }
         return this;
     }
 
     /**
      * Specify a middleware that will be called for all HTTP methods
      * @param param The simple pattern
-     * @param handler The middleware to call
+     * @param handlers The middleware to call
      */
-    public GRouter param(String param, Closure handler) {
-        jRouter.param(param, wrapClosure(handler));
+    public GRouter param(String param, Closure... handlers) {
+        for (Closure handler : handlers) {
+            jRouter.param(param, wrapClosure(handler));
+        }
         return this;
     }
 
