@@ -17,17 +17,11 @@ import org.vertx.java.platform.Verticle;
 import javax.crypto.Mac;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
 
 public class Persona extends Verticle {
 
     @Override
     public void start() {
-
-        // This is an example only, use a proper persistent storage
-        final ConcurrentMap<String, String> storage = vertx.sharedData().getMap("session.storage.persona");
-
         final Yoke yoke = new Yoke(this);
         yoke.engine("html", new StringPlaceholderEngine());
 
@@ -45,25 +39,32 @@ public class Persona extends Verticle {
                 .get("/", new Middleware() {
                     @Override
                     public void handle(final YokeRequest request, final Handler<Object> next) {
-                        String sid = request.getSessionId();
-                        String email = storage.get(sid == null ? "" : sid);
+                        request.loadSessionData(new Handler<JsonObject>() {
+                            @Override
+                            public void handle(JsonObject sessionData) {
+                                if (sessionData == null) {
+                                    // no session
+                                    request.put("email", "null");
+                                } else {
+                                    String email = sessionData.getString("email");
 
-                        if (email == null) {
-                            request.put("email", "null");
-                        } else {
-                            request.put("email", "'" + email + "'");
-                        }
-                        request.response().render("views/index.html", next);
+                                    if (email == null) {
+                                        request.put("email", "null");
+                                    } else {
+                                        request.put("email", "'" + email + "'");
+                                    }
+                                }
+
+                                request.response().render("views/index.html", next);
+                            }
+                        });
                     }
                 })
                 .post("/auth/logout", new Middleware() {
                     @Override
                     public void handle(YokeRequest request, Handler<Object> next) {
-                        // remove session from storage
-                        String sid = request.getSessionId();
-                        storage.remove(sid == null ? "" : sid);
                         // destroy session
-                        request.setSessionId(null);
+                        request.destroySession();
                         // send OK
                         request.response().end(new JsonObject().putBoolean("success", true));
                     }
@@ -111,16 +112,22 @@ public class Persona extends Verticle {
                                             JsonObject verifierResp = new JsonObject(body.toString());
                                             boolean valid = "okay".equals(verifierResp.getString("status"));
                                             String email = valid ? verifierResp.getString("email") : null;
+                                            // assertion is valid:
                                             if (valid) {
-                                                // assertion is valid:
                                                 // generate a session Id
-                                                String sid = UUID.randomUUID().toString();
-
-                                                request.setSessionId(sid);
+                                                String sid = request.createSession();
                                                 // save it and associate to the email address
-                                                storage.put(sid, email);
-                                                // OK response
-                                                request.response().end(new JsonObject().putBoolean("success", true));
+                                                request.saveSessionData(new JsonObject().putString("email", email), new Handler<String>() {
+                                                    @Override
+                                                    public void handle(String status) {
+                                                        if (!"ok".equals(status)) {
+                                                            next.handle(status);
+                                                            return;
+                                                        }
+                                                        // OK response
+                                                        request.response().end(new JsonObject().putBoolean("success", true));
+                                                    }
+                                                });
                                             } else {
                                                 request.response().end(new JsonObject().putBoolean("success", false));
                                             }

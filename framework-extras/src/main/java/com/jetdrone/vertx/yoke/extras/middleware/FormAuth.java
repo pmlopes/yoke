@@ -8,13 +8,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 
-import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
-
 public class FormAuth extends Middleware {
-
-    // This is an example only, use a proper persistent storage
-    final ConcurrentMap<String, String> storage = vertx.sharedData().getMap("session.storage.form.auth");
 
     private final AuthHandler authHandler;
 
@@ -50,6 +44,7 @@ public class FormAuth extends Middleware {
     public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
         super.init(vertx, logger, mount);
         // trim the initial slash
+        // TODO: i think the trim is on the wrong place
         loginURI = mount.substring(1) + loginURI;
         logoutURI = mount.substring(1) + logoutURI;
         return this;
@@ -84,10 +79,7 @@ public class FormAuth extends Middleware {
                     @Override
                     public void handle(JsonObject user) {
                         if (user != null) {
-                            // generate a session Id
-                            String sid = UUID.randomUUID().toString();
-
-                            request.setSessionId(sid);
+                            request.createSession();
                             // TODO: save it and associate to the user id
 
                             // get the redirect_url parameter
@@ -115,10 +107,8 @@ public class FormAuth extends Middleware {
         if (request.path().equals(logoutURI)) {
             if ("GET".equals(request.method())) {
                 // remove session from storage
-                String sid = request.getSessionId();
-                storage.remove(sid == null ? "" : sid);
-                // destroy session
-                request.setSessionId(null);
+                request.destroySession();
+                // TODO: redirect?
                 request.response().end();
                 return;
             }

@@ -2,20 +2,35 @@ package com.jetdrone.vertx.yoke.extras.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 
 public class OAuth2Provider extends Middleware {
 
-    private String cryptSecret;
+    interface OAuth2Store {
+        void lookupGrant(String clientId, String clientSecret, String code, Handler<String> handler);
+        void createAccessToken(String userId, String clientId, Handler<String> handler);
+    }
+
+    private Key cryptSecret;
+    private OAuth2Store store;
 
     public OAuth2Provider(String signKey) {
-        cryptSecret = signKey;
+        cryptSecret = new SecretKeySpec(signKey.getBytes(), "AES");
     }
 
     private String encodeUrlSaveBase64(String str) {
-        // return str.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=+$/, '');
-
-        return null;
+        return str.replaceAll("\\+", "-").replaceAll("/", "_").replaceAll("=+$", "");
     }
 
     private String decodeUrlSaveBase64(String str) {
@@ -25,11 +40,13 @@ public class OAuth2Provider extends Middleware {
     }
 
     private String encrypt(String data) {
-//        var cipher = crypto.createCipher("aes256", this.cryptSecret);
-//        var str = cipher.update(data, 'utf8', 'base64') + cipher.final('base64');
-//        str = this._encodeUrlSaveBase64(str);
-//        return str;
-        return null;
+        try {
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, cryptSecret);
+            return encodeUrlSaveBase64(Utils.base64(c.doFinal(data.getBytes())));
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String decrypt(String data) {
@@ -152,25 +169,34 @@ public class OAuth2Provider extends Middleware {
 //        return res.end();
     }
 
-    private void postAccessToken(YokeRequest request, Handler<Object> next) {
-//        var self = this,
-//                clientId = req.body.client_id,
-//                clientSecret = req.body.client_secret,
-//                redirectUri = req.body.redirect_uri,
-//                code = req.body.code;
-//
-//        try {
-//                code = self._decrypt(code);
-//        } catch(e) {
-//                return self.emit('accessDenied', req, res);
-//        }
-//
-//        self.emit('lookupGrant', clientId, clientSecret, code, res, function(userId) {
-//                self.emit('createAccessToken', userId, clientId, function(tokenDataStr) {
-//                        var atok = self._encrypt(tokenDataStr);
-//                        res.json({access_token:atok});
-//                });
-//        });
+    private void postAccessToken(final YokeRequest request, Handler<Object> next) {
+        final String clientId = request.formAttributes().get("client_id");
+        final String clientSecret = request.formAttributes().get("client_secret");
+        final String redirectUri = request.formAttributes().get("redirect_uri");
+        String code = request.formAttributes().get("code");
+
+        try {
+            code = decrypt(code);
+        } catch (RuntimeException e) {
+            // TODO: proper error
+            next.handle("accessDenied");
+            return;
+        }
+
+        store.lookupGrant(clientId, clientSecret, code, new Handler<String>() {
+            @Override
+            public void handle(String userId) {
+                // TODO: if null?
+                store.createAccessToken(userId, clientId, new Handler<String>() {
+                    @Override
+                    public void handle(String tokenDataStr) {
+                        // TODO: if null?
+                        String atok = encrypt(tokenDataStr);
+                        request.response().end(new JsonObject().putString("access_token", atok));
+                    }
+                });
+            }
+        });
     }
 
     @Override

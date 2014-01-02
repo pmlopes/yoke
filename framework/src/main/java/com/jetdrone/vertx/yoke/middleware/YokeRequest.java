@@ -329,12 +329,51 @@ public class YokeRequest implements HttpServerRequest {
         this.cookies = cookies;
     }
 
-    public void setSessionId(String sessionId) {
-        this.sessionId = sessionId;
+    public String sessionId() {
+        return sessionId;
     }
 
-    public String getSessionId() {
-        return sessionId;
+    public void loadSessionData(Handler<JsonObject> handler) {
+        if (sessionId == null) {
+            handler.handle(null);
+            return;
+        }
+
+        store.get(sessionId, handler);
+    }
+
+    public void saveSessionData(JsonObject sessionData, Handler<String> handler) {
+        if (sessionId == null) {
+            handler.handle("no session");
+            return;
+        }
+
+        store.set(sessionId, sessionData, handler);
+    }
+
+    public void destroySession(Handler<String> handler) {
+        if (sessionId == null) {
+            handler.handle("no session");
+            return;
+        }
+
+        store.destroy(sessionId, handler);
+        sessionId = null;
+    }
+
+    public void destroySession() {
+        destroySession(new Handler<String>() {
+            @Override
+            public void handle(String event) {}
+        });
+    }
+
+    protected String createSession(String sid) {
+        return sessionId = sid;
+    }
+
+    public String createSession() {
+        return createSession(UUID.randomUUID().toString());
     }
 
     public boolean isSecure() {

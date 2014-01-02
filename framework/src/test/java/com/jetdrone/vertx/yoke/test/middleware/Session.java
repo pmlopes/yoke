@@ -34,14 +34,14 @@ public class Session extends TestVerticle {
             get("/new", new Handler<YokeRequest>() {
                 @Override
                 public void handle(YokeRequest request) {
-                    request.setSessionId("1");
+                    request.createSession();
                     request.response().end();
                 }
             });
             get("/delete", new Handler<YokeRequest>() {
                 @Override
                 public void handle(YokeRequest request) {
-                    request.setSessionId(null);
+                    request.destroySession();
                     request.response().end();
                 }
             });

@@ -123,15 +123,26 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void length(Handler<Integer> callback) {
-        // REDIS keys prefix *
-        // return length
-        throw new RuntimeException("Not implemented!");
+    public void length(final Handler<Integer> next) {
+        JsonObject redis = new JsonObject();
+        redis.putString("command", "keys");
+        redis.putArray("args", new JsonArray().add(prefix + "*"));
+
+        eventBus.send(redisAddress, redis, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> message) {
+                if (!"ok".equals(message.body().getString("status"))) {
+                    next.handle(0);
+                } else {
+                    JsonArray keys = message.body().getArray("value");
+                    next.handle(keys.size());
+                }
+            }
+        });
     }
 
 
     private void getKeys(final Handler<JsonArray> next) {
-
         JsonObject redis = new JsonObject();
         redis.putString("command", "keys");
         redis.putArray("args", new JsonArray().add(prefix + "*"));
@@ -156,6 +167,5 @@ public class RedisSessionStore implements SessionStore {
                 }
             }
         });
-
     }
 }

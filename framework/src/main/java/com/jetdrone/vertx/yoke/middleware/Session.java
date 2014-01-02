@@ -67,7 +67,7 @@ public class Session extends Middleware {
                 String unsigned = sessionCookie.getUnsignedValue();
                 if (unsigned != null) {
                     hash = crc16(unsigned);
-                    request.setSessionId(unsigned);
+                    request.createSession(unsigned);
                 }
             }
         }
@@ -79,7 +79,7 @@ public class Session extends Middleware {
         response.headersHandler(new Handler<Void>() {
             @Override
             public void handle(Void done) {
-                String sessionId = request.getSessionId();
+                String sessionId = request.sessionId();
 
                 // removed
                 if (sessionId == null) {
