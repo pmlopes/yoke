@@ -594,18 +594,26 @@ public class YokeRequest implements HttpServerRequest {
         }
 
         String path = request.path();
+
         // path should start with / so we should ignore it
         if (path.charAt(0) == '/') {
-            path = path().substring(1);
+            path = path.substring(1);
+        } else {
+            return null;
         }
 
         String[] parts = path.split("/");
         Deque<String> resolved = new LinkedList<>();
 
         for (String p : parts) {
+            if ("".equals(p)) {
+                continue;
+            }
+
             if (".".equals(p)) {
                 continue;
             }
+
             if ("..".equals(p)) {
                 // if there is no entry the path is trying to jump outside the root
                 if (resolved.pollLast() == null) {
@@ -615,6 +623,11 @@ public class YokeRequest implements HttpServerRequest {
             }
 
             resolved.offerLast(p);
+        }
+
+        if (resolved.size() == 0) {
+            cachedNormalizedPath = "/";
+            return cachedNormalizedPath;
         }
 
         // re assemble the path

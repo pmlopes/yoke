@@ -44,4 +44,60 @@ public class YokeRequestTest extends TestVerticle {
 
         yoke.request("GET", "/./me/../pom.xml", null);
     }
+
+    @Test
+    public void testNormalizedPath2() {
+        final YokeTester yoke = new YokeTester(this);
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                assertEquals("/", request.normalizedPath());
+                testComplete();
+            }
+        });
+
+        yoke.request("GET", "/", null);
+    }
+
+    @Test
+    public void testNormalizedPath3() {
+        final YokeTester yoke = new YokeTester(this);
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                assertNull(request.normalizedPath());
+                testComplete();
+            }
+        });
+
+        yoke.request("GET", "/%2e%2e%2f", null);
+    }
+
+    @Test
+    public void testNormalizedPath4() {
+        final YokeTester yoke = new YokeTester(this);
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                assertNull(request.normalizedPath());
+                testComplete();
+            }
+        });
+
+        yoke.request("GET", "/%2e%2e/", null);
+    }
+
+    @Test
+    public void testNormalizedPath5() {
+        final YokeTester yoke = new YokeTester(this);
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                assertNull(request.normalizedPath());
+                testComplete();
+            }
+        });
+
+        yoke.request("GET", "/..%2f", null);
+    }
 }
