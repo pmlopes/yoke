@@ -19,8 +19,9 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import javax.crypto.Mac;
+import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -30,7 +31,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URLEncoder;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Set;
 
@@ -149,6 +152,15 @@ public final class Utils {
     }
 
     /**
+     * Creates a new Crypto KEY
+     * @param secret The secret key used to create signatures
+     * @return Key implementation
+     */
+    public static Key newCryptoKey(String secret) {
+        return new SecretKeySpec(secret.getBytes(), "AES");
+    }
+
+    /**
      * Signs a String value with a given MAC
      */
     public static String sign(String val, Mac mac) {
@@ -171,6 +183,29 @@ public final class Utils {
             return str;
         }
         return null;
+    }
+
+    public static String encrypt(String val, Key key) {
+        try {
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, key);
+            byte[] encVal = c.doFinal(val.getBytes());
+            return base64(encVal);
+        } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String decrypt(String val, Key key) {
+        try {
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.DECRYPT_MODE, key);
+            byte[] decordedValue = DatatypeConverter.parseBase64Binary(val);
+            byte[] decValue = c.doFinal(decordedValue);
+            return new String(decValue);
+        } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String escape(String html) {
@@ -276,5 +311,23 @@ public final class Utils {
             // end with element name
             writer.writeEndElement();
         }
+    }
+
+    public static String encodeURIComponent(String s) {
+        String result;
+
+        try {
+            result = URLEncoder.encode(s, "UTF-8")
+                    .replaceAll("\\+", "%20")
+                    .replaceAll("%21", "!")
+                    .replaceAll("%27", "'")
+                    .replaceAll("%28", "(")
+                    .replaceAll("%29", ")")
+                    .replaceAll("%7E", "~");
+        } catch (UnsupportedEncodingException e) {
+            result = s;
+        }
+
+        return result;
     }
 }
