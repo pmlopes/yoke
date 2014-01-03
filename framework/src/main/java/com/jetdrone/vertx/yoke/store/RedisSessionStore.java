@@ -1,12 +1,11 @@
 package com.jetdrone.vertx.yoke.store;
 
+import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-
-import java.util.Iterator;
 
 public class RedisSessionStore implements SessionStore {
 
@@ -109,17 +108,93 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void all(Handler<JsonArray> callback) {
-        // REDIS keys prefix *
-        // for each fetch
-        throw new RuntimeException("Not implemented!");
+    public void all(final Handler<JsonArray> next) {
+        JsonObject redis = new JsonObject();
+        redis.putString("command", "keys");
+        redis.putArray("args", new JsonArray().add(prefix + "*"));
+
+        final JsonArray results = new JsonArray();
+
+        eventBus.send(redisAddress, redis, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> message) {
+                if (!"ok".equals(message.body().getString("status"))) {
+                    next.handle(null);
+                } else {
+                    JsonArray keys = message.body().getArray("value");
+
+                    new AsyncIterator<Object>(keys.iterator()) {
+                        @Override
+                        public void handle(Object key) {
+                            if (!isEnd()) {
+                                JsonObject redis = new JsonObject();
+                                redis.putString("command", "get");
+                                redis.putArray("args", new JsonArray().add(key));
+
+                                eventBus.send(redisAddress, redis, new Handler<Message<JsonObject>>() {
+                                    @Override
+                                    public void handle(Message<JsonObject> message) {
+                                        if (!"ok".equals(message.body().getString("status"))) {
+                                            next.handle(null);
+                                        } else {
+                                            String value = message.body().getString("value");
+                                            if (value != null) {
+                                                results.add(new JsonObject(value));
+                                            }
+                                            next();
+                                        }
+                                    }
+                                });
+                            } else {
+                                next.handle(results);
+                            }
+                        }
+                    };
+                }
+            }
+        });
     }
 
     @Override
-    public void clear(Handler<String> callback) {
-        // REDIS keys prefix *
-        // for each DEL
-        throw new RuntimeException("Not implemented!");
+    public void clear(final Handler<String> next) {
+        JsonObject redis = new JsonObject();
+        redis.putString("command", "keys");
+        redis.putArray("args", new JsonArray().add(prefix + "*"));
+
+        eventBus.send(redisAddress, redis, new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> message) {
+                if (!"ok".equals(message.body().getString("status"))) {
+                    next.handle(message.body().getString("status"));
+                } else {
+                    JsonArray keys = message.body().getArray("value");
+
+                    new AsyncIterator<Object>(keys.iterator()) {
+                        @Override
+                        public void handle(Object key) {
+                            if (!isEnd()) {
+                                JsonObject redis = new JsonObject();
+                                redis.putString("command", "del");
+                                redis.putArray("args", new JsonArray().add(key));
+
+                                eventBus.send(redisAddress, redis, new Handler<Message<JsonObject>>() {
+                                    @Override
+                                    public void handle(Message<JsonObject> message) {
+                                        if (!"ok".equals(message.body().getString("status"))) {
+                                            next.handle(message.body().getString("status"));
+                                        } else {
+                                            next();
+                                        }
+                                    }
+                                });
+                            } else {
+                                next.handle("ok");
+                            }
+                        }
+                    };
+                }
+            }
+        });
     }
 
     @Override
