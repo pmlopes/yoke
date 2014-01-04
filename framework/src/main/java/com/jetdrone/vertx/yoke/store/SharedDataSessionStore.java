@@ -28,13 +28,13 @@ public class SharedDataSessionStore implements SessionStore {
     }
 
     @Override
-    public void set(String sid, JsonObject sess, Handler<String> callback) {
+    public void set(String sid, JsonObject sess, Handler<Object> callback) {
         storage.put(sid, sess.encode());
         callback.handle(null);
     }
 
     @Override
-    public void destroy(String sid, Handler<String> callback) {
+    public void destroy(String sid, Handler<Object> callback) {
         storage.remove(sid);
         callback.handle(null);
     }
@@ -49,9 +49,9 @@ public class SharedDataSessionStore implements SessionStore {
     }
 
     @Override
-    public void clear(Handler<String> callback) {
+    public void clear(Handler<Object> callback) {
         storage.clear();
-        callback.handle("ok");
+        callback.handle(null);
     }
 
     @Override

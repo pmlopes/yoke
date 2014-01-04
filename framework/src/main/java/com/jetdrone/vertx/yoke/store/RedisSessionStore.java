@@ -52,7 +52,7 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void set(String sid, JsonObject sess, final Handler<String> callback) {
+    public void set(String sid, JsonObject sess, final Handler<Object> callback) {
         sid = prefix + sid;
 
         Integer maxAge = null;
@@ -88,7 +88,7 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void destroy(String sid, final Handler<String> callback) {
+    public void destroy(String sid, final Handler<Object> callback) {
         sid = this.prefix + sid;
 
         JsonObject redis = new JsonObject();
@@ -156,7 +156,7 @@ public class RedisSessionStore implements SessionStore {
     }
 
     @Override
-    public void clear(final Handler<String> next) {
+    public void clear(final Handler<Object> next) {
         JsonObject redis = new JsonObject();
         redis.putString("command", "keys");
         redis.putArray("args", new JsonArray().add(prefix + "*"));
@@ -188,7 +188,7 @@ public class RedisSessionStore implements SessionStore {
                                     }
                                 });
                             } else {
-                                next.handle("ok");
+                                next.handle(null);
                             }
                         }
                     };
