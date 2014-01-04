@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke;
+package com.jetdrone.vertx.yoke.core;
 
 import java.util.Collection;
 import java.util.HashMap;

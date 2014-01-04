@@ -342,7 +342,7 @@ public class YokeRequest implements HttpServerRequest {
         store.get(sessionId, handler);
     }
 
-    public void saveSessionData(JsonObject sessionData, Handler<String> handler) {
+    public void saveSessionData(JsonObject sessionData, Handler<Object> handler) {
         if (sessionId == null) {
             createSession();
         }
@@ -350,7 +350,7 @@ public class YokeRequest implements HttpServerRequest {
         store.set(sessionId, sessionData, handler);
     }
 
-    public void destroySession(Handler<String> handler) {
+    public void destroySession(Handler<Object> handler) {
         if (sessionId == null) {
             handler.handle("no session");
             return;
@@ -361,9 +361,9 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     public void destroySession() {
-        destroySession(new Handler<String>() {
+        destroySession(new Handler<Object>() {
             @Override
-            public void handle(String event) {}
+            public void handle(Object event) {}
         });
     }
 

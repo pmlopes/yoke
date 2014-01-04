@@ -1,8 +1,9 @@
 // Copyright 2011-2013 the original author or authors.
 //
 // @package com.jetdrone.vertx.yoke
-package com.jetdrone.vertx.yoke;
+package com.jetdrone.vertx.yoke.core;
 
+import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.http.HttpServerRequest;
 

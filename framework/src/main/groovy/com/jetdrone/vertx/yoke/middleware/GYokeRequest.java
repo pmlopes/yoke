@@ -361,18 +361,18 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     }
 
     public void saveSessionData(Map<String, Object> sessionData, final Closure handler) {
-        saveSessionData(new JsonObject(sessionData), new Handler<String>() {
+        saveSessionData(new JsonObject(sessionData), new Handler<Object>() {
             @Override
-            public void handle(String status) {
+            public void handle(Object status) {
                 handler.call(status);
             }
         });
     }
 
     public void destroySession(final Closure handler) {
-        destroySession(new Handler<String>() {
+        destroySession(new Handler<Object>() {
             @Override
-            public void handle(String status) {
+            public void handle(Object status) {
                 handler.call(status);
             }
         });

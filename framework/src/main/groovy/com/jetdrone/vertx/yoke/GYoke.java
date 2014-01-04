@@ -15,6 +15,8 @@
  */
 package com.jetdrone.vertx.yoke;
 
+import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.GYokeRequest;
 import com.jetdrone.vertx.yoke.middleware.GYokeResponse;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;

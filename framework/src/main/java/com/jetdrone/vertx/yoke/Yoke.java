@@ -3,6 +3,8 @@
 // @package com.jetdrone.vertx.yoke
 package com.jetdrone.vertx.yoke;
 
+import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import com.jetdrone.vertx.yoke.store.SessionStore;

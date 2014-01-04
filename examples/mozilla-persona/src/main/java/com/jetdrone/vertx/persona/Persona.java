@@ -117,11 +117,11 @@ public class Persona extends Verticle {
                                                 // generate a session Id
                                                 String sid = request.createSession();
                                                 // save it and associate to the email address
-                                                request.saveSessionData(new JsonObject().putString("email", email), new Handler<String>() {
+                                                request.saveSessionData(new JsonObject().putString("email", email), new Handler<Object>() {
                                                     @Override
-                                                    public void handle(String status) {
-                                                        if (!"ok".equals(status)) {
-                                                            next.handle(status);
+                                                    public void handle(Object err) {
+                                                        if (err != null) {
+                                                            next.handle(err);
                                                             return;
                                                         }
                                                         // OK response
