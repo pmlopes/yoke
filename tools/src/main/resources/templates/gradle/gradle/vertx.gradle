@@ -80,8 +80,18 @@ buildscript {
   dependencies {
     classpath "io.vertx:vertx-core:$vertxVersion"
     classpath "io.vertx:vertx-platform:$vertxVersion"
-    // classpath "io.vertx:vertx-hazelcast:$vertxVersion"
-    classpath files(['src/main/resources'])
+    classpath "io.vertx:vertx-hazelcast:$vertxVersion"
+
+    // Extra classpath for Vert.x
+
+    // Users can be Vert.x platform classpath files (e.g. langs.properties) in either src/main/platform_lib
+    // or src/main/resources/platform_lib (if they want it in the module for fatjars)
+    classpath files(['src/main/platform-lib'])
+    classpath files(['src/main/platform-lib/*.jar'])
+    classpath files(['src/main/platform-lib/*.zip'])
+    classpath files(['src/main/resources/platform-lib'])
+    classpath files(['src/main/resources/platform-lib/*.jar'])
+    classpath files(['src/main/resources/platform-lib/*.zip'])
   }
 }
 
@@ -145,40 +155,34 @@ test {
   systemProperty 'vertx.mods', "build/mods"
 }
 
-task runModIDEA(dependsOn: copyMod, description: 'Run the module from the resources in IntelliJ') << {
-  runModWithClasspath("file:src/main/resources/${cpSeparator}file:src/test/resources/${cpSeparator}" +
-                      "file:out/production/${project.name}/${cpSeparator}file:out/test/${project.name}/");
-}
-
-task runModEclipse(dependsOn: copyMod, description: 'Run the module from the resources in Eclipse') << {
-  runModWithClasspath("file:src/main/resources/${cpSeparator}file:src/test/resources/${cpSeparator}file:bin/");
-}
-
-def runModWithClasspath(String classpath) {
+task init(description: 'Create module link and CP file') << {
   setSysProps()
-  def args = ['runmod', moduleName]
+  doInit()
+}
+
+task runMod(description: 'Run the module') << {
+  setSysProps()
+  // We also init here - this means for single module builds the user doesn't have to explicitly init -
+  // they can just do runMod
+  doInit()
+  args = ['runmod', moduleName]
   def args2 = runModArgs.split("\\s+")
-  // Ignore any -cp
-  boolean ignoring = false
-  for (String arg: args2) {
-    if (arg == '-cp') {
-      ignoring = true
-    } else if (!ignoring) {
-      args.add(arg)
-    } else {
-      ignoring = false
-    }
-  }
-  args.add('-cp')
-  args.add(classpath)
+  args.addAll(args2)
   Starter.main(args as String[])
 }
 
-task runMod(dependsOn: copyMod, description: 'Run the module using all the build dependencies (not using installed vertx') << {
-  setSysProps()
-  def args = ['runmod', moduleName]
-  def args2 = runModArgs.split("\\s+")
-  args.addAll(args2)
+def doInit() {
+  File cpFile = new File("vertx_classpath.txt")
+  if (!cpFile.exists()) {
+    cpFile.createNewFile();
+    String defaultCp =
+      "src/main/resources\r\n" +
+      "bin\r\n" +
+      "out/production/${project.name}\r\n" +
+      "out/test/${project.name}";
+    cpFile << defaultCp;
+  }
+  def args = ['create-module-link', moduleName]
   Starter.main(args as String[])
 }
 
@@ -200,7 +204,11 @@ task fatJar(dependsOn: modZip, description: 'Creates a fat executable jar which 
 
 def setSysProps() {
   System.setProperty("vertx.clusterManagerFactory", "org.vertx.java.spi.cluster.impl.hazelcast.HazelcastClusterManagerFactory")
-  System.setProperty("vertx.mods", "build/mods")
+  String modsDir = System.getenv("VERTX_MODS")
+  if (modsDir == null) {
+    modsDir = "build/mods";
+  }
+  System.setProperty("vertx.mods", modsDir)
 }
 
 def loadProperties(String sourceFileName) {
