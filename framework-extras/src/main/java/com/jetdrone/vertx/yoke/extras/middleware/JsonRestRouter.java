@@ -206,7 +206,7 @@ public class JsonRestRouter extends Router {
 
                             // TODO: handle overwrite
                             final JsonObject obj = event.result();
-                            obj.mergeIn(request.jsonBody());
+                            obj.mergeIn((JsonObject) request.jsonBody());
 
                             // update back to the db
                             store.update(idName, id, obj, new AsyncResultHandler<Number>() {

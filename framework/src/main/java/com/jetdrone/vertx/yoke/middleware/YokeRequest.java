@@ -10,6 +10,7 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
+import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.net.NetSocket;
@@ -256,11 +257,14 @@ public class YokeRequest implements HttpServerRequest {
     /**
      * A parsed Json Array if body is detected to contain a valid String for Json Object.
      */
-    public JsonObject jsonBody() {
-        if (body != null && body instanceof String) {
-            boolean flag = get("valid_json_object", false);
-            if (flag) {
-                return new JsonObject((String) body);
+    @SuppressWarnings("unchecked")
+    public <V extends JsonElement> V jsonBody() {
+        if (body != null) {
+            if (body instanceof Map) {
+                return (V) new JsonObject((Map) body);
+            }
+            if (body instanceof List) {
+                return (V) new JsonArray((List) body);
             }
         }
         return null;

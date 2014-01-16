@@ -17,13 +17,13 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
-import groovy.json.JsonSlurper;
 import org.vertx.groovy.core.http.HttpServerFileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
+import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.net.NetSocket;
 
@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core.http.HttpServerRequest*/ {
@@ -297,30 +298,23 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return body();
     }
 
-    public JsonObject getJsonBody() {
+    public <V extends JsonElement> V getJsonBody() {
         return jsonBody();
     }
     
     public Object getJson() {
         Object _body = body();
-        if (_body != null && _body instanceof String) {
-            Boolean validObject = get("valid_json_object");
-            Boolean validArray = get("valid_json_array");
-            if (validObject != null && validObject) {
-                return parseText((String)_body);
+        if (_body != null) {
+            if (_body instanceof Map) {
+                return _body;
             }
-            if (validArray != null && validArray) {
-                return parseText((String)_body);
+            if (_body instanceof List) {
+                return _body;
             }
         }
         return null;
     }
 
-    private Object parseText(String content) {
-        JsonSlurper slurper = new JsonSlurper();
-        return slurper.parseText(content);
-    }
-    
     public Buffer getBufferBody() {
         return bufferBody();
     }

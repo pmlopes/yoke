@@ -182,7 +182,8 @@ public abstract class OAuth2 {
                 }
 
                 // TODO: use better API once available
-                if(request.jsonBody().toMap().containsKey("allow")) {
+                JsonObject json = request.jsonBody();
+                if(json.toMap().containsKey("allow")) {
                     if("token".equals(response_type)) {
                         final String user_id;
 

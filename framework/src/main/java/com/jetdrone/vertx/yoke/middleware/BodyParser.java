@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.core.JSON;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
@@ -68,20 +69,13 @@ public class BodyParser extends Middleware {
         try {
             String content = buffer.toString();
             if (content.length() > 0) {
-                switch (content.charAt(0)) {
-                    case '{':
-                        request.setBody(content);
-                        request.put("valid_json_object", true);
-                        next.handle(null);
-                        break;
-                    case '[':
-                        request.setBody(content);
-                        request.put("valid_json_array", true);
-                        next.handle(null);
-                        break;
-                    default:
-                        next.handle(400);
+                try {
+                    request.setBody(JSON.decode(content));
+                } catch (DecodeException e) {
+                    next.handle(400);
+                    return;
                 }
+                next.handle(null);
             } else {
                 next.handle(400);
             }
