@@ -1,9 +1,6 @@
 package com.jetdrone.vertx.yoke.core;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public final class Context implements Map<String, Object> {
 
@@ -60,7 +57,7 @@ public final class Context implements Map<String, Object> {
     @Override
     public Object put(String s, Object o) {
         if (rw == null) {
-            rw = new HashMap<>();
+            rw = new LinkedHashMap<>();
         }
         return rw.put(s, o);
     }
@@ -76,7 +73,7 @@ public final class Context implements Map<String, Object> {
     @Override
     public void putAll(Map<? extends String, ?> map) {
         if (rw == null) {
-            rw = new HashMap<>();
+            rw = new LinkedHashMap<>();
         }
         rw.putAll(map);
     }

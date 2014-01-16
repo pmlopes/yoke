@@ -6,13 +6,11 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.util.Utils;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
+import org.vertx.java.core.*;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.logging.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -324,13 +322,14 @@ public class Static extends Middleware {
             next.handle(null);
         } else {
             String path = request.normalizedPath();
-
             // if the normalized path is null it cannot be resolved
             if (path == null) {
                 next.handle(404);
                 return;
             }
-            final String file = root + path;
+            // map file path from the request
+            // the final path is, root + request.path excluding mount
+            final String file = root + path.substring(mount.length());
 
             if (!includeHidden) {
                 int idx = file.lastIndexOf('/');

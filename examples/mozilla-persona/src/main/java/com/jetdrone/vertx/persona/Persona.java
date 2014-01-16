@@ -119,9 +119,9 @@ public class Persona extends Verticle {
                                                 // save it and associate to the email address
                                                 request.saveSessionData(new JsonObject().putString("email", email), new Handler<Object>() {
                                                     @Override
-                                                    public void handle(Object err) {
-                                                        if (err != null) {
-                                                            next.handle(err);
+                                                    public void handle(Object error) {
+                                                        if (error != null) {
+                                                            next.handle(error);
                                                             return;
                                                         }
                                                         // OK response

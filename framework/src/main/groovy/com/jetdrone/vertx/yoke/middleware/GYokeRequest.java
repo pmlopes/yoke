@@ -63,6 +63,10 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     }
 
     private Map<String, GYokeFileUpload> files;
+    // Groovy helpers
+    private GMultiMap params;
+    private GMultiMap formAttributes;
+    private GMultiMap headers;
 
     public GYokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
         super(request, response, secure, context, store);
@@ -246,12 +250,18 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return response();
     }
 
-    public MultiMap getHeaders() {
-        return headers();
+    public GMultiMap getHeaders() {
+        if (headers == null) {
+            headers = new GMultiMap(headers());
+        }
+        return headers;
     }
 
-    public MultiMap getParams() {
-        return params();
+    public GMultiMap getParams() {
+        if (params == null) {
+            params = new GMultiMap(params());
+        }
+        return params;
     }
 
     public GYokeRequest setExpectMultiPart(boolean expect) {
@@ -294,8 +304,8 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     public Object getJson() {
         Object _body = body();
         if (_body != null && _body instanceof String) {
-            Boolean validObject = (Boolean)get("valid_json_object");
-            Boolean validArray = (Boolean)get("valid_json_array");
+            Boolean validObject = get("valid_json_object");
+            Boolean validArray = get("valid_json_array");
             if (validObject != null && validObject) {
                 return parseText((String)_body);
             }
@@ -328,7 +338,10 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     }
 
     public MultiMap getFormAttributes() {
-        return formAttributes();
+        if (formAttributes == null) {
+            formAttributes = new GMultiMap(formAttributes());
+        }
+        return formAttributes;
     }
 
     public String getIp() {
