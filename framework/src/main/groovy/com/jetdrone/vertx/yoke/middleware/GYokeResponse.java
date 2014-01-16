@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.core.JSON;
 import groovy.lang.Closure;
 import org.vertx.groovy.core.impl.DefaultMultiMap;
 import org.vertx.java.core.AsyncResult;
@@ -23,8 +24,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.groovy.core.MultiMap;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.groovy.core.buffer.Buffer;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Map;
@@ -106,12 +105,12 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
 
     public void end(Map<String, Object> json) {
         setContentType("application/json", "UTF-8");
-        end(new JsonObject(json).encode());
+        end(JSON.encode(json));
     }
 
     public void end(List<Object> json) {
         setContentType("application/json", "UTF-8");
-        end(new JsonArray(json).encode());
+        end(JSON.encode(json));
     }
 
     public void jsonp(Map<String, Object> json) {
@@ -133,8 +132,7 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
         String body = null;
 
         if (json != null) {
-            JsonObject jsonObject = new JsonObject(json);
-            body = jsonObject.encode();
+            body = JSON.encode(json);
         }
 
         jsonp(callback, body);
@@ -151,8 +149,7 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
         String body = null;
 
         if (json != null) {
-            JsonArray jsonArray = new JsonArray(json);
-            body = jsonArray.encode();
+            body = JSON.encode(json);
         }
 
         jsonp(callback, body);

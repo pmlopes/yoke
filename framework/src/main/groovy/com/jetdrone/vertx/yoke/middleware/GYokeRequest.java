@@ -302,19 +302,6 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return jsonBody();
     }
     
-    public Object getJson() {
-        Object _body = body();
-        if (_body != null) {
-            if (_body instanceof Map) {
-                return _body;
-            }
-            if (_body instanceof List) {
-                return _body;
-            }
-        }
-        return null;
-    }
-
     public Buffer getBufferBody() {
         return bufferBody();
     }

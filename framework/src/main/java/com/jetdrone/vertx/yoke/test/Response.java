@@ -95,7 +95,19 @@ public class Response implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse putHeader(CharSequence name, CharSequence value) {
+        headers().set(name, value);
+        return this;
+    }
+
+    @Override
     public HttpServerResponse putHeader(String name, Iterable<String> values) {
+        headers().set(name, values);
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse putHeader(CharSequence name, Iterable<CharSequence> values) {
         headers().set(name, values);
         return this;
     }
@@ -112,8 +124,20 @@ public class Response implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse putTrailer(CharSequence name, CharSequence value) {
+        trailers().set(name, value);
+        return this;
+    }
+
+    @Override
     public HttpServerResponse putTrailer(String name, Iterable<String> values) {
         trailers().set(name, values);
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse putTrailer(CharSequence name, Iterable<CharSequence> value) {
+        trailers().set(name, value);
         return this;
     }
 

@@ -358,7 +358,19 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse putHeader(CharSequence name, CharSequence value) {
+        response.putHeader(name, value);
+        return this;
+    }
+
+    @Override
     public HttpServerResponse putHeader(String name, Iterable<String> values) {
+        response.putHeader(name, values);
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse putHeader(CharSequence name, Iterable<CharSequence> values) {
         response.putHeader(name, values);
         return this;
     }
@@ -375,8 +387,20 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse putTrailer(CharSequence name, CharSequence value) {
+        response.putTrailer(name, value);
+        return this;
+    }
+
+    @Override
     public HttpServerResponse putTrailer(String name, Iterable<String> values) {
         response.putTrailer(name, values);
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse putTrailer(CharSequence name, Iterable<CharSequence> value) {
+        response.putTrailer(name, value);
         return this;
     }
 

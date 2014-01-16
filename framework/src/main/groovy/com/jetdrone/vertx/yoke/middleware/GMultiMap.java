@@ -25,14 +25,20 @@ class GMultiMap implements MultiMap {
         return out;
     }
 
+    @SuppressWarnings("unchecked")
     public void putAt(String key, Object value) {
         if (value != null) {
             if (value instanceof Iterable) {
-                impl.add(key, (Iterable) value);
+                impl.add(key, (Iterable<String>) value);
             } else {
                 impl.add(key, (String) value);
             }
         }
+    }
+
+    @Override
+    public String get(CharSequence name) {
+        return impl.get(name);
     }
 
     @Override
@@ -42,6 +48,11 @@ class GMultiMap implements MultiMap {
 
     @Override
     public List<String> getAll(String name) {
+        return impl.getAll(name);
+    }
+
+    @Override
+    public List<String> getAll(CharSequence name) {
         return impl.getAll(name);
     }
 
@@ -56,6 +67,11 @@ class GMultiMap implements MultiMap {
     }
 
     @Override
+    public boolean contains(CharSequence name) {
+        return impl.contains(name);
+    }
+
+    @Override
     public boolean isEmpty() {
         return impl.isEmpty();
     }
@@ -66,53 +82,93 @@ class GMultiMap implements MultiMap {
     }
 
     @Override
-    public MultiMap add(String name, String value) {
-        return impl.add(name, value);
+    public GMultiMap add(String name, String value) {
+        impl.add(name, value);
+        return this;
     }
 
     @Override
-    public MultiMap add(String name, Iterable<String> values) {
-        return impl.add(name, values);
+    public GMultiMap add(CharSequence name, CharSequence value) {
+        impl.add(name, value);
+        return this;
     }
 
     @Override
-    public MultiMap add(MultiMap headers) {
-        return impl.add(headers);
+    public GMultiMap add(String name, Iterable<String> values) {
+        impl.add(name, values);
+        return this;
     }
 
     @Override
-    public MultiMap add(Map<String, String> headers) {
-        return impl.add(headers);
+    public GMultiMap add(CharSequence name, Iterable<CharSequence> values) {
+        impl.add(name, values);
+        return this;
     }
 
     @Override
-    public MultiMap set(String name, String value) {
-        return impl.set(name, value);
+    public GMultiMap add(MultiMap headers) {
+        impl.add(headers);
+        return this;
     }
 
     @Override
-    public MultiMap set(String name, Iterable<String> values) {
-        return impl.set(name, values);
+    public GMultiMap add(Map<String, String> headers) {
+        impl.add(headers);
+        return this;
     }
 
     @Override
-    public MultiMap set(MultiMap headers) {
-        return impl.set(headers);
+    public GMultiMap set(String name, String value) {
+        impl.set(name, value);
+        return this;
     }
 
     @Override
-    public MultiMap set(Map<String, String> headers) {
-        return impl.set(headers);
+    public GMultiMap set(CharSequence name, CharSequence value) {
+        impl.set(name, value);
+        return this;
     }
 
     @Override
-    public MultiMap remove(String name) {
-        return impl.remove(name);
+    public GMultiMap set(String name, Iterable<String> values) {
+        impl.set(name, values);
+        return this;
     }
 
     @Override
-    public MultiMap clear() {
-        return impl.clear();
+    public GMultiMap set(CharSequence name, Iterable<CharSequence> values) {
+        impl.set(name, values);
+        return this;
+    }
+
+    @Override
+    public GMultiMap set(MultiMap headers) {
+        impl.set(headers);
+        return this;
+    }
+
+    @Override
+    public GMultiMap set(Map<String, String> headers) {
+        impl.set(headers);
+        return this;
+    }
+
+    @Override
+    public GMultiMap remove(String name) {
+        impl.remove(name);
+        return this;
+    }
+
+    @Override
+    public GMultiMap remove(CharSequence name) {
+        impl.remove(name);
+        return this;
+    }
+
+    @Override
+    public GMultiMap clear() {
+        impl.clear();
+        return this;
     }
 
     @Override
