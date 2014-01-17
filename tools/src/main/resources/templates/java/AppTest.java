@@ -1,3 +1,4 @@
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
@@ -12,7 +13,7 @@ public class AppTest extends TestVerticle {
 
     @Test
     public void testApp() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -21,7 +22,9 @@ public class AppTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/", new Handler<Response>() {
+        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+
+        yokeAssert.request("GET", "/", new Handler<Response>() {
             @Override
             public void handle(Response response) {
                 assertEquals("OK", response.body.toString());
