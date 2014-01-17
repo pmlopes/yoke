@@ -150,7 +150,7 @@ public class JsonRestRouter extends Router {
         return new Middleware() {
             @Override
             public void handle(final YokeRequest request, final Handler<Object> next) {
-                JsonObject item = request.jsonBody();
+                JsonObject item = request.body();
 
                 if (item == null) {
                     next.handle("Body must be JSON");
@@ -206,7 +206,7 @@ public class JsonRestRouter extends Router {
 
                             // TODO: handle overwrite
                             final JsonObject obj = event.result();
-                            obj.mergeIn((JsonObject) request.jsonBody());
+                            obj.mergeIn((JsonObject) request.body());
 
                             // update back to the db
                             store.update(idName, id, obj, new AsyncResultHandler<Number>() {
@@ -238,7 +238,7 @@ public class JsonRestRouter extends Router {
         return new Middleware() {
             @Override
             public void handle(final YokeRequest request, final Handler<Object> next) {
-                JsonObject item = request.jsonBody();
+                JsonObject item = request.body();
 
                 if (item == null) {
                     next.handle("Body must be JSON");

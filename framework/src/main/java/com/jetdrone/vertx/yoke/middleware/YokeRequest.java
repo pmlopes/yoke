@@ -7,10 +7,10 @@ import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
-import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.net.NetSocket;
@@ -42,7 +42,6 @@ public class YokeRequest implements HttpServerRequest {
         }
         @Override
         public int compare(String o1, String o2) {
-            // verify if there is a
             float f1 = getQuality(o1);
             float f2 = getQuality(o2);
             if (f1 < f2) {
@@ -69,7 +68,8 @@ public class YokeRequest implements HttpServerRequest {
     // we can overrride the setMethod
     private String method;
     private long bodyLengthLimit = -1;
-    private Object body;
+    // the body is protected so extensions can access the raw object instead of casted versions.
+    protected Object body;
     private Map<String, YokeFileUpload> files;
     private Set<YokeCookie> cookies;
     private String sessionId;
@@ -85,26 +85,20 @@ public class YokeRequest implements HttpServerRequest {
         this.store = store;
     }
 
-    /**
-     * Allow getting properties in a generified way.
-     *
-     * @param name The key to get
-     * @param <R> The type of the return
-     * @return The found object
-     */
+    // Allow getting properties in a generified way.
+    //
+    // @param {String} name The key to get
+    // @return {R} The found object
     @SuppressWarnings("unchecked")
     public <R> R get(String name) {
         return (R) context.get(name);
     }
 
-    /**
-     * Allow getting properties in a generified way and return defaultValue if the key does not exist.
-     *
-     * @param name The key to get
-     * @param defaultValue value returned when the key does not exist
-     * @param <R> The type of the return
-     * @return The found object
-     */
+    // Allow getting properties in a generified way and return defaultValue if the key does not exist.
+    //
+    // @param {String} name The key to get
+    // @param {R} defaultValue value returned when the key does not exist
+    // @return {R} The found object
     public <R> R get(String name, R defaultValue) {
         if (context.containsKey(name)) {
             return get(name);
@@ -113,46 +107,37 @@ public class YokeRequest implements HttpServerRequest {
         }
     }
 
-    /**
-     * Allows putting a value into the context
-     *
-     * @param name the key to store
-     * @param value the value to store
-     * @param <R> the type of the previous value if present
-     * @return the previous value or null
-     */
+    // Allows putting a value into the context
+    //
+    // @param {String} name the key to store
+    // @param {R} value the value to store
+    // @return {R} the previous value or null
     @SuppressWarnings("unchecked")
     public <R> R put(String name, R value) {
         return (R) context.put(name, value);
     }
 
-    /**
-     * Allow getting headers in a generified way.
-     *
-     * @param name The key to get
-     * @return The found object
-     */
+    // Allow getting headers in a generified way.
+    //
+    // @param {String} name The key to get
+    // @return {String} The found object
     public String getHeader(String name) {
         return headers().get(name);
     }
 
-    /**
-     * Allow getting headers in a generified way.
-     *
-     * @param name The key to get
-     * @return The list of all found objects
-     */
+    // Allow getting headers in a generified way.
+    //
+    // @param {String} name The key to get
+    // @return {List} The list of all found objects
     public List<String> getAllHeaders(String name) {
         return headers().getAll(name);
     }
 
-    /**
-     * Allow getting headers in a generified way and return defaultValue if the key does not exist.
-     *
-     * @param name The key to get
-     * @param defaultValue value returned when the key does not exist
-     * @return The found object
-     */
+    // Allow getting headers in a generified way and return defaultValue if the key does not exist.
+    //
+    // @param {String} name The key to get
+    // @param {String} defaultValue value returned when the key does not exist
+    // @return {String} The found object
     public String getHeader(String name, String defaultValue) {
         if (headers().contains(name)) {
             return getHeader(name);
@@ -161,12 +146,10 @@ public class YokeRequest implements HttpServerRequest {
         }
     }
 
-    /**
-     * Allow getting Cookie by name.
-     *
-     * @param name The key to get
-     * @return The found object
-     */
+    // Allow getting Cookie by name.
+    //
+    // @param {String} name The key to get
+    // @return {YokeCookie} The found object
     public YokeCookie getCookie(String name) {
         if (cookies != null) {
             for (YokeCookie c : cookies) {
@@ -178,12 +161,10 @@ public class YokeRequest implements HttpServerRequest {
         return null;
     }
 
-    /**
-     * Allow getting all Cookie by name.
-     *
-     * @param name The key to get
-     * @return The found objects
-     */
+    // Allow getting all Cookie by name.
+    //
+    // @param {String} name The key to get
+    // @return {List} The found objects
     public List<YokeCookie> getAllCookies(String name) {
         List<YokeCookie> foundCookies = new ArrayList<>();
         if (cookies != null) {
@@ -196,48 +177,36 @@ public class YokeRequest implements HttpServerRequest {
         return foundCookies;
     }
 
-    /**
-     * The original HTTP setMethod for the request. One of GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
-     */
+    // The original HTTP setMethod for the request. One of GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
     public String originalMethod() {
         return request.method();
     }
 
-    /**
-     * Package level mutator for the overrided setMethod
-     * @param newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
-     */
+    // Package level mutator for the overrided setMethod
+    // @param {String} newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
     void setMethod(String newMethod) {
         this.method = newMethod.toUpperCase();
     }
 
-    /**
-     * Package level mutator for the bodyLength
-     */
+    // Package level mutator for the bodyLength
     void setBodyLengthLimit(long limit) {
         bodyLengthLimit = limit;
     }
 
-    /**
-     * Holds the maximum allowed length for the setBody data. -1 for unlimited
-     */
+    // Holds the maximum allowed length for the setBody data. -1 for unlimited
     public long bodyLengthLimit() {
         return bodyLengthLimit;
     }
 
-    /**
-     * Returns true if this request has setBody
-     *
-     * @return true if content-length or transfer-encoding is present
-     */
+    // Returns true if this request has setBody
+    //
+    // @return true if content-length or transfer-encoding is present
     public boolean hasBody() {
         MultiMap headers = headers();
         return headers.contains("transfer-encoding") || headers.contains("content-length");
     }
 
-    /**
-     * Returns the content length of this request setBody or -1 if header is not present.
-     */
+    // Returns the content length of this request setBody or -1 if header is not present.
     public long contentLength() {
         String contentLengthHeader = headers().get("content-length");
         if (contentLengthHeader != null) {
@@ -247,18 +216,9 @@ public class YokeRequest implements HttpServerRequest {
         }
     }
 
-    /**
-     * The request setBody and eventually a parsed version of it in json or map
-     */
-    public Object body() {
-        return body;
-    }
-
-    /**
-     * A parsed Json Array if body is detected to contain a valid String for Json Object.
-     */
+    // The request body and eventually a parsed version of it in json or map
     @SuppressWarnings("unchecked")
-    public <V extends JsonElement> V jsonBody() {
+    public <V> V body() {
         if (body != null) {
             if (body instanceof Map) {
                 return (V) new JsonObject((Map) body);
@@ -267,50 +227,22 @@ public class YokeRequest implements HttpServerRequest {
                 return (V) new JsonArray((List) body);
             }
         }
-        return null;
+
+        return (V) body;
     }
 
-    /**
-     * A parsed Json Array if body is detected to contain a valid String for Json array.
-     */
-    public JsonArray jsonArrayBody() {
-        if (body != null && body instanceof String) {
-            boolean flag = get("valid_json_array", false);
-            if (flag) {
-                return new JsonArray((String) body);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * The request setBody and eventually a parsed version of it in json or map
-     */
-    public Buffer bufferBody() {
-        if (body != null && body instanceof Buffer) {
-            return (Buffer) body;
-        }
-        return null;
-    }
-
-    /**
-     * Mutator for the request setBody
-     * The request setBody and eventually a parsed version of it in json or map
-     */
+    // Mutator for the request setBody
+    // The request setBody and eventually a parsed version of it in json or map
     void setBody(Object body) {
         this.body = body;
     }
 
-    /**
-     * The uploaded setFiles
-     */
+    // The uploaded setFiles
     public Map<String, YokeFileUpload> files() {
         return files;
     }
 
-    /**
-     * Get an uploaded file
-     */
+    // Get an uploaded file
     public YokeFileUpload getFile(String name) {
         if (files == null) {
             return null;
@@ -319,16 +251,12 @@ public class YokeRequest implements HttpServerRequest {
         return files.get(name);
     }
 
-    /**
-     * The uploaded setFiles
-     */
+    // The uploaded setFiles
     void setFiles(Map<String, YokeFileUpload> files) {
         this.files = files;
     }
 
-    /**
-     * Cookies
-     */
+    // Cookies
     void setCookies(Set<YokeCookie> cookies) {
         this.cookies = cookies;
     }
@@ -403,13 +331,11 @@ public class YokeRequest implements HttpServerRequest {
         return parts;
     }
 
-    /**
-     * Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which
-     * case you should respond with 406 "Not Acceptable".
-     *
-     * The type value must be a single mime type string such as "application/json" and is validated by checking
-     * if the request string starts with it.
-     */
+    // Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which
+    // case you should respond with 406 "Not Acceptable".
+    //
+    // The type value must be a single mime type string such as "application/json" and is validated by checking
+    // if the request string starts with it.
     public String accepts(String... types) {
         String accept = getHeader("accept");
         // accept anything when accept is not present
@@ -439,30 +365,28 @@ public class YokeRequest implements HttpServerRequest {
         return null;
     }
 
-    /**
-     * Check if the incoming request contains the "Content-Type"
-     * header field, and it contains the give mime `type`.
-     *
-     * Examples:
-     *
-     * // With Content-Type: text/html; charset=utf-8
-     * req.is('html');
-     * req.is('text/html');
-     * req.is('text/*');
-     * // => true
-     *
-     * // When Content-Type is application/json
-     * req.is('json');
-     * req.is('application/json');
-     * req.is('application/*');
-     * // => true
-     *
-     * req.is('html');
-     * // => false
-     *
-     * @param type content type
-     * @return true if content type is of type
-     */
+    // Check if the incoming request contains the "Content-Type"
+    // header field, and it contains the give mime `type`.
+    //
+    // Examples:
+    //
+    // // With Content-Type: text/html; charset=utf-8
+    // req.is('html');
+    // req.is('text/html');
+    // req.is('text/*');
+    // // => true
+    //
+    // // When Content-Type is application/json
+    // req.is('json');
+    // req.is('application/json');
+    // req.is('application/*');
+    // // => true
+    //
+    // req.is('html');
+    // // => false
+    //
+    // @param {String} type content type
+    // @return {Boolean} true if content type is of type
     public boolean is(String type) {
         String ct = getHeader("Content-Type");
         if (ct == null) {
@@ -496,10 +420,8 @@ public class YokeRequest implements HttpServerRequest {
         return ct.contains(type);
     }
 
-    /**
-     * Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For
-     * Header
-     */
+    // Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For
+    // Header
     public String ip() {
         Boolean trustProxy = (Boolean) context.get("trust-proxy");
         if (trustProxy != null && trustProxy) {
@@ -515,23 +437,19 @@ public class YokeRequest implements HttpServerRequest {
         return request.remoteAddress().getHostName();
     }
 
-    /**
-     * Allow getting parameters in a generified way.
-     *
-     * @param name The key to get
-     * @return The found object
-     */
+    // Allow getting parameters in a generified way.
+    //
+    // @param {String} name The key to get
+    // @return {String} The found object
     public String getParameter(String name) {
         return params().get(name);
     }
 
-    /**
-     * Allow getting parameters in a generified way and return defaultValue if the key does not exist.
-     *
-     * @param name The key to get
-     * @param defaultValue value returned when the key does not exist
-     * @return The found object
-     */
+    // Allow getting parameters in a generified way and return defaultValue if the key does not exist.
+    //
+    // @param {String} name The key to get
+    // @param {String} defaultValue value returned when the key does not exist
+    // @return {String} The found object
     public String getParameter(String name, String defaultValue) {
         String value = getParameter(name);
 
@@ -542,33 +460,27 @@ public class YokeRequest implements HttpServerRequest {
         return value;
     }
 
-    /**
-     * Allow getting parameters in a generified way.
-     *
-     * @param name The key to get
-     * @return The found object
-     */
+    // Allow getting parameters in a generified way.
+    //
+    // @param n{String} ame The key to get
+    // @return {List} The found object
     public List<String> getParameterList(String name) {
         return params().getAll(name);
     }
 
-    /**
-     * Allow getting form parameters in a generified way.
-     *
-     * @param name The key to get
-     * @return The found object
-     */
+    // Allow getting form parameters in a generified way.
+    //
+    // @param {String} name The key to get
+    // @return {String} The found object
     public String getFormParameter(String name) {
         return request.formAttributes().get(name);
     }
 
-    /**
-     * Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
-     *
-     * @param name The key to get
-     * @param defaultValue value returned when the key does not exist
-     * @return The found object
-     */
+    // Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
+    //
+    // @param {String} name The key to get
+    // @param {String} defaultValue value returned when the key does not exist
+    // @return {String} The found object
     public String getFormParameter(String name, String defaultValue) {
         String value = request.formAttributes().get(name);
 
@@ -579,19 +491,15 @@ public class YokeRequest implements HttpServerRequest {
         return value;
     }
 
-    /**
-     * Allow getting form parameters in a generified way.
-     *
-     * @param name The key to get
-     * @return The found object
-     */
+    // Allow getting form parameters in a generified way.
+    //
+    // @param {String} name The key to get
+    // @return {List} The found object
     public List<String> getFormParameterList(String name) {
         return request.formAttributes().getAll(name);
     }
 
-    /**
-     * Return the real request
-     */
+    // Return the real request
     public HttpServerRequest vertxHttpServerRequest() {
         return request;
     }
@@ -601,9 +509,6 @@ public class YokeRequest implements HttpServerRequest {
         return request.version();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#method()
-     */
     @Override
     public String method() {
         if (method != null) {
@@ -612,17 +517,11 @@ public class YokeRequest implements HttpServerRequest {
         return request.method();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#uri()
-     */
     @Override
     public String uri() {
         return request.uri();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#path()
-     */
     @Override
     public String path() {
         return request.path();
@@ -684,65 +583,41 @@ public class YokeRequest implements HttpServerRequest {
         return cachedNormalizedPath;
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#query()
-     */
     @Override
     public String query() {
         return request.query();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#response()
-     */
     @Override
     public YokeResponse response() {
         return response;
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#headers()
-     */
     @Override
     public MultiMap headers() {
         return request.headers();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#params()
-     */
     @Override
     public MultiMap params() {
         return request.params();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#remoteAddress()
-     */
     @Override
     public InetSocketAddress remoteAddress() {
         return request.remoteAddress();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#peerCertificateChain()
-     */
     @Override
     public X509Certificate[] peerCertificateChain() throws SSLPeerUnverifiedException {
         return request.peerCertificateChain();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#absoluteURI()
-     */
     @Override
     public URI absoluteURI() {
         return request.absoluteURI();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#bodyHandler(org.vertx.java.core.Handler)
-     */
     @Override
     public HttpServerRequest bodyHandler(Handler<Buffer> bodyHandler) {
         request.bodyHandler(bodyHandler);
@@ -781,45 +656,30 @@ public class YokeRequest implements HttpServerRequest {
         return request.formAttributes();
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#dataHandler(org.vertx.java.core.Handler)
-     */
     @Override
     public HttpServerRequest dataHandler(Handler<Buffer> handler) {
         request.dataHandler(handler);
         return this;
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#pause()
-     */
     @Override
     public HttpServerRequest pause() {
         request.pause();
         return this;
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#resume()
-     */
     @Override
     public HttpServerRequest resume() {
         request.resume();
         return this;
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#endHandler(org.vertx.java.core.Handler)
-     */
     @Override
     public HttpServerRequest endHandler(Handler<Void> endHandler) {
         request.endHandler(endHandler);
         return this;
     }
 
-    /**
-     * @see org.vertx.java.core.http.HttpServerRequest#exceptionHandler(org.vertx.java.core.Handler)
-     */
     @Override
     public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
         request.exceptionHandler(handler);

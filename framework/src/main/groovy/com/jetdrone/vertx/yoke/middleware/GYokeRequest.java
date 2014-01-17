@@ -295,15 +295,7 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     }
 
     public Object getBody() {
-        return body();
-    }
-
-    public <V extends JsonElement> V getJsonBody() {
-        return jsonBody();
-    }
-    
-    public Buffer getBufferBody() {
-        return bufferBody();
+        return body;
     }
 
     public HttpServerRequest getVertxHttpServerRequest() {

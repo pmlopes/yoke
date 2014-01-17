@@ -26,8 +26,8 @@ public class BodyParser extends TestVerticle {
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {
-                assertNotNull(request.jsonBody());
-                assertEquals(((JsonObject) request.jsonBody()).encode(), json.encode());
+                assertNotNull(request.body());
+                assertEquals(((JsonObject) request.body()).encode(), json.encode());
                 request.response().end();
             }
         });

@@ -47,7 +47,7 @@ public class MethodOverride extends Middleware {
                 }
             }
 
-            final JsonObject json = request.jsonBody();
+            final JsonObject json = request.body();
             if (json != null) {
                 String method = json.getString(key);
                 if (method != null) {
