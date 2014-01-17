@@ -24,7 +24,6 @@ import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
-import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.net.NetSocket;
 
@@ -69,8 +68,11 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
     private GMultiMap formAttributes;
     private GMultiMap headers;
 
-    public GYokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
+    private final GYokeResponse response;
+
+    public GYokeRequest(HttpServerRequest request, GYokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
         super(request, response, secure, context, store);
+        this.response = response;
     }
 
     private HttpServerFileUpload wrap(final org.vertx.java.core.http.HttpServerFileUpload jHttpServerFileUpload) {
@@ -247,8 +249,8 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return query();
     }
 
-    public YokeResponse getResponse() {
-        return response();
+    public GYokeResponse getResponse() {
+        return response;
     }
 
     public GMultiMap getHeaders() {

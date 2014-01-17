@@ -503,7 +503,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse sendFile(String filename) {
+    public YokeResponse sendFile(String filename) {
         // TODO: filter file?
         hasBody = true;
         filter = null;
@@ -513,7 +513,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse sendFile(String filename, String notFoundFile) {
+    public YokeResponse sendFile(String filename, String notFoundFile) {
         // TODO: filter file?
         hasBody = true;
         filter = null;
@@ -523,7 +523,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
+    public YokeResponse sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
         // TODO: filter file?
         hasBody = true;
         filter = null;
@@ -533,7 +533,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse sendFile(String filename, String notFoundFile, Handler<AsyncResult<Void>> resultHandler) {
+    public YokeResponse sendFile(String filename, String notFoundFile, Handler<AsyncResult<Void>> resultHandler) {
         // TODO: filter file?
         hasBody = true;
         filter = null;
@@ -548,7 +548,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse exceptionHandler(Handler<Throwable> handler) {
+    public YokeResponse exceptionHandler(Handler<Throwable> handler) {
         response.exceptionHandler(handler);
         return this;
     }

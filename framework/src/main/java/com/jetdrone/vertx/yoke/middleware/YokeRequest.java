@@ -7,7 +7,6 @@ import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;

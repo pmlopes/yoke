@@ -16,6 +16,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.core.GMultiMap;
 import com.jetdrone.vertx.yoke.core.JSON;
 import groovy.lang.Closure;
 import org.vertx.groovy.core.impl.DefaultMultiMap;
@@ -30,8 +31,8 @@ import java.util.Map;
 
 public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.core.http.HttpServerResponse*/ {
 
-    private MultiMap headers;
-    private MultiMap trailers;
+    private GMultiMap headers;
+    private GMultiMap trailers;
 
     public GYokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
         super(response, context, engines);
@@ -85,16 +86,16 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
         return this;
     }
 
-    public MultiMap getHeaders() {
+    public GMultiMap getHeaders() {
         if (headers == null) {
-            headers = new DefaultMultiMap(headers());
+            headers = new GMultiMap(headers());
         }
         return headers;
     }
 
-    public MultiMap getTrailers() {
+    public GMultiMap getTrailers() {
         if (trailers == null) {
-            trailers = new DefaultMultiMap(trailers());
+            trailers = new GMultiMap(trailers());
         }
         return trailers;
     }
@@ -155,7 +156,7 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
         jsonp(callback, body);
     }
 
-    public HttpServerResponse sendFile(String filename, final Closure resultHandler) {
+    public GYokeResponse sendFile(String filename, final Closure resultHandler) {
         sendFile(filename, new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> event) {
@@ -165,7 +166,7 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
         return this;
     }
 
-    public HttpServerResponse sendFile(String filename, String notFoundFile, final Closure resultHandler) {
+    public GYokeResponse sendFile(String filename, String notFoundFile, final Closure resultHandler) {
         sendFile(filename, notFoundFile, new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> event) {
@@ -173,5 +174,14 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
             }
         });
         return this;
+    }
+
+    public void render(final String template, final Closure<Object> next) {
+        render(template, new Handler<Object>() {
+            @Override
+            public void handle(Object event) {
+                next.call(event);
+            }
+        });
     }
 }
