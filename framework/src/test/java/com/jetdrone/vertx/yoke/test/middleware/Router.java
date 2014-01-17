@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.annotations.GET;
 import com.jetdrone.vertx.yoke.annotations.Path;
 import com.jetdrone.vertx.yoke.annotations.Produces;
@@ -28,10 +29,10 @@ public class Router extends TestVerticle {
 
     @Test
     public void testAnnotatedRouter() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(com.jetdrone.vertx.yoke.middleware.Router.from(new TestRouter()));
 
-        yoke.request("GET", "/ws", new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/ws", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -52,10 +53,10 @@ public class Router extends TestVerticle {
 
     @Test
     public void testAnnotatedRouter2() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(com.jetdrone.vertx.yoke.middleware.Router.from(new TestRouter2()));
 
-        yoke.request("GET", "/ws", new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/ws", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -67,7 +68,7 @@ public class Router extends TestVerticle {
 
     @Test
     public void testRouterWithParams() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api/:userId", new Middleware() {
                 @Override
@@ -89,7 +90,7 @@ public class Router extends TestVerticle {
             });
         }});
 
-        yoke.request("GET", "/api/1", new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/api/1", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -101,7 +102,7 @@ public class Router extends TestVerticle {
 
     @Test
     public void testRouterWithRegExParamsFail() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api/:userId", new Middleware() {
                 @Override
@@ -113,7 +114,7 @@ public class Router extends TestVerticle {
         }});
 
         // the pattern expects 2 digits
-        yoke.request("GET", "/api/1", new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/api/1", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(400, resp.getStatusCode());
@@ -124,7 +125,7 @@ public class Router extends TestVerticle {
 
     @Test
     public void testRouterWithRegExParamsPass() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api/:userId", new Middleware() {
                 @Override
@@ -136,7 +137,7 @@ public class Router extends TestVerticle {
         }});
 
         // the pattern expects 2 digits
-        yoke.request("GET", "/api/10", new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/api/10", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -147,7 +148,7 @@ public class Router extends TestVerticle {
 
     @Test
     public void testTrailingSlashes() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api", new Middleware() {
                 @Override
@@ -157,12 +158,14 @@ public class Router extends TestVerticle {
             });
         }});
 
-        yoke.request("GET", "/api", new Handler<Response>() {
+        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+
+        yokeAssert.request("GET", "/api", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
 
-                yoke.request("GET", "/api/", new Handler<Response>() {
+                yokeAssert.request("GET", "/api/", new Handler<Response>() {
                     @Override
                     public void handle(Response resp) {
                         assertEquals(200, resp.getStatusCode());

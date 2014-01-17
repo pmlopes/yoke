@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Vhost;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
@@ -17,7 +18,7 @@ public class VHost extends TestVerticle {
 
     @Test
     public void testLimit() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new Vhost("*.com", new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest request) {
@@ -36,7 +37,7 @@ public class VHost extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("host", "www.mycorp.com");
 
-        yoke.request("GET", "/", headers, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/", headers, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
             }

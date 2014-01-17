@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class YokeRequestTest extends TestVerticle {
 
     @Test
     public void testAccept() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -28,12 +29,12 @@ public class YokeRequestTest extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
-        yoke.request("GET", "/", headers, null);
+        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
     }
 
     @Test
     public void testNormalizedPath() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -42,12 +43,12 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/./me/../pom.xml", null);
+        new YokeTester(vertx, yoke).request("GET", "/./me/../pom.xml", null);
     }
 
     @Test
     public void testNormalizedPath2() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -56,12 +57,12 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/", null);
+        new YokeTester(vertx, yoke).request("GET", "/", null);
     }
 
     @Test
     public void testNormalizedPath3() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -70,12 +71,12 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/%2e%2e%2f", null);
+        new YokeTester(vertx, yoke).request("GET", "/%2e%2e%2f", null);
     }
 
     @Test
     public void testNormalizedPath4() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -84,12 +85,12 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/%2e%2e/", null);
+        new YokeTester(vertx, yoke).request("GET", "/%2e%2e/", null);
     }
 
     @Test
     public void testNormalizedPath5() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -98,6 +99,6 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/..%2f", null);
+        new YokeTester(vertx, yoke).request("GET", "/..%2f", null);
     }
 }

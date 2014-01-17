@@ -30,20 +30,19 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
-public class YokeTester extends Yoke {
+public class YokeTester {
 
     private final Vertx vertx;
     private final HttpServer fakeServer = new FakeHttpServer();
 
-    public YokeTester(Verticle verticle, boolean fakeSSL) {
-        super(verticle);
-        this.vertx = verticle.getVertx();
+    public YokeTester(Vertx vertx, Yoke yoke, boolean fakeSSL) {
+        this.vertx = vertx;
         fakeServer.setSSL(fakeSSL);
-        listen(fakeServer);
+        yoke.listen(fakeServer);
     }
 
-    public YokeTester(Verticle verticle) {
-        this(verticle, false);
+    public YokeTester(Vertx vertx, Yoke yoke) {
+        this(vertx, yoke, false);
     }
 
     public void request(final String method, final String url, final Handler<Response> handler) {

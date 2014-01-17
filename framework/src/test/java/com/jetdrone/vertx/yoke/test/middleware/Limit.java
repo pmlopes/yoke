@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class Limit extends TestVerticle {
 
     @Test
     public void testLimit() {
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Limit(1000));
 
         MultiMap headers = new CaseInsensitiveMultiMap();
@@ -28,7 +29,7 @@ public class Limit extends TestVerticle {
             body.appendByte((byte) 'A');
         }
 
-        yoke.request("GET", "/", headers, body, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(413, resp.getStatusCode());

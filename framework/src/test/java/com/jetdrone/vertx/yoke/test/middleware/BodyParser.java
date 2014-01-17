@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -20,7 +21,7 @@ public class BodyParser extends TestVerticle {
 
         final JsonObject json = new JsonObject().putString("key", "value");
 
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new Handler<YokeRequest>() {
             @Override
@@ -37,7 +38,7 @@ public class BodyParser extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        yoke.request("POST", "/upload", headers, body, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("POST", "/upload", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -50,7 +51,7 @@ public class BodyParser extends TestVerticle {
     @Test
     public void testMapBodyParser() {
 
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {
@@ -66,7 +67,7 @@ public class BodyParser extends TestVerticle {
         headers.add("content-type", "application/x-www-form-urlencoded");
         headers.add("content-length", Integer.toString(body.length()));
 
-        yoke.request("POST", "/upload", headers, body, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("POST", "/upload", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -79,7 +80,7 @@ public class BodyParser extends TestVerticle {
     @Test
     public void testBodyParserWithEmptyBody() {
 
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new Handler<YokeRequest>() {
             @Override
             public void handle(YokeRequest request) {
@@ -87,7 +88,7 @@ public class BodyParser extends TestVerticle {
             }
         });
 
-        yoke.request("DELETE", "/upload", new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("DELETE", "/upload", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

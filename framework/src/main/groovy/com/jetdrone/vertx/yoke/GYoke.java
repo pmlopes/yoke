@@ -202,4 +202,8 @@ public class GYoke {
         jYoke.listen(server);
         return this;
     }
+
+    public Yoke toJavaYoke() {
+        return this.jYoke;
+    }
 }

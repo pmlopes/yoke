@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -16,7 +17,7 @@ public class BasicAuth extends TestVerticle {
 
     @Test
     public void testBasicAuth() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth("Aladdin", "open sesame"));
         yoke.use(new Middleware() {
             @Override
@@ -25,8 +26,10 @@ public class BasicAuth extends TestVerticle {
             }
         });
 
+        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+
         // first time is forbidden
-        yoke.request("GET", "/", new Handler<Response>() {
+        yokeAssert.request("GET", "/", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(401, resp.getStatusCode());
@@ -36,7 +39,7 @@ public class BasicAuth extends TestVerticle {
                 MultiMap headers = new CaseInsensitiveMultiMap();
                 headers.add("authorization", "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==");
 
-                yoke.request("GET", "/", headers, new Handler<Response>() {
+                yokeAssert.request("GET", "/", headers, new Handler<Response>() {
                     @Override
                     public void handle(Response resp) {
                         assertEquals(200, resp.getStatusCode());
@@ -49,7 +52,7 @@ public class BasicAuth extends TestVerticle {
 
     @Test
     public void testEmptyPassword() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth(new com.jetdrone.vertx.yoke.middleware.BasicAuth.AuthHandler() {
             @Override
             public void handle(String username, String password, Handler<Boolean> result) {
@@ -64,8 +67,10 @@ public class BasicAuth extends TestVerticle {
             }
         });
 
+        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+
         // first time is forbidden
-        yoke.request("GET", "/", new Handler<Response>() {
+        yokeAssert.request("GET", "/", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(401, resp.getStatusCode());
@@ -75,7 +80,7 @@ public class BasicAuth extends TestVerticle {
                 MultiMap headers = new CaseInsensitiveMultiMap();
                 headers.add("authorization", "Basic QWxhZGRpbjo=");
 
-                yoke.request("GET", "/", headers, new Handler<Response>() {
+                yokeAssert.request("GET", "/", headers, new Handler<Response>() {
                     @Override
                     public void handle(Response resp) {
                         assertEquals(200, resp.getStatusCode());

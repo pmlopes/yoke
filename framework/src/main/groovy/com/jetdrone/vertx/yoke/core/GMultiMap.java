@@ -1,17 +1,22 @@
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.core;
 
 import org.vertx.java.core.MultiMap;
+import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-class GMultiMap implements MultiMap {
+public class GMultiMap implements MultiMap {
 
     private final MultiMap impl;
 
-    GMultiMap(MultiMap impl) {
+    public GMultiMap() {
+        this.impl = new CaseInsensitiveMultiMap();
+    }
+
+    public GMultiMap(MultiMap impl) {
         this.impl = impl;
     }
 

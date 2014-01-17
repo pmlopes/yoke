@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -19,7 +20,7 @@ public class MethodOverride extends TestVerticle {
     @Test
     public void testOverride() {
 
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.MethodOverride());
         yoke.use(new Handler<YokeRequest>() {
             @Override
@@ -32,7 +33,7 @@ public class MethodOverride extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("x-http-setMethod-override", "DELETE");
 
-        yoke.request("GET", "/upload", headers, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("GET", "/upload", headers, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -44,7 +45,7 @@ public class MethodOverride extends TestVerticle {
     @Test
     public void testOverrideUrlPost() {
 
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new com.jetdrone.vertx.yoke.middleware.MethodOverride());
         yoke.use(new Handler<YokeRequest>() {
@@ -61,7 +62,7 @@ public class MethodOverride extends TestVerticle {
         headers.add("content-type", "application/x-www-form-urlencoded");
         headers.add("content-length", Integer.toString(body.length()));
 
-        yoke.request("POST", "/upload", headers, body, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("POST", "/upload", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -75,7 +76,7 @@ public class MethodOverride extends TestVerticle {
 
         final JsonObject json = new JsonObject().putString("_method", "delete");
 
-        YokeTester yoke = new YokeTester(this);
+        Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new com.jetdrone.vertx.yoke.middleware.MethodOverride());
         yoke.use(new Handler<YokeRequest>() {
@@ -92,7 +93,7 @@ public class MethodOverride extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        yoke.request("POST", "/upload", headers, body, new Handler<Response>() {
+        new YokeTester(vertx, yoke).request("POST", "/upload", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

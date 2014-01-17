@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.test;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.junit.Test;
@@ -17,7 +18,8 @@ public class MiddlewareTest extends TestVerticle {
 
     @Test
     public void testMiddleware() {
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
+
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -26,7 +28,7 @@ public class MiddlewareTest extends TestVerticle {
             }
         });
 
-        yoke.request("GET", "/", null);
+        new YokeTester(vertx, yoke).request("GET", "/", null);
     }
 
     @Test

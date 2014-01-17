@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.test.engine;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.engine.Function;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
@@ -27,7 +28,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             out.close();
             final String location = temp.getAbsolutePath();
 
-            YokeTester yoke = new YokeTester(this);
+            Yoke yoke = new Yoke(this);
             yoke.engine("html", new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
             yoke.use(new Middleware() {
                 @Override
@@ -37,7 +38,7 @@ public class StringPlaceholderEngine extends TestVerticle {
                 }
             });
 
-            yoke.request("GET", "/", new Handler<Response>() {
+            new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
                 @Override
                 public void handle(Response resp) {
                     assertEquals(200, resp.getStatusCode());
@@ -60,7 +61,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             out.close();
             final String location = temp.getAbsolutePath();
 
-            YokeTester yoke = new YokeTester(this);
+            Yoke yoke = new Yoke(this);
             yoke.set("fnName", new Function() {
                 @Override
                 public String exec(Map<String, Object> context, Object... args) {
@@ -76,7 +77,7 @@ public class StringPlaceholderEngine extends TestVerticle {
                 }
             });
 
-            yoke.request("GET", "/", new Handler<Response>() {
+            new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
                 @Override
                 public void handle(Response resp) {
                     assertEquals(200, resp.getStatusCode());

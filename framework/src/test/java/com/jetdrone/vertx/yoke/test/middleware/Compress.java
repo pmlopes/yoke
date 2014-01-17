@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -17,7 +18,7 @@ import static org.vertx.testtools.VertxAssert.testComplete;
 public class Compress extends TestVerticle {
   @Test
   public void testGzipCompress() {
-    YokeTester yoke = new YokeTester(this);
+    Yoke yoke = new Yoke(this);
     yoke.use(new com.jetdrone.vertx.yoke.middleware.Compress());
     yoke.use(new Middleware() {
       @Override
@@ -30,16 +31,16 @@ public class Compress extends TestVerticle {
     headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     headers.add("Accept-Encoding", "gzip,deflate,sdch");
 
-    yoke.request("GET", "/", headers, new Handler<Response>() {
-      @Override
-      public void handle(Response resp) {
-        assertEquals(200, resp.getStatusCode());
-        for (int i = 0; i < resp.body.length(); i++) {
-            System.out.println((int) resp.body.getByte(i));
-        }
-        testComplete();
-      }
-    });
+      new YokeTester(vertx, yoke).request("GET", "/", headers, new Handler<Response>() {
+          @Override
+          public void handle(Response resp) {
+              assertEquals(200, resp.getStatusCode());
+              for (int i = 0; i < resp.body.length(); i++) {
+                  System.out.println((int) resp.body.getByte(i));
+              }
+              testComplete();
+          }
+      });
   }
 
 //  @Test

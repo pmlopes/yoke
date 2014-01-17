@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test.middleware;
 
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.CookieParser;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
@@ -21,7 +22,7 @@ public class Session extends TestVerticle {
     @Test
     public void testSession() {
         final Mac hmac = Utils.newHmacSHA256("keyboard.cat");
-        final YokeTester yoke = new YokeTester(this);
+        final Yoke yoke = new Yoke(this);
         yoke.use(new CookieParser(hmac));
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Session(hmac));
         yoke.use(new Router() {{
@@ -47,7 +48,9 @@ public class Session extends TestVerticle {
             });
         }});
 
-        yoke.request("GET", "/", new Handler<Response>() {
+        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+
+        yokeAssert.request("GET", "/", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 // start: there is no cookie
@@ -56,7 +59,7 @@ public class Session extends TestVerticle {
                 assertNull(nocookie);
 
                 // create session
-                yoke.request("GET", "/new", new Handler<Response>() {
+                yokeAssert.request("GET", "/new", new Handler<Response>() {
                     @Override
                     public void handle(Response resp) {
                         // start: there is a cookie
@@ -68,7 +71,7 @@ public class Session extends TestVerticle {
                         MultiMap headers = new CaseInsensitiveMultiMap();
                         headers.add("cookie", cookie);
 
-                        yoke.request("GET", "/", headers, new Handler<Response>() {
+                        yokeAssert.request("GET", "/", headers, new Handler<Response>() {
                             @Override
                             public void handle(Response resp) {
                                 // the session should be the same, so no set-cookie
@@ -80,7 +83,7 @@ public class Session extends TestVerticle {
                                 MultiMap headers = new CaseInsensitiveMultiMap();
                                 headers.add("cookie", cookie);
 
-                                yoke.request("GET", "/delete", headers, new Handler<Response>() {
+                                yokeAssert.request("GET", "/delete", headers, new Handler<Response>() {
                                     @Override
                                     public void handle(Response resp) {
                                         // there should be a set-cookie with maxAge 0
