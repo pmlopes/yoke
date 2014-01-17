@@ -3,10 +3,7 @@ package com.jetdrone.vertx.yoke.core;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import org.vertx.java.core.json.DecodeException;
@@ -36,12 +33,7 @@ public final class JSON {
         // custom serializers
         ECMA_COMPAT = new SimpleModule("ECMA+Custom Compat Layer");
         // serialize Dates as per ECMAScript SPEC
-        ECMA_COMPAT.addSerializer(new JsonSerializer<Date>() {
-            @Override
-            public Class<Date> handledType() {
-                return Date.class;
-            }
-
+        ECMA_COMPAT.addSerializer(Date.class, new JsonSerializer<Date>() {
             @Override
             public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 if (value == null) {
@@ -53,12 +45,7 @@ public final class JSON {
         });
 
         // serialize byte[] as Base64 Strings (same as used to be with Vert.x Json[Object|Array])
-        ECMA_COMPAT.addSerializer(new JsonSerializer<byte[]>() {
-            @Override
-            public Class<byte[]> handledType() {
-                return byte[].class;
-            }
-
+        ECMA_COMPAT.addSerializer(byte[].class, new JsonSerializer<byte[]>() {
             @Override
             public void serialize(byte[] value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 if (value == null) {
@@ -72,9 +59,14 @@ public final class JSON {
         MAPPER.registerModule(ECMA_COMPAT);
     }
 
-    public static void addSerializer(final JsonSerializer<?> serializer) {
+    public static <T> void addSerializer(Class<? extends T> clazz, final JsonSerializer<T> serializer) {
         // Serialize Custom Types
-        ECMA_COMPAT.addSerializer(serializer);
+        ECMA_COMPAT.addSerializer(clazz, serializer);
+    }
+
+    public static <T> void addDeserializer(Class<T> clazz, final JsonDeserializer<? extends T> deserializer) {
+        // Serialize Custom Types
+        ECMA_COMPAT.addDeserializer(clazz, deserializer);
     }
 
     public static String encode(Object item) {
@@ -94,7 +86,19 @@ public final class JSON {
         try {
             // Untyped List/Map
             return (R) MAPPER.readValue(source, Object.class);
-        } catch (IOException e) {
+        } catch (IOException | RuntimeException e) {
+            throw new DecodeException(e.getMessage());
+        }
+    }
+
+    public static <R> R decode(String source, Class<R> clazz) {
+        if (source == null) {
+            return null;
+        }
+
+        try {
+            return MAPPER.readValue(source, clazz);
+        } catch (IOException | RuntimeException e) {
             throw new DecodeException(e.getMessage());
         }
     }
