@@ -16,7 +16,7 @@
 package com.jetdrone.vertx.yoke.extras.engine;
 
 import com.jetdrone.vertx.yoke.engine.AbstractEngine;
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.ReaderTemplateLoader;

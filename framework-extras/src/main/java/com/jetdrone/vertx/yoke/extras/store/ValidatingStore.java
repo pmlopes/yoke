@@ -15,7 +15,7 @@
  */
 package com.jetdrone.vertx.yoke.extras.store;
 
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.json.JsonArray;

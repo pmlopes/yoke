@@ -4,32 +4,52 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpVersion;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
+// # Logger
+//
+// Logger for request. There are 3 formats included:
+// 1. DEFAULT
+// 2. SHORT
+// 3. TINY
+//
+// Default tries to log in a format similar to Apache log format, while the other 2 are more suited to development mode.
+// The logging depends on Vert.x logger settings and the severity of the error, so for errors with status greater or
+// equal to 500 the fatal severity is used, for status greater or equal to 400 the error severity is used, for status
+// greater or equal to 300 warn is used and for status above 100 info is used.
 public class Logger extends Middleware {
 
-    private final SimpleDateFormat ISODATE;
+    // The Date formatter (UTC JS compatible format)
+    // @property ISODATE
+    // @private
+    private final ThreadLocalUTCDateFormat ISODATE;
 
+    // The possible out of the box formats.
     public enum Format {
         DEFAULT,
         SHORT,
         TINY
     }
 
-    final boolean immediate;
-    final Format format;
+    // log before request or after
+    // @property immediate
+    // @private
+    private final boolean immediate;
+
+    // the current choosen format
+    // @property format
+    // @private
+    private final Format format;
 
     public Logger(boolean immediate, Format format) {
         this.immediate = immediate;
         this.format = format;
 
-        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
-        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
+        ISODATE = new ThreadLocalUTCDateFormat();
     }
 
     public Logger(Format format) {

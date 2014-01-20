@@ -1,7 +1,11 @@
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.core
 package com.jetdrone.vertx.yoke.core;
 
 import java.util.*;
 
+// # Context
 public final class Context implements Map<String, Object> {
 
     private final Map<String, Object> ro;

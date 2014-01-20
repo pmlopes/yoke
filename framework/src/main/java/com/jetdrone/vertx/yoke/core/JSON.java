@@ -1,3 +1,6 @@
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.core
 package com.jetdrone.vertx.yoke.core;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,6 +16,7 @@ import org.vertx.java.core.json.impl.Base64;
 import java.io.IOException;
 import java.util.Date;
 
+// # JSON
 public final class JSON {
 
     private JSON() {}

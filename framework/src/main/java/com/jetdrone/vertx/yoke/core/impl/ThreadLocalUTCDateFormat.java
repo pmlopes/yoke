@@ -1,3 +1,6 @@
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.core.impl
 package com.jetdrone.vertx.yoke.core.impl;
 
 import java.text.DateFormat;
@@ -6,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+// # ThreadLocalUTCDateFormat
 public final class ThreadLocalUTCDateFormat extends ThreadLocal<DateFormat> {
 
     public final String format(Date date) {

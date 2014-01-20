@@ -15,7 +15,7 @@
  */
 package com.jetdrone.vertx.yoke.engine;
 
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import groovy.lang.MissingPropertyException;
 import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;

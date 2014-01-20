@@ -16,7 +16,7 @@
 package com.jetdrone.vertx.yoke.extras.engine;
 
 import com.jetdrone.vertx.yoke.engine.AbstractEngine;
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.mvel2.templates.CompiledTemplate;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRuntime;

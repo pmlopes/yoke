@@ -1,3 +1,6 @@
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.middleware.filters
 package com.jetdrone.vertx.yoke.middleware.filters;
 
 import java.io.IOException;
@@ -5,6 +8,7 @@ import java.io.OutputStream;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
+// # GZipWriterFilter
 public class GZipWriterFilter extends AbstractWriterFilter {
 
     public GZipWriterFilter(Pattern filter) throws IOException {

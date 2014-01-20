@@ -9,7 +9,7 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
-import com.jetdrone.vertx.yoke.util.YokeException;
+import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;

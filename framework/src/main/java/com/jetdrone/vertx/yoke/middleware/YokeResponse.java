@@ -6,7 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
-import com.jetdrone.vertx.yoke.util.YokeException;
+import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;

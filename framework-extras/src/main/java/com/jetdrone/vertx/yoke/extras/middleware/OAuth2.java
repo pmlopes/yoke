@@ -3,7 +3,7 @@ package com.jetdrone.vertx.yoke.extras.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
-import com.jetdrone.vertx.yoke.util.YokeException;
+import com.jetdrone.vertx.yoke.core.YokeException;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;

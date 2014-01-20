@@ -19,7 +19,7 @@ import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.jetdrone.vertx.yoke.engine.AbstractEngine;
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;

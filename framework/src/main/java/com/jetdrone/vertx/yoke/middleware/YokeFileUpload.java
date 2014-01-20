@@ -26,7 +26,7 @@ public class YokeFileUpload {
     private final long size;
     private final String path;
 
-    YokeFileUpload(Vertx vertx, HttpServerFileUpload fileUpload, String uploadDir) {
+    public YokeFileUpload(Vertx vertx, HttpServerFileUpload fileUpload, String uploadDir) {
         this.fileSystem = vertx.fileSystem();
 
         this.filename = fileUpload.filename();
@@ -43,7 +43,7 @@ public class YokeFileUpload {
         this.path = uploadDir + UUID.randomUUID().toString();
     }
 
-    YokeFileUpload(FileSystem fileSystem, String filename, String name, String contentType, String contentTransferEncoding, Charset charset, long size, String path) {
+    public YokeFileUpload(FileSystem fileSystem, String filename, String name, String contentType, String contentTransferEncoding, Charset charset, long size, String path) {
         this.fileSystem = fileSystem;
         this.filename = filename;
         this.name = name;

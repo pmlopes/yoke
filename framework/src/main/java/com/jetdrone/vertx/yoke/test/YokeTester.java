@@ -21,7 +21,6 @@ import org.vertx.java.core.*;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.*;
 import org.vertx.java.core.net.NetSocket;
-import org.vertx.java.platform.Verticle;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
@@ -30,6 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
+// # YokeTester
 public class YokeTester {
 
     private final Vertx vertx;

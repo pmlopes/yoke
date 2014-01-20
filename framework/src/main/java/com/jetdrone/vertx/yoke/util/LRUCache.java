@@ -1,3 +1,6 @@
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.util
 package com.jetdrone.vertx.yoke.util;
 
 import java.util.Date;

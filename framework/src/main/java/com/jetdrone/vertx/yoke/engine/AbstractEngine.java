@@ -1,23 +1,11 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.engine
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.LRUCache;
-import com.jetdrone.vertx.yoke.util.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -28,11 +16,11 @@ import org.vertx.java.core.file.FileSystem;
 
 import java.util.Date;
 
-/**
- * Engine represents a Template Engine that can be registered with Yoke. Any template engine just needs to
- * extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
- * operations in the context of the module.
- */
+// # AbstractEngine
+//
+// Engine represents a Template Engine that can be registered with Yoke. Any template engine just needs to
+// extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
+// operations in the context of the module.
 public abstract class AbstractEngine<T> implements Engine {
 
     protected Vertx vertx;

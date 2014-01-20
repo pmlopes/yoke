@@ -1,9 +1,13 @@
+// Copyright 2011-2013 the original author or authors.
+//
+// @package com.jetdrone.vertx.yoke.util
 package com.jetdrone.vertx.yoke.util;
 
 import org.vertx.java.core.Handler;
 
 import java.util.Iterator;
 
+// # AsyncIterator
 public abstract class AsyncIterator<T> implements Handler<T> {
 
     private final Iterator<T> iterator;
