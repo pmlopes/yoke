@@ -204,6 +204,6 @@ public class GYoke {
     }
 
     public Yoke toJavaYoke() {
-        return this.jYoke;
+        return jYoke;
     }
 }

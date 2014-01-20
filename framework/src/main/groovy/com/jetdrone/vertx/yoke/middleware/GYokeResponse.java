@@ -29,7 +29,7 @@ import org.vertx.groovy.core.buffer.Buffer;
 import java.util.List;
 import java.util.Map;
 
-public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.core.http.HttpServerResponse*/ {
+public class GYokeResponse extends YokeResponse implements org.vertx.groovy.core.http.HttpServerResponse {
 
     private GMultiMap headers;
     private GMultiMap trailers;
@@ -49,6 +49,70 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
 
     public GYokeResponse write(Buffer buffer) {
         write(buffer.toJavaBuffer());
+        return this;
+    }
+
+    public GYokeResponse write(String chunk) {
+        super.write(chunk);
+        return this;
+    }
+
+    public GYokeResponse write(String chunk, String enc) {
+        super.write(chunk, enc);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse setStatusCode(int statusCode) {
+        super.setStatusCode(statusCode);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse putTrailer(String name, String value) {
+        super.putTrailer(name, value);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse sendFile(String filename) {
+        super.sendFile(filename);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse setWriteQueueMaxSize(int maxSize) {
+        super.setWriteQueueMaxSize(maxSize);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse setChunked(boolean chunked) {
+        super.setChunked(chunked);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse setStatusMessage(String statusMessage) {
+        super.setStatusMessage(statusMessage);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse putHeader(String name, Iterable<String> values) {
+        super.putHeader(name, values);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse putTrailer(String name, Iterable<String> values) {
+        super.putTrailer(name, values);
+        return this;
+    }
+
+    @Override
+    public GYokeResponse sendFile(String filename, String notFoundFile) {
+        super.sendFile(filename, notFoundFile);
         return this;
     }
 
@@ -183,5 +247,11 @@ public class GYokeResponse extends YokeResponse /*implements org.vertx.groovy.co
                 next.call(event);
             }
         });
+    }
+
+    @Override
+    public GYokeResponse putHeader(String name, String value) {
+        super.putHeader(name, value);
+        return this;
     }
 }

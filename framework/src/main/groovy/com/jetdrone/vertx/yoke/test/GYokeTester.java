@@ -26,21 +26,21 @@ public class GYokeTester extends YokeTester {
         });
     }
 
-    public void request(final String method, final String url, final GMultiMap headers, final Closure<Response> handler) {
-        request(method, url, headers, new Handler<Response>() {
-            @Override
-            public void handle(Response event) {
-                handler.call(event);
-            }
-        });
-    }
-
-    public void request(final String method, final String url, final GMultiMap headers, final Buffer body, final Closure<Response> handler) {
-        request(method, url, headers, body, new Handler<Response>() {
-            @Override
-            public void handle(Response event) {
-                handler.call(event);
-            }
-        });
-    }
+//    public void request(final String method, final String url, final GMultiMap headers, final Closure<Response> handler) {
+//        request(method, url, headers, new Handler<Response>() {
+//            @Override
+//            public void handle(Response event) {
+//                handler.call(event);
+//            }
+//        });
+//    }
+//
+//    public void request(final String method, final String url, final GMultiMap headers, final Buffer body, final Closure<Response> handler) {
+//        request(method, url, headers, body, new Handler<Response>() {
+//            @Override
+//            public void handle(Response event) {
+//                handler.call(event);
+//            }
+//        });
+//    }
 }

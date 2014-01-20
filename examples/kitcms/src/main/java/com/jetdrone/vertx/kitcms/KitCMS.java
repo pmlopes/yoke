@@ -201,7 +201,7 @@ public class KitCMS extends Verticle {
 
                                     @Override
                                     public void handle(Object o) {
-                                        if (!isEnd()) {
+                                        if (hasNext()) {
                                             final String key = (String) o;
                                             db.get(domain.namespace + "&" + key, new Handler<Message<JsonObject>>() {
                                                 @Override
@@ -251,7 +251,7 @@ public class KitCMS extends Verticle {
                             new AsyncIterator<Object>(json) {
                                 @Override
                                 public void handle(Object o) {
-                                    if (!isEnd()) {
+                                    if (hasNext()) {
                                         final JsonObject json = (JsonObject) o;
                                         db.set(domain.namespace + "&" + json.getString("key"), json.getString("value"), new Handler<Message<JsonObject>>() {
                                             @Override

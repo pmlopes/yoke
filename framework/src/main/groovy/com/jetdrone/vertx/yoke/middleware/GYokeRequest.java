@@ -20,7 +20,6 @@ import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import org.vertx.groovy.core.http.HttpServerFileUpload;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
@@ -35,7 +34,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core.http.HttpServerRequest*/ {
+public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.http.HttpServerRequest {
 
     /**
      * Allow getting properties in a generified way.
@@ -312,7 +311,19 @@ public class GYokeRequest extends YokeRequest /*implements org.vertx.groovy.core
         return netSocket();
     }
 
-    public MultiMap getFormAttributes() {
+    @Override
+    public GYokeRequest resume() {
+        super.resume();
+        return this;
+    }
+
+    @Override
+    public GYokeRequest pause() {
+        super.pause();
+        return this;
+    }
+
+    public GMultiMap getFormAttributes() {
         if (formAttributes == null) {
             formAttributes = new GMultiMap(formAttributes());
         }

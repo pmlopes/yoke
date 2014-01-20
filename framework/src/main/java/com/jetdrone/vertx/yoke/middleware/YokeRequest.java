@@ -618,7 +618,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public HttpServerRequest bodyHandler(Handler<Buffer> bodyHandler) {
+    public YokeRequest bodyHandler(Handler<Buffer> bodyHandler) {
         request.bodyHandler(bodyHandler);
         return this;
     }
@@ -629,7 +629,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public HttpServerRequest expectMultiPart(boolean expect) {
+    public YokeRequest expectMultiPart(boolean expect) {
         // if we expect
         if (expect) {
             // then only call it once
@@ -646,8 +646,9 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public HttpServerRequest uploadHandler(Handler<HttpServerFileUpload> uploadHandler) {
-        return request.uploadHandler(uploadHandler);
+    public YokeRequest uploadHandler(Handler<HttpServerFileUpload> uploadHandler) {
+        request.uploadHandler(uploadHandler);
+        return this;
     }
 
     @Override
@@ -656,7 +657,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public HttpServerRequest dataHandler(Handler<Buffer> handler) {
+    public YokeRequest dataHandler(Handler<Buffer> handler) {
         request.dataHandler(handler);
         return this;
     }
@@ -668,19 +669,19 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public HttpServerRequest resume() {
+    public YokeRequest resume() {
         request.resume();
         return this;
     }
 
     @Override
-    public HttpServerRequest endHandler(Handler<Void> endHandler) {
+    public YokeRequest endHandler(Handler<Void> endHandler) {
         request.endHandler(endHandler);
         return this;
     }
 
     @Override
-    public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
+    public YokeRequest exceptionHandler(Handler<Throwable> handler) {
         request.exceptionHandler(handler);
         return this;
     }

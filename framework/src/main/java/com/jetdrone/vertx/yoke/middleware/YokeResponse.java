@@ -319,7 +319,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse setStatusCode(int statusCode) {
+    public YokeResponse setStatusCode(int statusCode) {
         response.setStatusCode(statusCode);
         return this;
     }
@@ -330,13 +330,13 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse setStatusMessage(String statusMessage) {
+    public YokeResponse setStatusMessage(String statusMessage) {
         response.setStatusMessage(statusMessage);
         return this;
     }
 
     @Override
-    public HttpServerResponse setChunked(boolean chunked) {
+    public YokeResponse setChunked(boolean chunked) {
         response.setChunked(chunked);
         return this;
     }
@@ -352,25 +352,25 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse putHeader(String name, String value) {
+    public YokeResponse putHeader(String name, String value) {
         response.putHeader(name, value);
         return this;
     }
 
     @Override
-    public HttpServerResponse putHeader(CharSequence name, CharSequence value) {
+    public YokeResponse putHeader(CharSequence name, CharSequence value) {
         response.putHeader(name, value);
         return this;
     }
 
     @Override
-    public HttpServerResponse putHeader(String name, Iterable<String> values) {
+    public YokeResponse putHeader(String name, Iterable<String> values) {
         response.putHeader(name, values);
         return this;
     }
 
     @Override
-    public HttpServerResponse putHeader(CharSequence name, Iterable<CharSequence> values) {
+    public YokeResponse putHeader(CharSequence name, Iterable<CharSequence> values) {
         response.putHeader(name, values);
         return this;
     }
@@ -381,37 +381,37 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse putTrailer(String name, String value) {
+    public YokeResponse putTrailer(String name, String value) {
         response.putTrailer(name, value);
         return this;
     }
 
     @Override
-    public HttpServerResponse putTrailer(CharSequence name, CharSequence value) {
+    public YokeResponse putTrailer(CharSequence name, CharSequence value) {
         response.putTrailer(name, value);
         return this;
     }
 
     @Override
-    public HttpServerResponse putTrailer(String name, Iterable<String> values) {
+    public YokeResponse putTrailer(String name, Iterable<String> values) {
         response.putTrailer(name, values);
         return this;
     }
 
     @Override
-    public HttpServerResponse putTrailer(CharSequence name, Iterable<CharSequence> value) {
+    public YokeResponse putTrailer(CharSequence name, Iterable<CharSequence> value) {
         response.putTrailer(name, value);
         return this;
     }
 
     @Override
-    public HttpServerResponse closeHandler(Handler<Void> handler) {
+    public YokeResponse closeHandler(Handler<Void> handler) {
         response.closeHandler(handler);
         return this;
     }
 
     @Override
-    public HttpServerResponse write(Buffer chunk) {
+    public YokeResponse write(Buffer chunk) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -423,7 +423,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse setWriteQueueMaxSize(int maxSize) {
+    public YokeResponse setWriteQueueMaxSize(int maxSize) {
         response.setWriteQueueMaxSize(maxSize);
         return this;
     }
@@ -434,13 +434,13 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse drainHandler(Handler<Void> handler) {
+    public YokeResponse drainHandler(Handler<Void> handler) {
         response.drainHandler(handler);
         return this;
     }
 
     @Override
-    public HttpServerResponse write(String chunk, String enc) {
+    public YokeResponse write(String chunk, String enc) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -452,7 +452,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public HttpServerResponse write(String chunk) {
+    public YokeResponse write(String chunk) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {

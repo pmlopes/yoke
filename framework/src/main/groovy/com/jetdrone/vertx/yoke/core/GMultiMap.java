@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.core;
 
-import org.vertx.java.core.MultiMap;
+import org.vertx.groovy.core.MultiMap;
+import org.vertx.groovy.core.impl.DefaultMultiMap;
 import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 
 import java.util.Iterator;
@@ -13,11 +14,11 @@ public class GMultiMap implements MultiMap {
     private final MultiMap impl;
 
     public GMultiMap() {
-        this.impl = new CaseInsensitiveMultiMap();
+        this(new CaseInsensitiveMultiMap());
     }
 
-    public GMultiMap(MultiMap impl) {
-        this.impl = impl;
+    public GMultiMap(org.vertx.java.core.MultiMap base) {
+        this.impl = new DefaultMultiMap(base);
     }
 
     public Object getAt(String key) {
@@ -42,11 +43,6 @@ public class GMultiMap implements MultiMap {
     }
 
     @Override
-    public String get(CharSequence name) {
-        return impl.get(name);
-    }
-
-    @Override
     public String get(String name) {
         return impl.get(name);
     }
@@ -56,14 +52,15 @@ public class GMultiMap implements MultiMap {
         return impl.getAll(name);
     }
 
+    /**
+     * Returns all entries it contains.
+     *
+     * @return A immutable {@link java.util.List} of the name-value entries, which will be
+     *         empty if no pairs are found
+     */
     @Override
-    public List<String> getAll(CharSequence name) {
-        return impl.getAll(name);
-    }
-
-    @Override
-    public List<Map.Entry<String, String>> entries() {
-        return impl.entries();
+    public List<Map.Entry<String, String>> getEntries() {
+        return impl.getEntries();
     }
 
     @Override
@@ -72,28 +69,22 @@ public class GMultiMap implements MultiMap {
     }
 
     @Override
-    public boolean contains(CharSequence name) {
-        return impl.contains(name);
-    }
-
-    @Override
     public boolean isEmpty() {
         return impl.isEmpty();
     }
 
+    /**
+     * Gets a immutable {@link java.util.Set} of all names
+     *
+     * @return A {@link java.util.Set} of all names
+     */
     @Override
-    public Set<String> names() {
-        return impl.names();
+    public Set<String> getNames() {
+        return impl.getNames();
     }
 
     @Override
     public GMultiMap add(String name, String value) {
-        impl.add(name, value);
-        return this;
-    }
-
-    @Override
-    public GMultiMap add(CharSequence name, CharSequence value) {
         impl.add(name, value);
         return this;
     }
@@ -105,43 +96,13 @@ public class GMultiMap implements MultiMap {
     }
 
     @Override
-    public GMultiMap add(CharSequence name, Iterable<CharSequence> values) {
-        impl.add(name, values);
-        return this;
-    }
-
-    @Override
-    public GMultiMap add(MultiMap headers) {
-        impl.add(headers);
-        return this;
-    }
-
-    @Override
-    public GMultiMap add(Map<String, String> headers) {
-        impl.add(headers);
-        return this;
-    }
-
-    @Override
     public GMultiMap set(String name, String value) {
         impl.set(name, value);
         return this;
     }
 
     @Override
-    public GMultiMap set(CharSequence name, CharSequence value) {
-        impl.set(name, value);
-        return this;
-    }
-
-    @Override
     public GMultiMap set(String name, Iterable<String> values) {
-        impl.set(name, values);
-        return this;
-    }
-
-    @Override
-    public GMultiMap set(CharSequence name, Iterable<CharSequence> values) {
         impl.set(name, values);
         return this;
     }
@@ -165,24 +126,39 @@ public class GMultiMap implements MultiMap {
     }
 
     @Override
-    public GMultiMap remove(CharSequence name) {
-        impl.remove(name);
-        return this;
-    }
-
-    @Override
     public GMultiMap clear() {
         impl.clear();
         return this;
     }
 
+    /**
+     * Return the number of names.
+     */
     @Override
-    public int size() {
-        return impl.size();
+    public int getSize() {
+        return impl.getSize();
+    }
+
+    /**
+     * Same as {@link #set(java.lang.String, java.lang.String)}  or {@link #set(java.lang.String, java.lang.Iterable)}
+     */
+    @Override
+    public GMultiMap leftShift(Map.Entry<String, ?> entry) {
+        impl.leftShift(entry);
+        return this;
+    }
+
+    /**
+     * Same as {@link #set(org.vertx.groovy.core.MultiMap)}
+     */
+    @Override
+    public GMultiMap leftShift(MultiMap map) {
+        impl.leftShift(map);
+        return this;
     }
 
     @Override
-    public Iterator<Map.Entry<String, String>> iterator() {
+    public Iterator iterator() {
         return impl.iterator();
     }
 }

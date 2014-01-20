@@ -130,7 +130,7 @@ public class RedisSessionStore implements SessionStore {
                     new AsyncIterator<Object>(keys.iterator()) {
                         @Override
                         public void handle(Object key) {
-                            if (!isEnd()) {
+                            if (hasNext()) {
                                 JsonObject redis = new JsonObject();
                                 redis.putString("command", "get");
                                 redis.putArray("args", new JsonArray().add(key));
@@ -176,7 +176,7 @@ public class RedisSessionStore implements SessionStore {
                     new AsyncIterator<Object>(keys.iterator()) {
                         @Override
                         public void handle(Object key) {
-                            if (!isEnd()) {
+                            if (hasNext()) {
                                 JsonObject redis = new JsonObject();
                                 redis.putString("command", "del");
                                 redis.putArray("args", new JsonArray().add(key));

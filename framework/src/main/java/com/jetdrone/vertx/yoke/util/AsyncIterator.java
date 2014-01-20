@@ -23,8 +23,8 @@ public abstract class AsyncIterator<T> implements Handler<T> {
         next();
     }
 
-    public final boolean isEnd() {
-        return end;
+    public final boolean hasNext() {
+        return !end;
     }
 
     public final void next() {

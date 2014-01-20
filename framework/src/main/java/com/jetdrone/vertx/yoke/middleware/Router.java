@@ -733,7 +733,7 @@ public class Router extends Middleware {
                     new AsyncIterator<String>(binding.paramNames) {
                         @Override
                         public void handle(String param) {
-                            if (!isEnd()) {
+                            if (hasNext()) {
                                 params.add(param, m.group(param));
                                 Middleware paramMiddleware = paramProcessors.get(param);
                                 if (paramMiddleware != null) {
