@@ -119,17 +119,23 @@ public class FormAuth extends Middleware {
         next.handle(null);
     }
 
-    public static class RequiredAuth extends Middleware {
+    public final Middleware RequiredAuth = new Middleware() {
         @Override
-        public void handle(YokeRequest request, Handler<Object> next) {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
-    }
+        public void handle(YokeRequest request, final Handler<Object> next) {
+            if (request.sessionId() != null) {
+                next.handle(null);
+                return;
+            }
 
-    public static class UserExists extends Middleware {
+            request.response().setStatusCode(403);
+            request.response().redirect(loginURI + "?redirect_url=" + request.normalizedPath());
+        }
+    };
+
+    public final Middleware UserExists = new Middleware() {
         @Override
-        public void handle(YokeRequest request, Handler<Object> next) {
+        public void handle(YokeRequest request, final Handler<Object> next) {
             //To change body of implemented methods use File | Settings | File Templates.
         }
-    }
+    };
 }

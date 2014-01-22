@@ -2,7 +2,6 @@ package com.jetdrone.vertx.yoke.core;
 
 import org.vertx.groovy.core.MultiMap;
 import org.vertx.groovy.core.impl.DefaultMultiMap;
-import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 
 import java.util.Iterator;
 import java.util.List;
@@ -12,10 +11,6 @@ import java.util.Set;
 public class GMultiMap implements MultiMap {
 
     private final MultiMap impl;
-
-    public GMultiMap() {
-        this(new CaseInsensitiveMultiMap());
-    }
 
     public GMultiMap(org.vertx.java.core.MultiMap base) {
         this.impl = new DefaultMultiMap(base);
