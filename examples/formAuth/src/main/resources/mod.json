@@ -1,0 +1,4 @@
+{
+  "main": "com.jetdrone.vertx.FormAuthExample",
+  "includes": "com.jetdrone~yoke~1.0.5-SNAPSHOT"
+}

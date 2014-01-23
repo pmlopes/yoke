@@ -68,7 +68,6 @@ public class Session extends Middleware {
             // session cookies must be signed
             if (sessionCookie.isSigned()) {
                 unsigned = sessionCookie.getUnsignedValue();
-                System.out.println("unsigned: " + unsigned);
                 if (unsigned != null) {
                     hash = crc16(unsigned);
                 }

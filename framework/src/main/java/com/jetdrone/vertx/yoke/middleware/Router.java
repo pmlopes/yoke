@@ -722,51 +722,71 @@ public class Router extends Middleware {
     }
 
     private void route(final YokeRequest request, final Handler<Object> next, final List<PatternBinding> bindings) {
-        for (final PatternBinding binding: bindings) {
-            // TODO: use normalized path?
-            final Matcher m = binding.pattern.matcher(request.path());
-            if (m.matches()) {
-                final MultiMap params = request.params();
 
-                if (binding.paramNames != null) {
-                    // Named params
-                    new AsyncIterator<String>(binding.paramNames) {
+        new AsyncIterator<PatternBinding>(bindings) {
+            @Override
+            public void handle(PatternBinding binding) {
+                if (hasNext()) {
+                    route(request, binding, new Handler<Object>() {
                         @Override
-                        public void handle(String param) {
-                            if (hasNext()) {
-                                params.add(param, m.group(param));
-                                Middleware paramMiddleware = paramProcessors.get(param);
-                                if (paramMiddleware != null) {
-                                    paramMiddleware.handle(request, new Handler<Object>() {
-                                        @Override
-                                        public void handle(Object err) {
-                                            if (err == null) {
-                                                next();
-                                            } else {
-                                                next.handle(err);
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    next();
-                                }
+                        public void handle(Object err) {
+                            if (err == null) {
+                                next();
                             } else {
-                                binding.middleware.handle(request, next);
+                                next.handle(err);
                             }
                         }
-                    };
+                    });
                 } else {
-                    // Un-named params
-                    for (int i = 0; i < m.groupCount(); i++) {
-                        params.add("param" + i, m.group(i + 1));
-                    }
-                    binding.middleware.handle(request, next);
+                    // continue with yoke
+                    next.handle(null);
                 }
-                return;
             }
-        }
+        };
+    }
 
-        next.handle(null);
+    private void route(final YokeRequest request, final PatternBinding binding, final Handler<Object> next) {
+        final Matcher m = binding.pattern.matcher(request.path());
+        if (m.matches()) {
+            final MultiMap params = request.params();
+
+            if (binding.paramNames != null) {
+                // Named params
+                new AsyncIterator<String>(binding.paramNames) {
+                    @Override
+                    public void handle(String param) {
+                        if (hasNext()) {
+                            params.add(param, m.group(param));
+                            Middleware paramMiddleware = paramProcessors.get(param);
+                            if (paramMiddleware != null) {
+                                paramMiddleware.handle(request, new Handler<Object>() {
+                                    @Override
+                                    public void handle(Object err) {
+                                        if (err == null) {
+                                            next();
+                                        } else {
+                                            next.handle(err);
+                                        }
+                                    }
+                                });
+                            } else {
+                                next();
+                            }
+                        } else {
+                            binding.middleware.handle(request, next);
+                        }
+                    }
+                };
+            } else {
+                // Un-named params
+                for (int i = 0; i < m.groupCount(); i++) {
+                    params.add("param" + i, m.group(i + 1));
+                }
+                binding.middleware.handle(request, next);
+            }
+        } else {
+            next.handle(null);
+        }
     }
 
     private static class PatternBinding {

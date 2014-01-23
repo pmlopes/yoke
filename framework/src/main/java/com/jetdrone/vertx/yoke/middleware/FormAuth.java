@@ -1,7 +1,6 @@
-package com.jetdrone.vertx.yoke.extras.middleware;
+package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -103,6 +102,8 @@ public class FormAuth extends Middleware {
                         }
                     }
                 });
+
+                return;
             }
         }
 
