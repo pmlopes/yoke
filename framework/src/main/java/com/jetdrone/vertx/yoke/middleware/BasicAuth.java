@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -13,20 +14,6 @@ import javax.xml.bind.DatatypeConverter;
 // Enfore basic authentication by providing a AuthHandler.handler(user, pass), which must return true in order to gain
 // access. Populates request.user. The final alternative is simply passing username / password strings.
 public class BasicAuth extends Middleware {
-
-    // ## AuthHandler
-    // AuthHandler interface that needs to be implemented in order to validate usernames/passwords.
-    public interface AuthHandler {
-        // Handles a challenge authentication request and asynchronously returns true on success.
-        //
-        // @method handle
-        // @asynchronous
-        //
-        // @param {String} username
-        // @param {String} password
-        // @param {Handler} result
-        void handle(String username, String password, Handler<Boolean> result);
-    }
 
     // Realm name for the application
     //
@@ -55,8 +42,13 @@ public class BasicAuth extends Middleware {
         this.realm = realm;
         authHandler = new AuthHandler() {
             @Override
-            public void handle(String _username, String _password, Handler<Boolean> result) {
-                result.handle(username.equals(_username) && password.equals(_password));
+            public void handle(String _username, String _password, Handler<JsonObject> result) {
+                boolean success = username.equals(_username) && password.equals(_password);
+                if (success) {
+                    result.handle(new JsonObject().putString("username", _username));
+                } else {
+                    result.handle(null);
+                }
             }
         };
     }
@@ -93,7 +85,7 @@ public class BasicAuth extends Middleware {
     //           }
     //         }
     //       }, "My App Auth");
-    public BasicAuth(AuthHandler authHandler, String realm) {
+    public BasicAuth(String realm, AuthHandler authHandler) {
         this.realm = realm;
         this.authHandler = authHandler;
     }
@@ -116,7 +108,7 @@ public class BasicAuth extends Middleware {
     //         }
     //       });
     public BasicAuth(AuthHandler authHandler) {
-        this(authHandler, "Authentication required");
+        this("Authentication required", authHandler);
     }
 
     // Handle all forbidden errors, in this case we need to add a special header to the response
@@ -162,10 +154,10 @@ public class BasicAuth extends Middleware {
             if (!"Basic".equals(scheme)) {
                 next.handle(400);
             } else {
-                authHandler.handle(user, pass, new Handler<Boolean>() {
+                authHandler.handle(user, pass, new Handler<JsonObject>() {
                     @Override
-                    public void handle(Boolean valid) {
-                        if (valid) {
+                    public void handle(JsonObject json) {
+                        if (json != null) {
                             request.put("user", user);
                             next.handle(null);
                         } else {

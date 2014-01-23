@@ -20,14 +20,14 @@ public class FormAuth extends Middleware {
     private final boolean forceSSL;
 
     public FormAuth(AuthHandler authHandler) {
-        this(authHandler, false);
+        this(false, authHandler);
     }
 
-    public FormAuth(AuthHandler authHandler, boolean forceSSL) {
-        this(authHandler, forceSSL, "/login", "/logout", null);
+    public FormAuth(boolean forceSSL, AuthHandler authHandler) {
+        this(forceSSL, "/login", "/logout", null, authHandler);
     }
 
-    public FormAuth(AuthHandler authHandler, boolean forceSSL, String loginURI, String logoutURI, String loginTemplate) {
+    public FormAuth(boolean forceSSL, String loginURI, String logoutURI, String loginTemplate, AuthHandler authHandler) {
         this.authHandler = authHandler;
         this.loginURI = loginURI;
         this.logoutURI = logoutURI;

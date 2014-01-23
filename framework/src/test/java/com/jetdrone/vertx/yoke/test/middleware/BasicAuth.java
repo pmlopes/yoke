@@ -2,6 +2,7 @@ package com.jetdrone.vertx.yoke.test.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.middleware.AuthHandler;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
@@ -53,10 +55,15 @@ public class BasicAuth extends TestVerticle {
     @Test
     public void testEmptyPassword() {
         final Yoke yoke = new Yoke(this);
-        yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth(new com.jetdrone.vertx.yoke.middleware.BasicAuth.AuthHandler() {
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth(new AuthHandler() {
             @Override
-            public void handle(String username, String password, Handler<Boolean> result) {
-                result.handle(username.equals("Aladdin") && password == null);
+            public void handle(String username, String password, Handler<JsonObject> result) {
+                boolean success = username.equals("Aladdin") && password == null;
+                if (success) {
+                    result.handle(new JsonObject().putString("username", username));
+                } else {
+                    result.handle(null);
+                }
             }
         }));
 
