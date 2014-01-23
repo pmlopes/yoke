@@ -71,7 +71,6 @@ public class YokeRequest implements HttpServerRequest {
     protected Object body;
     private Map<String, YokeFileUpload> files;
     private Set<YokeCookie> cookies;
-    private String sessionId;
     // control flags
     private boolean expectMultiPartCalled = false;
 
@@ -113,6 +112,9 @@ public class YokeRequest implements HttpServerRequest {
     // @return {R} the previous value or null
     @SuppressWarnings("unchecked")
     public <R> R put(String name, R value) {
+        if (value == null) {
+            return (R) context.remove(name);
+        }
         return (R) context.put(name, value);
     }
 
@@ -260,50 +262,87 @@ public class YokeRequest implements HttpServerRequest {
         this.cookies = cookies;
     }
 
-    public String sessionId() {
-        return sessionId;
+    // Session management
+
+    // Destroys a session from the request context and also from the storage engine.
+    // @method destroySession
+    public void destroySession() {
+        JsonObject session = get("session");
+        if (session == null) {
+            return;
+        }
+
+        String sessionId = session.getString("id");
+        // remove from the context
+        put("session", null);
+
+        if (sessionId == null) {
+            return;
+        }
+
+        store.destroy(sessionId, new Handler<Object>() {
+            @Override
+            public void handle(Object error) {
+                if (error != null) {
+                    // TODO: better handling of errors
+                    System.err.println(error);
+                }
+            }
+        });
     }
 
-    public void loadSessionData(Handler<JsonObject> handler) {
+    // Loads a session given its session id and sets the "session" property in the request context.
+    // @method loadSession
+    // @param {String} sessionId the id to load
+    // @param {Handler} handler the success/complete handler
+    public void loadSession(String sessionId, final Handler<Object> handler) {
         if (sessionId == null) {
             handler.handle(null);
             return;
         }
 
-        store.get(sessionId, handler);
-    }
-
-    public void saveSessionData(JsonObject sessionData, Handler<Object> handler) {
-        if (sessionId == null) {
-            createSession();
-        }
-
-        store.set(sessionId, sessionData, handler);
-    }
-
-    public void destroySession(Handler<Object> handler) {
-        if (sessionId == null) {
-            handler.handle("no session");
-            return;
-        }
-
-        store.destroy(sessionId, handler);
-        sessionId = null;
-    }
-
-    public void destroySession() {
-        destroySession(new Handler<Object>() {
+        store.get(sessionId, new Handler<JsonObject>() {
             @Override
-            public void handle(Object event) {}
+            public void handle(JsonObject session) {
+                if (session != null) {
+                    put("session", session);
+                }
+                handler.handle(null);
+            }
         });
     }
 
-    protected String createSession(String sid) {
-        return sessionId = sid;
-    }
+    // Create a new Session and store it with the underlying storage.
+    // Internally create a entry in the request context under the name "session" and add a end handler to save that
+    // object once the execution is terminated.
+    //
+    // @method createSession
+    // @return {JsonObject} session
+    public JsonObject createSession() {
+        final String sessionId = UUID.randomUUID().toString();
+        final JsonObject session = new JsonObject().putString("id", sessionId);
 
-    public String createSession() {
-        return createSession(UUID.randomUUID().toString());
+        put("session", session);
+
+        response().headersHandler(new Handler<Void>() {
+            @Override
+            public void handle(Void event) {
+                JsonObject session = get("session");
+                if (session != null) {
+                    store.set(sessionId, session, new Handler<Object>() {
+                        @Override
+                        public void handle(Object error) {
+                            if (error != null) {
+                                // TODO: better handling of errors
+                                System.err.println(error);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
+        return session;
     }
 
     public boolean isSecure() {

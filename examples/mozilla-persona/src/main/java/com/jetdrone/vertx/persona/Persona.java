@@ -39,25 +39,22 @@ public class Persona extends Verticle {
                 .get("/", new Middleware() {
                     @Override
                     public void handle(final YokeRequest request, final Handler<Object> next) {
-                        request.loadSessionData(new Handler<JsonObject>() {
-                            @Override
-                            public void handle(JsonObject sessionData) {
-                                if (sessionData == null) {
-                                    // no session
-                                    request.put("email", "null");
-                                } else {
-                                    String email = sessionData.getString("email");
+                        JsonObject sessionData = request.get("session");
 
-                                    if (email == null) {
-                                        request.put("email", "null");
-                                    } else {
-                                        request.put("email", "'" + email + "'");
-                                    }
-                                }
+                        if (sessionData == null) {
+                            // no session
+                            request.put("email", "null");
+                        } else {
+                            String email = sessionData.getString("email");
 
-                                request.response().render("views/index.html", next);
+                            if (email == null) {
+                                request.put("email", "null");
+                            } else {
+                                request.put("email", "'" + email + "'");
                             }
-                        });
+                        }
+
+                        request.response().render("views/index.html", next);
                     }
                 })
                 .post("/auth/logout", new Middleware() {
@@ -114,20 +111,10 @@ public class Persona extends Verticle {
                                             String email = valid ? verifierResp.getString("email") : null;
                                             // assertion is valid:
                                             if (valid) {
-                                                // generate a session Id
-                                                String sid = request.createSession();
-                                                // save it and associate to the email address
-                                                request.saveSessionData(new JsonObject().putString("email", email), new Handler<Object>() {
-                                                    @Override
-                                                    public void handle(Object error) {
-                                                        if (error != null) {
-                                                            next.handle(error);
-                                                            return;
-                                                        }
-                                                        // OK response
-                                                        request.response().end(new JsonObject().putBoolean("success", true));
-                                                    }
-                                                });
+                                                // generate a session
+                                                request.createSession();
+                                                // OK response
+                                                request.response().end(new JsonObject().putBoolean("success", true));
                                             } else {
                                                 request.response().end(new JsonObject().putBoolean("success", false));
                                             }

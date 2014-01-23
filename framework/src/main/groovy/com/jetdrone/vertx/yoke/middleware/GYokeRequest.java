@@ -342,37 +342,11 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
         return normalizedPath();
     }
 
-    public String getSessionId() {
-        return sessionId();
-    }
-
-    public void loadSessionData(final Closure handler) {
-        loadSessionData(new Handler<JsonObject>() {
+    public void loadSession(String sessionId, final Closure handler) {
+        loadSession(sessionId, new Handler<Object>() {
             @Override
-            public void handle(JsonObject sessionData) {
-                if (sessionData == null) {
-                    handler.call();
-                    return;
-                }
-                handler.call(sessionData.toMap());
-            }
-        });
-    }
-
-    public void saveSessionData(Map<String, Object> sessionData, final Closure handler) {
-        saveSessionData(new JsonObject(sessionData), new Handler<Object>() {
-            @Override
-            public void handle(Object status) {
-                handler.call(status);
-            }
-        });
-    }
-
-    public void destroySession(final Closure handler) {
-        destroySession(new Handler<Object>() {
-            @Override
-            public void handle(Object status) {
-                handler.call(status);
+            public void handle(Object event) {
+                handler.call(event);
             }
         });
     }

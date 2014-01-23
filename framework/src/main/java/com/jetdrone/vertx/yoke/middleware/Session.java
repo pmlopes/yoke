@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonObject;
 
 import javax.crypto.Mac;
 
@@ -58,28 +59,30 @@ public class Session extends Middleware {
 
         // find the session cookie
         final YokeCookie sessionCookie = request.getCookie(name);
+        final YokeResponse response = request.response();
 
         int hash = 0;
+        String unsigned = null;
 
         if (sessionCookie != null) {
             // session cookies must be signed
             if (sessionCookie.isSigned()) {
-                String unsigned = sessionCookie.getUnsignedValue();
+                unsigned = sessionCookie.getUnsignedValue();
+                System.out.println("unsigned: " + unsigned);
                 if (unsigned != null) {
                     hash = crc16(unsigned);
-                    request.createSession(unsigned);
                 }
             }
         }
 
         final int originalHash = hash;
-        final YokeResponse response = request.response();
 
         // call us when headers are being set for the response
         response.headersHandler(new Handler<Void>() {
             @Override
             public void handle(Void done) {
-                String sessionId = request.sessionId();
+                JsonObject session = request.get("session");
+                String sessionId = session == null ? null : session.getString("id");
 
                 // removed
                 if (sessionId == null) {
@@ -105,7 +108,12 @@ public class Session extends Middleware {
             }
         });
 
-        next.handle(null);
+        if (unsigned == null) {
+            next.handle(null);
+            return;
+        }
+
+        request.loadSession(unsigned, next);
     }
 
     private static final int[] CRC16_TABLE = {

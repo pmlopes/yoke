@@ -82,10 +82,11 @@ public class FormAuth extends Middleware {
                     @Override
                     public void handle(JsonObject user) {
                         if (user != null) {
-                            request.createSession();
+                            JsonObject session = request.createSession();
+                            session.putString("user", request.getFormParameter("username"));
+
                             // get the redirect_url parameter
                             String redirect = request.getParameter("redirect_url", "/");
-
                             request.response().redirect(redirect);
                         } else {
                             if (loginTemplate != null) {
@@ -109,8 +110,9 @@ public class FormAuth extends Middleware {
             if ("GET".equals(request.method())) {
                 // remove session from storage
                 request.destroySession();
-                // TODO: redirect?
-                request.response().end();
+                // get the redirect_url parameter
+                String redirect = request.getParameter("redirect_url", "/");
+                request.response().redirect(redirect);
                 return;
             }
         }
@@ -121,21 +123,17 @@ public class FormAuth extends Middleware {
 
     public final Middleware RequiredAuth = new Middleware() {
         @Override
-        public void handle(YokeRequest request, final Handler<Object> next) {
-            if (request.sessionId() != null) {
-                next.handle(null);
-                return;
+        public void handle(final YokeRequest request, final Handler<Object> next) {
+            JsonObject session = request.get("session");
+
+            if (session != null) {
+                if (session.getString("id") != null) {
+                    next.handle(null);
+                    return;
+                }
             }
 
-            request.response().setStatusCode(403);
             request.response().redirect(loginURI + "?redirect_url=" + request.normalizedPath());
-        }
-    };
-
-    public final Middleware UserExists = new Middleware() {
-        @Override
-        public void handle(YokeRequest request, final Handler<Object> next) {
-            //To change body of implemented methods use File | Settings | File Templates.
         }
     };
 }
