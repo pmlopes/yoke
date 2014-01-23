@@ -201,7 +201,7 @@ public class YokeRequest implements HttpServerRequest {
 
     // Returns true if this request has setBody
     //
-    // @return true if content-length or transfer-encoding is present
+    // @return {Boolean} true if content-length or transfer-encoding is present
     public boolean hasBody() {
         MultiMap headers = headers();
         return headers.contains("transfer-encoding") || headers.contains("content-length");
@@ -500,7 +500,7 @@ public class YokeRequest implements HttpServerRequest {
 
     // Allow getting parameters in a generified way.
     //
-    // @param n{String} ame The key to get
+    // @param {String} name The key to get
     // @return {List} The found object
     public List<String> getParameterList(String name) {
         return params().getAll(name);
