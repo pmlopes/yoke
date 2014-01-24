@@ -61,7 +61,7 @@ public class FormAuth extends Middleware {
                     request.response().setContentType("text/html");
                     request.response().end(
                             loginTemplate.replace("{title}", (String) request.get("title"))
-                                    .replace("{action}", loginURI + "?redirect_url=" + request.getParameter("redirect_url", "/"))
+                                    .replace("{action}", loginURI + "?redirect_url=" + Utils.encodeURIComponent(request.getParameter("redirect_url", "/")))
                                     .replace("{message}", ""));
                 } else {
                     // render login
@@ -86,7 +86,7 @@ public class FormAuth extends Middleware {
 
                             // get the redirect_url parameter
                             String redirect = request.getParameter("redirect_url", "/");
-                            request.response().redirect(redirect);
+                            request.response().redirect(Utils.decodeURIComponent(redirect));
                         } else {
                             if (loginTemplate != null) {
                                 // render internal login
@@ -94,7 +94,7 @@ public class FormAuth extends Middleware {
                                 request.response().setStatusCode(401);
                                 request.response().end(
                                         loginTemplate.replace("{title}", (String) request.get("title"))
-                                                .replace("{action}", loginURI + "?redirect_url=" + request.getParameter("redirect_url", "/"))
+                                                .replace("{action}", loginURI + "?redirect_url=" + Utils.encodeURIComponent(request.getParameter("redirect_url", "/")))
                                                 .replace("{message}", "Invalid username and/or password, please try again."));
                             } else {
                                 next.handle(401);
@@ -113,7 +113,7 @@ public class FormAuth extends Middleware {
                 request.destroySession();
                 // get the redirect_url parameter
                 String redirect = request.getParameter("redirect_url", "/");
-                request.response().redirect(redirect);
+                request.response().redirect(Utils.decodeURIComponent(redirect));
                 return;
             }
         }
@@ -134,7 +134,8 @@ public class FormAuth extends Middleware {
                 }
             }
 
-            request.response().redirect(loginURI + "?redirect_url=" + request.normalizedPath());
+            String redirect = request.getParameter("redirect_url", Utils.encodeURIComponent(request.uri()));
+            request.response().redirect(loginURI + "?redirect_url=" + Utils.decodeURIComponent(redirect));
         }
     };
 }

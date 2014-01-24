@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -312,6 +313,18 @@ public final class Utils {
                     .replaceAll("%28", "(")
                     .replaceAll("%29", ")")
                     .replaceAll("%7E", "~");
+        } catch (UnsupportedEncodingException e) {
+            result = s;
+        }
+
+        return result;
+    }
+
+    public static String decodeURIComponent(String s) {
+        String result;
+
+        try {
+            result = URLDecoder.decode(s, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             result = s;
         }
