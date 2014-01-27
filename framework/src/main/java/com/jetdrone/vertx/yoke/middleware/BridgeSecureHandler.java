@@ -10,7 +10,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.logging.Logger;
 
 // # BridgeSecureHandler
 //
@@ -36,8 +35,8 @@ public class BridgeSecureHandler extends Middleware {
     private final SessionStore sessionStore;
 
     @Override
-    public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
-        super.init(vertx, logger, mount);
+    public Middleware init(final Vertx vertx, final String mount) {
+        super.init(vertx, mount);
 
         // register a new handler for the configured address
         vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {

@@ -10,8 +10,6 @@ import org.vertx.java.core.VoidHandler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.logging.Logger;
 
 // # RequestProxy
 //
@@ -26,12 +24,6 @@ public class RequestProxy extends Middleware {
     private final String host;
     private final int port;
     private final boolean secure;
-
-    @Override
-    public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
-        super.init(vertx, logger, mount);
-        return this;
-    }
 
     public RequestProxy(String prefix, String host, int port, boolean secure) {
         this.prefix = prefix;

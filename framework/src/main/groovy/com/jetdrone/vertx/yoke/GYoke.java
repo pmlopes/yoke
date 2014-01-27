@@ -22,13 +22,16 @@ import com.jetdrone.vertx.yoke.middleware.GYokeResponse;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
+import org.vertx.groovy.platform.Container;
+import org.vertx.groovy.platform.Verticle;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
 import org.vertx.groovy.core.Vertx;
 import org.vertx.groovy.core.http.HttpServer;
-import org.vertx.java.core.logging.Logger;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +49,28 @@ public class GYoke {
 
     private final Yoke jYoke;
     private final org.vertx.java.core.Vertx vertx;
+    private Container container;
+
+    // Creates a Yoke instance.
+    //
+    // This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
+    // with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
+    // system and timers.
+    //
+    // @constructor
+    // @param {Verticle} verticle
+    //
+    // @example
+    //      public class MyVerticle extends Verticle {
+    //          public void start() {
+    //              def yoke = new Yoke(this)
+    //              ...
+    //          }
+    //      }
+    public GYoke(Verticle verticle) {
+        this(verticle.getVertx());
+        this.container = verticle.getContainer();
+    }
 
     /**
      * Creates a Yoke instance.
@@ -56,10 +81,10 @@ public class GYoke {
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(Vertx vertx, Logger logger) {
+    public GYoke(Vertx vertx) {
         this.vertx = vertx.toJavaVertx();
 
-        jYoke = new Yoke(this.vertx, logger, new RequestWrapper() {
+        jYoke = new Yoke(this.vertx, null, new RequestWrapper() {
             @Override
             public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Engine> engines) {
                 // the context map is shared with all middlewares
@@ -201,6 +226,83 @@ public class GYoke {
         org.vertx.java.core.http.HttpServer server = gserver.toJavaServer();
         jYoke.listen(server);
         return this;
+    }
+
+    // Deploys required middleware
+    //
+    // @method deploy
+    // @param {JsonElement} config
+    @SuppressWarnings("unchecked")
+    public GYoke deploy(Object config, Closure handler) {
+        if (config instanceof List) {
+            for (Object o : (List) config) {
+                Map mod = (Map) o;
+
+                String module = (String) mod.get("module");
+                String verticle = (String) mod.get("verticle");
+                Integer instances = (Integer) mod.get("instances");
+                Map modConfig = (Map) mod.get("config");
+                Boolean worker = (Boolean) mod.get("worker");
+                Boolean multiThreaded = (Boolean) mod.get("multiThreaded");
+
+                instances = instances == null ? 1 : instances;
+                modConfig = modConfig == null ? Collections.emptyMap() : modConfig;
+                worker = worker == null ? false : worker;
+                multiThreaded = multiThreaded == null ? false : multiThreaded;
+
+                if (module != null) {
+                    deploy(module, true, false, false, instances, modConfig, handler);
+                } else {
+                    deploy(verticle, false, worker, multiThreaded, instances, modConfig, handler);
+                }
+            }
+        } else {
+            Map mod = (Map) config;
+
+            String module = (String) mod.get("module");
+            String verticle = (String) mod.get("verticle");
+            Integer instances = (Integer) mod.get("instances");
+            Map modConfig = (Map) mod.get("config");
+            Boolean worker = (Boolean) mod.get("worker");
+            Boolean multiThreaded = (Boolean) mod.get("multiThreaded");
+
+            instances = instances == null ? 1 : instances;
+            modConfig = modConfig == null ? Collections.emptyMap() : modConfig;
+            worker = worker == null ? false : worker;
+            multiThreaded = multiThreaded == null ? false : multiThreaded;
+
+            if (module != null) {
+                deploy(module, true, false, false, instances, modConfig, handler);
+            } else {
+                deploy(verticle, false, worker, multiThreaded, instances, modConfig, handler);
+            }
+        }
+
+        return this;
+    }
+
+    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, Map<String, Object> config, Closure handler) {
+        if (module) {
+            if (handler != null) {
+                container.deployModule(name, config, instances, handler);
+            } else {
+                container.deployModule(name, config, instances);
+            }
+        } else {
+            if (worker) {
+                if (handler != null) {
+                    container.deployWorkerVerticle(name, config, instances, multiThreaded, handler);
+                } else {
+                    container.deployWorkerVerticle(name, config, instances, multiThreaded);
+                }
+            } else {
+                if (handler != null) {
+                    container.deployVerticle(name, config, instances, handler);
+                } else {
+                    container.deployVerticle(name, config, instances);
+                }
+            }
+        }
     }
 
     public Yoke toJavaYoke() {

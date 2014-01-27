@@ -9,7 +9,6 @@ import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.logging.Logger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -50,44 +49,44 @@ public class Router extends Middleware {
     }
 
     @Override
-    public Middleware init(Vertx vertx, Logger logger, String mount) {
-        super.init(vertx, logger, mount);
+    public Middleware init(Vertx vertx, String mount) {
+        super.init(vertx, mount);
         // since this call can happen after the bindings are in place we need to update all bindings to have a reference
         // to the vertx object
         for (PatternBinding binding : getBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : putBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : postBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : deleteBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : optionsBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : headBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : traceBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : connectBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         for (PatternBinding binding : patchBindings) {
-            binding.middleware.init(vertx, logger, mount);
+            binding.middleware.init(vertx, mount);
         }
 
         return this;
@@ -669,7 +668,7 @@ public class Router extends Middleware {
 
     public Router param(final String paramName, final Middleware handler) {
         // also pass the vertx object to the routes
-        handler.init(vertx, logger, mount);
+        handler.init(vertx, mount);
         paramProcessors.put(paramName, handler);
         return this;
     }
@@ -710,14 +709,14 @@ public class Router extends Middleware {
         String regex = sb.toString();
         PatternBinding binding = new PatternBinding(Pattern.compile(regex), groups, handler);
         // also pass the vertx object to the routes
-        handler.init(vertx, logger, mount);
+        handler.init(vertx, mount);
         bindings.add(binding);
     }
 
     private void addRegEx(Pattern regex, Middleware handler, List<PatternBinding> bindings) {
         PatternBinding binding = new PatternBinding(regex, null, handler);
         // also pass the vertx object to the routes
-        handler.init(vertx, logger, mount);
+        handler.init(vertx, mount);
         bindings.add(binding);
     }
 

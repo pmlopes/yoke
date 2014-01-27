@@ -17,7 +17,9 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.logging.Logger;
+import org.vertx.java.core.json.JsonElement;
+import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.platform.Container;
 import org.vertx.java.platform.Verticle;
 
 import java.util.*;
@@ -39,11 +41,11 @@ public class Yoke implements RequestWrapper {
     // @property vertx
     private final Vertx vertx;
 
-    // internal logger
+    // Vert.x container
     //
     // @private
-    // @property logger
-    private final Logger logger;
+    // @property container
+    private final Container container;
 
     // request wrapper in use
     //
@@ -87,7 +89,7 @@ public class Yoke implements RequestWrapper {
     //          }
     //      }
     public Yoke(Verticle verticle) {
-        this(verticle.getVertx(), verticle.getContainer().logger(), null);
+        this(verticle.getVertx(), verticle.getContainer(), null);
     }
 
     // Creates a Yoke instance.
@@ -97,19 +99,37 @@ public class Yoke implements RequestWrapper {
     // features such as file system and timers.
     //
     // @constructor
-    // @param {Verticle} verticle
-    // @param {Logger} logger
+    // @param {Vertx} vertx
     //
     // @example
     //      public class MyVerticle extends Verticle {
     //          public void start() {
-    //              final Yoke yoke = new Yoke(getVertx(),
-    //                  getContainer().logger());
+    //              final Yoke yoke = new Yoke(getVertx());
     //              ...
     //          }
     //      }
-    public Yoke(Vertx vertx, Logger logger) {
-        this(vertx, logger, null);
+    public Yoke(Vertx vertx) {
+        this(vertx, null, null);
+    }
+
+    // Creates a Yoke instance.
+    //
+    // This constructor should be called from a verticle and pass a valid Vertx instance and a Container. This instance
+    // will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
+    // features such as file system and timers.
+    //
+    // @constructor
+    // @param {Vertx} vertx
+    //
+    // @example
+    //      public class MyVerticle extends Verticle {
+    //          public void start() {
+    //              final Yoke yoke = new Yoke(getVertx());
+    //              ...
+    //          }
+    //      }
+    public Yoke(Vertx vertx, Container container) {
+        this(vertx, container, null);
     }
 
     // Creates a Yoke instance.
@@ -119,21 +139,21 @@ public class Yoke implements RequestWrapper {
     // @constructor
     // @internal
     // @param {Verticle} verticle
-    // @param {Logger} logger
+    // @param {Container} container
     // @param {RequestWrapper} requestWrapper
     //
     // @example
     //      public class MyVerticle extends Verticle {
     //          public void start() {
     //              final Yoke yoke = new Yoke(getVertx(),
-    //                  getContainer().logger(),
+    //                  getContainer(),
     //                  new RequestWrapper() {...});
     //              ...
     //          }
     //      }
-    public Yoke(Vertx vertx, Logger logger, RequestWrapper requestWrapper) {
+    public Yoke(Vertx vertx, Container container, RequestWrapper requestWrapper) {
         this.vertx = vertx;
-        this.logger = logger;
+        this.container = container;
         this.requestWrapper = requestWrapper == null ? this : requestWrapper;
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
@@ -195,7 +215,7 @@ public class Yoke implements RequestWrapper {
             }
 
             // initialize the middleware with the current Vert.x and Logger
-            m.init(vertx, logger, route);
+            m.init(vertx, route);
         }
         return this;
     }
@@ -442,5 +462,64 @@ public class Yoke implements RequestWrapper {
             }
         });
         return this;
+    }
+
+    // Deploys required middleware
+    //
+    // @method deploy
+    // @param {JsonElement} config
+    public Yoke deploy(JsonElement config) {
+        return deploy(config, null);
+    }
+
+    // Deploys required middleware
+    //
+    // @method deploy
+    // @param {JsonElement} config
+    // @param {Handler} handler
+    public Yoke deploy(JsonElement config, Handler<AsyncResult<String>> handler) {
+        if (config.isArray()) {
+            for (Object o : config.asArray()) {
+                JsonObject mod = (JsonObject) o;
+                if (mod.getString("module") != null) {
+                    deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+                } else {
+                    deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+                }
+            }
+        } else {
+            JsonObject mod = config.asObject();
+            if (mod.getString("module") != null) {
+                deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+            } else {
+                deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+            }
+        }
+
+        return this;
+    }
+
+    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, JsonObject config, Handler<AsyncResult<String>> handler) {
+        if (module) {
+            if (handler != null) {
+                container.deployModule(name, config, instances, handler);
+            } else {
+                container.deployModule(name, config, instances);
+            }
+        } else {
+            if (worker) {
+                if (handler != null) {
+                    container.deployWorkerVerticle(name, config, instances, multiThreaded, handler);
+                } else {
+                    container.deployWorkerVerticle(name, config, instances, multiThreaded);
+                }
+            } else {
+                if (handler != null) {
+                    container.deployVerticle(name, config, instances, handler);
+                } else {
+                    container.deployVerticle(name, config, instances);
+                }
+            }
+        }
     }
 }

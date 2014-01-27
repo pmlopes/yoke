@@ -121,9 +121,9 @@ public class Favicon extends Middleware {
     // @param {Logger} logger
     // @param {String} mount
     @Override
-    public Middleware init(Vertx vertx, Logger logger, String mount) {
+    public Middleware init(Vertx vertx, String mount) {
         try {
-            super.init(vertx, logger, mount);
+            super.init(vertx, mount);
             if (path == null) {
                 icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {

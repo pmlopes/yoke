@@ -40,8 +40,8 @@ public class FormAuth extends Middleware {
     }
 
     @Override
-    public Middleware init(final Vertx vertx, final Logger logger, final String mount) {
-        super.init(vertx, logger, mount);
+    public Middleware init(final Vertx vertx, final String mount) {
+        super.init(vertx, mount);
         // trim the initial slash
         String correctedMount = mount;
         if (mount.endsWith("/")) {

@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpVersion;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.Date;
 
@@ -22,6 +23,8 @@ import java.util.Date;
 // equal to 500 the fatal severity is used, for status greater or equal to 400 the error severity is used, for status
 // greater or equal to 300 warn is used and for status above 100 info is used.
 public class Logger extends Middleware {
+
+    private final org.vertx.java.core.logging.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     // The Date formatter (UTC JS compatible format)
     // @property ISODATE

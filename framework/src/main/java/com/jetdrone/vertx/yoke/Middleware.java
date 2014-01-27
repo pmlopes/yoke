@@ -6,7 +6,6 @@ package com.jetdrone.vertx.yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.logging.Logger;
 
 // # Middleware
 //
@@ -46,12 +45,6 @@ public abstract class Middleware {
     // @protected
     protected Vertx vertx;
 
-    // The internal logger.
-    //
-    // @property logger
-    // @protected
-    protected Logger logger;
-
     // The configured mount point for this middleware.
     //
     // @property mount
@@ -62,12 +55,10 @@ public abstract class Middleware {
     //
     // @method init
     // @param {Vertx} vertx the local Vert.x instance.
-    // @param {Logger} logger the current logger.
     // @param {String} mount the configured mount path.
     // @return {Middleware}
-    public Middleware init(Vertx vertx, Logger logger, String mount) {
+    public Middleware init(Vertx vertx, String mount) {
         this.vertx = vertx;
-        this.logger = logger;
         this.mount = mount;
 
         return this;
