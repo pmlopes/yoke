@@ -6,13 +6,18 @@ package com.jetdrone.vertx.yoke.core;
 import org.vertx.java.core.AsyncResult;
 
 // # YokeAsyncResult
+//
+// Class to wrap a pair of Throwable + Result into a Vert.x AsyncResult Object.
 public class YokeAsyncResult<T> implements AsyncResult<T> {
     final Throwable throwable;
     final T result;
 
-    /**
-     * Used from scripting engines
-     */
+    // Create a YokeAsyncResult given an error object and a result in the same style as CPS. This is useful for
+    // scripting engines where data types do not have to match java types.
+    //
+    // @constructor
+    // @param {Object} error
+    // @param {T} result
     public YokeAsyncResult(Object error, T result) {
         if (error != null) {
             if (error instanceof Throwable) {
@@ -28,11 +33,19 @@ public class YokeAsyncResult<T> implements AsyncResult<T> {
         this.result = result;
     }
 
+    // Create a new YokeAsyncResult given a Throwable error. This is always a failure result.
+    //
+    // @constructor
+    // @param {Throwable} throwable the error that was thrown.
     public YokeAsyncResult(Throwable throwable) {
         this.throwable = throwable;
         this.result = null;
     }
 
+    // Create a new YokeAsyncResult given a T result. This is always a successful result.
+    //
+    // @constructor
+    // @param {T} result the result from the operation.
     public YokeAsyncResult(T result) {
         this.throwable = null;
         this.result = result;

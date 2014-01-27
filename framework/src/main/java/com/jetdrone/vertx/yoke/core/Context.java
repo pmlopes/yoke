@@ -6,11 +6,23 @@ package com.jetdrone.vertx.yoke.core;
 import java.util.*;
 
 // # Context
+//
+// Context represents the state of a request. Internally it is a Map that allows read write operations and under it
+// there is the application context that only allows read operations. Adding elements to the context with the same
+// name as entries in the application context, shadows the application context entries.
 public final class Context implements Map<String, Object> {
 
+    // ReadOnly sub context (Application Context)
+    //
+    // @property ro
+    // @private
     private final Map<String, Object> ro;
     private Map<String, Object> rw;
 
+    // Create a new Context with the given Read Only sub context
+    //
+    // @constructor
+    // @param {Map} ro parent context
     public Context(Map<String, Object> ro) {
         this.ro = ro;
     }

@@ -14,6 +14,7 @@ import org.vertx.java.core.json.EncodeException;
 import org.vertx.java.core.json.impl.Base64;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 
 // # JSON
@@ -44,6 +45,18 @@ public final class JSON {
                     jgen.writeNull();
                 } else {
                     jgen.writeString(DATE_FORMAT.format(value));
+                }
+            }
+        });
+
+        ECMA_COMPAT.addDeserializer(Date.class, new JsonDeserializer<Date>() {
+            @Override
+            public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
+                String date = jp.getText();
+                try {
+                    return DATE_FORMAT.parse(date);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });

@@ -6,6 +6,9 @@ package com.jetdrone.vertx.yoke.core;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 // # YokeException
+//
+// A YokeException is a Exception that can be link to a specific Http Status Code without the need to handle it in code.
+// Error Handlers are expected to use the supplied status code.
 public class YokeException extends Throwable {
 
     private static final long serialVersionUID = 1L;
