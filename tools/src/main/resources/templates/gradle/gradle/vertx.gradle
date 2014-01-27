@@ -86,12 +86,10 @@ buildscript {
 
     // Users can be Vert.x platform classpath files (e.g. langs.properties) in either src/main/platform_lib
     // or src/main/resources/platform_lib (if they want it in the module for fatjars)
-    classpath files(['src/main/platform-lib'])
-    classpath files(['src/main/platform-lib/*.jar'])
-    classpath files(['src/main/platform-lib/*.zip'])
-    classpath files(['src/main/resources/platform-lib'])
-    classpath files(['src/main/resources/platform-lib/*.jar'])
-    classpath files(['src/main/resources/platform-lib/*.zip'])
+    classpath files(['src/main/platform_lib'])
+    classpath fileTree(dir: 'src/main/platform_lib', includes: ['*.jar', '*.zip'])
+    classpath files(['src/main/resources/platform_lib'])
+    classpath fileTree(dir: 'src/main/resources/platform_lib', includes: ['*.jar', '*.zip'])
   }
 }
 

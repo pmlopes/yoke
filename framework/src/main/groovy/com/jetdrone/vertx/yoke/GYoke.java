@@ -49,7 +49,7 @@ public class GYoke {
 
     private final Yoke jYoke;
     private final org.vertx.java.core.Vertx vertx;
-    private Container container;
+    private final Container container;
 
     // Creates a Yoke instance.
     //
@@ -68,8 +68,7 @@ public class GYoke {
     //          }
     //      }
     public GYoke(Verticle verticle) {
-        this(verticle.getVertx());
-        this.container = verticle.getContainer();
+        this(verticle.getVertx(), verticle.getContainer());
     }
 
     /**
@@ -81,8 +80,9 @@ public class GYoke {
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(Vertx vertx) {
+    public GYoke(Vertx vertx, Container container) {
         this.vertx = vertx.toJavaVertx();
+        this.container = container;
 
         jYoke = new Yoke(this.vertx, null, new RequestWrapper() {
             @Override
