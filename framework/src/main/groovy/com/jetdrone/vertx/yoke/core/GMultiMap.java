@@ -1,3 +1,6 @@
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.core;
 
 import org.vertx.groovy.core.MultiMap;

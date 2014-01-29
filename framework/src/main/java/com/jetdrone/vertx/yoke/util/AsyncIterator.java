@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.util
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.util;
 
 import org.vertx.java.core.Handler;

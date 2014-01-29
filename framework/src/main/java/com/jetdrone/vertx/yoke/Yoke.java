@@ -1,6 +1,6 @@
-// Copyright 2011-2012 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.core.Context;
