@@ -23,23 +23,8 @@ public final class ThreadLocalUTCDateFormat extends ThreadLocal<DateFormat> {
         return get().format(value);
     }
 
-    @Override
-    public DateFormat get() {
-        return super.get();
-    }
-
     public final Date parse(String text) throws ParseException {
         return get().parse(text);
-    }
-
-    @Override
-    public void remove() {
-        super.remove();
-    }
-
-    @Override
-    public void set(DateFormat value) {
-        super.set(value);
     }
 
     @Override

@@ -21,9 +21,8 @@ public class Vhost extends Middleware {
     /** Create a new Vhost middleware. This middleware will verify the request hostname and if it matches it will send
      * the request to the registered handler, otherwise will continue inside the middleware chain.
      *
-     * @constructor
-     * @param {String} hostname
-     * @param {Handler} handler
+     * @param hostname
+     * @param handler
      *
      * @example
      *      new Yoke(...)

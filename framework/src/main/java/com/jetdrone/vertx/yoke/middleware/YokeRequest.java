@@ -86,7 +86,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting properties in a generified way.
      *
-     * @param {String} name The key to get
+     * @param name The key to get
      * @return {R} The found object
      */
     @SuppressWarnings("unchecked")
@@ -96,8 +96,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting properties in a generified way and return defaultValue if the key does not exist.
      *
-     * @param {String} name The key to get
-     * @param {R} defaultValue value returned when the key does not exist
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
      * @return {R} The found object
      */
     public <R> R get(String name, R defaultValue) {
@@ -110,8 +110,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allows putting a value into the context
      *
-     * @param {String} name the key to store
-     * @param {R} value the value to store
+     * @param name the key to store
+     * @param value the value to store
      * @return {R} the previous value or null
      */
     @SuppressWarnings("unchecked")
@@ -124,8 +124,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting headers in a generified way.
      *
-     * @param {String} name The key to get
-     * @return {String} The found object
+     * @param name The key to get
+     * @return The found object
      */
     public String getHeader(String name) {
         return headers().get(name);
@@ -133,7 +133,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting headers in a generified way.
      *
-     * @param {String} name The key to get
+     * @param name The key to get
      * @return {List} The list of all found objects
      */
     public List<String> getAllHeaders(String name) {
@@ -142,8 +142,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting headers in a generified way and return defaultValue if the key does not exist.
      *
-     * @param {String} name The key to get
-     * @param {String} defaultValue value returned when the key does not exist
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
     public String getHeader(String name, String defaultValue) {
@@ -156,8 +156,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting Cookie by name.
      *
-     * @param {String} name The key to get
-     * @return {YokeCookie} The found object
+     * @param name The key to get
+     * @return The found object
      */
     public YokeCookie getCookie(String name) {
         if (cookies != null) {
@@ -172,8 +172,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting all Cookie by name.
      *
-     * @param {String} name The key to get
-     * @return {List} The found objects
+     * @param name The key to get
+     * @return The found objects
      */
     public List<YokeCookie> getAllCookies(String name) {
         List<YokeCookie> foundCookies = new ArrayList<>();
@@ -193,7 +193,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /** Package level mutator for the overrided setMethod
-     * @param {String} newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
+     * @param newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
      */
     void setMethod(String newMethod) {
         this.method = newMethod.toUpperCase();
@@ -277,7 +277,6 @@ public class YokeRequest implements HttpServerRequest {
     // Session management
 
     /** Destroys a session from the request context and also from the storage engine.
-     * @method destroySession
      */
     public void destroySession() {
         JsonObject session = get("session");
@@ -305,9 +304,8 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /** Loads a session given its session id and sets the "session" property in the request context.
-     * @method loadSession
-     * @param {String} sessionId the id to load
-     * @param {Handler} handler the success/complete handler
+     * @param sessionId the id to load
+     * @param handler the success/complete handler
      */
     public void loadSession(String sessionId, final Handler<Object> handler) {
         if (sessionId == null) {
@@ -330,7 +328,6 @@ public class YokeRequest implements HttpServerRequest {
      * Internally create a entry in the request context under the name "session" and add a end handler to save that
      * object once the execution is terminated.
      *
-     * @method createSession
      * @return {JsonObject} session
      */
     public JsonObject createSession() {
@@ -439,8 +436,8 @@ public class YokeRequest implements HttpServerRequest {
      * req.is('html');
      * // => false
      *
-     * @param {String} type content type
-     * @return {Boolean} true if content type is of type
+     * @param type content type
+     * @return true if content type is of type
      */
     public boolean is(String type) {
         String ct = getHeader("Content-Type");
@@ -494,7 +491,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting parameters in a generified way.
      *
-     * @param {String} name The key to get
+     * @param name The key to get
      * @return {String} The found object
      */
     public String getParameter(String name) {
@@ -503,8 +500,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting parameters in a generified way and return defaultValue if the key does not exist.
      *
-     * @param {String} name The key to get
-     * @param {String} defaultValue value returned when the key does not exist
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
     public String getParameter(String name, String defaultValue) {
@@ -519,7 +516,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting parameters in a generified way.
      *
-     * @param {String} name The key to get
+     * @param name The key to get
      * @return {List} The found object
      */
     public List<String> getParameterList(String name) {
@@ -528,7 +525,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting form parameters in a generified way.
      *
-     * @param {String} name The key to get
+     * @param name The key to get
      * @return {String} The found object
      */
     public String getFormParameter(String name) {
@@ -537,8 +534,8 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
      *
-     * @param {String} name The key to get
-     * @param {String} defaultValue value returned when the key does not exist
+     * @param name The key to get
+     * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
     public String getFormParameter(String name, String defaultValue) {
@@ -553,7 +550,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Allow getting form parameters in a generified way.
      *
-     * @param {String} name The key to get
+     * @param name The key to get
      * @return {List} The found object
      */
     public List<String> getFormParameterList(String name) {
@@ -697,12 +694,12 @@ public class YokeRequest implements HttpServerRequest {
             // then only call it once
             if (!expectMultiPartCalled) {
                 expectMultiPartCalled = true;
-                request.expectMultiPart(expect);
+                request.expectMultiPart(true);
             }
         } else {
             // if we don't expect reset even if we were called before
             expectMultiPartCalled = false;
-            request.expectMultiPart(expect);
+            request.expectMultiPart(false);
         }
         return this;
     }

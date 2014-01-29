@@ -23,16 +23,15 @@ import java.util.TreeSet;
  */
 public class CookieParser extends Middleware {
 
-    /** Message Signer
-     * @property hmacSHA256
-     * @private
+    /**
+     * Message Signer
      */
     private final Mac hmacSHA256;
 
-    /** Instantiates a CookieParser with a given Mac.
+    /**
+     * Instantiates a CookieParser with a given Mac.
      *
-     * @constructor
-     * @param {Mac} hmacSHA256
+     * @param hmacSHA256 Mac
      *
      * @example
      *      Yoke yoke = new Yoke(...);
@@ -43,8 +42,6 @@ public class CookieParser extends Middleware {
     }
 
     /** Instantiates a CookieParser without a Mac. In this case no cookies will be signed.
-     *
-     * @constructor
      *
      * @example
      *      Yoke yoke = new Yoke(...);

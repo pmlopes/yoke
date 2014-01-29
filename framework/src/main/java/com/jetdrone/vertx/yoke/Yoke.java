@@ -37,30 +37,18 @@ import java.util.*;
 public class Yoke implements RequestWrapper {
 
     /** Vert.x instance
-     *
-     * @private
-     * @property vertx
      */
     private final Vertx vertx;
 
     /** Vert.x container
-     *
-     * @private
-     * @property container
      */
     private final Container container;
 
     /** request wrapper in use
-     *
-     * @private
-     * @property requestWrapper
      */
     private final RequestWrapper requestWrapper;
 
     /** default context used by all requests
-     *
-     * @private
-     * @property defaultContext
      *
      * @example
      *      {
@@ -72,9 +60,6 @@ public class Yoke implements RequestWrapper {
     protected final Map<String, Object> defaultContext = new HashMap<>();
 
     /** The internal registry of [render engines](Engine.html)
-     *
-     * @private
-     * @property engineMap
      */
     private final Map<String, Engine> engineMap = new HashMap<>();
 
@@ -84,8 +69,7 @@ public class Yoke implements RequestWrapper {
      * with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
      * system and timers.
      *
-     * @constructor
-     * @param {Verticle} verticle
+     * @param verticle
      *
      * @example
      *      public class MyVerticle extends Verticle {
@@ -105,8 +89,7 @@ public class Yoke implements RequestWrapper {
      * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
      * features such as file system and timers.
      *
-     * @constructor
-     * @param {Vertx} vertx
+     * @param vertx
      *
      * @example
      *      public class MyVerticle extends Verticle {
@@ -126,8 +109,7 @@ public class Yoke implements RequestWrapper {
      * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
      * features such as file system and timers.
      *
-     * @constructor
-     * @param {Vertx} vertx
+     * @param vertx
      *
      * @example
      *      public class MyVerticle extends Verticle {
@@ -145,11 +127,9 @@ public class Yoke implements RequestWrapper {
      *
      * This constructor should be called internally or from other language bindings.
      *
-     * @constructor
-     * @internal
-     * @param {Verticle} verticle
-     * @param {Container} container
-     * @param {RequestWrapper} requestWrapper
+     * @param vertx
+     * @param container
+     * @param requestWrapper
      *
      * @example
      *      public class MyVerticle extends Verticle {
@@ -172,18 +152,15 @@ public class Yoke implements RequestWrapper {
     }
 
     /** Mounted middleware represents a binding of a Middleware instance to a specific url path.
-     * @private
      */
     private static class MountedMiddleware {
         final String mount;
         final Middleware middleware;
 
         /** Constructs a new Mounted Middleware
-         * @constructor
-         * @private
          *
-         * @param {String} mount Mount path
-         * @param {Middleware} middleware Middleware to use on the path.
+         * @param mount Mount path
+         * @param middleware Middleware to use on the path.
          */
         private MountedMiddleware(String mount, Middleware middleware) {
             this.mount = mount;
@@ -192,16 +169,10 @@ public class Yoke implements RequestWrapper {
     }
 
     /** Ordered list of mounted middleware in the chain
-     *
-     * @private
-     * @property middlewareList
      */
     private final List<MountedMiddleware> middlewareList = new ArrayList<>();
 
     /** Special middleware used for error handling
-     *
-     * @private
-     * @property errorHandler
      */
     private Middleware errorHandler;
 
@@ -211,9 +182,8 @@ public class Yoke implements RequestWrapper {
      * You might want to add a middleware that is only supposed to run on a specific route (path prefix).
      * In this case if the request path does not match the prefix the middleware is skipped automatically.
      *
-     * @method use
-     * @param {String} route The route prefix for the middleware
-     * @param {Middleware[]} middleware The middleware add to the chain
+     * @param route The route prefix for the middleware
+     * @param middleware The middleware add to the chain
      *
      * @example
      *     yoke.use("/login", new CustomLoginMiddleware());
@@ -236,8 +206,7 @@ public class Yoke implements RequestWrapper {
     }
 
     /** Adds a middleware to the chain with the prefix "/".
-     * @method use
-     * @param {Middleware} middleware The middleware add to the chain
+     * @param middleware The middleware add to the chain
      */
     public Yoke use(Middleware... middleware) {
         return use("/", middleware);
@@ -251,9 +220,8 @@ public class Yoke implements RequestWrapper {
      * The idea to user a Handler is to keep the API familiar with the rest of the Vert.x
      * API.
      *
-     * @method use
-     * @param {String} route The route prefix for the middleware
-     * @param {Handler} handler The Handler to add
+     * @param route The route prefix for the middleware
+     * @param handler The Handler to add
      *
      * @example
      *     yoke.use("/login", new Handler<YokeRequest>() {
@@ -275,8 +243,7 @@ public class Yoke implements RequestWrapper {
     /**
      * Adds a Handler to a route.
      *
-     * @method use
-     * @param {Handler} handler The Handler to add
+     * @param handler The Handler to add
      *
      * @example
      *     yoke.use("/login", new Handler<YokeRequest>() {
@@ -294,9 +261,8 @@ public class Yoke implements RequestWrapper {
      * registered you can use the method render in the YokeResponse to
      * render a template.
      *
-     * @method engine
-     * @param {String} extension The file extension for this template engine e.g.: .jsp
-     * @param {Engine} engine The implementation of the engine
+     * @param extension The file extension for this template engine e.g.: .jsp
+     * @param engine The implementation of the engine
      */
     public Yoke engine(String extension, Engine engine) {
         engine.setVertx(vertx);
@@ -305,9 +271,6 @@ public class Yoke implements RequestWrapper {
     }
 
     /** Special store engine used for accessing session data
-     *
-     * @private
-     * @property store
      */
     private SessionStore store;
 
@@ -319,9 +282,8 @@ public class Yoke implements RequestWrapper {
     /** When you need to share global properties with your requests you can add them
      * to Yoke and on every request they will be available as request.get(String)
      *
-     * @method set
-     * @param {String} key unique identifier
-     * @param {Object} value Any non null value, nulls are not saved
+     * @param key unique identifier
+     * @param value Any non null value, nulls are not saved
      */
     public Yoke set(String key, Object value) {
         if (value == null) {
@@ -335,8 +297,7 @@ public class Yoke implements RequestWrapper {
 
     /** Starts the server listening at a given port bind to all available interfaces.
      *
-     * @method listen
-     * @param {int} port the server TCP port
+     * @param port the server TCP port
      * @return {Yoke}
      */
     public Yoke listen(int port) {
@@ -345,9 +306,8 @@ public class Yoke implements RequestWrapper {
 
     /** Starts the server listening at a given port bind to all available interfaces.
      *
-     * @method listen
-     * @param {int} port the server TCP port
-     * @param {Handler} handler for asynchronous result of the listen operation
+     * @param port the server TCP port
+     * @param handler for asynchronous result of the listen operation
      * @return {Yoke}
      */
     public Yoke listen(int port, Handler<Boolean> handler) {
@@ -356,8 +316,7 @@ public class Yoke implements RequestWrapper {
 
     /** Starts the server listening at a given port and given address.
      *
-     * @method listen
-     * @param {int} port the server TCP port
+     * @param port the server TCP port
      * @return {Yoke}
      */
     public Yoke listen(int port, String address) {
@@ -366,9 +325,8 @@ public class Yoke implements RequestWrapper {
 
     /** Starts the server listening at a given port and given address.
      *
-     * @method listen
-     * @param {int} port the server TCP port
-     * @param {Handler} handler for asynchronous result of the listen operation
+     * @param port the server TCP port
+     * @param handler for asynchronous result of the listen operation
      * @return {Yoke}
      */
     public Yoke listen(int port, String address, final Handler<Boolean> handler) {
@@ -391,12 +349,9 @@ public class Yoke implements RequestWrapper {
 
     /** Default implementation of the request wrapper
      *
-     * @internal
-     * @method wrap
-     * @param {HttpServerRequest} request
-     * @param {boolean} secure
-     * @param {Map} context
-     * @param {Map} engines
+     * @param request
+     * @param secure
+     * @param engines
      */
     @Override
     public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Engine> engines) {
@@ -408,8 +363,7 @@ public class Yoke implements RequestWrapper {
 
     /** Starts listening at a already created server.
      *
-     * @method listen
-     * @param {HttpServer} server
+     * @param server
      * @return {Yoke}
      */
     public Yoke listen(final HttpServer server) {
@@ -491,8 +445,7 @@ public class Yoke implements RequestWrapper {
 
     /** Deploys required middleware
      *
-     * @method deploy
-     * @param {JsonElement} config
+     * @param config
      */
     public Yoke deploy(JsonElement config) {
         return deploy(config, null);
@@ -500,9 +453,8 @@ public class Yoke implements RequestWrapper {
 
     /** Deploys required middleware
      *
-     * @method deploy
-     * @param {JsonElement} config
-     * @param {Handler} handler
+     * @param config
+     * @param handler
      */
     public Yoke deploy(JsonElement config, Handler<AsyncResult<String>> handler) {
         if (config.isArray()) {

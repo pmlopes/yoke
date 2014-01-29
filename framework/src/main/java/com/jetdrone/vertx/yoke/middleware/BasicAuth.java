@@ -35,9 +35,9 @@ public class BasicAuth extends Middleware {
      *         "MyApp Auth Required"));
      * </pre>
      *
-     * @param username
-     * @param password
-     * @param realm
+     * @param username the security principal user name
+     * @param password the security principal password
+     * @param realm the security realm
      */
     public BasicAuth(final String username, final String password, String realm) {
         this.realm = realm;
@@ -61,8 +61,9 @@ public class BasicAuth extends Middleware {
      *       Yoke yoke = new Yoke(...);
      *       yoke.use("/admin", new BasicAuth("admin", "s3cr37"));
      * </pre>
-     * @param username
-     * @param password
+     *
+     * @param username the security principal user name
+     * @param password the security principal password
      */
     public BasicAuth(String username, String password) {
         this (username, password, "Authentication required");
@@ -86,8 +87,8 @@ public class BasicAuth extends Middleware {
      *       }, "My App Auth");
      * </pre>
      *
-     * @param authHandler
-     * @param realm
+     * @param authHandler the authentication handler
+     * @param realm the security realm
      */
     public BasicAuth(String realm, AuthHandler authHandler) {
         this.realm = realm;
@@ -111,7 +112,7 @@ public class BasicAuth extends Middleware {
      *       });
      * </pre>
 
-     * @param authHandler
+     * @param authHandler the authentication handler
      */
     public BasicAuth(AuthHandler authHandler) {
         this("Authentication required", authHandler);
@@ -120,8 +121,8 @@ public class BasicAuth extends Middleware {
     /**
      * Handle all forbidden errors, in this case we need to add a special header to the response
      *
-     * @param request
-     * @param next
+     * @param request yoke request
+     * @param next middleware to be called next
      */
     private void handle401(final YokeRequest request, final Handler<Object> next) {
         YokeResponse response = request.response();
@@ -180,7 +181,7 @@ public class BasicAuth extends Middleware {
      *
      * The usecase is a multitenant app where I want different realms for paths like /foo/homepage and /bar/homepage.
      *
-     * @param request http request
+     * @param request http yoke request
      * @return realm name
      */
     public String getRealm(YokeRequest request) {

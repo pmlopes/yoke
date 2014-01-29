@@ -71,8 +71,8 @@ public class BridgeSecureHandler extends Middleware {
 
     /** Creates a new BridgeSecureHandler
      *
-     * @param authAddress
-     * @param sessionStore
+     * @param authAddress event buss address for authentication module
+     * @param sessionStore the store where the session is to be located from
      */
     public BridgeSecureHandler(final String authAddress, final SessionStore sessionStore) {
         this.authAddress = authAddress;
@@ -81,7 +81,7 @@ public class BridgeSecureHandler extends Middleware {
 
     /** Creates a new BridgeSecureHandler using the default auth address
      *
-     * @param sessionStore
+     * @param sessionStore the store where the session is to be located from
      */
     public BridgeSecureHandler(final SessionStore sessionStore) {
         this(DEFAULT_AUTH_ADDRESS, sessionStore);

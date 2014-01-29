@@ -23,22 +23,22 @@ import java.util.regex.Pattern;
  */
 public class Compress extends Middleware {
 
-    /** Regular expression to identify resources that are subject to compression
-     * @propery filter
-     * @private
+    /**
+     * Regular expression to identify resources that are subject to compression
      */
     private final Pattern filter;
 
-    /** Creates a new Compression Middleware given a regular expression of allowed mime types
-     * @constructor
-     * @param {Pattern} filter
+    /**
+     * Creates a new Compression Middleware given a regular expression of allowed mime types
+     *
+     * @param filter Regular expression to specify which mime types are allowed to be compressed
      */
     public Compress(Pattern filter) {
         this.filter = filter;
     }
 
-    /** Creates a new Compression Middleware using the default allowed mime types
-     * @constructor
+    /**
+     * Creates a new Compression Middleware using the default allowed mime types
      */
     public Compress() {
         this(Pattern.compile("json|text|javascript"));

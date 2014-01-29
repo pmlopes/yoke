@@ -14,9 +14,9 @@ import org.vertx.java.core.json.JsonObject;
 public interface AuthHandler {
     /** Handles a challenge authentication request and asynchronously returns the user object on success, null for error.
      *
-     * @param username
-     * @param password
-     * @param  result
+     * @param username the security principal user name
+     * @param password the security principal password
+     * @param  result authentication result
      */
     void handle(String username, String password, Handler<JsonObject> result);
 }

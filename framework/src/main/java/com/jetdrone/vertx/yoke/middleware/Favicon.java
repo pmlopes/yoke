@@ -8,8 +8,6 @@ import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.platform.Container;
-import org.vertx.java.core.logging.Logger;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,23 +26,15 @@ public class Favicon extends Middleware {
      */
     private class Icon {
         /** Headers for the icon resource
-         *
-         * @property headers
-         * @private
          */
         private final Map<String, String> headers;
 
         /** Binary content of the icon file
-         *
-         * @property body
-         * @private
          */
         private final Buffer body;
 
         /** Instantiate a new Icon
-         *
-         * @constructor
-         * @param {Buffer} buffer
+         * @param buffer buffer containing the image data for this icon.
          */
         private Icon(Buffer buffer) {
             headers = new HashMap<>();
@@ -64,31 +54,21 @@ public class Favicon extends Middleware {
     }
 
     /** favicon cache
-     *
-     * @property icon
-     * @private
      */
     private Icon icon;
 
     /** Location of the icon in the file system
-     *
-     * @property path
-     * @private
      */
     private final String path;
 
     /** Cache control for the resource
-     *
-     * @property maxAge
-     * @private
      */
     private final long maxAge;
 
     /** Create a new Favicon instance using a file in the file system and customizable cache period
      *
-     * @constructor
-     * @param {String} path
-     * @param {long} maxAge
+     * @param path
+     * @param maxAge
      *
      * @example
      *      Yoke yoke = new Yoke(...);
@@ -101,8 +81,7 @@ public class Favicon extends Middleware {
 
     /** Create a new Favicon instance using a file in the file system and cache for 1 day.
      *
-     * @constructor
-     * @param {String} path
+     * @param path
      *
      * @example
      *      Yoke yoke = new Yoke(...);
@@ -114,8 +93,6 @@ public class Favicon extends Middleware {
 
     /** Create a new Favicon instance using a the default icon and cache for 1 day.
      *
-     * @constructor
-     *
      * @example
      *      Yoke yoke = new Yoke(...);
      *      yoke.use(new Favicon());
@@ -126,11 +103,8 @@ public class Favicon extends Middleware {
 
     /** Loads the icon from the file system once we get a reference to Vert.x
      *
-     * @internal
-     * @method init
-     * @param {Vertx} vertx
-     * @param {Logger} logger
-     * @param {String} mount
+     * @param vertx
+     * @param mount
      */
     @Override
     public Middleware init(Vertx vertx, String mount) {

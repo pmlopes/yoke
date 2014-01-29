@@ -17,12 +17,12 @@ import java.util.Map;
  */
 public class MimeType {
 
-    /** @private
+    /**
      * Internal map with all known mime types
      */
     private static final Map<String, String> mimes = new HashMap<>();
 
-    /** @private
+    /**
      * Internal default content encoding (charset)
      */
     private static final String defaultContentEncoding = Charset.defaultCharset().name();
@@ -30,10 +30,7 @@ public class MimeType {
     /** Loads a file from a input stream containing all known mime types. The InputStream is a resource mapped from the
      * project resource directory.
      *
-     * @private
-     * @static
-     * @method loadFile
-     * @param {InputStream} in
+     * @param in
      */
     private static void loadFile(InputStream in) {
 
@@ -64,12 +61,9 @@ public class MimeType {
     /** Returns a mime type string by parsing the file extension of a file string. If the extension is not found or
      * unknown the default value is returned.
      *
-     * @method getMime
-     * @static
-     * @getter
-     * @param {String} file - path to a file with extension
-     * @param {String} defaultMimeType - what to return if not found
-     * @return {String} mime type
+     * @param file - path to a file with extension
+     * @param defaultMimeType - what to return if not found
+     * @return mime type
      */
     public static String getMime(String file, String defaultMimeType) {
         int sep = file.lastIndexOf('.');
@@ -88,11 +82,8 @@ public class MimeType {
 
     /** Gets the mime type string for a file with fallback to text/plain
      *
-     * @method getMime
-     * @static
-     * @getter
-     * @param {String} file - path to a file with extension
-     * @return {String} mime type
+     * @param file - path to a file with extension
+     * @return mime type
      */
     public static String getMime(String file) {
         return getMime(file, "text/plain");
@@ -101,12 +92,9 @@ public class MimeType {
     /** Gets the default charset for a file.
      * for now all mime types that start with text returns UTF-8 otherwise the fallback.
      *
-     * @method getCharset
-     * @static
-     * @getter
-     * @param {String} mime the mime type to query
-     * @param {String} fallback if not found returns fallback
-     * @return {String} charset string
+     * @param mime the mime type to query
+     * @param fallback if not found returns fallback
+     * @returncharset string
      */
     public static String getCharset(String mime, String fallback) {
         // TODO: exceptions json and which other should also be marked as text
@@ -119,11 +107,8 @@ public class MimeType {
 
     /** Gets the default charset for a file with default fallback null
      *
-     * @method getCharset
-     * @static
-     * @getter
-     * @param {String} mime the mime type to query
-     * @return {String} charset string
+     * @param mime the mime type to query
+     * @return charset string
      */
     public static String getCharset(String mime) {
         return getCharset(mime, null);

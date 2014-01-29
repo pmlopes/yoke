@@ -28,8 +28,6 @@ public class Logger extends Middleware {
     private final org.vertx.java.core.logging.Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /** The Date formatter (UTC JS compatible format)
-     * @property ISODATE
-     * @private
      */
     private final ThreadLocalUTCDateFormat ISODATE;
 
@@ -43,14 +41,10 @@ public class Logger extends Middleware {
     }
 
     /** log before request or after
-     * @property immediate
-     * @private
      */
     private final boolean immediate;
 
     /** the current choosen format
-     * @property format
-     * @private
      */
     private final Format format;
 

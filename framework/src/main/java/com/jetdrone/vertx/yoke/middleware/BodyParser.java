@@ -40,7 +40,8 @@ public class BodyParser extends Middleware {
      *      Yoke yoke = new Yoke(...);
      *      yoke.use(new BodyParser("/upload"));
      * </pre>
-     * @param uploadDir
+     *
+     * @param uploadDir upload directory path
      */
     public BodyParser(String uploadDir) {
         this.uploadDir = uploadDir;
@@ -59,9 +60,9 @@ public class BodyParser extends Middleware {
 
     /** Internal method to parse JSON requests directly to the YokeRequest object
      *
-     * @param request
-     * @param buffer
-     * @param next
+     * @param request http yoke request
+     * @param buffer buffer containing the json payload
+     * @param next middleware to be called next
      */
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
@@ -86,8 +87,8 @@ public class BodyParser extends Middleware {
      * If not the middleware verifies if there is a body and according to its headers tries to
      * parse it as JSON, form data or multi part upload.
      *
-     * @param request
-     * @param next
+     * @param request http yoke request
+     * @param next middleware to be called next
      */
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {

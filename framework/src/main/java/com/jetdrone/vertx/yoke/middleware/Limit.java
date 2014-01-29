@@ -14,16 +14,12 @@ import org.vertx.java.core.Handler;
 public class Limit extends Middleware {
 
     /** The max allowed length for the resource
-     *
-     * @property limit
-     * @private
      */
     private final long limit;
 
     /** Creates a Limit instance with a given max allowed bytes
      *
-     * @constructor
-     * @param {long} limit
+     * @param limit
      *
      * @example
      *      new Yoke(...)

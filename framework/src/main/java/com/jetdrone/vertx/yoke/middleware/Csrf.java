@@ -19,22 +19,19 @@ import java.util.UUID;
  */
 public class Csrf extends Middleware {
 
-    /** Handler that validates the CRSF token
-     * @property valueHandler
-     * @private
+    /**
+     * Handler that validates the CRSF token
      */
     private final ValueHandler valueHandler;
 
-    /** Name of the property where the token is found/stored in the request context
-     * @property key
-     * @private
+    /**
+     * Name of the property where the token is found/stored in the request context
      */
     private final String key;
 
     /** Instantiate a new Csrf with a user defined key
      *
-     * @constructor
-     * @param {String} key name of the context variable to store the token.
+     * @param key name of the context variable to store the token.
      *
      * @example
      *     new Csrf("_crsf")
@@ -59,8 +56,6 @@ public class Csrf extends Middleware {
 
     /** Instantiate a new Csrf with the default key "_crsf"
      *
-     * @constructor
-     *
      * @example
      *     new Csrf()
      */
@@ -70,9 +65,8 @@ public class Csrf extends Middleware {
 
     /** Instantiate a new Csrf with custom Handler and key
      *
-     * @constructor
-     * @param {String} key name of the context variable to store the token.
-     * @param {ValueHandler} the handler for the token validation.
+     * @param key name of the context variable to store the token.
+     * @param valueHandler the handler for the token validation.
      *
      * @example
      *     new Csrf("_crsf", new ValueHandler() {...})
@@ -84,8 +78,7 @@ public class Csrf extends Middleware {
 
     /** Instantiate a new Csrf with custom Handler
      *
-     * @constructor
-     * @param {ValueHandler} the handler for the token validation.
+     * @param valueHandler the handler for the token validation.
      *
      * @example
      *     new Csrf(new ValueHandler() {...})

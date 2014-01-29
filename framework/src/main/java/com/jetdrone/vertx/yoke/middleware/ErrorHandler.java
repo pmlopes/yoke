@@ -22,24 +22,17 @@ import java.util.List;
 public class ErrorHandler extends Middleware {
 
     /** Flag to enable/disable printing the full stack trace of exceptions.
-     *
-     * @property fullStack
-     * @private
      */
     private final boolean fullStack;
 
     /** Cached template for rendering the html errors
-     *
-     * @property errorTemplate
-     * @private
      */
     private final String errorTemplate;
 
     /** Create a new ErrorHandler allowing to print or not the stack trace. Include stack trace `true` might be useful in
      * development mode but probably you don't want it in production.
      *
-     * @constructor
-     * @param {boolean} fullStack
+     * @param fullStack include full stack trace in error report.
      *
      * @example
      *      Yoke yoke = new Yoke(...);
@@ -52,10 +45,7 @@ public class ErrorHandler extends Middleware {
 
     /** Override the Middleware isErrorHandler getter.
      *
-     * @internal
-     * @method isErrorHandler
-     * @getter
-     * @return {boolean} true
+     * @return always true
      */
     @Override
     public boolean isErrorHandler() {
@@ -65,10 +55,8 @@ public class ErrorHandler extends Middleware {
     /** Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
      * numbers these are handled as Http error codes.
      *
-     * @method getMessage
-     * @private
-     * @param {Object} error
-     * @return {String}
+     * @param error Error object
+     * @return String representation of the error object.
      */
     private String getMessage(Object error) {
         if (error instanceof Throwable) {
@@ -94,10 +82,8 @@ public class ErrorHandler extends Middleware {
 
     /** Extracts a single error code from a error Object. This will handle Throwables, Strings and Numbers.
      *
-     * @method getErrorCode
-     * @private
-     * @param {Object} error
-     * @return {int}
+     * @param error Error object
+     * @return HTTP status code for the error object
      */
     private int getErrorCode(Object error) {
         if (error instanceof Number) {
@@ -111,10 +97,8 @@ public class ErrorHandler extends Middleware {
 
     /** Convert the stack trace to a List in order to be rendered in the error template.
      *
-     * @method getStackTrace
-     * @private
-     * @param {Object} error
-     * @return {List}
+     * @param error error object
+     * @return List containing the stack trace for the object
      */
     private List<String> getStackTrace(Object error) {
         if (fullStack && error instanceof Throwable) {

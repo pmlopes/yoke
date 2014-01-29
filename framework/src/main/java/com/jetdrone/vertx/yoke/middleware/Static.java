@@ -10,7 +10,6 @@ import org.vertx.java.core.*;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
 import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.logging.*;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -25,50 +24,35 @@ import java.util.TimeZone;
 public class Static extends Middleware {
 
     /** SimpleDateFormat to format date objects into ISO format.
-     *
-     * @property ISODATE
-     * @private
      */
     private final SimpleDateFormat ISODATE;
 
     /** Cache for the HTML template of the directory listing page
-     *
-     * @property directoryTemplate
-     * @private
      */
     private final String directoryTemplate;
 
     /** Root directory where to look files from
-     * @property root
-     * @private
      */
     private final String root;
 
     /** Max age allowed for cache of resources
-     * @property maxAge
-     * @private
      */
     private final long maxAge;
 
     /** Allow directory listing
-     * @property directoryListing
-     * @private
      */
     private final boolean directoryListing;
 
     /** Include hidden files (Hiden files are files start start with dot (.).
-     * @property includeHidden
-     * @private
      */
     private final boolean includeHidden;
 
     /** Create a new Static File Server Middleware
      *
-     * @constructor
-     * @param {String} root the root location of the static files in the file system (relative to the main Verticle).
-     * @param {long} maxAge cache-control max-age directive
-     * @param {boolean} directoryListing generate index pages for directories
-     * @param {boolean} includeHidden in the directory listing show dot files
+     * @param root the root location of the static files in the file system (relative to the main Verticle).
+     * @param maxAge cache-control max-age directive
+     * @param directoryListing generate index pages for directories
+     * @param includeHidden in the directory listing show dot files
      *
      * @example
      *      new Yoke(...)
@@ -90,9 +74,8 @@ public class Static extends Middleware {
 
     /** Create a new Static File Server Middleware that does not generate directory listings or hidden files
      *
-     * @constructor
-     * @param {String} root the root location of the static files in the file system (relative to the main Verticle).
-     * @param {long} maxAge cache-control max-age directive
+     * @param root the root location of the static files in the file system (relative to the main Verticle).
+     * @param maxAge cache-control max-age directive
      *
      * @example
      *      new Yoke(...)
@@ -105,8 +88,7 @@ public class Static extends Middleware {
     /** Create a new Static File Server Middleware that does not generate directory listings or hidden files and files
      * are cache for 1 full day
      *
-     * @constructor
-     * @param {String} root the root location of the static files in the file system (relative to the main Verticle).
+     * @param root the root location of the static files in the file system (relative to the main Verticle).
      *
      * @example
      *      new Yoke(...)
@@ -118,10 +100,8 @@ public class Static extends Middleware {
 
     /** Create all required header so content can be cache by Caching servers or Browsers
      *
-     * @method writeHeaders
-     * @param {YokeRequest} request
-     * @param {FileProps} props
-     * @private
+     * @param request
+     * @param props
      */
     private void writeHeaders(final YokeRequest request, final FileProps props) {
 
@@ -146,11 +126,9 @@ public class Static extends Middleware {
 
     /** Write a file into the response body
      *
-     * @method sendFile
-     * @param {YokeRequest} request
-     * @param {String} file
-     * @param {FileProps} props
-     * @private
+     * @param request
+     * @param file
+     * @param props
      */
     private void sendFile(final YokeRequest request, final String file, final FileProps props) {
         // write content type
@@ -169,11 +147,9 @@ public class Static extends Middleware {
 
     /** Generate Directory listing
      *
-     * @method sendDirectory
-     * @param {YokeRequest} request
-     * @param {String} dir
-     * @param {Handler} next
-     * @private
+     * @param request
+     * @param dir
+     * @param next
      */
     private void sendDirectory(final YokeRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx.fileSystem();
@@ -278,10 +254,8 @@ public class Static extends Middleware {
     /** Verify if a resource is fresh, fresh means that its cache headers are validated against the local resource and
      * etags last-modified headers are still the same.
      *
-     * @method isFresh
-     * @param {YokeRequest} request
+     * @param request
      * @return {boolean}
-     * @private
      */
     private boolean isFresh(final YokeRequest request) {
         // defaults
