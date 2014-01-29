@@ -2,7 +2,10 @@ language: java
 jdk:
   - openjdk7
 
-script: ./gradlew check uploadArchives -S
+install: true
+
+script:
+  - TERM=dumb ./gradlew check uploadArchives
 
 env:
   global:
