@@ -24,7 +24,8 @@ import org.vertx.java.platform.Verticle;
 
 import java.util.*;
 
-/** # Yoke
+/**
+ * # Yoke
  *
  * Yoke is a chain executor of middleware for Vert.x 2.x. The goal of this library is not to provide a web application
  * framework but the backbone that helps the creation of web applications.
@@ -36,110 +37,124 @@ import java.util.*;
  */
 public class Yoke implements RequestWrapper {
 
-    /** Vert.x instance
+    /**
+     * Vert.x instance
      */
     private final Vertx vertx;
 
-    /** Vert.x container
+    /**
+     * Vert.x container
      */
     private final Container container;
 
-    /** request wrapper in use
+    /**
+     * request wrapper in use
      */
     private final RequestWrapper requestWrapper;
 
-    /** default context used by all requests
+    /**
+     * default context used by all requests
      *
-     * @example
-     *      {
-     *        title: "Yoke",
-     *        x-powered-by: true,
-     *        trust-proxy: true
-     *      }
+     * <pre>
+     * {
+     *   title: "Yoke",
+     *   x-powered-by: true,
+     *   trust-proxy: true
+     * }
+     * </pre>
      */
     protected final Map<String, Object> defaultContext = new HashMap<>();
 
-    /** The internal registry of [render engines](Engine.html)
+    /**
+     * The internal registry of [render engines](Engine.html)
      */
     private final Map<String, Engine> engineMap = new HashMap<>();
 
-    /** Creates a Yoke instance.
+    /**
+     * Creates a Yoke instance.
      *
      * This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
      * with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
      * system and timers.
      *
-     * @param verticle
+     * <pre>
+     * public class MyVerticle extends Verticle {
+     *   public void start() {
+     *     final Yoke yoke = new Yoke(this);
+     *     ...
+     *   }
+     * }
+     * </pre>
      *
-     * @example
-     *      public class MyVerticle extends Verticle {
-     *          public void start() {
-     *              final Yoke yoke = new Yoke(this);
-     *              ...
-     *          }
-     *      }
+     * @param verticle the main verticle
      */
     public Yoke(Verticle verticle) {
         this(verticle.getVertx(), verticle.getContainer(), null);
     }
 
-    /** Creates a Yoke instance.
+    /**
+     * Creates a Yoke instance.
      *
      * This constructor should be called from a verticle and pass a valid Vertx instance and a Logger. This instance
      * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
      * features such as file system and timers.
      *
-     * @param vertx
+     * <pre>
+     * public class MyVerticle extends Verticle {
+     *   public void start() {
+     *     final Yoke yoke = new Yoke(getVertx());
+     *     ...
+     *   }
+     * }
+     * </pre>
      *
-     * @example
-     *      public class MyVerticle extends Verticle {
-     *          public void start() {
-     *              final Yoke yoke = new Yoke(getVertx());
-     *              ...
-     *          }
-     *      }
+     * @param vertx
      */
     public Yoke(Vertx vertx) {
         this(vertx, null, null);
     }
 
-    /** Creates a Yoke instance.
+    /**
+     * Creates a Yoke instance.
      *
      * This constructor should be called from a verticle and pass a valid Vertx instance and a Container. This instance
      * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
      * features such as file system and timers.
      *
-     * @param vertx
+     * <pre>
+     * public class MyVerticle extends Verticle {
+     *   public void start() {
+     *     final Yoke yoke = new Yoke(getVertx());
+     *     ...
+     *   }
+     * }
+     * </pre>
      *
-     * @example
-     *      public class MyVerticle extends Verticle {
-     *          public void start() {
-     *              final Yoke yoke = new Yoke(getVertx());
-     *              ...
-     *          }
-     *      }
+     * @param vertx
      */
     public Yoke(Vertx vertx, Container container) {
         this(vertx, container, null);
     }
 
-    /** Creates a Yoke instance.
+    /**
+     * Creates a Yoke instance.
      *
      * This constructor should be called internally or from other language bindings.
+     *
+     * <pre>
+     * public class MyVerticle extends Verticle {
+     *   public void start() {
+     *     final Yoke yoke = new Yoke(getVertx(),
+     *         getContainer(),
+     *         new RequestWrapper() {...});
+     *     ...
+     *   }
+     * }
+     * </pre>
      *
      * @param vertx
      * @param container
      * @param requestWrapper
-     *
-     * @example
-     *      public class MyVerticle extends Verticle {
-     *          public void start() {
-     *              final Yoke yoke = new Yoke(getVertx(),
-     *                  getContainer(),
-     *                  new RequestWrapper() {...});
-     *              ...
-     *          }
-     *      }
      */
     public Yoke(Vertx vertx, Container container, RequestWrapper requestWrapper) {
         this.vertx = vertx;
@@ -151,15 +166,17 @@ public class Yoke implements RequestWrapper {
         store = new SharedDataSessionStore(vertx, "yoke.sessiondata");
     }
 
-    /** Mounted middleware represents a binding of a Middleware instance to a specific url path.
+    /**
+     * Mounted middleware represents a binding of a Middleware instance to a specific url path.
      */
     private static class MountedMiddleware {
         final String mount;
         final Middleware middleware;
 
-        /** Constructs a new Mounted Middleware
+        /**
+         * Constructs a new Mounted Middleware
          *
-         * @param mount Mount path
+         * @param mount      Mount path
          * @param middleware Middleware to use on the path.
          */
         private MountedMiddleware(String mount, Middleware middleware) {
@@ -168,25 +185,29 @@ public class Yoke implements RequestWrapper {
         }
     }
 
-    /** Ordered list of mounted middleware in the chain
+    /**
+     * Ordered list of mounted middleware in the chain
      */
     private final List<MountedMiddleware> middlewareList = new ArrayList<>();
 
-    /** Special middleware used for error handling
+    /**
+     * Special middleware used for error handling
      */
     private Middleware errorHandler;
 
-    /** Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is
+    /**
+     * Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is
      * treated differently and only the last error handler is kept.
      *
      * You might want to add a middleware that is only supposed to run on a specific route (path prefix).
      * In this case if the request path does not match the prefix the middleware is skipped automatically.
      *
-     * @param route The route prefix for the middleware
-     * @param middleware The middleware add to the chain
+     * <pre>
+     * yoke.use("/login", new CustomLoginMiddleware());
+     * </pre>
      *
-     * @example
-     *     yoke.use("/login", new CustomLoginMiddleware());
+     * @param route      The route prefix for the middleware
+     * @param middleware The middleware add to the chain
      */
     public Yoke use(String route, Middleware... middleware) {
         for (Middleware m : middleware) {
@@ -205,14 +226,17 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
-    /** Adds a middleware to the chain with the prefix "/".
+    /**
+     * Adds a middleware to the chain with the prefix "/".
+     *
      * @param middleware The middleware add to the chain
      */
     public Yoke use(Middleware... middleware) {
         return use("/", middleware);
     }
 
-    /** Adds a Handler to a route. The behaviour is similar to the middleware, however this
+    /**
+     * Adds a Handler to a route. The behaviour is similar to the middleware, however this
      * will be a terminal point in the execution chain. In this case any middleware added
      * after will not be executed. However you should care about the route which may lead
      * to skip this middleware.
@@ -220,15 +244,16 @@ public class Yoke implements RequestWrapper {
      * The idea to user a Handler is to keep the API familiar with the rest of the Vert.x
      * API.
      *
-     * @param route The route prefix for the middleware
-     * @param handler The Handler to add
+     * <pre>
+     * yoke.use("/login", new Handler<YokeRequest>() {
+     *   public void handle(YokeRequest request) {
+     *     request.response.end("Hello");
+     *   }
+     * });
+     * </pre>
      *
-     * @example
-     *     yoke.use("/login", new Handler<YokeRequest>() {
-     *         public void handle(YokeRequest request) {
-     *             request.response.end("Hello");
-     *         }
-     *     });
+     * @param route   The route prefix for the middleware
+     * @param handler The Handler to add
      */
     public Yoke use(String route, final Handler<YokeRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
@@ -243,26 +268,27 @@ public class Yoke implements RequestWrapper {
     /**
      * Adds a Handler to a route.
      *
+     * <pre>
+     * yoke.use("/login", new Handler<YokeRequest>() {
+     *   public void handle(YokeRequest request) {
+     *     request.response.end("Hello");
+     *   }
+     * });
+     * </pre>
      * @param handler The Handler to add
-     *
-     * @example
-     *     yoke.use("/login", new Handler<YokeRequest>() {
-     *         public void handle(YokeRequest request) {
-     *             request.response.end("Hello");
-     *         }
-     *     });
      */
     public Yoke use(Handler<YokeRequest> handler) {
         return use("/", handler);
     }
 
-    /** Adds a Render Engine to the library. Render Engines are Template engines you
+    /**
+     * Adds a Render Engine to the library. Render Engines are Template engines you
      * might want to use to speed the development of your application. Once they are
      * registered you can use the method render in the YokeResponse to
      * render a template.
      *
      * @param extension The file extension for this template engine e.g.: .jsp
-     * @param engine The implementation of the engine
+     * @param engine    The implementation of the engine
      */
     public Yoke engine(String extension, Engine engine) {
         engine.setVertx(vertx);
@@ -270,7 +296,8 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
-    /** Special store engine used for accessing session data
+    /**
+     * Special store engine used for accessing session data
      */
     private SessionStore store;
 
@@ -279,10 +306,11 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
-    /** When you need to share global properties with your requests you can add them
+    /**
+     * When you need to share global properties with your requests you can add them
      * to Yoke and on every request they will be available as request.get(String)
      *
-     * @param key unique identifier
+     * @param key   unique identifier
      * @param value Any non null value, nulls are not saved
      */
     public Yoke set(String key, Object value) {
@@ -295,7 +323,8 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
-    /** Starts the server listening at a given port bind to all available interfaces.
+    /**
+     * Starts the server listening at a given port bind to all available interfaces.
      *
      * @param port the server TCP port
      * @return {Yoke}
@@ -304,9 +333,10 @@ public class Yoke implements RequestWrapper {
         return listen(port, "0.0.0.0", null);
     }
 
-    /** Starts the server listening at a given port bind to all available interfaces.
+    /**
+     * Starts the server listening at a given port bind to all available interfaces.
      *
-     * @param port the server TCP port
+     * @param port    the server TCP port
      * @param handler for asynchronous result of the listen operation
      * @return {Yoke}
      */
@@ -314,7 +344,8 @@ public class Yoke implements RequestWrapper {
         return listen(port, "0.0.0.0", handler);
     }
 
-    /** Starts the server listening at a given port and given address.
+    /**
+     * Starts the server listening at a given port and given address.
      *
      * @param port the server TCP port
      * @return {Yoke}
@@ -323,9 +354,10 @@ public class Yoke implements RequestWrapper {
         return listen(port, address, null);
     }
 
-    /** Starts the server listening at a given port and given address.
+    /**
+     * Starts the server listening at a given port and given address.
      *
-     * @param port the server TCP port
+     * @param port    the server TCP port
      * @param handler for asynchronous result of the listen operation
      * @return {Yoke}
      */
@@ -347,7 +379,8 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
-    /** Default implementation of the request wrapper
+    /**
+     * Default implementation of the request wrapper
      *
      * @param request
      * @param secure
@@ -361,7 +394,8 @@ public class Yoke implements RequestWrapper {
         return new YokeRequest(request, response, secure, context, store);
     }
 
-    /** Starts listening at a already created server.
+    /**
+     * Starts listening at a already created server.
      *
      * @param server
      * @return {Yoke}
@@ -383,6 +417,7 @@ public class Yoke implements RequestWrapper {
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;
+
                     @Override
                     public void handle(Object error) {
                         if (error == null) {
@@ -443,7 +478,8 @@ public class Yoke implements RequestWrapper {
         return this;
     }
 
-    /** Deploys required middleware
+    /**
+     * Deploys required middleware
      *
      * @param config
      */
@@ -451,7 +487,8 @@ public class Yoke implements RequestWrapper {
         return deploy(config, null);
     }
 
-    /** Deploys required middleware
+    /**
+     * Deploys required middleware
      *
      * @param config
      * @param handler

@@ -17,7 +17,6 @@ import org.vertx.java.core.Vertx;
  * return true.
  *
  * The current list of Middleware is:
- *
  * * [BasicAuth](middleware/BasicAuth.html),
  * * [BodyParser](middleware/BodyParser.html),
  * * [BridgeSecureHandler](middleware/BridgeSecureHandler.html),
@@ -38,7 +37,6 @@ import org.vertx.java.core.Vertx;
  * * [Vhost](middleware/Vhost.html).
  *
  * Using the extras project you get the following extra Middleware:
- *
  * * [JsonRestRouter].
  */
 public abstract class Middleware {
@@ -109,9 +107,10 @@ public abstract class Middleware {
      *   }
      * }
      * </pre>
+     *
      * @param request A YokeRequest which in practice is a extended HttpServerRequest
-     * @param next The callback to inform that the next middleware in the chain should be used. A value different from
-     *             null represents an error and in that case the error handler middleware will be executed.
+     * @param next    The callback to inform that the next middleware in the chain should be used. A value different from
+     *                null represents an error and in that case the error handler middleware will be executed.
      */
     public abstract void handle(final YokeRequest request, final Handler<Object> next);
 }
