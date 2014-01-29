@@ -1,17 +1,5 @@
-/*
- * Copyright 2011-2012 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+/**
+ * Copyright 2011-2014 the original author or authors.
  */
 package com.jetdrone.vertx.yoke;
 
@@ -51,22 +39,23 @@ public class GYoke {
     private final org.vertx.java.core.Vertx vertx;
     private final Container container;
 
-    // Creates a Yoke instance.
-    //
-    // This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
-    // with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
-    // system and timers.
-    //
-    // @constructor
-    // @param {Verticle} verticle
-    //
-    // @example
-    //      public class MyVerticle extends Verticle {
-    //          public void start() {
-    //              def yoke = new Yoke(this)
-    //              ...
-    //          }
-    //      }
+    /**
+     * Creates a Yoke instance.
+     *
+     * This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
+     * with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
+     * system and timers.
+     *
+     * <pre>
+     * public class MyVerticle extends Verticle {
+     *   public void start() {
+     *     def yoke = new Yoke(this)
+     *     ...
+     *   }
+     * }
+     * </pre>
+     * @param verticle the main verticle
+     */
     public GYoke(Verticle verticle) {
         this(verticle.getVertx(), verticle.getContainer());
     }
@@ -95,10 +84,9 @@ public class GYoke {
         });
     }
 
-    // Special store engine used for accessing session data
-    //
-    // @private
-    // @property store
+    /**
+     * Special store engine used for accessing session data
+     */
     private SessionStore store;
 
     public GYoke store(SessionStore store) {
@@ -228,10 +216,11 @@ public class GYoke {
         return this;
     }
 
-    // Deploys required middleware
-    //
-    // @method deploy
-    // @param {JsonElement} config
+    /** Deploys required middleware
+     *
+     * @param config configuration to use
+     * @param handler Closure tho allow asynchronous result handling
+     */
     @SuppressWarnings("unchecked")
     public GYoke deploy(Object config, Closure handler) {
         if (config instanceof List) {

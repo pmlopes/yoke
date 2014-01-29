@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.engine
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
@@ -16,11 +16,13 @@ import org.vertx.java.core.file.FileSystem;
 
 import java.util.Date;
 
-// # AbstractEngine
-//
-// Engine represents a Template Engine that can be registered with Yoke. Any template engine just needs to
-// extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
-// operations in the context of the module.
+/**
+ * # AbstractEngine
+ *
+ * Engine represents a Template Engine that can be registered with Yoke. Any template engine just needs to
+ * extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
+ * operations in the context of the module.
+ */
 public abstract class AbstractEngine<T> implements Engine {
 
     protected Vertx vertx;

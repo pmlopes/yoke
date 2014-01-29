@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -9,7 +9,9 @@ import org.vertx.java.core.json.JsonObject;
 
 import javax.crypto.Mac;
 
-// # Session
+/**
+ * # Session
+ */
 public class Session extends Middleware {
 
     private final Mac hmacSHA256;

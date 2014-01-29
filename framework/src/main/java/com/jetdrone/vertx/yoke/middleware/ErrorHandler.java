@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -15,55 +15,49 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// # ErrorHandler
-//
-// Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
+/** # ErrorHandler
+ *
+ * Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
+ */
 public class ErrorHandler extends Middleware {
 
-    // Flag to enable/disable printing the full stack trace of exceptions.
-    //
-    // @property fullStack
-    // @private
+    /** Flag to enable/disable printing the full stack trace of exceptions.
+     */
     private final boolean fullStack;
 
-    // Cached template for rendering the html errors
-    //
-    // @property errorTemplate
-    // @private
+    /** Cached template for rendering the html errors
+     */
     private final String errorTemplate;
 
-    // Create a new ErrorHandler allowing to print or not the stack trace. Include stack trace `true` might be useful in
-    // development mode but probably you don't want it in production.
-    //
-    // @constructor
-    // @param {boolean} fullStack
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new ErrorHandler(true);
+    /** Create a new ErrorHandler allowing to print or not the stack trace. Include stack trace `true` might be useful in
+     * development mode but probably you don't want it in production.
+     *
+     * @param fullStack include full stack trace in error report.
+     *
+     * @example
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new ErrorHandler(true);
+     */
     public ErrorHandler(boolean fullStack) {
         this.fullStack = fullStack;
         errorTemplate = Utils.readResourceToBuffer(getClass(), "error.html").toString();
     }
 
-    // Override the Middleware isErrorHandler getter.
-    //
-    // @internal
-    // @method isErrorHandler
-    // @getter
-    // @return {boolean} true
+    /** Override the Middleware isErrorHandler getter.
+     *
+     * @return always true
+     */
     @Override
     public boolean isErrorHandler() {
         return true;
     }
 
-    // Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
-    // numbers these are handled as Http error codes.
-    //
-    // @method getMessage
-    // @private
-    // @param {Object} error
-    // @return {String}
+    /** Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
+     * numbers these are handled as Http error codes.
+     *
+     * @param error Error object
+     * @return String representation of the error object.
+     */
     private String getMessage(Object error) {
         if (error instanceof Throwable) {
             String message = ((Throwable) error).getMessage();
@@ -86,12 +80,11 @@ public class ErrorHandler extends Middleware {
         }
     }
 
-    // Extracts a single error code from a error Object. This will handle Throwables, Strings and Numbers.
-    //
-    // @method getErrorCode
-    // @private
-    // @param {Object} error
-    // @return {int}
+    /** Extracts a single error code from a error Object. This will handle Throwables, Strings and Numbers.
+     *
+     * @param error Error object
+     * @return HTTP status code for the error object
+     */
     private int getErrorCode(Object error) {
         if (error instanceof Number) {
             return ((Number) error).intValue();
@@ -102,12 +95,11 @@ public class ErrorHandler extends Middleware {
         }
     }
 
-    // Convert the stack trace to a List in order to be rendered in the error template.
-    //
-    // @method getStackTrace
-    // @private
-    // @param {Object} error
-    // @return {List}
+    /** Convert the stack trace to a List in order to be rendered in the error template.
+     *
+     * @param error error object
+     * @return List containing the stack trace for the object
+     */
     private List<String> getStackTrace(Object error) {
         if (fullStack && error instanceof Throwable) {
             List<String> stackTrace = new ArrayList<>();

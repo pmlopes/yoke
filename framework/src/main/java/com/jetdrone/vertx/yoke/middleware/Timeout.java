@@ -1,16 +1,17 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 
-// # Timeout
-//
-// Times out the request in ```ms```, defaulting to ```5000```.
-//
-// The timeout error is passed to ```next.handle(408)``` so that you may customize the response behaviour.
+/** # Timeout
+ *
+ * Times out the request in ```ms```, defaulting to ```5000```.
+ *
+ * The timeout error is passed to ```next.handle(408)``` so that you may customize the response behaviour.
+ */
 public class Timeout extends Middleware {
 
     private final long timeout;

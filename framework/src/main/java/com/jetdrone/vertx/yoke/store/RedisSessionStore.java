@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.store;
 
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
@@ -10,7 +10,7 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-// # RedisSessionStore
+/** # RedisSessionStore */
 public class RedisSessionStore implements SessionStore {
 
     private final EventBus eventBus;

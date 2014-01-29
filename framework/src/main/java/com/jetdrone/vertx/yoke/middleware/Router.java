@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -17,11 +17,21 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// # Router
-//
-// Route request by path or regular expression. All *HTTP* verbs are available:
-//
-// ```GET```,```PUT```, ```POST```, ```DELETE```, ```OPTIONS```, ```HEAD```, ```TRACE```, ```CONNECT```. ```PATCH```
+/**
+ * # Router
+ *
+ * Route request by path or regular expression. All *HTTP* verbs are available:
+ *
+ * * `GET`
+ * * `PUT`
+ * * `POST`
+ * * `DELETE`
+ * * `OPTIONS`
+ * * `HEAD`
+ * * `TRACE`
+ * * `CONNECT`
+ * * `PATCH`
+ */
 public class Router extends Middleware {
 
     private final List<PatternBinding> getBindings = new ArrayList<>();
@@ -36,14 +46,19 @@ public class Router extends Middleware {
 
     private final Map<String, Middleware> paramProcessors = new HashMap<>();
 
-    // @example
-    //      new Router() {{
-    //        get("/hello", new Handler<YokeRequest>() {
-    //          public void handle(YokeRequest request) {
-    //            request.response().end("Hello World!");
-    //          }
-    //        });
-    //      }}
+    /**
+     * Create a new Router Middleware.
+     *
+     * <pre>
+     * new Router() {{
+     *   get("/hello", new Handler<YokeRequest>() {
+     *     public void handle(YokeRequest request) {
+     *       request.response().end("Hello World!");
+     *     }
+     *   });
+     * }}
+     * </pre>
+     */
     public Router() {
 
     }
@@ -804,7 +819,7 @@ public class Router extends Middleware {
         // read the method one
         Path p = m.getAnnotation(Path.class);
         if (p != null) {
-            // method path is present
+             // method path is present
             return p.value();
         }
 

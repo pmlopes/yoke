@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware.filters
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware.filters;
 
 import org.vertx.java.core.buffer.Buffer;
@@ -10,7 +10,9 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
-// # AbstractWriterFilter
+/**
+ * # AbstractWriterFilter
+ */
 public abstract class AbstractWriterFilter implements WriterFilter {
     final Pattern filter;
     final OutputStream stream;

@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.util.Utils;
@@ -10,7 +10,9 @@ import io.netty.handler.codec.http.DefaultCookie;
 import javax.crypto.Mac;
 import java.util.Set;
 
-// # YokeCookie
+/**
+ * # YokeCookie
+ */
 public class YokeCookie implements Cookie {
 
     private final Cookie nettyCookie;

@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke;
 
 import java.io.BufferedReader;
@@ -11,25 +11,29 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-// # MimeType
-//
-// Basic MimeType support inspired by the Apache Http Server project.
+/**
+ * # MimeType
+ *
+ * Basic MimeType support inspired by the Apache Http Server project.
+ */
 public class MimeType {
 
-    // @private
-    // Internal map with all known mime types
+    /**
+     * Internal map with all known mime types
+     */
     private static final Map<String, String> mimes = new HashMap<>();
-    // @private
-    // Internal default content encoding (charset)
+
+    /**
+     * Internal default content encoding (charset)
+     */
     private static final String defaultContentEncoding = Charset.defaultCharset().name();
 
-    // Loads a file from a input stream containing all known mime types. The InputStream is a resource mapped from the
-    // project resource directory.
-    //
-    // @private
-    // @static
-    // @method loadFile
-    // @param {InputStream} in
+    /**
+     * Loads a file from a input stream containing all known mime types. The InputStream is a resource mapped from the
+     * project resource directory.
+     *
+     * @param in InputStream
+     */
     private static void loadFile(InputStream in) {
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
@@ -48,22 +52,22 @@ public class MimeType {
         }
     }
 
-    // @constructor MimeType
-    // Static constructor to load the mime types from the resource directory inside the jar file.
+    /** @constructor MimeType
+     * Static constructor to load the mime types from the resource directory inside the jar file.
+     */
     static {
         loadFile(MimeType.class.getResourceAsStream("mime.types"));
         loadFile(MimeType.class.getResourceAsStream("mimex.types"));
     }
 
-    // Returns a mime type string by parsing the file extension of a file string. If the extension is not found or
-    // unknown the default value is returned.
-    //
-    // @method getMime
-    // @static
-    // @getter
-    // @param {String} file - path to a file with extension
-    // @param {String} defaultMimeType - what to return if not found
-    // @return {String} mime type
+    /**
+     * Returns a mime type string by parsing the file extension of a file string. If the extension is not found or
+     * unknown the default value is returned.
+     *
+     * @param file            path to a file with extension
+     * @param defaultMimeType what to return if not found
+     * @return mime type
+     */
     public static String getMime(String file, String defaultMimeType) {
         int sep = file.lastIndexOf('.');
         if (sep != -1) {
@@ -79,26 +83,24 @@ public class MimeType {
         return defaultMimeType;
     }
 
-    // Gets the mime type string for a file with fallback to text/plain
-    //
-    // @method getMime
-    // @static
-    // @getter
-    // @param {String} file - path to a file with extension
-    // @return {String} mime type
+    /**
+     * Gets the mime type string for a file with fallback to text/plain
+     *
+     * @param file path to a file with extension
+     * @return mime type
+     */
     public static String getMime(String file) {
         return getMime(file, "text/plain");
     }
 
-    // Gets the default charset for a file.
-    // for now all mime types that start with text returns UTF-8 otherwise the fallback.
-    //
-    // @method getCharset
-    // @static
-    // @getter
-    // @param {String} mime the mime type to query
-    // @param {String} fallback if not found returns fallback
-    // @return {String} charset string
+    /**
+     * Gets the default charset for a file.
+     * for now all mime types that start with text returns UTF-8 otherwise the fallback.
+     *
+     * @param mime     the mime type to query
+     * @param fallback if not found returns fallback
+     * @return charset string
+     */
     public static String getCharset(String mime, String fallback) {
         // TODO: exceptions json and which other should also be marked as text
         if (mime.startsWith("text")) {
@@ -108,13 +110,12 @@ public class MimeType {
         return fallback;
     }
 
-    // Gets the default charset for a file with default fallback null
-    //
-    // @method getCharset
-    // @static
-    // @getter
-    // @param {String} mime the mime type to query
-    // @return {String} charset string
+    /**
+     * Gets the default charset for a file with default fallback null
+     *
+     * @param mime the mime type to query
+     * @return charset string
+     */
     public static String getCharset(String mime) {
         return getCharset(mime, null);
     }

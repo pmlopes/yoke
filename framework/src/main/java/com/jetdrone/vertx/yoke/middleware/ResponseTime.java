@@ -1,14 +1,15 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 
-// # ResponseTime
-//
-// Adds the ```x-response-time``` header displaying the response duration in milliseconds.
+/** # ResponseTime
+ *
+ * Adds the ```x-response-time``` header displaying the response duration in milliseconds.
+ */
 public class ResponseTime extends Middleware {
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {

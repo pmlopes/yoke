@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import org.vertx.java.core.AsyncResult;
@@ -13,7 +13,9 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-// # YokeFileUpload
+/**
+ * # YokeFileUpload
+ */
 public class YokeFileUpload {
 
     final FileSystem fileSystem;

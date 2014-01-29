@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.middleware.middleware
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
@@ -9,35 +9,36 @@ import org.vertx.java.core.json.JsonObject;
 
 import javax.xml.bind.DatatypeConverter;
 
-// # BasicAuth
-//
-// Enfore basic authentication by providing a AuthHandler.handler(user, pass), which must return true in order to gain
-// access. Populates request.user. The final alternative is simply passing username / password strings.
+/**
+ * # BasicAuth
+ *
+ * Enfore basic authentication by providing a AuthHandler.handler(user, pass), which must return true in order to gain
+ * access. Populates request.user. The final alternative is simply passing username / password strings.
+ */
 public class BasicAuth extends Middleware {
 
-    // Realm name for the application
-    //
-    // @property realm
-    // @private
+    /**
+     * Realm name for the application
+     */
     private final String realm;
 
-    // AuthHandler for validating this instance authentication requests.
-    //
-    // @property authHandler
-    // @private
+    /**
+     * AuthHandler for validating this instance authentication requests.
+     */
     private final AuthHandler authHandler;
 
-    // Creates a new BasicAuth middleware with a master username / password and a given realm.
-    //
-    // @constructor
-    // @param {String} username
-    // @param {String} password
-    // @param {String} realm
-    //
-    // @example
-    //       Yoke yoke = new Yoke(...);
-    //       yoke.use("/admin", new BasicAuth("admin", "s3cr37",
-    //           "MyApp Auth Required"));
+    /**
+     * Creates a new BasicAuth middleware with a master username / password and a given realm.
+     * <pre>
+     *   Yoke yoke = new Yoke(...);
+     *     yoke.use("/admin", new BasicAuth("admin", "s3cr37",
+     *         "MyApp Auth Required"));
+     * </pre>
+     *
+     * @param username the security principal user name
+     * @param password the security principal password
+     * @param realm the security realm
+     */
     public BasicAuth(final String username, final String password, String realm) {
         this.realm = realm;
         authHandler = new AuthHandler() {
@@ -53,70 +54,76 @@ public class BasicAuth extends Middleware {
         };
     }
 
-    // Creates a new BasicAuth middleware with a master username / password. By default the realm will be `Authentication required`.
-    //
-    // @constructor
-    // @param {String} username
-    // @param {String} password
-    //
-    // @example
-    //       Yoke yoke = new Yoke(...);
-    //       yoke.use("/admin", new BasicAuth("admin", "s3cr37"));
+    /**
+     * Creates a new BasicAuth middleware with a master username / password. By default the realm will be `Authentication required`.
+     *
+     * <pre>
+     *       Yoke yoke = new Yoke(...);
+     *       yoke.use("/admin", new BasicAuth("admin", "s3cr37"));
+     * </pre>
+     *
+     * @param username the security principal user name
+     * @param password the security principal password
+     */
     public BasicAuth(String username, String password) {
         this (username, password, "Authentication required");
 
     }
 
-    // Creates a new BasicAuth middleware with a AuthHandler and a given realm.
-    //
-    // @constructor
-    // @param {AuthHandler} authHandler
-    // @param {String} realm
-    //
-    // @example
-    //       Yoke yoke = new Yoke(...);
-    //       yoke.use("/admin", new AuthHandler() {
-    //         public void handle(String user, String password, Handler next) {
-    //           // a better example would be fetching user from a DB
-    //           if ("user".equals(user) && "pass".equals(password)) {
-    //             next.handle(true);
-    //           } else {
-    //             next.handle(false);
-    //           }
-    //         }
-    //       }, "My App Auth");
+    /**
+     * Creates a new BasicAuth middleware with a AuthHandler and a given realm.
+     *
+     * <pre>
+     *       Yoke yoke = new Yoke(...);
+     *       yoke.use("/admin", new AuthHandler() {
+     *         public void handle(String user, String password, Handler next) {
+     *           // a better example would be fetching user from a DB
+     *           if ("user".equals(user) && "pass".equals(password)) {
+     *             next.handle(true);
+     *           } else {
+     *             next.handle(false);
+     *           }
+     *         }
+     *       }, "My App Auth");
+     * </pre>
+     *
+     * @param authHandler the authentication handler
+     * @param realm the security realm
+     */
     public BasicAuth(String realm, AuthHandler authHandler) {
         this.realm = realm;
         this.authHandler = authHandler;
     }
 
-    // Creates a new BasicAuth middleware with a AuthHandler.
-    //
-    // @constructor
-    // @param {AuthHandler} authHandler
-    //
-    // @example
-    //       Yoke yoke = new Yoke(...);
-    //       yoke.use("/admin", new AuthHandler() {
-    //         public void handle(String user, String password, Handler next) {
-    //           // a better example would be fetching user from a DB
-    //           if ("user".equals(user) && "pass".equals(password)) {
-    //             next.handle(true);
-    //           } else {
-    //             next.handle(false);
-    //           }
-    //         }
-    //       });
+    /**
+     * Creates a new BasicAuth middleware with a AuthHandler.
+     *
+     * <pre>
+     *       Yoke yoke = new Yoke(...);
+     *       yoke.use("/admin", new AuthHandler() {
+     *         public void handle(String user, String password, Handler next) {
+     *           // a better example would be fetching user from a DB
+     *           if ("user".equals(user) && "pass".equals(password)) {
+     *             next.handle(true);
+     *           } else {
+     *             next.handle(false);
+     *           }
+     *         }
+     *       });
+     * </pre>
+
+     * @param authHandler the authentication handler
+     */
     public BasicAuth(AuthHandler authHandler) {
         this("Authentication required", authHandler);
     }
 
-    // Handle all forbidden errors, in this case we need to add a special header to the response
-    //
-    // @method handle401
-    // @private
-    // @param {YokeRequest} request
-    // @param {Handler} next
+    /**
+     * Handle all forbidden errors, in this case we need to add a special header to the response
+     *
+     * @param request yoke request
+     * @param next middleware to be called next
+     */
     private void handle401(final YokeRequest request, final Handler<Object> next) {
         YokeResponse response = request.response();
         response.putHeader("WWW-Authenticate", "Basic realm=\"" + getRealm(request) + "\"");
@@ -169,13 +176,14 @@ public class BasicAuth extends Middleware {
         }
     }
 
-    // Get the realm for this instance
-    //
-    // The usecase is a multitenant app where I want different realms for paths like /foo/homepage and /bar/homepage.
-    //
-    // @method getRealm
-    // @param {YokeRequest} request http request
-    // @return {String} realm name
+    /**
+     * Get the realm for this instance
+     *
+     * The usecase is a multitenant app where I want different realms for paths like /foo/homepage and /bar/homepage.
+     *
+     * @param request http yoke request
+     * @return realm name
+     */
     public String getRealm(YokeRequest request) {
         return realm;
     }

@@ -1,6 +1,6 @@
-// Copyright 2011-2013 the original author or authors.
-//
-// @package com.jetdrone.vertx.yoke.engine
+/**
+ * Copyright 2011-2014 the original author or authors.
+ */
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
@@ -13,7 +13,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// # StringPlaceholderEngine
+/**
+ * # StringPlaceholderEngine
+ */
 public class StringPlaceholderEngine extends AbstractEngine<String> {
 
     private static final String placeholderPrefix = "${";
