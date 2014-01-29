@@ -30,6 +30,7 @@ EXTRAS =	Rest.html
 %.html: %.md
 # First escape < and >
 	@cp $< /tmp/escaped.md
+	@sed -i 's/\&/\&amp;/g' /tmp/escaped.md
 	@sed -i 's/</\&lt;/g' /tmp/escaped.md
 	@sed -i 's/>/\&gt;/g' /tmp/escaped.md
 # Replace into template
