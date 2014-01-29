@@ -10,7 +10,9 @@ import io.netty.handler.codec.http.DefaultCookie;
 import javax.crypto.Mac;
 import java.util.Set;
 
-// # YokeCookie
+/**
+ * # YokeCookie
+ */
 public class YokeCookie implements Cookie {
 
     private final Cookie nettyCookie;

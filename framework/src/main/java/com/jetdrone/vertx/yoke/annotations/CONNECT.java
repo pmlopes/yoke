@@ -8,9 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// # CONNECT
-//
-// Annotate a method that will handle the HTTP CONNECT method requests for a given path.
+/**
+ * # CONNECT
+ *
+ * Annotate a method that will handle the HTTP CONNECT method requests for a given path.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface CONNECT {

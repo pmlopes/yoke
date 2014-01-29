@@ -20,8 +20,9 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.*;
 
-// YokeRequest is an extension to Vert.x *HttpServerRequest* with some helper methods to make it easier to perform common
-// tasks related to web application development.
+/** YokeRequest is an extension to Vert.x *HttpServerRequest* with some helper methods to make it easier to perform common
+ * tasks related to web application development.
+ */
 public class YokeRequest implements HttpServerRequest {
 
     private static final Comparator<String> ACCEPT_X_COMPARATOR = new Comparator<String>() {
@@ -83,20 +84,22 @@ public class YokeRequest implements HttpServerRequest {
         this.store = store;
     }
 
-    // Allow getting properties in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {R} The found object
+    /** Allow getting properties in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {R} The found object
+     */
     @SuppressWarnings("unchecked")
     public <R> R get(String name) {
         return (R) context.get(name);
     }
 
-    // Allow getting properties in a generified way and return defaultValue if the key does not exist.
-    //
-    // @param {String} name The key to get
-    // @param {R} defaultValue value returned when the key does not exist
-    // @return {R} The found object
+    /** Allow getting properties in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param {String} name The key to get
+     * @param {R} defaultValue value returned when the key does not exist
+     * @return {R} The found object
+     */
     public <R> R get(String name, R defaultValue) {
         if (context.containsKey(name)) {
             return get(name);
@@ -105,11 +108,12 @@ public class YokeRequest implements HttpServerRequest {
         }
     }
 
-    // Allows putting a value into the context
-    //
-    // @param {String} name the key to store
-    // @param {R} value the value to store
-    // @return {R} the previous value or null
+    /** Allows putting a value into the context
+     *
+     * @param {String} name the key to store
+     * @param {R} value the value to store
+     * @return {R} the previous value or null
+     */
     @SuppressWarnings("unchecked")
     public <R> R put(String name, R value) {
         if (value == null) {
@@ -118,27 +122,30 @@ public class YokeRequest implements HttpServerRequest {
         return (R) context.put(name, value);
     }
 
-    // Allow getting headers in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {String} The found object
+    /** Allow getting headers in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {String} The found object
+     */
     public String getHeader(String name) {
         return headers().get(name);
     }
 
-    // Allow getting headers in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {List} The list of all found objects
+    /** Allow getting headers in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {List} The list of all found objects
+     */
     public List<String> getAllHeaders(String name) {
         return headers().getAll(name);
     }
 
-    // Allow getting headers in a generified way and return defaultValue if the key does not exist.
-    //
-    // @param {String} name The key to get
-    // @param {String} defaultValue value returned when the key does not exist
-    // @return {String} The found object
+    /** Allow getting headers in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param {String} name The key to get
+     * @param {String} defaultValue value returned when the key does not exist
+     * @return {String} The found object
+     */
     public String getHeader(String name, String defaultValue) {
         if (headers().contains(name)) {
             return getHeader(name);
@@ -147,10 +154,11 @@ public class YokeRequest implements HttpServerRequest {
         }
     }
 
-    // Allow getting Cookie by name.
-    //
-    // @param {String} name The key to get
-    // @return {YokeCookie} The found object
+    /** Allow getting Cookie by name.
+     *
+     * @param {String} name The key to get
+     * @return {YokeCookie} The found object
+     */
     public YokeCookie getCookie(String name) {
         if (cookies != null) {
             for (YokeCookie c : cookies) {
@@ -162,10 +170,11 @@ public class YokeRequest implements HttpServerRequest {
         return null;
     }
 
-    // Allow getting all Cookie by name.
-    //
-    // @param {String} name The key to get
-    // @return {List} The found objects
+    /** Allow getting all Cookie by name.
+     *
+     * @param {String} name The key to get
+     * @return {List} The found objects
+     */
     public List<YokeCookie> getAllCookies(String name) {
         List<YokeCookie> foundCookies = new ArrayList<>();
         if (cookies != null) {
@@ -183,8 +192,9 @@ public class YokeRequest implements HttpServerRequest {
         return request.method();
     }
 
-    // Package level mutator for the overrided setMethod
-    // @param {String} newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
+    /** Package level mutator for the overrided setMethod
+     * @param {String} newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
+     */
     void setMethod(String newMethod) {
         this.method = newMethod.toUpperCase();
     }
@@ -199,15 +209,17 @@ public class YokeRequest implements HttpServerRequest {
         return bodyLengthLimit;
     }
 
-    // Returns true if this request has setBody
-    //
-    // @return {Boolean} true if content-length or transfer-encoding is present
+    /** Returns true if this request has setBody
+     *
+     * @return {Boolean} true if content-length or transfer-encoding is present
+     */
     public boolean hasBody() {
         MultiMap headers = headers();
         return headers.contains("transfer-encoding") || headers.contains("content-length");
     }
 
-    // Returns the content length of this request setBody or -1 if header is not present.
+    /** Returns the content length of this request setBody or -1 if header is not present.
+     */
     public long contentLength() {
         String contentLengthHeader = headers().get("content-length");
         if (contentLengthHeader != null) {
@@ -217,7 +229,7 @@ public class YokeRequest implements HttpServerRequest {
         }
     }
 
-    // The request body and eventually a parsed version of it in json or map
+    /** The request body and eventually a parsed version of it in json or map */
     @SuppressWarnings("unchecked")
     public <V> V body() {
         if (body != null) {
@@ -232,18 +244,18 @@ public class YokeRequest implements HttpServerRequest {
         return (V) body;
     }
 
-    // Mutator for the request setBody
-    // The request setBody and eventually a parsed version of it in json or map
+    /** Mutator for the request setBody
+     * The request setBody and eventually a parsed version of it in json or map*/
     void setBody(Object body) {
         this.body = body;
     }
 
-    // The uploaded setFiles
+    /** The uploaded setFiles */
     public Map<String, YokeFileUpload> files() {
         return files;
     }
 
-    // Get an uploaded file
+    /** Get an uploaded file */
     public YokeFileUpload getFile(String name) {
         if (files == null) {
             return null;
@@ -252,20 +264,21 @@ public class YokeRequest implements HttpServerRequest {
         return files.get(name);
     }
 
-    // The uploaded setFiles
+    /** The uploaded setFiles */
     void setFiles(Map<String, YokeFileUpload> files) {
         this.files = files;
     }
 
-    // Cookies
+    /** Cookies */
     void setCookies(Set<YokeCookie> cookies) {
         this.cookies = cookies;
     }
 
     // Session management
 
-    // Destroys a session from the request context and also from the storage engine.
-    // @method destroySession
+    /** Destroys a session from the request context and also from the storage engine.
+     * @method destroySession
+     */
     public void destroySession() {
         JsonObject session = get("session");
         if (session == null) {
@@ -291,10 +304,11 @@ public class YokeRequest implements HttpServerRequest {
         });
     }
 
-    // Loads a session given its session id and sets the "session" property in the request context.
-    // @method loadSession
-    // @param {String} sessionId the id to load
-    // @param {Handler} handler the success/complete handler
+    /** Loads a session given its session id and sets the "session" property in the request context.
+     * @method loadSession
+     * @param {String} sessionId the id to load
+     * @param {Handler} handler the success/complete handler
+     */
     public void loadSession(String sessionId, final Handler<Object> handler) {
         if (sessionId == null) {
             handler.handle(null);
@@ -312,12 +326,13 @@ public class YokeRequest implements HttpServerRequest {
         });
     }
 
-    // Create a new Session and store it with the underlying storage.
-    // Internally create a entry in the request context under the name "session" and add a end handler to save that
-    // object once the execution is terminated.
-    //
-    // @method createSession
-    // @return {JsonObject} session
+    /** Create a new Session and store it with the underlying storage.
+     * Internally create a entry in the request context under the name "session" and add a end handler to save that
+     * object once the execution is terminated.
+     *
+     * @method createSession
+     * @return {JsonObject} session
+     */
     public JsonObject createSession() {
         final String sessionId = UUID.randomUUID().toString();
         final JsonObject session = new JsonObject().putString("id", sessionId);
@@ -369,11 +384,12 @@ public class YokeRequest implements HttpServerRequest {
         return parts;
     }
 
-    // Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which
-    // case you should respond with 406 "Not Acceptable".
-    //
-    // The type value must be a single mime type string such as "application/json" and is validated by checking
-    // if the request string starts with it.
+    /** Check if the given type(s) is acceptable, returning the best match when true, otherwise null, in which
+     * case you should respond with 406 "Not Acceptable".
+     *
+     * The type value must be a single mime type string such as "application/json" and is validated by checking
+     * if the request string starts with it.
+     */
     public String accepts(String... types) {
         String accept = getHeader("accept");
         // accept anything when accept is not present
@@ -403,28 +419,29 @@ public class YokeRequest implements HttpServerRequest {
         return null;
     }
 
-    // Check if the incoming request contains the "Content-Type"
-    // header field, and it contains the give mime `type`.
-    //
-    // Examples:
-    //
-    // // With Content-Type: text/html; charset=utf-8
-    // req.is('html');
-    // req.is('text/html');
-    // req.is('text/*');
-    // // => true
-    //
-    // // When Content-Type is application/json
-    // req.is('json');
-    // req.is('application/json');
-    // req.is('application/*');
-    // // => true
-    //
-    // req.is('html');
-    // // => false
-    //
-    // @param {String} type content type
-    // @return {Boolean} true if content type is of type
+    /** Check if the incoming request contains the "Content-Type"
+     * header field, and it contains the give mime `type`.
+     *
+     * Examples:
+     *
+     * // With Content-Type: text/html; charset=utf-8
+     * req.is('html');
+     * req.is('text/html');
+     * req.is('text/*');
+     * // => true
+     *
+     * // When Content-Type is application/json
+     * req.is('json');
+     * req.is('application/json');
+     * req.is('application/*');
+     * // => true
+     *
+     * req.is('html');
+     * // => false
+     *
+     * @param {String} type content type
+     * @return {Boolean} true if content type is of type
+     */
     public boolean is(String type) {
         String ct = getHeader("Content-Type");
         if (ct == null) {
@@ -458,8 +475,8 @@ public class YokeRequest implements HttpServerRequest {
         return ct.contains(type);
     }
 
-    // Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For
-    // Header
+    /** Returns the ip address of the client, when trust-proxy is true (default) then first look into X-Forward-For
+     * Header */
     public String ip() {
         Boolean trustProxy = (Boolean) context.get("trust-proxy");
         if (trustProxy != null && trustProxy) {
@@ -475,19 +492,21 @@ public class YokeRequest implements HttpServerRequest {
         return request.remoteAddress().getHostName();
     }
 
-    // Allow getting parameters in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {String} The found object
+    /** Allow getting parameters in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {String} The found object
+     */
     public String getParameter(String name) {
         return params().get(name);
     }
 
-    // Allow getting parameters in a generified way and return defaultValue if the key does not exist.
-    //
-    // @param {String} name The key to get
-    // @param {String} defaultValue value returned when the key does not exist
-    // @return {String} The found object
+    /** Allow getting parameters in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param {String} name The key to get
+     * @param {String} defaultValue value returned when the key does not exist
+     * @return {String} The found object
+     */
     public String getParameter(String name, String defaultValue) {
         String value = getParameter(name);
 
@@ -498,27 +517,30 @@ public class YokeRequest implements HttpServerRequest {
         return value;
     }
 
-    // Allow getting parameters in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {List} The found object
+    /** Allow getting parameters in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {List} The found object
+     */
     public List<String> getParameterList(String name) {
         return params().getAll(name);
     }
 
-    // Allow getting form parameters in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {String} The found object
+    /** Allow getting form parameters in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {String} The found object
+     */
     public String getFormParameter(String name) {
         return request.formAttributes().get(name);
     }
 
-    // Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
-    //
-    // @param {String} name The key to get
-    // @param {String} defaultValue value returned when the key does not exist
-    // @return {String} The found object
+    /** Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
+     *
+     * @param {String} name The key to get
+     * @param {String} defaultValue value returned when the key does not exist
+     * @return {String} The found object
+     */
     public String getFormParameter(String name, String defaultValue) {
         String value = request.formAttributes().get(name);
 
@@ -529,15 +551,16 @@ public class YokeRequest implements HttpServerRequest {
         return value;
     }
 
-    // Allow getting form parameters in a generified way.
-    //
-    // @param {String} name The key to get
-    // @return {List} The found object
+    /** Allow getting form parameters in a generified way.
+     *
+     * @param {String} name The key to get
+     * @return {List} The found object
+     */
     public List<String> getFormParameterList(String name) {
         return request.formAttributes().getAll(name);
     }
 
-    // Return the real request
+    /** Return the real request */
     public HttpServerRequest vertxHttpServerRequest() {
         return request;
     }

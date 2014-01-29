@@ -11,30 +11,35 @@ import org.vertx.java.core.Handler;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-// # Compress
-//
-// Middleware to compress responses and set the appropriate response headers.
-// Not all responses are compressed, the middleware first inspects if the
-// request accepts compression and tries to select the best matched algorithm.
-//
-// You can specify which content types are compressable and by default json/text/javascript
-// are enabled.
+/**
+ * # Compress
+ *
+ * Middleware to compress responses and set the appropriate response headers.
+ * Not all responses are compressed, the middleware first inspects if the
+ * request accepts compression and tries to select the best matched algorithm.
+ *
+ * You can specify which content types are compressable and by default json/text/javascript
+ * are enabled.
+ */
 public class Compress extends Middleware {
 
-    // Regular expression to identify resources that are subject to compression
-    // @propery filter
-    // @private
+    /** Regular expression to identify resources that are subject to compression
+     * @propery filter
+     * @private
+     */
     private final Pattern filter;
 
-    // Creates a new Compression Middleware given a regular expression of allowed mime types
-    // @constructor
-    // @param {Pattern} filter
+    /** Creates a new Compression Middleware given a regular expression of allowed mime types
+     * @constructor
+     * @param {Pattern} filter
+     */
     public Compress(Pattern filter) {
         this.filter = filter;
     }
 
-    // Creates a new Compression Middleware using the default allowed mime types
-    // @constructor
+    /** Creates a new Compression Middleware using the default allowed mime types
+     * @constructor
+     */
     public Compress() {
         this(Pattern.compile("json|text|javascript"));
     }

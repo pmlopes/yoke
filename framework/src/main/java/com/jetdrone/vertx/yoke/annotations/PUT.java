@@ -8,9 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// # PUT
-//
-// Annotate a method that will handle the HTTP PUT method requests for a given path.
+/**
+ * # PUT
+ *
+ * Annotate a method that will handle the HTTP PUT method requests for a given path.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface PUT {

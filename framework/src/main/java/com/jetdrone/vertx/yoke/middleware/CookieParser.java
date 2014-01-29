@@ -12,40 +12,44 @@ import javax.crypto.Mac;
 import java.util.Set;
 import java.util.TreeSet;
 
-// # CookieParser
-//
-// Parse request cookies both signed or plain.
-//
-// If a cooke value starts with *s:* it means that it is a signed cookie. In this case the value is expected to be
-// *s:<cookie>.<signature>*. The signature is *HMAC + SHA256*.
-//
-// When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.
+/** # CookieParser
+ *
+ * Parse request cookies both signed or plain.
+ *
+ * If a cooke value starts with *s:* it means that it is a signed cookie. In this case the value is expected to be
+ * *s:<cookie>.<signature>*. The signature is *HMAC + SHA256*.
+ *
+ * When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.
+ */
 public class CookieParser extends Middleware {
 
-    // Message Signer
-    // @property hmacSHA256
-    // @private
+    /** Message Signer
+     * @property hmacSHA256
+     * @private
+     */
     private final Mac hmacSHA256;
 
-    // Instantiates a CookieParser with a given Mac.
-    //
-    // @constructor
-    // @param {Mac} hmacSHA256
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new CookieParser(Utils.newHmacSHA256("s3cr3t")));
+    /** Instantiates a CookieParser with a given Mac.
+     *
+     * @constructor
+     * @param {Mac} hmacSHA256
+     *
+     * @example
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new CookieParser(Utils.newHmacSHA256("s3cr3t")));
+     */
     public CookieParser(Mac hmacSHA256) {
         this.hmacSHA256 = hmacSHA256;
     }
 
-    // Instantiates a CookieParser without a Mac. In this case no cookies will be signed.
-    //
-    // @constructor
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new CookieParser());
+    /** Instantiates a CookieParser without a Mac. In this case no cookies will be signed.
+     *
+     * @constructor
+     *
+     * @example
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new CookieParser());
+     */
     public CookieParser() {
         this(null);
     }

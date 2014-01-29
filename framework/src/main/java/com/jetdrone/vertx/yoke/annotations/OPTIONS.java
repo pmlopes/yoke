@@ -8,9 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// # OPTIONS
-//
-// Annotate a method that will handle the HTTP OPTIONS method requests for a given path.
+/**
+ * # OPTIONS
+ *
+ * Annotate a method that will handle the HTTP OPTIONS method requests for a given path.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface OPTIONS {

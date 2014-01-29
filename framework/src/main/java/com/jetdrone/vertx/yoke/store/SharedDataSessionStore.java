@@ -10,7 +10,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.util.concurrent.ConcurrentMap;
 
-// #SharedDataSessionStore
+/** #SharedDataSessionStore */
 public class SharedDataSessionStore implements SessionStore {
 
     private final ConcurrentMap<String, String> storage;

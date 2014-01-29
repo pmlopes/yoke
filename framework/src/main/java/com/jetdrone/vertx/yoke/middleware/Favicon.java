@@ -16,31 +16,36 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-// # Favicon
-//
-// By default serves the Yoke favicon, or the favicon located by the given ```path```.
+/** # Favicon
+ *
+ * By default serves the Yoke favicon, or the favicon located by the given ```path```.
+ */
 public class Favicon extends Middleware {
 
-    // ## Icon
-    //
-    // Represents a favicon.ico file and related headers
+    /** ## Icon
+     *
+     * Represents a favicon.ico file and related headers
+     */
     private class Icon {
-        // Headers for the icon resource
-        //
-        // @property headers
-        // @private
+        /** Headers for the icon resource
+         *
+         * @property headers
+         * @private
+         */
         private final Map<String, String> headers;
 
-        // Binary content of the icon file
-        //
-        // @property body
-        // @private
+        /** Binary content of the icon file
+         *
+         * @property body
+         * @private
+         */
         private final Buffer body;
 
-        // Instantiate a new Icon
-        //
-        // @constructor
-        // @param {Buffer} buffer
+        /** Instantiate a new Icon
+         *
+         * @constructor
+         * @param {Buffer} buffer
+         */
         private Icon(Buffer buffer) {
             headers = new HashMap<>();
             body = buffer;
@@ -58,68 +63,75 @@ public class Favicon extends Middleware {
         }
     }
 
-    // favicon cache
-    //
-    // @property icon
-    // @private
+    /** favicon cache
+     *
+     * @property icon
+     * @private
+     */
     private Icon icon;
 
-    // Location of the icon in the file system
-    //
-    // @property path
-    // @private
+    /** Location of the icon in the file system
+     *
+     * @property path
+     * @private
+     */
     private final String path;
 
-    // Cache control for the resource
-    //
-    // @property maxAge
-    // @private
+    /** Cache control for the resource
+     *
+     * @property maxAge
+     * @private
+     */
     private final long maxAge;
 
-    // Create a new Favicon instance using a file in the file system and customizable cache period
-    //
-    // @constructor
-    // @param {String} path
-    // @param {long} maxAge
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new Favicon("/icons/icon.ico", 1000));
+    /** Create a new Favicon instance using a file in the file system and customizable cache period
+     *
+     * @constructor
+     * @param {String} path
+     * @param {long} maxAge
+     *
+     * @example
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new Favicon("/icons/icon.ico", 1000));
+     */
     public Favicon(String path, long maxAge) {
         this.path = path;
         this.maxAge = maxAge;
     }
 
-    // Create a new Favicon instance using a file in the file system and cache for 1 day.
-    //
-    // @constructor
-    // @param {String} path
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new Favicon("/icons/icon.ico"));
+    /** Create a new Favicon instance using a file in the file system and cache for 1 day.
+     *
+     * @constructor
+     * @param {String} path
+     *
+     * @example
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new Favicon("/icons/icon.ico"));
+     */
     public Favicon(String path) {
         this(path, 86400000);
     }
 
-    // Create a new Favicon instance using a the default icon and cache for 1 day.
-    //
-    // @constructor
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new Favicon());
+    /** Create a new Favicon instance using a the default icon and cache for 1 day.
+     *
+     * @constructor
+     *
+     * @example
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new Favicon());
+     */
     public Favicon() {
         this(null);
     }
 
-    // Loads the icon from the file system once we get a reference to Vert.x
-    //
-    // @internal
-    // @method init
-    // @param {Vertx} vertx
-    // @param {Logger} logger
-    // @param {String} mount
+    /** Loads the icon from the file system once we get a reference to Vert.x
+     *
+     * @internal
+     * @method init
+     * @param {Vertx} vertx
+     * @param {Logger} logger
+     * @param {String} mount
+     */
     @Override
     public Middleware init(Vertx vertx, String mount) {
         try {

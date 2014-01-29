@@ -8,7 +8,9 @@ import java.io.OutputStream;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
-// # DeflateWriterFilter
+/**
+ * # DeflateWriterFilter
+ */
 public class DeflateWriterFilter extends AbstractWriterFilter {
 
     public DeflateWriterFilter(Pattern filter) throws IOException {

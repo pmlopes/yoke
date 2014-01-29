@@ -13,7 +13,9 @@ import java.io.File;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
-// # YokeFileUpload
+/**
+ * # YokeFileUpload
+ */
 public class YokeFileUpload {
 
     final FileSystem fileSystem;

@@ -8,7 +8,9 @@ import java.io.OutputStream;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
-// # GZipWriterFilter
+/**
+ * # GZipWriterFilter
+ */
 public class GZipWriterFilter extends AbstractWriterFilter {
 
     public GZipWriterFilter(Pattern filter) throws IOException {

@@ -8,9 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// # POST
-//
-// Annotate a method that will handle the HTTP POST method requests for a given path.
+/**
+ * # POST
+ *
+ * Annotate a method that will handle the HTTP POST method requests for a given path.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface POST {

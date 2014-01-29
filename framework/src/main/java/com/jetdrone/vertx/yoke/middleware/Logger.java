@@ -11,41 +11,47 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import java.util.Date;
 
-// # Logger
-//
-// Logger for request. There are 3 formats included:
-// 1. DEFAULT
-// 2. SHORT
-// 3. TINY
-//
-// Default tries to log in a format similar to Apache log format, while the other 2 are more suited to development mode.
-// The logging depends on Vert.x logger settings and the severity of the error, so for errors with status greater or
-// equal to 500 the fatal severity is used, for status greater or equal to 400 the error severity is used, for status
-// greater or equal to 300 warn is used and for status above 100 info is used.
+/** # Logger
+ *
+ * Logger for request. There are 3 formats included:
+ * 1. DEFAULT
+ * 2. SHORT
+ * 3. TINY
+ *
+ * Default tries to log in a format similar to Apache log format, while the other 2 are more suited to development mode.
+ * The logging depends on Vert.x logger settings and the severity of the error, so for errors with status greater or
+ * equal to 500 the fatal severity is used, for status greater or equal to 400 the error severity is used, for status
+ * greater or equal to 300 warn is used and for status above 100 info is used.
+ */
 public class Logger extends Middleware {
 
     private final org.vertx.java.core.logging.Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    // The Date formatter (UTC JS compatible format)
-    // @property ISODATE
-    // @private
+    /** The Date formatter (UTC JS compatible format)
+     * @property ISODATE
+     * @private
+     */
     private final ThreadLocalUTCDateFormat ISODATE;
 
-    // The possible out of the box formats.
+    /**
+     * The possible out of the box formats.
+     */
     public enum Format {
         DEFAULT,
         SHORT,
         TINY
     }
 
-    // log before request or after
-    // @property immediate
-    // @private
+    /** log before request or after
+     * @property immediate
+     * @private
+     */
     private final boolean immediate;
 
-    // the current choosen format
-    // @property format
-    // @private
+    /** the current choosen format
+     * @property format
+     * @private
+     */
     private final Format format;
 
     public Logger(boolean immediate, Format format) {

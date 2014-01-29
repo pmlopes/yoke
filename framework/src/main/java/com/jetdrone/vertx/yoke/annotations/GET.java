@@ -8,9 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// # GET
-//
-// Annotate a method that will handle the HTTP GET method requests for a given path.
+/**
+ * # GET
+ *
+ * Annotate a method that will handle the HTTP GET method requests for a given path.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.FIELD})
 public @interface GET {

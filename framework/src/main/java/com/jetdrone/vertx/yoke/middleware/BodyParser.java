@@ -13,58 +13,56 @@ import org.vertx.java.core.json.DecodeException;
 
 import java.util.HashMap;
 
-// # BodyParser
-//
-// Parse request bodies, supports *application/json*, *application/x-www-form-urlencoded*, and *multipart/form-data*.
-//
-// Once data has been parsed the result is visible in the field ```body``` of the request. To help there are 2 helper
-// getters for this field:  ```bodyJson()``` returns ```JsonObject``` and ```bodyBuffer()``` returns ```Buffer```.
-//
-// If the content type was *multipart/form-data* and there were uploaded files the files are ```files()``` returns
-// ```Map<String, HttpServerFileUpload>```.
-//
-// ### Limitations
-//
-// Currently when parsing *multipart/form-data* if there are several files uploaded under the same name, only the last
-// is preserved.
+/** # BodyParser
+ *
+ * Parse request bodies, supports *application/json*, *application/x-www-form-urlencoded*, and *multipart/form-data*.
+ *
+ * Once data has been parsed the result is visible in the field `body` of the request.
+ *
+ * If the content type was *multipart/form-data* and there were uploaded files the files are ```files()``` returns
+ * `Map<String, HttpServerFileUpload>`.
+ *
+ * ### Limitations
+ *
+ * Currently when parsing *multipart/form-data* if there are several files uploaded under the same name, only the last
+ * is preserved.
+ */
 public class BodyParser extends Middleware {
 
-    // Location on the file system to store the uploaded files.
-    // @property uploadDir
-    // @private
+    /**
+     * Location on the file system to store the uploaded files.
+     */
     private final String uploadDir;
 
-    // Instantiates a Body parser with a configurable upload directory.
-    //
-    // @constructor
-    // @param {String} uploadDir
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new BodyParser("/upload"));
+    /** Instantiates a Body parser with a configurable upload directory.
+     *
+     * <pre>
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new BodyParser("/upload"));
+     * </pre>
+     * @param uploadDir
+     */
     public BodyParser(String uploadDir) {
         this.uploadDir = uploadDir;
     }
 
-    // Instantiates a Body parser using the system default temp directory.
-    //
-    // @constructor
-    //
-    // @example
-    //      Yoke yoke = new Yoke(...);
-    //      yoke.use(new BodyParser());
+    /** Instantiates a Body parser using the system default temp directory.
+     *
+     * <pre>
+     *      Yoke yoke = new Yoke(...);
+     *      yoke.use(new BodyParser());
+     * </pre>
+     */
     public BodyParser() {
         this(System.getProperty("java.io.tmpdir"));
     }
 
-    // Internal method to parse JSON requests directly to the YokeRequest object
-    //
-    // @method parseJSON
-    // @private
-    // @asynchronous
-    // @param {YokeRequest} request
-    // @param {Buffer} buffer
-    // @param {Handler} next
+    /** Internal method to parse JSON requests directly to the YokeRequest object
+     *
+     * @param request
+     * @param buffer
+     * @param next
+     */
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
         try {
             String content = buffer.toString();
@@ -84,14 +82,13 @@ public class BodyParser extends Middleware {
         }
     }
 
-    // Handler for the parser. When the request method is GET or HEAD this is a Noop middleware.
-    // If not the middleware verifies if there is a body and according to its headers tries to
-    // parse it as JSON, form data or multi part upload.
-    //
-    // @method handle
-    // @asynchronous
-    // @param {YokeRequest} request
-    // @param {Handler} next
+    /** Handler for the parser. When the request method is GET or HEAD this is a Noop middleware.
+     * If not the middleware verifies if there is a body and according to its headers tries to
+     * parse it as JSON, form data or multi part upload.
+     *
+     * @param request
+     * @param next
+     */
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
         final String method = request.method();

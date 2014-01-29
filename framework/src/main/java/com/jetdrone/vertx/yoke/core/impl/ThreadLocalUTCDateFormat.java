@@ -9,7 +9,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-// # ThreadLocalUTCDateFormat
+/**
+ * # ThreadLocalUTCDateFormat
+ *
+ */
 public final class ThreadLocalUTCDateFormat extends ThreadLocal<DateFormat> {
 
     public final String format(Date date) {

@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
 
-// # JSON
+/**
+ * # JSON
+ */
 public final class JSON {
 
     private JSON() {}

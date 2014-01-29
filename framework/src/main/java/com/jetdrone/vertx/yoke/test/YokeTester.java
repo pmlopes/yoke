@@ -17,7 +17,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
-// # YokeTester
+/** # YokeTester */
 public class YokeTester {
 
     private final Vertx vertx;
@@ -253,12 +253,12 @@ public class YokeTester {
             throw new UnsupportedOperationException();
         }
 
-        //@Override
+        @Override
         public HttpServer setCompressionSupported(boolean compressionSupported) {
             throw new UnsupportedOperationException();
         }
 
-        //@Override
+        @Override
         public boolean isCompressionSupported() {
             return false;
         }

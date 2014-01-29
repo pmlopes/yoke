@@ -10,7 +10,9 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.regex.Pattern;
 
-// # AbstractWriterFilter
+/**
+ * # AbstractWriterFilter
+ */
 public abstract class AbstractWriterFilter implements WriterFilter {
     final Pattern filter;
     final OutputStream stream;

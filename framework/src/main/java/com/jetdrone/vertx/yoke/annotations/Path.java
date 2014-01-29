@@ -8,9 +8,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// # Path
-//
-// Annotate a method with the path to be mounted in the middleware chain.
+/**
+ * # Path
+ *
+ * Annotate a method with the path to be mounted in the middleware chain.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
 public @interface Path {

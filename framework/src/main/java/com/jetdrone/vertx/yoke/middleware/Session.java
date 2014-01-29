@@ -9,7 +9,9 @@ import org.vertx.java.core.json.JsonObject;
 
 import javax.crypto.Mac;
 
-// # Session
+/**
+ * # Session
+ */
 public class Session extends Middleware {
 
     private final Mac hmacSHA256;

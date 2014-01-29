@@ -13,7 +13,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// # StringPlaceholderEngine
+/**
+ * # StringPlaceholderEngine
+ */
 public class StringPlaceholderEngine extends AbstractEngine<String> {
 
     private static final String placeholderPrefix = "${";

@@ -39,22 +39,23 @@ public class GYoke {
     private final org.vertx.java.core.Vertx vertx;
     private Container container;
 
-    // Creates a Yoke instance.
-    //
-    // This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
-    // with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
-    // system and timers.
-    //
-    // @constructor
-    // @param {Verticle} verticle
-    //
-    // @example
-    //      public class MyVerticle extends Verticle {
-    //          public void start() {
-    //              def yoke = new Yoke(this)
-    //              ...
-    //          }
-    //      }
+    /**
+     * Creates a Yoke instance.
+     *
+     * This constructor should be called from a verticle and pass a valid Vertx instance. This instance will be shared
+     * with all registered middleware. The reason behind this is to allow middleware to use Vertx features such as file
+     * system and timers.
+     *
+     * <pre>
+     * public class MyVerticle extends Verticle {
+     *   public void start() {
+     *     def yoke = new Yoke(this)
+     *     ...
+     *   }
+     * }
+     * </pre>
+     * @param verticle the main verticle
+     */
     public GYoke(Verticle verticle) {
         this(verticle.getVertx());
         this.container = verticle.getContainer();
@@ -83,10 +84,9 @@ public class GYoke {
         });
     }
 
-    // Special store engine used for accessing session data
-    //
-    // @private
-    // @property store
+    /**
+     * Special store engine used for accessing session data
+     */
     private SessionStore store;
 
     public GYoke store(SessionStore store) {
@@ -216,10 +216,11 @@ public class GYoke {
         return this;
     }
 
-    // Deploys required middleware
-    //
-    // @method deploy
-    // @param {JsonElement} config
+    /** Deploys required middleware
+     *
+     * @param config configuration to use
+     * @param handler Closure tho allow asynchronous result handling
+     */
     @SuppressWarnings("unchecked")
     public GYoke deploy(Object config, Closure handler) {
         if (config instanceof List) {

@@ -5,7 +5,9 @@ package com.jetdrone.vertx.yoke.middleware.filters;
 
 import org.vertx.java.core.buffer.Buffer;
 
-// # WriterFilter
+/**
+ * # WriterFilter
+ */
 public interface WriterFilter {
     /**
      * Returns the content encoding name for this filter.

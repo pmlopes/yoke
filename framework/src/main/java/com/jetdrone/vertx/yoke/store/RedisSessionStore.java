@@ -10,7 +10,7 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-// # RedisSessionStore
+/** # RedisSessionStore */
 public class RedisSessionStore implements SessionStore {
 
     private final EventBus eventBus;

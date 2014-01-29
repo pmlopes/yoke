@@ -7,7 +7,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-// # SessionStore
+/** # SessionStore */
 public interface SessionStore {
 
     // Attempt to fetch session by the given `sid`.
