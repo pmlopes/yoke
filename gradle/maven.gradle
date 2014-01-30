@@ -43,7 +43,7 @@ signing {
 }
 
 uploadArchives {
-    if (!modname.startsWith("example") && sonatypeUsername != null && sonatypePassword != null) {
+    if (!modname.startsWith("example") && sonatypeUsername != '' && sonatypePassword != '') {
         group 'build'
         description = "Does a maven deploy of archives artifacts"
 
