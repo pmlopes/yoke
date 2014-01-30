@@ -55,7 +55,7 @@ var yoke = new Yoke()
 
 Vert.x 2 module:
 
-```com.jetdrone~yoke~1.0.0-beta2```
+```com.jetdrone~yoke~1.0.4```
 
 ### Maven artifact
 
@@ -63,16 +63,10 @@ Vert.x 2 module:
 <dependency>
   <groupId>com.jetdrone</groupId>
   <artifactId>yoke</artifactId>
-  <version>1.0.0-beta2</version>
+  <version>1.0.4</version>
   <scope>provided</scope>
 </dependency>
 ```
-
-
-## Extensions to Vert.x
-
-* [YokeRequest](YokeRequest.html) - The internal augmented request object.
-* [YokeResponse](YokeResponse.html) - The internal augmented response object.
 
 
 ## Tutorials
@@ -87,30 +81,6 @@ Vert.x 2 module:
 * [KitCMS](https://github.com/pmlopes/yoke/tree/master/example/kitcms) - Remake of KitCMS from NodeJS with Yoke
 * [Persona](Persona.html) - Implementation of Mozilla Persona Authentication with Yoke
 
-
-## Middleware
-
-* [BasicAuth](BasicAuth.html) basic http authentication
-* [BodyParser](BodyParser.html) extensible request body parser
-* [CookieParser](CookieParser.html) cookie parser
-* [ErrorHandler](ErrorHandler.html) flexible error handler
-* [Favicon](Favicon.html) efficient favicon server (with default icon)
-* [Limit](Limit.html) limit the bytesize of request bodies
-* [Logger](Logger.html) Access request logger
-* [MethodOverride](MethodOverride.html) faux HTTP method support
-* [ResponseTime](ResponseTime.html) calculates response-time and exposes via x-response-time
-* [Router](Router.html) flexible routing based on RouteMatcher
-* [Session](Session.html) Cookie session
-* [Static](Static.html) streaming static file server supporting directory listings
-* [Timeout](Timeout.html) request timeouts
-* [Vhost](Vhost.html) virtual host sub-domain mapping middleware
-
-
-## Engines
-
-* [StringPlaceholderEngine](StringPlaceholderEngine.html) StringPlaceholderEngine
-* [GroovyTemplate](GroovyTemplate.html) GroovyTemplate
-* [MicroTemplateEngine](MicroTemplateEngine.html) MicroTemplateEngine
 
 ## Benchmarks
 
