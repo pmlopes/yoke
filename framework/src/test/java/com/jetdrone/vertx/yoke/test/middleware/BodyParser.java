@@ -78,6 +78,35 @@ public class BodyParser extends TestVerticle {
     }
 
     @Test
+    public void testTextBodyParser() {
+
+        Yoke yoke = new Yoke(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+                Buffer body = request.body();
+                assertEquals("hello-world", body.toString());
+                request.response().end();
+            }
+        });
+
+        Buffer body = new Buffer("hello-world");
+
+        MultiMap headers = new CaseInsensitiveMultiMap();
+        headers.add("content-length", Integer.toString(body.length()));
+
+        new YokeTester(vertx, yoke).request("POST", "/upload", headers, body, new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
+                assertNotNull(resp.body);
+                testComplete();
+            }
+        });
+    }
+
+    @Test
     public void testBodyParserWithEmptyBody() {
 
         Yoke yoke = new Yoke(this);
