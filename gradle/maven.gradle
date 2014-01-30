@@ -47,8 +47,8 @@ uploadArchives {
         group 'build'
         description = "Does a maven deploy of archives artifacts"
 
-        repositories {
-            mavenDeployer {
+	    repositories {
+		    mavenDeployer {
                 // setUniqueVersion(false)
 
                 configuration = configurations.archives
@@ -68,7 +68,7 @@ uploadArchives {
                 configurePom(pom)
             }
         }
-    }
+	}
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
