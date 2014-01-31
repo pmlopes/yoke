@@ -68,14 +68,13 @@ public class BodyParser extends Middleware {
      * @param next middleware to be called next
      */
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
-        String content = buffer.toString();
-        if (content.isEmpty()) {
+        if (buffer.length() == 0) {
             next.handle(400);
             return;
         }
 
         try {
-            request.setBody(JSON.decode(content));
+            request.setBody(JSON.decode(buffer.toString()));
         } catch (DecodeException e) {
             next.handle(e);
             return;
@@ -87,8 +86,7 @@ public class BodyParser extends Middleware {
         final String method = request.method();
         if ("GET".equals(method) || "HEAD".equals(method)) return true;
 
-        MultiMap headers = request.headers();
-        if (!headers.contains("transfer-encoding") && !headers.contains("content-length")) return true;
+        if(!request.hasBody()) return true;
 
         return false;
     }
@@ -117,7 +115,7 @@ public class BodyParser extends Middleware {
             request.uploadHandler(uploadHandler(request, next));
         }
 
-        if(buffer != null){
+        if(buffer != null || request.bodyLengthLimit() != -1){
             request.dataHandler(dataHandler(request, next, buffer));
         }
 
@@ -170,13 +168,17 @@ public class BodyParser extends Middleware {
             @Override
             public void handle(Buffer event) {
                 if (limit == -1) {
-                    buffer.appendBuffer(event);
+                    if(buffer != null){
+                        buffer.appendBuffer(event);
+                    }
                     return;
                 }
 
                 size += event.length();
                 if (size < limit) {
-                    buffer.appendBuffer(event);
+                    if(buffer != null){
+                        buffer.appendBuffer(event);
+                    }
                 } else {
                     request.dataHandler(null);
                     request.endHandler(null);
