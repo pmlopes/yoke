@@ -106,7 +106,7 @@ task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module
   into "$projectDir/build/mods/$moduleName"
   from compileJava
   from "$projectDir/src/main/resources"
-  into( "$buildDir/lib" ) {
+  into( "lib" ) {
     from configurations.compile
   }
 }
