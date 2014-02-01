@@ -43,14 +43,12 @@ signing {
 }
 
 uploadArchives {
-    if (!modname.startsWith("example")) {
+    if (!modname.startsWith("example") && sonatypeUsername != '' && sonatypePassword != '') {
         group 'build'
         description = "Does a maven deploy of archives artifacts"
 
-        repositories {
-            mavenDeployer {
-                // setUniqueVersion(false)
-
+	    repositories {
+		    mavenDeployer {
                 configuration = configurations.archives
 
                 repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
@@ -68,7 +66,7 @@ uploadArchives {
                 configurePom(pom)
             }
         }
-    }
+	}
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

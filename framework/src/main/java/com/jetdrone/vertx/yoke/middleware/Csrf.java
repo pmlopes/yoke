@@ -8,7 +8,8 @@ import org.vertx.java.core.Handler;
 
 import java.util.UUID;
 
-/** # Csrf
+/**
+ * # Csrf
  *
  * This middleware adds a CSRF token to requests which mutate state. You should put the result within a hidden form
  * field, query-string etc. This token should be validated against the visitor's session.
@@ -29,12 +30,14 @@ public class Csrf extends Middleware {
      */
     private final String key;
 
-    /** Instantiate a new Csrf with a user defined key
+    /**
+     * Instantiate a new Csrf with a user defined key
+     *
+     * <pre>
+     * new Csrf("_crsf")
+     * </pre>
      *
      * @param key name of the context variable to store the token.
-     *
-     * @example
-     *     new Csrf("_crsf")
      */
     public Csrf(final String key) {
         this.key = key;
@@ -54,34 +57,40 @@ public class Csrf extends Middleware {
         };
     }
 
-    /** Instantiate a new Csrf with the default key "_crsf"
+    /**
+     * Instantiate a new Csrf with the default key "_crsf"
      *
-     * @example
-     *     new Csrf()
+     * <pre>
+     * new Csrf()
+     * </pre>
      */
     public Csrf() {
         this("_csrf");
     }
 
-    /** Instantiate a new Csrf with custom Handler and key
+    /**
+     * Instantiate a new Csrf with custom Handler and key
      *
-     * @param key name of the context variable to store the token.
+     * <pre>
+     * new Csrf("_crsf", new ValueHandler() {...})
+     * </pre>
+     *
+     * @param key          name of the context variable to store the token.
      * @param valueHandler the handler for the token validation.
-     *
-     * @example
-     *     new Csrf("_crsf", new ValueHandler() {...})
      */
     public Csrf(String key, ValueHandler valueHandler) {
         this.key = key;
         this.valueHandler = valueHandler;
     }
 
-    /** Instantiate a new Csrf with custom Handler
+    /**
+     * Instantiate a new Csrf with custom Handler
+     *
+     * <pre>
+     * new Csrf(new ValueHandler() {...})
+     * </pre>
      *
      * @param valueHandler the handler for the token validation.
-     *
-     * @example
-     *     new Csrf(new ValueHandler() {...})
      */
     public Csrf(ValueHandler valueHandler) {
         this("_csrf", valueHandler);

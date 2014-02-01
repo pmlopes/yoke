@@ -12,7 +12,8 @@ import javax.crypto.Mac;
 import java.util.Set;
 import java.util.TreeSet;
 
-/** # CookieParser
+/**
+ * # CookieParser
  *
  * Parse request cookies both signed or plain.
  *
@@ -31,21 +32,24 @@ public class CookieParser extends Middleware {
     /**
      * Instantiates a CookieParser with a given Mac.
      *
-     * @param hmacSHA256 Mac
+     * <pre>
+     * Yoke yoke = new Yoke(...);
+     * yoke.use(new CookieParser(Utils.newHmacSHA256("s3cr3t")));
+     * </pre>
      *
-     * @example
-     *      Yoke yoke = new Yoke(...);
-     *      yoke.use(new CookieParser(Utils.newHmacSHA256("s3cr3t")));
+     * @param hmacSHA256 Mac
      */
     public CookieParser(Mac hmacSHA256) {
         this.hmacSHA256 = hmacSHA256;
     }
 
-    /** Instantiates a CookieParser without a Mac. In this case no cookies will be signed.
+    /**
+     * Instantiates a CookieParser without a Mac. In this case no cookies will be signed.
      *
-     * @example
-     *      Yoke yoke = new Yoke(...);
-     *      yoke.use(new CookieParser());
+     * <pre>
+     * Yoke yoke = new Yoke(...);
+     * yoke.use(new CookieParser());
+     * </pre>
      */
     public CookieParser() {
         this(null);

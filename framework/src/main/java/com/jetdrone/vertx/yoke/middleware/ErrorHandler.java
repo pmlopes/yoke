@@ -15,35 +15,41 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** # ErrorHandler
+/**
+ * # ErrorHandler
  *
  * Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
  */
 public class ErrorHandler extends Middleware {
 
-    /** Flag to enable/disable printing the full stack trace of exceptions.
+    /**
+     * Flag to enable/disable printing the full stack trace of exceptions.
      */
     private final boolean fullStack;
 
-    /** Cached template for rendering the html errors
+    /**
+     * Cached template for rendering the html errors
      */
     private final String errorTemplate;
 
-    /** Create a new ErrorHandler allowing to print or not the stack trace. Include stack trace `true` might be useful in
+    /**
+     * Create a new ErrorHandler allowing to print or not the stack trace. Include stack trace `true` might be useful in
      * development mode but probably you don't want it in production.
      *
-     * @param fullStack include full stack trace in error report.
+     * <pre>
+     * Yoke yoke = new Yoke(...);
+     * yoke.use(new ErrorHandler(true);
+     * </pre>
      *
-     * @example
-     *      Yoke yoke = new Yoke(...);
-     *      yoke.use(new ErrorHandler(true);
+     * @param fullStack include full stack trace in error report.
      */
     public ErrorHandler(boolean fullStack) {
         this.fullStack = fullStack;
         errorTemplate = Utils.readResourceToBuffer(getClass(), "error.html").toString();
     }
 
-    /** Override the Middleware isErrorHandler getter.
+    /**
+     * Override the Middleware isErrorHandler getter.
      *
      * @return always true
      */
@@ -52,7 +58,8 @@ public class ErrorHandler extends Middleware {
         return true;
     }
 
-    /** Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
+    /**
+     * Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
      * numbers these are handled as Http error codes.
      *
      * @param error Error object
@@ -80,7 +87,8 @@ public class ErrorHandler extends Middleware {
         }
     }
 
-    /** Extracts a single error code from a error Object. This will handle Throwables, Strings and Numbers.
+    /**
+     * Extracts a single error code from a error Object. This will handle Throwables, Strings and Numbers.
      *
      * @param error Error object
      * @return HTTP status code for the error object
@@ -95,7 +103,8 @@ public class ErrorHandler extends Middleware {
         }
     }
 
-    /** Convert the stack trace to a List in order to be rendered in the error template.
+    /**
+     * Convert the stack trace to a List in order to be rendered in the error template.
      *
      * @param error error object
      * @return List containing the stack trace for the object

@@ -23,40 +23,48 @@ import java.util.TimeZone;
  */
 public class Static extends Middleware {
 
-    /** SimpleDateFormat to format date objects into ISO format.
+    /**
+     * SimpleDateFormat to format date objects into ISO format.
      */
     private final SimpleDateFormat ISODATE;
 
-    /** Cache for the HTML template of the directory listing page
+    /**
+     * Cache for the HTML template of the directory listing page
      */
     private final String directoryTemplate;
 
-    /** Root directory where to look files from
+    /**
+     * Root directory where to look files from
      */
     private final String root;
 
-    /** Max age allowed for cache of resources
+    /**
+     * Max age allowed for cache of resources
      */
     private final long maxAge;
 
-    /** Allow directory listing
+    /**
+     * Allow directory listing
      */
     private final boolean directoryListing;
 
-    /** Include hidden files (Hiden files are files start start with dot (.).
+    /**
+     * Include hidden files (Hiden files are files start start with dot (.).
      */
     private final boolean includeHidden;
 
-    /** Create a new Static File Server Middleware
+    /**
+     * Create a new Static File Server Middleware
      *
-     * @param root the root location of the static files in the file system (relative to the main Verticle).
-     * @param maxAge cache-control max-age directive
+     * <pre>
+     * new Yoke(...)
+     *   .use(new Static("webroot", 0, true, false));
+     * </pre>
+     *
+     * @param root             the root location of the static files in the file system (relative to the main Verticle).
+     * @param maxAge           cache-control max-age directive
      * @param directoryListing generate index pages for directories
-     * @param includeHidden in the directory listing show dot files
-     *
-     * @example
-     *      new Yoke(...)
-     *        .use(new Static("webroot", 0, true, false));
+     * @param includeHidden    in the directory listing show dot files
      */
     public Static(String root, long maxAge, boolean directoryListing, boolean includeHidden) {
         if (root.endsWith("/")) {
@@ -72,33 +80,38 @@ public class Static extends Middleware {
         ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
-    /** Create a new Static File Server Middleware that does not generate directory listings or hidden files
+    /**
+     * Create a new Static File Server Middleware that does not generate directory listings or hidden files
      *
-     * @param root the root location of the static files in the file system (relative to the main Verticle).
+     * <pre>
+     * new Yoke(...)
+     *   .use(new Static("webroot", 0));
+     * </pre>
+     *
+     * @param root   the root location of the static files in the file system (relative to the main Verticle).
      * @param maxAge cache-control max-age directive
-     *
-     * @example
-     *      new Yoke(...)
-     *        .use(new Static("webroot", 0));
      */
-    public Static(String root,long maxAge) {
+    public Static(String root, long maxAge) {
         this(root, maxAge, false, false);
     }
 
-    /** Create a new Static File Server Middleware that does not generate directory listings or hidden files and files
+    /**
+     * Create a new Static File Server Middleware that does not generate directory listings or hidden files and files
      * are cache for 1 full day
      *
-     * @param root the root location of the static files in the file system (relative to the main Verticle).
+     * <pre>
+     * new Yoke(...)
+     *   .use(new Static("webroot"));
+     * </pre>
      *
-     * @example
-     *      new Yoke(...)
-     *        .use(new Static("webroot"));
+     * @param root the root location of the static files in the file system (relative to the main Verticle).
      */
     public Static(String root) {
         this(root, 86400000, false, false);
     }
 
-    /** Create all required header so content can be cache by Caching servers or Browsers
+    /**
+     * Create all required header so content can be cache by Caching servers or Browsers
      *
      * @param request
      * @param props
@@ -124,7 +137,8 @@ public class Static extends Middleware {
         }
     }
 
-    /** Write a file into the response body
+    /**
+     * Write a file into the response body
      *
      * @param request
      * @param file
@@ -145,7 +159,8 @@ public class Static extends Middleware {
         }
     }
 
-    /** Generate Directory listing
+    /**
+     * Generate Directory listing
      *
      * @param request
      * @param dir
@@ -251,7 +266,8 @@ public class Static extends Middleware {
         });
     }
 
-    /** Verify if a resource is fresh, fresh means that its cache headers are validated against the local resource and
+    /**
+     * Verify if a resource is fresh, fresh means that its cache headers are validated against the local resource and
      * etags last-modified headers are still the same.
      *
      * @param request

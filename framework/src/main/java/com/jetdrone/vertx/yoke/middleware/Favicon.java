@@ -14,26 +14,32 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
-/** # Favicon
+/**
+ * # Favicon
  *
  * By default serves the Yoke favicon, or the favicon located by the given ```path```.
  */
 public class Favicon extends Middleware {
 
-    /** ## Icon
+    /**
+     * ## Icon
      *
      * Represents a favicon.ico file and related headers
      */
     private class Icon {
-        /** Headers for the icon resource
+        /**
+         * Headers for the icon resource
          */
         private final Map<String, String> headers;
 
-        /** Binary content of the icon file
+        /**
+         * Binary content of the icon file
          */
         private final Buffer body;
 
-        /** Instantiate a new Icon
+        /**
+         * Instantiate a new Icon
+         *
          * @param buffer buffer containing the image data for this icon.
          */
         private Icon(Buffer buffer) {
@@ -53,55 +59,65 @@ public class Favicon extends Middleware {
         }
     }
 
-    /** favicon cache
+    /**
+     * favicon cache
      */
     private Icon icon;
 
-    /** Location of the icon in the file system
+    /**
+     * Location of the icon in the file system
      */
     private final String path;
 
-    /** Cache control for the resource
+    /**
+     * Cache control for the resource
      */
     private final long maxAge;
 
-    /** Create a new Favicon instance using a file in the file system and customizable cache period
+    /**
+     * Create a new Favicon instance using a file in the file system and customizable cache period
+     *
+     * <pre>
+     * Yoke yoke = new Yoke(...);
+     * yoke.use(new Favicon("/icons/icon.ico", 1000));
+     * </pre>
      *
      * @param path
      * @param maxAge
-     *
-     * @example
-     *      Yoke yoke = new Yoke(...);
-     *      yoke.use(new Favicon("/icons/icon.ico", 1000));
      */
     public Favicon(String path, long maxAge) {
         this.path = path;
         this.maxAge = maxAge;
     }
 
-    /** Create a new Favicon instance using a file in the file system and cache for 1 day.
+    /**
+     * Create a new Favicon instance using a file in the file system and cache for 1 day.
+     *
+     * <pre>
+     * Yoke yoke = new Yoke(...);
+     * yoke.use(new Favicon("/icons/icon.ico"));
+     * </pre>
      *
      * @param path
-     *
-     * @example
-     *      Yoke yoke = new Yoke(...);
-     *      yoke.use(new Favicon("/icons/icon.ico"));
      */
     public Favicon(String path) {
         this(path, 86400000);
     }
 
-    /** Create a new Favicon instance using a the default icon and cache for 1 day.
+    /**
+     * Create a new Favicon instance using a the default icon and cache for 1 day.
      *
-     * @example
-     *      Yoke yoke = new Yoke(...);
-     *      yoke.use(new Favicon());
+     * <pre>
+     * Yoke yoke = new Yoke(...);
+     * yoke.use(new Favicon());
+     * </pre>
      */
     public Favicon() {
         this(null);
     }
 
-    /** Loads the icon from the file system once we get a reference to Vert.x
+    /**
+     * Loads the icon from the file system once we get a reference to Vert.x
      *
      * @param vertx
      * @param mount
