@@ -17,6 +17,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
@@ -493,14 +494,36 @@ public class Yoke implements RequestWrapper {
      * @param config
      * @param handler
      */
-    public Yoke deploy(JsonElement config, Handler<AsyncResult<String>> handler) {
+    public Yoke deploy(final JsonElement config, final Handler<AsyncResult<String>> handler) {
         if (config.isArray()) {
+            // wait for all deployments before calling the real handler
+            Handler<AsyncResult<String>> waitFor = new Handler<AsyncResult<String>>() {
+
+                private int latch = config.asArray().size();
+                private boolean handled = false;
+
+                @Override
+                public void handle(AsyncResult<String> event) {
+                    latch--;
+                    if (event.failed()) {
+                        handled = true;
+                        handler.handle(event);
+                        return;
+                    }
+                    if (latch == 0) {
+                        if (!handled) {
+                            handler.handle(event);
+                        }
+                        handled = true;
+                    }
+                }
+            };
             for (Object o : config.asArray()) {
                 JsonObject mod = (JsonObject) o;
                 if (mod.getString("module") != null) {
-                    deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+                    deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
                 } else {
-                    deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+                    deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
                 }
             }
         } else {
