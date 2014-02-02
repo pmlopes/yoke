@@ -161,7 +161,14 @@ task init(description: 'Create module link and CP file') << {
   doInit()
 }
 
-task runMod(description: 'Run the module') << {
+task collectDeps(type: Copy) {
+  destinationDir = file("build")
+  into("$buildDir/deps") {
+    from configurations.compile
+  }
+}
+
+task runMod(description: 'Run the module', dependsOn: collectDeps) << {
   setSysProps()
   // We also init here - this means for single module builds the user doesn't have to explicitly init -
   // they can just do runMod
@@ -180,7 +187,8 @@ def doInit() {
       "$projectDir/src/main/resources\r\n" +
       "$projectDir/bin\r\n" +
       "$projectDir/out/production/${project.name}\r\n" +
-      "$projectDir/out/test/${project.name}";
+      "$projectDir/out/test/${project.name}\r\n" +
+      "$projectDir/build/deps\r\n";
     cpFile << defaultCp;
   }
   def args = ['create-module-link', moduleName]
