@@ -299,7 +299,7 @@ public class Yoke implements RequestWrapper {
     /**
      * Special store engine used for accessing session data
      */
-    private SessionStore store;
+    protected SessionStore store;
 
     public Yoke store(SessionStore store) {
         this.store = store;

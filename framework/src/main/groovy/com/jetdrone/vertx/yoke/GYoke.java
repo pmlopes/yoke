@@ -79,18 +79,13 @@ public class GYoke {
                 // the context map is shared with all middlewares
                 final Map<String, Object> context = new Context(jYoke.defaultContext);
                 GYokeResponse response = new GYokeResponse(request.response(), context, engines);
-                return new GYokeRequest(request, response, secure, context, store);
+                return new GYokeRequest(request, response, secure, context, jYoke.store);
             }
         });
     }
 
-    /**
-     * Special store engine used for accessing session data
-     */
-    private SessionStore store;
-
     public GYoke store(SessionStore store) {
-        this.store = store;
+        jYoke.store(store);
         return this;
     }
 
