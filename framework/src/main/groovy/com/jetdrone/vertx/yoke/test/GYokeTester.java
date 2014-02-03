@@ -74,7 +74,6 @@ public class GYokeTester extends YokeTester {
                 }
                 if (o instanceof String) {
                     multiMap.add(entry.getKey(), (String) o);
-                    continue;
                 }
             }
         }

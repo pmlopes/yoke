@@ -17,7 +17,6 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
@@ -480,19 +479,45 @@ public class Yoke implements RequestWrapper {
     }
 
     /**
-     * Deploys required middleware
+     * Deploys required middleware from a config json element.
      *
-     * @param config
+     * The current format for the config is either a single item or an array:
+     * <pre>
+     * {
+     *   module: String, // the name of the module
+     *   verticle: String, // the name of the verticle (either verticle or module must be present)
+     *   instances: Number, // how many instances, default 1
+     *   worker: Boolean, // is it a worker verticle? default false
+     *   multiThreaded: Boolean, // is it a multiThreaded verticle? default false
+     *   config: JsonObject // any config you need to pass to the module/verticle
+     * }
+     * </pre>
+     *
+     * @param config either a json object or a json array.
      */
     public Yoke deploy(JsonElement config) {
         return deploy(config, null);
     }
 
     /**
-     * Deploys required middleware
+     * Deploys required middleware from a config json element. The handler is only called once all middleware is
+     * deployed or in error. The order of deployment is not guaranteed since all deploy functions are called
+     * concurrently and do not wait for the previous result before deploying the next item.
      *
-     * @param config
-     * @param handler
+     * The current format for the config is either a single item or an array:
+     * <pre>
+     * {
+     *   module: String, // the name of the module
+     *   verticle: String, // the name of the verticle (either verticle or module must be present)
+     *   instances: Number, // how many instances, default 1
+     *   worker: Boolean, // is it a worker verticle? default false
+     *   multiThreaded: Boolean, // is it a multiThreaded verticle? default false
+     *   config: JsonObject // any config you need to pass to the module/verticle
+     * }
+     * </pre>
+     *
+     * @param config either a json object or a json array.
+     * @param handler A async result handler that is called once all middleware is deployed or on error.
      */
     public Yoke deploy(final JsonElement config, final Handler<AsyncResult<String>> handler) {
         if (config.isArray()) {
@@ -504,17 +529,9 @@ public class Yoke implements RequestWrapper {
 
                 @Override
                 public void handle(AsyncResult<String> event) {
-                    latch--;
-                    if (event.failed()) {
+                    if (!handled && (event.failed() || --latch == 0)) {
                         handled = true;
                         handler.handle(event);
-                        return;
-                    }
-                    if (latch == 0) {
-                        if (!handled) {
-                            handler.handle(event);
-                        }
-                        handled = true;
                     }
                 }
             };
