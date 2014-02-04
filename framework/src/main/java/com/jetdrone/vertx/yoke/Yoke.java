@@ -17,6 +17,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
@@ -395,7 +396,6 @@ public class Yoke {
                 // the context map is shared with all middlewares
                 final YokeRequest request = requestWrapper.wrap(req, secure, new Context(defaultContext), engineMap, store);
 
-                System.err.println(">>>>>" + request);
                 // add x-powered-by header is enabled
                 Boolean poweredBy = request.get("x-powered-by");
                 if (poweredBy != null && poweredBy) {
@@ -504,38 +504,36 @@ public class Yoke {
      * </pre>
      *
      * @param config either a json object or a json array.
-     * @param handler A async result handler that is called once all middleware is deployed or on error.
+     * @param handler A handler that is called once all middleware is deployed or on error.
      */
-    public Yoke deploy(final JsonElement config, final Handler<AsyncResult<String>> handler) {
-        if (config.isArray()) {
-            // wait for all deployments before calling the real handler
-            Handler<AsyncResult<String>> waitFor = new Handler<AsyncResult<String>>() {
+    public Yoke deploy(final JsonElement config, final Handler<Object> handler) {
+        if (config.isObject()) {
+            return deploy(new JsonArray().addObject(config.asObject()));
+        }
 
-                private int latch = config.asArray().size();
-                private boolean handled = false;
+        // wait for all deployments before calling the real handler
+        Handler<AsyncResult<String>> waitFor = new Handler<AsyncResult<String>>() {
 
-                @Override
-                public void handle(AsyncResult<String> event) {
+            private int latch = config.asArray().size();
+            private boolean handled = false;
+
+            @Override
+            public void handle(AsyncResult<String> event) {
+                if (handler != null) {
                     if (!handled && (event.failed() || --latch == 0)) {
                         handled = true;
-                        handler.handle(event);
+                        handler.handle(event.failed() ? event.cause() : null);
                     }
                 }
-            };
-            for (Object o : config.asArray()) {
-                JsonObject mod = (JsonObject) o;
-                if (mod.getString("module") != null) {
-                    deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
-                } else {
-                    deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
-                }
             }
-        } else {
-            JsonObject mod = config.asObject();
+        };
+
+        for (Object o : config.asArray()) {
+            JsonObject mod = (JsonObject) o;
             if (mod.getString("module") != null) {
-                deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+                deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
             } else {
-                deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), handler);
+                deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
             }
         }
 

@@ -6,16 +6,14 @@ function JSYoke() {
     this.vertx = __jvertx;
     this.container = __jcontainer;
     this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container);
-//    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container, new com.jetdrone.vertx.yoke.core.RequestWrapper(function (request, secure, engines){
-//        // the context map is shared with all middlewares
-//        var context = new Context(jYoke.defaultContext);
-//        var response = new GYokeResponse(request.response(), context, engines);
-//        return new GYokeRequest(request, response, secure, context, store);
-//    }));
+//    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container, new com.jetdrone.vertx.yoke.core.impl.JSRequestWrapper());
 }
 
 JSYoke.prototype.store = function (sessionStore) {
-    throw new Error('Not Implemented');
+    if (sessionStore) {
+        // TODO: handle non Java stores
+        this.jYoke.store(sessionStore);
+    }
 };
 
 JSYoke.prototype.use = function (route, callback) {

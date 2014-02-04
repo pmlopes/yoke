@@ -18,6 +18,9 @@ import java.util.Map;
  */
 public class MimeType {
 
+    // This is a singleton
+    private MimeType() {}
+
     /**
      * Internal map with all known mime types
      */
