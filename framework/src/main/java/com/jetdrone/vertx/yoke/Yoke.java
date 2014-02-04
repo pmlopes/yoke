@@ -5,8 +5,8 @@ package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.RequestWrapper;
+import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.core.YokeException;
@@ -35,7 +35,7 @@ import java.util.*;
  *
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
-public class Yoke implements RequestWrapper {
+public class Yoke {
 
     /**
      * Vert.x instance
@@ -159,7 +159,7 @@ public class Yoke implements RequestWrapper {
     public Yoke(Vertx vertx, Container container, RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.container = container;
-        this.requestWrapper = requestWrapper == null ? this : requestWrapper;
+        this.requestWrapper = requestWrapper == null ? new DefaultRequestWrapper() : requestWrapper;
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
         defaultContext.put("trust-proxy", true);
@@ -380,21 +380,6 @@ public class Yoke implements RequestWrapper {
     }
 
     /**
-     * Default implementation of the request wrapper
-     *
-     * @param request
-     * @param secure
-     * @param engines
-     */
-    @Override
-    public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Engine> engines) {
-        // the context map is shared with all middlewares
-        final Map<String, Object> context = new Context(defaultContext);
-        YokeResponse response = new YokeResponse(request.response(), context, engines);
-        return new YokeRequest(request, response, secure, context, store);
-    }
-
-    /**
      * Starts listening at a already created server.
      *
      * @param server
@@ -407,8 +392,10 @@ public class Yoke implements RequestWrapper {
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest req) {
-                final YokeRequest request = requestWrapper.wrap(req, secure, engineMap);
+                // the context map is shared with all middlewares
+                final YokeRequest request = requestWrapper.wrap(req, secure, new Context(defaultContext), engineMap, store);
 
+                System.err.println(">>>>>" + request);
                 // add x-powered-by header is enabled
                 Boolean poweredBy = request.get("x-powered-by");
                 if (poweredBy != null && poweredBy) {
