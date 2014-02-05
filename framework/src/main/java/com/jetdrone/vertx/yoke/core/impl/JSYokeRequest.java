@@ -12,7 +12,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
     private static final Map<String, JSProperty> JS_PROPERTIES = new HashMap<String, JSProperty>() {{
         // members
-        put("response", new JSProperty(YokeRequest.class, "response", true));
+        put("response", null);
         put("params", new JSProperty(YokeRequest.class, "params", true));
         put("headers", new JSProperty(YokeRequest.class, "headers", true));
         put("bodyLengthLimit", new JSProperty(YokeRequest.class, "bodyLengthLimit", true));
@@ -54,12 +54,17 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
     private final Context context;
 
+    private Scriptable jsFiles;
+    private Scriptable jsParams;
+    private Scriptable jsFormAttributes;
+    private Scriptable jsHeaders;
+    private Scriptable jsCookies;
+
     private Scriptable prototype, parent;
 
     public JSYokeRequest(HttpServerRequest request, JSYokeResponse response, boolean secure, Context context, SessionStore store) {
         super(request, response, secure, context, store);
         this.context = context;
-        // TODO: cache scritable objects to avoid to many allocations
     }
 
     @Override
@@ -72,6 +77,36 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
         // first context
         if (context.containsKey(name)) {
             return context.get(name);
+        }
+        // cacheable scriptable objects
+        switch (name) {
+            case "response":
+                return response();
+            case "params":
+                if (jsParams == null) {
+                    jsParams = (Scriptable) JS_PROPERTIES.get(name).getValue(this);
+                }
+                return jsParams;
+            case "headers":
+                if (jsHeaders == null) {
+                    jsHeaders = (Scriptable) JS_PROPERTIES.get(name).getValue(this);
+                }
+                return jsHeaders;
+            case "formAttributes":
+                if (jsFormAttributes == null) {
+                    jsFormAttributes = (Scriptable) JS_PROPERTIES.get(name).getValue(this);
+                }
+                return jsFormAttributes;
+            case "cookies":
+                if (jsCookies == null) {
+                    jsCookies = (Scriptable) JS_PROPERTIES.get(name).getValue(this);
+                }
+                return jsCookies;
+            case "files":
+                if (jsFiles == null) {
+                    jsFiles = (Scriptable) JS_PROPERTIES.get(name).getValue(this);
+                }
+                return jsFiles;
         }
         // then members
         if (JS_PROPERTIES.containsKey(name)) {

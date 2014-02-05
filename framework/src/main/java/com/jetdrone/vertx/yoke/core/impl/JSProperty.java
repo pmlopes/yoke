@@ -482,22 +482,6 @@ public class JSProperty {
         this.wrapType = wrapType;
     }
 
-    public boolean isScriptable() {
-        if (asMember) {
-            switch (wrapType) {
-                case MultiMap:
-                case Map:
-                case List:
-                    return true;
-                case None:
-                default:
-                    return false;
-            }
-        } else {
-            return true;
-        }
-    }
-
     public Object getValue(Object thisObj) {
         try {
             if (asMember) {
