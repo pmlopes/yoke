@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
@@ -15,7 +16,7 @@ public class DefaultRequestWrapper implements RequestWrapper {
      * Default implementation of the request wrapper
      */
     @Override
-    public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines, SessionStore store) {
+    public YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store) {
         return new YokeRequest(request, new YokeResponse(request.response(), context, engines), secure, context, store);
     }
 }

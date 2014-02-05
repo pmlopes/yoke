@@ -5,8 +5,8 @@
 function JSYoke() {
     this.vertx = __jvertx;
     this.container = __jcontainer;
-    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container);
-//    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container, new com.jetdrone.vertx.yoke.core.impl.JSRequestWrapper());
+//    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container);
+    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container, new com.jetdrone.vertx.yoke.core.impl.JSRequestWrapper());
 }
 
 JSYoke.prototype.store = function (sessionStore) {

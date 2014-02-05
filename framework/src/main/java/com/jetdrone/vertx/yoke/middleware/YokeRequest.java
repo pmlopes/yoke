@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -59,7 +60,7 @@ public class YokeRequest implements HttpServerRequest {
     // the wrapped response
     private final YokeResponse response;
     // the request context
-    private final Map<String, Object> context;
+    private final Context context;
     // is this request secure
     private final boolean secure;
     // session data store
@@ -75,7 +76,7 @@ public class YokeRequest implements HttpServerRequest {
     // control flags
     private boolean expectMultiPartCalled = false;
 
-    public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
+    public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Context context, SessionStore store) {
         this.context = context;
         this.request = request;
         this.method = request.method();
@@ -152,6 +153,14 @@ public class YokeRequest implements HttpServerRequest {
         } else {
             return defaultValue;
         }
+    }
+
+    /**
+     * Access all request cookies
+     * @return Set of cookies
+     */
+    public Set<YokeCookie> cookies() {
+        return cookies;
     }
 
     /** Allow getting Cookie by name.

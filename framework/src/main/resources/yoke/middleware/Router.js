@@ -82,7 +82,7 @@ JSRouter.prototype.all = function (pattern, callback) {
 JSRouter.prototype.param = function (paramName, regexOrCallback) {
     if (regexOrCallback instanceof RegExp) {
         this.jMiddleware.param(paramName, wrap(function (req, next) {
-            if (!regexOrCallback.test(req.params().get(paramName))) {
+            if (!regexOrCallback.test(req.params[paramName])) {
                 // Bad Request
                 next(400);
                 return;

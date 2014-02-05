@@ -4,13 +4,12 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.GMultiMap;
 import com.jetdrone.vertx.yoke.core.JSON;
 import groovy.lang.Closure;
-import org.vertx.groovy.core.impl.DefaultMultiMap;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
-import org.vertx.groovy.core.MultiMap;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.groovy.core.buffer.Buffer;
 
@@ -22,7 +21,7 @@ public class GYokeResponse extends YokeResponse implements org.vertx.groovy.core
     private GMultiMap headers;
     private GMultiMap trailers;
 
-    public GYokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
+    public GYokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
         super(response, context, engines);
     }
 

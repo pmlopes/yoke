@@ -28,5 +28,5 @@ public interface RequestWrapper {
      * @param store the current Session Store implementation
      * @return an Implementation of YokeRequest
      */
-    YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines, SessionStore store);
+    YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store);
 }

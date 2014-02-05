@@ -54,7 +54,8 @@ function testJSListenToServer() {
     yoke.use(router);
 
     router.get('/api/:userId', function (req, next) {
-        req.response().end('OK');
+        vassert.assertTrue(!req.isSecure());
+        req.response.end('OK');
     });
 
     router.param('userId', /[1-9][0-9]/);

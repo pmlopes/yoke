@@ -3,17 +3,13 @@
  */
 package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.core.Context;
-import com.jetdrone.vertx.yoke.core.RequestWrapper;
-import com.jetdrone.vertx.yoke.middleware.GYokeRequest;
-import com.jetdrone.vertx.yoke.middleware.GYokeResponse;
+import com.jetdrone.vertx.yoke.core.impl.GroovyRequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import org.vertx.groovy.platform.Container;
 import org.vertx.groovy.platform.Verticle;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
 import org.vertx.groovy.core.Vertx;
 import org.vertx.groovy.core.http.HttpServer;
@@ -73,12 +69,7 @@ public class GYoke {
         this.vertx = vertx.toJavaVertx();
         this.container = container;
 
-        jYoke = new Yoke(this.vertx, null, new RequestWrapper() {
-            @Override
-            public YokeRequest wrap(HttpServerRequest request, boolean secure, Map<String, Object> context, Map<String, Engine> engines, SessionStore store) {
-                return new GYokeRequest(request, new GYokeResponse(request.response(), context, engines), secure, context, store);
-            }
-        });
+        jYoke = new Yoke(this.vertx, null, new GroovyRequestWrapper());
     }
 
     public GYoke store(SessionStore store) {

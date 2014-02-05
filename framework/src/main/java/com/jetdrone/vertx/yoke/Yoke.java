@@ -90,7 +90,7 @@ public class Yoke {
      * @param verticle the main verticle
      */
     public Yoke(Verticle verticle) {
-        this(verticle.getVertx(), verticle.getContainer(), null);
+        this(verticle.getVertx(), verticle.getContainer(), new DefaultRequestWrapper());
     }
 
     /**
@@ -112,7 +112,7 @@ public class Yoke {
      * @param vertx
      */
     public Yoke(Vertx vertx) {
-        this(vertx, null, null);
+        this(vertx, null, new DefaultRequestWrapper());
     }
 
     /**
@@ -134,7 +134,7 @@ public class Yoke {
      * @param vertx
      */
     public Yoke(Vertx vertx, Container container) {
-        this(vertx, container, null);
+        this(vertx, container, new DefaultRequestWrapper());
     }
 
     /**
@@ -160,7 +160,7 @@ public class Yoke {
     public Yoke(Vertx vertx, Container container, RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.container = container;
-        this.requestWrapper = requestWrapper == null ? new DefaultRequestWrapper() : requestWrapper;
+        this.requestWrapper = requestWrapper;
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
         defaultContext.put("trust-proxy", true);

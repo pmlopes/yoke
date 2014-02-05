@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.GMultiMap;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
@@ -21,6 +22,7 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.http.HttpServerRequest {
 
@@ -57,7 +59,7 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
 
     private final GYokeResponse response;
 
-    public GYokeRequest(HttpServerRequest request, GYokeResponse response, boolean secure, Map<String, Object> context, SessionStore store) {
+    public GYokeRequest(HttpServerRequest request, GYokeResponse response, boolean secure, Context context, SessionStore store) {
         super(request, response, secure, context, store);
         this.response = response;
     }
@@ -338,4 +340,13 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
             }
         });
     }
+
+    /**
+     * Access all request cookies
+     * @return Set of cookies
+     */
+    public Set<YokeCookie> getCookies() {
+        return cookies();
+    }
+
 }

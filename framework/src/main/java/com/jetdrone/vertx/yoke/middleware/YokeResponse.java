@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.MimeType;
+import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.Cookie;
@@ -29,7 +30,7 @@ public class YokeResponse implements HttpServerResponse {
     // the original request
     private final HttpServerResponse response;
     // the context
-    private final Map<String, Object> context;
+    private final Context context;
     // engine map
     private final Map<String, Engine> engines;
     // response cookies
@@ -44,7 +45,7 @@ public class YokeResponse implements HttpServerResponse {
     private WriterFilter filter;
     private boolean hasBody;
 
-    public YokeResponse(HttpServerResponse response, Map<String, Object> context, Map<String, Engine> engines) {
+    public YokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
         this.response = response;
         this.context = context;
         this.engines = engines;
