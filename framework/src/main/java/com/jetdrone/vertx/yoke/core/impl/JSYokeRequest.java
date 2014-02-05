@@ -4,202 +4,62 @@ import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.WrappedException;
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
-    private static final Set<String> jsProperties = new HashSet<>(Arrays.asList(
-            // members
-            "response",
-            "params",
-            "headers",
-            "bodyLengthLimit",
-            "contentLength",
-            "version",
-            "method",
-            "uri",
-            "path",
-            "query",
-            "normalizedPath",
-            "remoteAddress",
-            "peerCertificateChain",
-            "absoluteURI",
-            "netSocket",
-            "formAttributes",
-            "localAddress",
-            "ip",
-            "cookies",
-            "body",
-            "files",
-            // methods
-            "hasBody",
-            "destroySession",
-            "loadSession",
-            "createSession",
-            "isSecure",
-            "accepts",
-            "is",
-            "vertxHttpServerRequest",
-            "bodyHandler",
-            "expectMultiPart",
-            "uploadHandler",
-            "dataHandler",
-            "pause",
-            "resume",
-            "endHandler",
-            "exceptionHandler"
-    ));
-
-    private static final Method hasBody = getMethod("hasBody");
-    private static final Method pause = getMethod("pause");
-    private static final Method resume = getMethod("resume");
-    private static final Method isSecure = getMethod("isSecure");
-    private static final Method destroySession = getMethod("destroySession");
-    private static final Method loadSession = getMethod("loadSession", String.class, Handler.class);
-    private static final Method createSession = getMethod("createSession");
-    private static final Method accepts = getMethod("accepts", String[].class);
-    private static final Method is = getMethod("is", String.class);
-    private static final Method vertxHttpServerRequest = getMethod("vertxHttpServerRequest");
-    private static final Method bodyHandler = getMethod("bodyHandler", Handler.class);
-    private static final Method expectMultiPart = getMethod("expectMultiPart", boolean.class);
-    private static final Method uploadHandler = getMethod("uploadHandler", Handler.class);
-    private static final Method dataHandler = getMethod("dataHandler", Handler.class);
-    private static final Method endHandler = getMethod("endHandler", Handler.class);
-    private static final Method exceptionHandler = getMethod("exceptionHandler", Handler.class);
+    private static final Map<String, JSProperty> JS_PROPERTIES = new HashMap<String, JSProperty>() {{
+        // members
+        put("response", new JSProperty(YokeRequest.class, "response", true));
+        put("params", new JSProperty(YokeRequest.class, "params", true));
+        put("headers", new JSProperty(YokeRequest.class, "headers", true));
+        put("bodyLengthLimit", new JSProperty(YokeRequest.class, "bodyLengthLimit", true));
+        put("contentLength", new JSProperty(YokeRequest.class, "contentLength", true));
+        put("version", new JSProperty(YokeRequest.class, "version", true));
+        put("method", new JSProperty(YokeRequest.class, "method", true));
+        put("uri", new JSProperty(YokeRequest.class, "uri", true));
+        put("path", new JSProperty(YokeRequest.class, "path", true));
+        put("query", new JSProperty(YokeRequest.class, "query", true));
+        put("normalizedPath", new JSProperty(YokeRequest.class, "normalizedPath", true));
+        put("remoteAddress", new JSProperty(YokeRequest.class, "remoteAddress", true));
+        put("peerCertificateChain", new JSProperty(YokeRequest.class, "peerCertificateChain", true));
+        put("absoluteURI", new JSProperty(YokeRequest.class, "absoluteURI", true));
+        put("netSocket", new JSProperty(YokeRequest.class, "netSocket", true));
+        put("formAttributes", new JSProperty(YokeRequest.class, "formAttributes", true));
+        put("localAddress", new JSProperty(YokeRequest.class, "localAddress", true));
+        put("ip", new JSProperty(YokeRequest.class, "ip", true));
+        put("cookies", new JSProperty(YokeRequest.class, "cookies", true));
+        put("body", new JSProperty(YokeRequest.class, "body", true));
+        put("files", new JSProperty(YokeRequest.class, "files", true));
+        // methods
+        put("hasBody", new JSProperty(YokeRequest.class, "hasBody"));
+        put("destroySession", new JSProperty(YokeRequest.class, "destroySession"));
+        put("loadSession", new JSProperty(YokeRequest.class, "hasBody"));
+        put("createSession", new JSProperty(YokeRequest.class, "hasBody"));
+        put("isSecure", new JSProperty(YokeRequest.class, "hasBody"));
+        put("accepts", new JSProperty(YokeRequest.class, "hasBody"));
+        put("is", new JSProperty(YokeRequest.class, "hasBody"));
+        put("vertxHttpServerRequest", new JSProperty(YokeRequest.class, "hasBody"));
+        put("bodyHandler", new JSProperty(YokeRequest.class, "hasBody"));
+        put("expectMultiPart", new JSProperty(YokeRequest.class, "hasBody"));
+        put("uploadHandler", new JSProperty(YokeRequest.class, "hasBody"));
+        put("dataHandler", new JSProperty(YokeRequest.class, "hasBody"));
+        put("pause", new JSProperty(YokeRequest.class, "hasBody"));
+        put("resume", new JSProperty(YokeRequest.class, "hasBody"));
+        put("endHandler", new JSProperty(YokeRequest.class, "hasBody"));
+        put("exceptionHandler", new JSProperty(YokeRequest.class, "hasBody"));
+    }};
 
     private final Context context;
 
     private Scriptable prototype, parent;
 
-    private Scriptable files;
-    private Scriptable params;
-    private Scriptable formAttributes;
-    private Scriptable headers;
-
-    private final Scriptable response;
-
     public JSYokeRequest(HttpServerRequest request, JSYokeResponse response, boolean secure, Context context, SessionStore store) {
         super(request, response, secure, context, store);
         this.context = context;
-        this.response = response;
-
-    }
-
-    private static Method getMethod(String name, Class<?>... parameterTypes) {
-        try {
-            return YokeRequest.class.getMethod(name, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Object getProperty(String name) {
-        switch (name) {
-            // members
-            case "response":
-                return response;
-            case "params":
-                if (params == null) {
-                    params = JSUtil.wrapMultiMap(params());
-                }
-                return params;
-            case "headers":
-                if (headers == null) {
-                    headers = JSUtil.wrapMultiMap(headers());
-                }
-                return headers;
-            case "bodyLengthLimit":
-                return bodyLengthLimit();
-            case "contentLength":
-                return contentLength();
-            case "version":
-                return version();
-            case "method":
-                return method();
-            case "uri":
-                return uri();
-            case "path":
-                return path();
-            case "query":
-                return query();
-            case "normalizedPath":
-                return normalizedPath();
-            case "remoteAddress":
-                return remoteAddress();
-            case "peerCertificateChain":
-                try {
-                    return peerCertificateChain();
-                } catch (SSLPeerUnverifiedException e) {
-                    throw new WrappedException(e);
-                }
-            case "absoluteURI":
-                return absoluteURI();
-            case "netSocket":
-                return netSocket();
-            case "formAttributes":
-                if (formAttributes == null) {
-                    formAttributes = JSUtil.wrapMultiMap(formAttributes());
-                }
-                return formAttributes;
-            case "localAddress":
-                return localAddress();
-            case "ip":
-                return ip();
-            case "cookies":
-                throw new RuntimeException("Not Implemented");
-            case "body":
-                throw new RuntimeException("Not Implemented");
-            case "files":
-                throw new RuntimeException("Not Implemented");
-//                if (files == null) {
-//                    files = JSUtil.wrapMap(files());
-//                }
-//                return files;
-
-            // methods
-            case "hasBody":
-                return JSUtil.wrapFunction(hasBody);
-            case "destroySession":
-                return JSUtil.wrapFunction(destroySession);
-            case "loadSession":
-                throw new RuntimeException("Not Implemented");
-            case "createSession":
-                throw new RuntimeException("Not Implemented");
-            case "isSecure":
-                return JSUtil.wrapFunction(isSecure);
-            case "accepts":
-                throw new RuntimeException("Not Implemented");
-            case "is":
-                throw new RuntimeException("Not Implemented");
-            case "vertxHttpServerRequest":
-                throw new RuntimeException("Not Implemented");
-            case "bodyHandler":
-                throw new RuntimeException("Not Implemented");
-            case "expectMultiPart":
-                throw new RuntimeException("Not Implemented");
-            case "uploadHandler":
-                throw new RuntimeException("Not Implemented");
-            case "dataHandler":
-                throw new RuntimeException("Not Implemented");
-            case "pause":
-                return JSUtil.wrapFunction(pause);
-            case "resume":
-                return JSUtil.wrapFunction(resume);
-            case "endHandler":
-                throw new RuntimeException("Not Implemented");
-            case "exceptionHandler":
-                throw new RuntimeException("Not Implemented");
-            default:
-                return NOT_FOUND;
-        }
+        // TODO: cache scritable objects to avoid to many allocations
     }
 
     @Override
@@ -214,8 +74,8 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
             return context.get(name);
         }
         // then members
-        if (jsProperties.contains(name)) {
-            return getProperty(name);
+        if (JS_PROPERTIES.containsKey(name)) {
+            return JS_PROPERTIES.get(name).getValue(this);
         }
         // fail to find
         return NOT_FOUND;
@@ -233,7 +93,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
             return true;
         }
         // then functions
-        if (jsProperties.contains(name)) {
+        if (JS_PROPERTIES.containsKey(name)) {
             return true;
         }
         // fail to find

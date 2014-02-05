@@ -1,5 +1,6 @@
 var vertxTests = require('vertx_tests');
 var vassert = require('vertx_assert');
+var console = require('vertx/console');
 
 var vertx = require('vertx');
 
@@ -24,7 +25,7 @@ function testJS() {
     });
 }
 
-function testJSListenToServer() {
+function testJSListenToServer1() {
 
     var server = vertx.createHttpServer();
     var yoke = new Yoke();
@@ -45,7 +46,7 @@ function testJSListenToServer() {
 
 var Router  = require('yoke/middleware/Router');
 
-function testJSListenToServer() {
+function testJSListenToServer2() {
 
     var server = vertx.createHttpServer();
     var yoke = new Yoke();
@@ -70,6 +71,25 @@ function testJSListenToServer() {
     });
 }
 
+function testIterateParams() {
+
+    var yoke = new Yoke();
+    // all resources are forbidden
+    yoke.use(function (req, next) {
+        for (var p in req.params) {
+            console.log(p + ': ' + req.params[p]);
+        }
+        next(401);
+    });
+
+    yoke.listen(8888);
+
+    // The server is listening so send an HTTP request
+    vertx.createHttpClient().port(8888).getNow("/?p1=1&p2=2&p3=3", function(resp) {
+        vassert.assertTrue(401 == resp.statusCode());
+        vassert.testComplete();
+    });
+}
 
 vertxTests.startTests(this);
 
