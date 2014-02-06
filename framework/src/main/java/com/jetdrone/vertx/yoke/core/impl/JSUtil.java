@@ -103,18 +103,6 @@ class JSUtil {
         };
     }
 
-    static int argc(Object[] args) {
-        if (args == null) {
-            return 0;
-        }
-
-        return args.length;
-    }
-
-    static boolean is(Object arg, Class<?> clazz) {
-        return arg == null || clazz.isInstance(arg);
-    }
-
     static boolean is(Object[] args, Class<?>... classes) {
         if (args == null && classes == null) {
             return true;
