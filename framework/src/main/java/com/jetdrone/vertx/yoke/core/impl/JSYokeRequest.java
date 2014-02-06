@@ -10,47 +10,49 @@ import java.util.*;
 
 final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
-    private static final Map<String, JSProperty> JS_PROPERTIES = new HashMap<String, JSProperty>() {{
+    private static final Map<String, JSProperty> JS_PROPERTIES = new HashMap<>();
+
+    static {
         // members
-        put("response", null);
-        put("params", new JSProperty(YokeRequest.class, "params", true));
-        put("headers", new JSProperty(YokeRequest.class, "headers", true));
-        put("bodyLengthLimit", new JSProperty(YokeRequest.class, "bodyLengthLimit", true));
-        put("contentLength", new JSProperty(YokeRequest.class, "contentLength", true));
-        put("version", new JSProperty(YokeRequest.class, "version", true));
-        put("method", new JSProperty(YokeRequest.class, "method", true));
-        put("uri", new JSProperty(YokeRequest.class, "uri", true));
-        put("path", new JSProperty(YokeRequest.class, "path", true));
-        put("query", new JSProperty(YokeRequest.class, "query", true));
-        put("normalizedPath", new JSProperty(YokeRequest.class, "normalizedPath", true));
-        put("remoteAddress", new JSProperty(YokeRequest.class, "remoteAddress", true));
-        put("peerCertificateChain", new JSProperty(YokeRequest.class, "peerCertificateChain", true));
-        put("absoluteURI", new JSProperty(YokeRequest.class, "absoluteURI", true));
-        put("netSocket", new JSProperty(YokeRequest.class, "netSocket", true));
-        put("formAttributes", new JSProperty(YokeRequest.class, "formAttributes", true));
-        put("localAddress", new JSProperty(YokeRequest.class, "localAddress", true));
-        put("ip", new JSProperty(YokeRequest.class, "ip", true));
-        put("cookies", new JSProperty(YokeRequest.class, "cookies", true));
-        put("body", new JSProperty(YokeRequest.class, "body", true));
-        put("files", new JSProperty(YokeRequest.class, "files", true));
+        JS_PROPERTIES.put("response", null);
+        JS_PROPERTIES.put("params", new JSProperty(YokeRequest.class, "params", true));
+        JS_PROPERTIES.put("headers", new JSProperty(YokeRequest.class, "headers", true));
+        JS_PROPERTIES.put("bodyLengthLimit", new JSProperty(YokeRequest.class, "bodyLengthLimit", true));
+        JS_PROPERTIES.put("contentLength", new JSProperty(YokeRequest.class, "contentLength", true));
+        JS_PROPERTIES.put("version", new JSProperty(YokeRequest.class, "version", true));
+        JS_PROPERTIES.put("method", new JSProperty(YokeRequest.class, "method", true));
+        JS_PROPERTIES.put("uri", new JSProperty(YokeRequest.class, "uri", true));
+        JS_PROPERTIES.put("path", new JSProperty(YokeRequest.class, "path", true));
+        JS_PROPERTIES.put("query", new JSProperty(YokeRequest.class, "query", true));
+        JS_PROPERTIES.put("normalizedPath", new JSProperty(YokeRequest.class, "normalizedPath", true));
+        JS_PROPERTIES.put("remoteAddress", new JSProperty(YokeRequest.class, "remoteAddress", true));
+        JS_PROPERTIES.put("peerCertificateChain", new JSProperty(YokeRequest.class, "peerCertificateChain", true));
+        JS_PROPERTIES.put("absoluteURI", new JSProperty(YokeRequest.class, "absoluteURI", true));
+        JS_PROPERTIES.put("netSocket", new JSProperty(YokeRequest.class, "netSocket", true));
+        JS_PROPERTIES.put("formAttributes", new JSProperty(YokeRequest.class, "formAttributes", true));
+        JS_PROPERTIES.put("localAddress", new JSProperty(YokeRequest.class, "localAddress", true));
+        JS_PROPERTIES.put("ip", new JSProperty(YokeRequest.class, "ip", true));
+        JS_PROPERTIES.put("cookies", new JSProperty(YokeRequest.class, "cookies", true));
+        JS_PROPERTIES.put("body", new JSProperty(YokeRequest.class, "body", true));
+        JS_PROPERTIES.put("files", new JSProperty(YokeRequest.class, "files", true));
         // methods
-        put("hasBody", new JSProperty(YokeRequest.class, "hasBody"));
-        put("destroySession", new JSProperty(YokeRequest.class, "destroySession"));
-        put("loadSession", new JSProperty(YokeRequest.class, "hasBody"));
-        put("createSession", new JSProperty(YokeRequest.class, "hasBody"));
-        put("isSecure", new JSProperty(YokeRequest.class, "hasBody"));
-        put("accepts", new JSProperty(YokeRequest.class, "hasBody"));
-        put("is", new JSProperty(YokeRequest.class, "hasBody"));
-        put("vertxHttpServerRequest", new JSProperty(YokeRequest.class, "hasBody"));
-        put("bodyHandler", new JSProperty(YokeRequest.class, "hasBody"));
-        put("expectMultiPart", new JSProperty(YokeRequest.class, "hasBody"));
-        put("uploadHandler", new JSProperty(YokeRequest.class, "hasBody"));
-        put("dataHandler", new JSProperty(YokeRequest.class, "hasBody"));
-        put("pause", new JSProperty(YokeRequest.class, "hasBody"));
-        put("resume", new JSProperty(YokeRequest.class, "hasBody"));
-        put("endHandler", new JSProperty(YokeRequest.class, "hasBody"));
-        put("exceptionHandler", new JSProperty(YokeRequest.class, "hasBody"));
-    }};
+        JS_PROPERTIES.put("hasBody", new JSProperty(YokeRequest.class, "hasBody"));
+        JS_PROPERTIES.put("destroySession", new JSProperty(YokeRequest.class, "destroySession"));
+        JS_PROPERTIES.put("loadSession", new JSProperty(YokeRequest.class, "loadSession"));
+        JS_PROPERTIES.put("createSession", new JSProperty(YokeRequest.class, "createSession"));
+        JS_PROPERTIES.put("isSecure", new JSProperty(YokeRequest.class, "isSecure"));
+        JS_PROPERTIES.put("accepts", new JSProperty(YokeRequest.class, "accepts"));
+        JS_PROPERTIES.put("is", new JSProperty(YokeRequest.class, "is"));
+        JS_PROPERTIES.put("httpServerRequest", new JSProperty(YokeRequest.class, "vertxHttpServerRequest"));
+        JS_PROPERTIES.put("bodyHandler", new JSProperty(YokeRequest.class, "bodyHandler"));
+        JS_PROPERTIES.put("expectMultiPart", new JSProperty(YokeRequest.class, "expectMultiPart"));
+        JS_PROPERTIES.put("uploadHandler", new JSProperty(YokeRequest.class, "uploadHandler"));
+        JS_PROPERTIES.put("dataHandler", new JSProperty(YokeRequest.class, "dataHandler"));
+        JS_PROPERTIES.put("pause", new JSProperty(YokeRequest.class, "pause"));
+        JS_PROPERTIES.put("resume", new JSProperty(YokeRequest.class, "resume"));
+        JS_PROPERTIES.put("endHandler", new JSProperty(YokeRequest.class, "endHandler"));
+        JS_PROPERTIES.put("exceptionHandler", new JSProperty(YokeRequest.class, "exceptionHandler"));
+    }
 
     private final Context context;
 
@@ -81,6 +83,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
         // cacheable scriptable objects
         switch (name) {
             case "response":
+                // special case
                 return response();
             case "params":
                 if (jsParams == null) {
@@ -107,10 +110,11 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                     jsFiles = (Scriptable) JS_PROPERTIES.get(name).getValue(this);
                 }
                 return jsFiles;
-        }
-        // then members
-        if (JS_PROPERTIES.containsKey(name)) {
-            return JS_PROPERTIES.get(name).getValue(this);
+            default:
+                // then members
+                if (JS_PROPERTIES.containsKey(name)) {
+                    return JS_PROPERTIES.get(name).getValue(this);
+                }
         }
         // fail to find
         return NOT_FOUND;

@@ -2,36 +2,54 @@ package com.jetdrone.vertx.yoke.core.impl;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.core.Context;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import org.mozilla.javascript.Scriptable;
 import org.vertx.java.core.http.HttpServerResponse;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
-    private static final Set<String> jsProperties = new HashSet<>(Arrays.asList(
-            // members
+    private static final Map<String, JSProperty> JS_PROPERTIES = new HashMap<>();
 
-            // methods
-            "end"
-    ));
+    static {
+        JS_PROPERTIES.put("putTrailer", new JSProperty(YokeResponse.class, "putTrailer"));
+        JS_PROPERTIES.put("setStatusCode", new JSProperty(YokeResponse.class, "setStatusCode"));
+        JS_PROPERTIES.put("getStatusCode", new JSProperty(YokeResponse.class, "getStatusCode"));
 
-    private static final Method end = getMethod("end", String.class);
+        JS_PROPERTIES.put("setStatusMessage", new JSProperty(YokeResponse.class, "setStatusMessage"));
+        JS_PROPERTIES.put("getStatusMessage", new JSProperty(YokeResponse.class, "getStatusMessage"));
 
-    private static Method getMethod(String name, Class<?>... parameterTypes) {
-        try {
-            return YokeResponse.class.getMethod(name, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
+        JS_PROPERTIES.put("jsonp", new JSProperty(YokeResponse.class, "jsonp"));
+
+        JS_PROPERTIES.put("addCookie", new JSProperty(YokeResponse.class, "addCookie"));
+
+        JS_PROPERTIES.put("isChunked", new JSProperty(YokeResponse.class, "isChunked"));
+        JS_PROPERTIES.put("setChunked", new JSProperty(YokeResponse.class, "setChunked"));
+
+        JS_PROPERTIES.put("closeHandler", new JSProperty(YokeResponse.class, "closeHandler"));
+        JS_PROPERTIES.put("sendFile", new JSProperty(YokeResponse.class, "sendFile"));
+        JS_PROPERTIES.put("trailers", new JSProperty(YokeResponse.class, "trailers"));
+
+        JS_PROPERTIES.put("redirect", new JSProperty(YokeResponse.class, "redirect"));
+        JS_PROPERTIES.put("getHeader", new JSProperty(YokeResponse.class, "getHeader"));
+        JS_PROPERTIES.put("headersHandler", new JSProperty(YokeResponse.class, "headersHandler"));
+        JS_PROPERTIES.put("exceptionHandler", new JSProperty(YokeResponse.class, "exceptionHandler"));
+
+        JS_PROPERTIES.put("drainHandler", new JSProperty(YokeResponse.class, "drainHandler"));
+        JS_PROPERTIES.put("setWriteQueueMaxSize", new JSProperty(YokeResponse.class, "setWriteQueueMaxSize"));
+        JS_PROPERTIES.put("writeQueueFull", new JSProperty(YokeResponse.class, "writeQueueFull"));
+        JS_PROPERTIES.put("endHandler", new JSProperty(YokeResponse.class, "endHandler"));
+        JS_PROPERTIES.put("putHeader", new JSProperty(YokeResponse.class, "putHeader"));
+
+        JS_PROPERTIES.put("headers", new JSProperty(YokeResponse.class, "headers"));
+        JS_PROPERTIES.put("setContentType", new JSProperty(YokeResponse.class, "setContentType"));
+        JS_PROPERTIES.put("render", new JSProperty(YokeResponse.class, "render"));
+        JS_PROPERTIES.put("write", new JSProperty(YokeResponse.class, "write"));
+        JS_PROPERTIES.put("close", new JSProperty(YokeResponse.class, "close"));
+        JS_PROPERTIES.put("end", new JSProperty(YokeResponse.class, "end"));
     }
-
 
     public JSYokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
         super(response, context, engines);
@@ -41,15 +59,6 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
     private final Context context;
 
     private Scriptable prototype, parent;
-
-    private Object getProperty(String name) {
-        switch (name) {
-            case "end":
-                return JSUtil.wrapFunction(end);
-            default:
-                return NOT_FOUND;
-        }
-    }
 
     @Override
     public String getClassName() {
@@ -62,9 +71,13 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
         if (context.containsKey(name)) {
             return context.get(name);
         }
-        // then members
-        if (jsProperties.contains(name)) {
-            return getProperty(name);
+        // cacheable scriptable objects
+        switch (name) {
+            default:
+                // then members
+                if (JS_PROPERTIES.containsKey(name)) {
+                    return JS_PROPERTIES.get(name).getValue(this);
+                }
         }
         // fail to find
         return NOT_FOUND;
@@ -82,7 +95,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
             return true;
         }
         // then functions
-        if (jsProperties.contains(name)) {
+        if (JS_PROPERTIES.containsKey(name)) {
             return true;
         }
         // fail to find

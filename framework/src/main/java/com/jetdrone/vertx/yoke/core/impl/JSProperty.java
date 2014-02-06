@@ -118,7 +118,7 @@ public class JSProperty {
         };
     }
 
-    private static Scriptable wrapList(final List list) {
+    private static Scriptable wrapList(final List<?> list) {
         return new Scriptable() {
             @Override
             public String getClassName() {
@@ -202,7 +202,7 @@ public class JSProperty {
         };
     }
 
-    private static Scriptable wrapMap(final Map map) {
+    private static Scriptable wrapMap(final Map<String, Object> map) {
         return new Scriptable() {
             @Override
             public String getClassName() {
