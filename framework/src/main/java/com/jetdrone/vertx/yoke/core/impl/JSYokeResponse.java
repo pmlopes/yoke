@@ -3,62 +3,52 @@ package com.jetdrone.vertx.yoke.core.impl;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
+import io.netty.handler.codec.http.Cookie;
+import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.Undefined;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.json.JsonElement;
+import org.vertx.java.core.streams.ReadStream;
 
-import java.util.HashMap;
 import java.util.Map;
+
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
 
 final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
-    private static final Map<String, JSProperty> JS_PROPERTIES = new HashMap<>();
-
-    static {
-        JS_PROPERTIES.put("putTrailer", new JSProperty(YokeResponse.class, "putTrailer"));
-        JS_PROPERTIES.put("setStatusCode", new JSProperty(YokeResponse.class, "setStatusCode"));
-        JS_PROPERTIES.put("getStatusCode", new JSProperty(YokeResponse.class, "getStatusCode"));
-
-        JS_PROPERTIES.put("setStatusMessage", new JSProperty(YokeResponse.class, "setStatusMessage"));
-        JS_PROPERTIES.put("getStatusMessage", new JSProperty(YokeResponse.class, "getStatusMessage"));
-
-        JS_PROPERTIES.put("jsonp", new JSProperty(YokeResponse.class, "jsonp"));
-
-        JS_PROPERTIES.put("addCookie", new JSProperty(YokeResponse.class, "addCookie"));
-
-        JS_PROPERTIES.put("isChunked", new JSProperty(YokeResponse.class, "isChunked"));
-        JS_PROPERTIES.put("setChunked", new JSProperty(YokeResponse.class, "setChunked"));
-
-        JS_PROPERTIES.put("closeHandler", new JSProperty(YokeResponse.class, "closeHandler"));
-        JS_PROPERTIES.put("sendFile", new JSProperty(YokeResponse.class, "sendFile"));
-        JS_PROPERTIES.put("trailers", new JSProperty(YokeResponse.class, "trailers"));
-
-        JS_PROPERTIES.put("redirect", new JSProperty(YokeResponse.class, "redirect"));
-        JS_PROPERTIES.put("getHeader", new JSProperty(YokeResponse.class, "getHeader"));
-        JS_PROPERTIES.put("headersHandler", new JSProperty(YokeResponse.class, "headersHandler"));
-        JS_PROPERTIES.put("exceptionHandler", new JSProperty(YokeResponse.class, "exceptionHandler"));
-
-        JS_PROPERTIES.put("drainHandler", new JSProperty(YokeResponse.class, "drainHandler"));
-        JS_PROPERTIES.put("setWriteQueueMaxSize", new JSProperty(YokeResponse.class, "setWriteQueueMaxSize"));
-        JS_PROPERTIES.put("writeQueueFull", new JSProperty(YokeResponse.class, "writeQueueFull"));
-        JS_PROPERTIES.put("endHandler", new JSProperty(YokeResponse.class, "endHandler"));
-        JS_PROPERTIES.put("putHeader", new JSProperty(YokeResponse.class, "putHeader"));
-
-        JS_PROPERTIES.put("headers", new JSProperty(YokeResponse.class, "headers"));
-        JS_PROPERTIES.put("setContentType", new JSProperty(YokeResponse.class, "setContentType"));
-        JS_PROPERTIES.put("render", new JSProperty(YokeResponse.class, "render"));
-        JS_PROPERTIES.put("write", new JSProperty(YokeResponse.class, "write"));
-        JS_PROPERTIES.put("close", new JSProperty(YokeResponse.class, "close"));
-        JS_PROPERTIES.put("end", new JSProperty(YokeResponse.class, "end"));
-    }
+    private static final Object[] NO_IDS = new Object[0];
 
     public JSYokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
         super(response, context, engines);
-        this.context = context;
     }
 
-    private final Context context;
-
     private Scriptable prototype, parent;
+
+    // cacheable scriptable/callable objects
+
+    private Callable addCookie;
+    private Callable close;
+    private Callable closeHandler;
+    private Callable drainHandler;
+    private Callable end;
+    private Callable endHandler;
+    private Callable exceptionHandler;
+    private Callable getHeader;
+    private Scriptable headers;
+    private Callable headersHandler;
+    private Callable jsonp;
+    private Callable putHeader;
+    private Callable putTrailer;
+    private Callable redirect;
+    private Callable render;
+    private Callable sendFile;
+    private Callable setContentType;
+    private Callable setWriteQueueMaxSize;
+    private Scriptable trailers;
+    private Callable write;
 
     @Override
     public String getClassName() {
@@ -67,49 +57,519 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
     @Override
     public Object get(String name, Scriptable start) {
-        // first context
-        if (context.containsKey(name)) {
-            return context.get(name);
-        }
-        // cacheable scriptable objects
         switch (name) {
-            default:
-                // then members
-                if (JS_PROPERTIES.containsKey(name)) {
-                    return JS_PROPERTIES.get(name).getValue(this);
+            case "addCookie":
+                if (addCookie == null) {
+                    addCookie = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Cookie.class)) {
+                                JSYokeResponse.this.addCookie((Cookie) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
                 }
+                return addCookie;
+            case "close":
+                if (close == null) {
+                    close = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+                            JSYokeResponse.this.close();
+                            return Undefined.instance;
+                        }
+                    };
+                }
+                return close;
+            case "closeHandler":
+                if (closeHandler == null) {
+                    closeHandler = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Handler.class)) {
+                                JSYokeResponse.this.closeHandler((Handler) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return closeHandler;
+            case "drainHandler":
+                if (drainHandler == null) {
+                    drainHandler = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Handler.class)) {
+                                JSYokeResponse.this.drainHandler((Handler) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return drainHandler;
+            case "end":
+                if (end == null) {
+                    end = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.end((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, JsonElement.class)) {
+                                JSYokeResponse.this.end((JsonElement) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, ReadStream.class)) {
+                                JSYokeResponse.this.end((ReadStream) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.end((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, Buffer.class)) {
+                                JSYokeResponse.this.end((Buffer) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args)) {
+                                JSYokeResponse.this.end();
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return end;
+            case "endHandler":
+                if (endHandler == null) {
+                    endHandler = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Handler.class)) {
+                                JSYokeResponse.this.endHandler((Handler) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return endHandler;
+            case "exceptionHandler":
+                if (exceptionHandler == null) {
+                    exceptionHandler = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Handler.class)) {
+                                JSYokeResponse.this.exceptionHandler((Handler) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return exceptionHandler;
+            case "getHeader":
+                if (getHeader == null) {
+                    getHeader = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.getHeader((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.getHeader((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return getHeader;
+            case "statusCode":
+                return getStatusCode();
+            case "statusMessage":
+                return getStatusMessage();
+            case "headers":
+                if (headers == null) {
+                    headers = toScriptable(headers());
+                }
+                return headers;
+            case "headersHandler":
+                if (headersHandler == null) {
+                    headersHandler = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Handler.class)) {
+                                JSYokeResponse.this.headersHandler((Handler) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return headersHandler;
+            case "chunked":
+                return isChunked();
+            case "jsonp":
+                if (jsonp == null) {
+                    jsonp = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, JsonElement.class)) {
+                                JSYokeResponse.this.jsonp((String) args[0], (JsonElement) args[1]);
+                                return Undefined.instance;
+                            }
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.jsonp((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+                            if (is(args, JsonElement.class)) {
+                                JSYokeResponse.this.jsonp((JsonElement) args[0]);
+                                return Undefined.instance;
+                            }
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.jsonp((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return jsonp;
+            case "putHeader":
+                if (putHeader == null) {
+                    putHeader = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, CharSequence.class, CharSequence.class)) {
+                                JSYokeResponse.this.putHeader((CharSequence) args[0], (CharSequence) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, CharSequence.class, Iterable.class)) {
+                                JSYokeResponse.this.putHeader((CharSequence) args[0], (Iterable) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.putHeader((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class, Iterable.class)) {
+                                JSYokeResponse.this.putHeader((String) args[0], (Iterable<String>) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return putHeader;
+            case "putTrailer":
+                if (putTrailer == null) {
+                    putTrailer = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, CharSequence.class, CharSequence.class)) {
+                                JSYokeResponse.this.putTrailer((CharSequence) args[0], (CharSequence) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, CharSequence.class, Iterable.class)) {
+                                JSYokeResponse.this.putTrailer((CharSequence) args[0], (Iterable) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.putTrailer((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class, Iterable.class)) {
+                                JSYokeResponse.this.putTrailer((String) args[0], (Iterable<String>) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return putTrailer;
+            case "redirect":
+                if (redirect == null) {
+                    redirect = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Integer.class, String.class)) {
+                                JSYokeResponse.this.redirect((Integer) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.redirect((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return redirect;
+            case "render":
+                if (render == null) {
+                    render = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, Handler.class)) {
+                                JSYokeResponse.this.render((String) args[0], (Handler) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.render((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return render;
+            case "sendFile":
+                if (sendFile == null) {
+                    sendFile = new Callable() {
+                        @Override
+                        @SuppressWarnings("unchecked")
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, String.class, Handler.class)) {
+                                JSYokeResponse.this.sendFile((String) args[0], (String) args[1], (Handler) args[2]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.sendFile((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class, Handler.class)) {
+                                JSYokeResponse.this.sendFile((String) args[0], (Handler) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.sendFile((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return sendFile;
+            case "setContentType":
+                if (setContentType == null) {
+                    setContentType = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.setContentType((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.setContentType((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return setContentType;
+            case "setWriteQueueMaxSize":
+                if (setWriteQueueMaxSize == null) {
+                    setWriteQueueMaxSize = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, Integer.class)) {
+                                JSYokeResponse.this.setWriteQueueMaxSize((Integer) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return setWriteQueueMaxSize;
+            case "trailers":
+                if (trailers == null) {
+                    trailers = toScriptable(trailers());
+                }
+                return trailers;
+            case "write":
+                if (write == null) {
+                    write = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeResponse.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
+                            }
+
+                            if (is(args, String.class, String.class)) {
+                                JSYokeResponse.this.write((String) args[0], (String) args[1]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, String.class)) {
+                                JSYokeResponse.this.write((String) args[0]);
+                                return Undefined.instance;
+                            }
+
+                            if (is(args, Buffer.class)) {
+                                JSYokeResponse.this.write((Buffer) args[0]);
+                                return Undefined.instance;
+                            }
+                            
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return write;
+            case "writeQueueFull":
+                return writeQueueFull();
+            default:
+                // fail to find
+                return NOT_FOUND;
         }
-        // fail to find
-        return NOT_FOUND;
     }
 
     @Override
     public Object get(int index, Scriptable start) {
-        return get(Integer.toString(index), start);
+        return NOT_FOUND;
     }
 
     @Override
     public boolean has(String name, Scriptable start) {
-        // first context
-        if (context.containsKey(name)) {
-            return true;
-        }
-        // then functions
-        if (JS_PROPERTIES.containsKey(name)) {
-            return true;
-        }
-        // fail to find
         return false;
     }
 
     @Override
     public boolean has(int index, Scriptable start) {
-        return has(Integer.toString(index), start);
+        return false;
     }
 
     @Override
     public void put(String name, Scriptable start, Object value) {
-        context.put(name, value);
+        switch (name) {
+            case "chunked":
+                setChunked((Boolean) value);
+                return;
+            case "statusCode":
+                setStatusCode((Integer) value);
+                return;
+            case "statusMessage":
+                setStatusMessage((String) value);
+                return;
+            default:
+                throw new UnsupportedOperationException();
+        }
     }
 
     @Override
@@ -119,7 +579,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
     @Override
     public void delete(String name) {
-        context.remove(name);
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -149,7 +609,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
     @Override
     public Object[] getIds() {
-        return context.keySet().toArray();
+        return NO_IDS;
     }
 
     @Override
@@ -159,13 +619,6 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
     @Override
     public boolean hasInstance(Scriptable instance) {
-        Scriptable proto = instance.getPrototype();
-        while (proto != null) {
-            if (proto.equals(this))
-                return true;
-            proto = proto.getPrototype();
-        }
-
-        return false;
+        return instance != null && instance instanceof JSYokeResponse;
     }
 }

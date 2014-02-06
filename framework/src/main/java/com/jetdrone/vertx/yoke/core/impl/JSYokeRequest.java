@@ -131,10 +131,6 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
         if (context.containsKey(name)) {
             return true;
         }
-        // then functions
-        if (JS_PROPERTIES.containsKey(name)) {
-            return true;
-        }
         // fail to find
         return false;
     }
@@ -196,13 +192,6 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
     @Override
     public boolean hasInstance(Scriptable instance) {
-        Scriptable proto = instance.getPrototype();
-        while (proto != null) {
-            if (proto.equals(this))
-                return true;
-            proto = proto.getPrototype();
-        }
-
-        return false;
+        return instance != null && instance instanceof JSYokeRequest;
     }
 }

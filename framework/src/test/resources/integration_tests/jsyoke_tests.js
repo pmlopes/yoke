@@ -5,41 +5,20 @@ var console = require('vertx/console');
 var vertx = require('vertx');
 
 var Yoke = require('yoke/Yoke');
+var YokeTester = require('yoke/test/YokeTester');
 
 // The test methods must begin with "test"
 
-function testJS() {
-
-    var yoke = new Yoke();
-    // all resources are forbidden
-    yoke.use(function (req, next) {
-        next(401);
-    });
-
-    yoke.listen(8888);
-
-    // The server is listening so send an HTTP request
-    vertx.createHttpClient().port(8888).getNow("/", function(resp) {
-        vassert.assertTrue(401 == resp.statusCode());
-        vassert.testComplete();
-    });
-}
-
 function testJSListenToServer1() {
 
-    var server = vertx.createHttpServer();
     var yoke = new Yoke();
     // all resources are forbidden
     yoke.use(function (req, next) {
         next(401);
     });
 
-    yoke.listen(server);
-    server.listen(8888);
-
-    // The server is listening so send an HTTP request
-    vertx.createHttpClient().port(8888).getNow("/", function(resp) {
-        vassert.assertTrue(401 == resp.statusCode());
+    new YokeTester(yoke).request('GET', '/', function(resp) {
+        vassert.assertTrue(401 == resp.statusCode);
         vassert.testComplete();
     });
 }
@@ -48,25 +27,20 @@ var Router  = require('yoke/middleware/Router');
 
 function testJSListenToServer2() {
 
-    var server = vertx.createHttpServer();
     var yoke = new Yoke();
 
     var router = new Router();
     yoke.use(router);
 
-    router.get('/api/:userId', function (req, next) {
+    router.get('/api/:userId', function (req) {
         vassert.assertTrue(!req.isSecure());
         req.response.end('OK');
     });
 
     router.param('userId', /[1-9][0-9]/);
 
-    yoke.listen(server);
-    server.listen(8888);
-
-    // the pattern expects 2 digits
-    vertx.createHttpClient().port(8888).getNow('/api/10', function(resp) {
-        vassert.assertTrue(200 == resp.statusCode());
+    new YokeTester(yoke).request('GET', '/api/10', function(resp) {
+        vassert.assertTrue(200 == resp.statusCode);
         vassert.testComplete();
     });
 }
@@ -77,16 +51,31 @@ function testIterateParams() {
     // all resources are forbidden
     yoke.use(function (req, next) {
         for (var p in req.params) {
+//            vassert.assertEquals(p, 'p' + req.params[p]);
             console.log(p + ': ' + req.params[p]);
         }
         next(401);
     });
 
-    yoke.listen(8888);
+    new YokeTester(yoke).request('GET', '/?p1=1&p2=2&p3=3', function(resp) {
+        vassert.assertTrue(401 == resp.statusCode);
+        vassert.testComplete();
+    });
+}
 
-    // The server is listening so send an HTTP request
-    vertx.createHttpClient().port(8888).getNow("/?p1=1&p2=2&p3=3", function(resp) {
-        vassert.assertTrue(401 == resp.statusCode());
+function testResponseCode() {
+
+    var yoke = new Yoke();
+    yoke.use(function (req, next) {
+        req.response.statusCode = 503;
+        req.response.statusMessage = 'Blah!';
+        req.response.end();
+
+    });
+
+    new YokeTester(yoke).request('GET', '/', function(resp) {
+        vassert.assertTrue(503 == resp.statusCode);
+        vassert.assertEquals('Blah!', resp.statusMessage);
         vassert.testComplete();
     });
 }
