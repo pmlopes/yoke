@@ -66,7 +66,7 @@ public class YokeTester {
 
                 @Override
                 public String uri() {
-                    return uri.getPath() + "?" + uri.getQuery() + "#" + uri.getFragment();
+                    return uri.getPath() + (uri.getQuery() != null ? "?" + uri.getQuery() : "") + (uri.getFragment() != null ? "#" + uri.getFragment() : "");
                 }
 
                 @Override

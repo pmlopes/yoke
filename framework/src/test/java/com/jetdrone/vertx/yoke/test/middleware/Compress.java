@@ -36,7 +36,7 @@ public class Compress extends TestVerticle {
           public void handle(Response resp) {
               assertEquals(200, resp.getStatusCode());
               for (int i = 0; i < resp.body.length(); i++) {
-                  System.out.println((int) resp.body.getByte(i));
+//                  System.out.println((int) resp.body.getByte(i));
               }
               testComplete();
           }

@@ -3,8 +3,6 @@ function YokeTester(yoke, ssl) {
 }
 
 YokeTester.prototype.request = function(method, url, headers, body, callback) {
-    // TODO: convert headers from js object to multimap
-    // TODO: what is a buffer in rhino?
     // 3 args
     if (body === undefined && callback === undefined) {
         this.jYokeTester.request(method, url, new org.vertx.java.core.Handler({
@@ -13,14 +11,26 @@ YokeTester.prototype.request = function(method, url, headers, body, callback) {
     }
     // 4 args
     else if (callback === undefined) {
-        this.jYokeTester.request(method, url, headers, new org.vertx.java.core.Handler({
-            handle: headers
+        this.jYokeTester.request(method, url, toMultiMap(headers), new org.vertx.java.core.Handler({
+            handle: body
         }));
-    } else {
-        this.jYokeTester.request(method, url, headers, body, new org.vertx.java.core.Handler({
-            handle: headers
+    }
+    // 5 args
+    else {
+        this.jYokeTester.request(method, url, toMultiMap(headers), new org.vertx.java.core.buffer.Buffer(body), new org.vertx.java.core.Handler({
+            handle: callback
         }));
     }
 };
+
+function toMultiMap(json) {
+    var headers = new org.vertx.java.core.http.CaseInsensitiveMultiMap();
+    for (k in json) {
+        if (json.hasOwnProperty(k)) {
+            headers.add(k, json[k]);
+        }
+    }
+    return headers;
+}
 
 module.exports = YokeTester;
