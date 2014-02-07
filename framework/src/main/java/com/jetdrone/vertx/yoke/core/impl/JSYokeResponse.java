@@ -19,8 +19,6 @@ import java.util.Map;
 
 import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
 
-// TODO: verify all return types since all functions return undefined
-
 final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
     public JSYokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
@@ -268,13 +266,11 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                             }
 
                             if (is(args, String.class, String.class)) {
-                                JSYokeResponse.this.getHeader((String) args[0], (String) args[1]);
-                                return Undefined.instance;
+                                return JSYokeResponse.this.getHeader((String) args[0], (String) args[1]);
                             }
 
                             if (is(args, String.class)) {
-                                JSYokeResponse.this.getHeader((String) args[0]);
-                                return Undefined.instance;
+                                return JSYokeResponse.this.getHeader((String) args[0]);
                             }
 
                             throw new UnsupportedOperationException();

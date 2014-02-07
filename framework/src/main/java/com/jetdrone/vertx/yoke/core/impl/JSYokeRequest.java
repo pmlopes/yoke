@@ -16,8 +16,6 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 
 import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
 
-// TODO: verify all return types since all functions return undefined
-
 final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
     private final Context context;
@@ -81,8 +79,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (isVararg(args, String.class)) {
-                                JSYokeRequest.this.accepts((String[]) args);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.accepts((String[]) args);
                             }
 
                             throw new UnsupportedOperationException();
@@ -91,6 +88,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 }
                 return accepts;
             case "body":
+                // TODO: convert to JS objects
                 return body();
             case "bodyHandler":
                 if (bodyHandler == null) {
@@ -270,8 +268,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getAllCookies((String) args[0]);
-                                return Undefined.instance;
+                                return toScriptable(JSYokeRequest.this.getAllCookies((String) args[0]));
                             }
 
                             throw new UnsupportedOperationException();
@@ -289,8 +286,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getAllHeaders((String) args[0]);
-                                return Undefined.instance;
+                                return toScriptable(JSYokeRequest.this.getAllHeaders((String) args[0]));
                             }
 
                             throw new UnsupportedOperationException();
@@ -308,6 +304,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
+                                // TODO: convert to JS
                                 JSYokeRequest.this.getCookie((String) args[0]);
                                 return Undefined.instance;
                             }
@@ -327,6 +324,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
+                                // TODO: convert to JS
                                 JSYokeRequest.this.getFile((String) args[0]);
                                 return Undefined.instance;
                             }
@@ -346,13 +344,11 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class, String.class)) {
-                                JSYokeRequest.this.getFormParameter((String) args[0], (String) args[1]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.getFormParameter((String) args[0], (String) args[1]);
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getFormParameter((String) args[0]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.getFormParameter((String) args[0]);
                             }
 
                             throw new UnsupportedOperationException();
@@ -370,8 +366,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getFormParameterList((String) args[0]);
-                                return Undefined.instance;
+                                return toScriptable(JSYokeRequest.this.getFormParameterList((String) args[0]));
                             }
 
                             throw new UnsupportedOperationException();
@@ -389,13 +384,11 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class, String.class)) {
-                                JSYokeRequest.this.getHeader((String) args[0], (String) args[1]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.getHeader((String) args[0], (String) args[1]);
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getHeader((String) args[0]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.getHeader((String) args[0]);
                             }
 
                             throw new UnsupportedOperationException();
@@ -413,13 +406,11 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class, String.class)) {
-                                JSYokeRequest.this.getParameter((String) args[0], (String) args[1]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.getParameter((String) args[0], (String) args[1]);
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getParameter((String) args[0]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.getParameter((String) args[0]);
                             }
 
                             throw new UnsupportedOperationException();
@@ -437,8 +428,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.getParameterList((String) args[0]);
-                                return Undefined.instance;
+                                return toScriptable(JSYokeRequest.this.getParameterList((String) args[0]));
                             }
 
                             throw new UnsupportedOperationException();
@@ -455,8 +445,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
                             }
 
-                            JSYokeRequest.this.hasBody();
-                            return Undefined.instance;
+                            return JSYokeRequest.this.hasBody();
                         }
                     };
                 }
@@ -478,8 +467,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                JSYokeRequest.this.is((String) args[0]);
-                                return Undefined.instance;
+                                return JSYokeRequest.this.is((String) args[0]);
                             }
 
                             throw new UnsupportedOperationException();
