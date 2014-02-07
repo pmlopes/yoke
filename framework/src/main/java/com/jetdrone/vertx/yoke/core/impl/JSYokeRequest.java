@@ -14,6 +14,9 @@ import org.vertx.java.core.http.HttpServerRequest;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
 
 final class JSYokeRequest  extends YokeRequest implements Scriptable {
@@ -88,8 +91,19 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 }
                 return accepts;
             case "body":
-                // TODO: convert to JS objects
-                return body();
+                if (body != null) {
+                    if (body instanceof Map) {
+                        return toScriptable((Map) body);
+                    }
+                    if (body instanceof List) {
+                        return toScriptable((List) body);
+                    }
+                    if (body instanceof Buffer) {
+                        return body.toString();
+                    }
+                }
+
+                return body;
             case "bodyHandler":
                 if (bodyHandler == null) {
                     bodyHandler = new Callable() {
@@ -304,9 +318,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                // TODO: convert to JS
-                                JSYokeRequest.this.getCookie((String) args[0]);
-                                return Undefined.instance;
+                                return toScriptable(JSYokeRequest.this.getCookie((String) args[0]));
                             }
 
                             throw new UnsupportedOperationException();
@@ -324,9 +336,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                // TODO: convert to JS
-                                JSYokeRequest.this.getFile((String) args[0]);
-                                return Undefined.instance;
+                                return toScriptable(JSYokeRequest.this.getFile((String) args[0]));
                             }
 
                             throw new UnsupportedOperationException();

@@ -1,5 +1,7 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
+import com.jetdrone.vertx.yoke.middleware.YokeCookie;
+import com.jetdrone.vertx.yoke.middleware.YokeFileUpload;
 import org.mozilla.javascript.Scriptable;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonElement;
@@ -126,7 +128,17 @@ class JSUtil {
         return null;
     }
 
-    static Scriptable toScriptable(final Map<String, ?> map) {
+    static Scriptable toScriptable(final YokeCookie cookie) {
+        // TODO: implement me!!!
+        return null;
+    }
+
+    static Scriptable toScriptable(final YokeFileUpload fileUpload) {
+        // TODO: implement me!!!
+        return null;
+    }
+
+    static Scriptable toScriptable(final Map<?, ?> map) {
         return new Scriptable() {
 
             private Scriptable prototype, parent;
