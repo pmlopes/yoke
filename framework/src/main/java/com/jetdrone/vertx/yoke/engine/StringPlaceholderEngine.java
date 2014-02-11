@@ -65,6 +65,29 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
             }
         });
     }
+    
+    @Override
+    public void render(final String file, final String layoutFile, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
+        
+        /* For now the focus was to implement the layout support in the Groovy template engine */
+        /* This will follow as soon as possible */
+        
+        // verify if the file is still fresh in the cache
+        read(file, new AsyncResultHandler<String>() {
+            @Override
+            public void handle(AsyncResult<String> asyncResult) {
+                if (asyncResult.failed()) {
+                    handler.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                } else {
+                    try {
+                        handler.handle(new YokeAsyncResult<>(parseStringValue(asyncResult.result(), context, new HashSet<String>())));
+                    } catch (IllegalArgumentException iae) {
+                        handler.handle(new YokeAsyncResult<Buffer>(iae));
+                    }
+                }
+            }
+        });
+    }     
 
     private Buffer parseStringValue(String template, Map<String, Object> context, Set<String> visitedPlaceholders) {
         StringBuilder buf = new StringBuilder(template);
