@@ -55,5 +55,12 @@ public class Jade4JEngine extends AbstractEngine<JadeTemplate> {
             }
         });
     }
+    
+    @Override
+    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
+        
+    	// todo: implement proper layout support like in Groovy Template Engine   
+    	
+    }     
 
 }
