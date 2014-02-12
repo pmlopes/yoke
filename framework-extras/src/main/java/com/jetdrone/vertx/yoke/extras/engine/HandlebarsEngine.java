@@ -30,6 +30,13 @@ import java.util.Map;
 
 public class HandlebarsEngine extends AbstractEngine<Template> {
 
+    private static final String placeholderPrefix = "{{";
+    private static final String placeholderSuffix = "}}";
+    
+    // The expectation is that in Handlebars, the layout template will include somthing like {{TemplateBody}}
+    // that will be replaced with the main template
+    private static final String PLACEHOLDER_TEMPLATE_BODY = placeholderPrefix + KEY_FOR_TEMPLATE_BODY_INSIDE_LAYOUT + placeholderSuffix;	
+
     private final Handlebars handlebars = new Handlebars();
 
     @Override
@@ -50,13 +57,51 @@ public class HandlebarsEngine extends AbstractEngine<Template> {
             }
         });
     }
-    
+
     @Override
     public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
-       
-    	// todo: implement proper layout support like in Groovy Template Engine   
-    	
-    }        
+        
+    	// get the layout template first
+        read(layoutFilename, new AsyncResultHandler<String>() {
+            @Override
+            public void handle(AsyncResult<String> asyncResult) {
+                if (asyncResult.failed()) {
+                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
+                } else {
+                    try {
+                    		
+                    		// we got the layout content based on the filename, let's save it and move further
+                    		// and obtain the main template's body
+                    		final String layoutTemplateText = asyncResult.result();
+                    		
+                            read(filename, new AsyncResultHandler<String>() {
+                                @Override
+                                public void handle(AsyncResult<String> asyncResult2) {
+                                    if (asyncResult2.failed()) {
+                                        next.handle(new YokeAsyncResult<Buffer>(asyncResult2.cause()));
+                                    } else {
+                                        try {
+                                        	// we now have all the ingredients, so use compileWithLayout instead of compile
+                                        	
+                                            Template template = compileWithLayout(filename,layoutFilename, asyncResult2.result(), layoutTemplateText);
+                                            next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
+                                            
+                                        } catch (IOException | ClassNotFoundException ex) {
+                                            next.handle(new YokeAsyncResult<Buffer>(ex));
+                                        }
+                                    }
+                                }
+                            });                    		
+                    	
+                        
+                    } catch (Exception ex) {
+                        next.handle(new YokeAsyncResult<Buffer>(ex));
+                    }
+                }
+            }
+        });    	
+    }    
+           
 
     private Template compile(String filename, String templateText) throws IOException {
 
@@ -70,6 +115,31 @@ public class HandlebarsEngine extends AbstractEngine<Template> {
 
         return template;
     }
+    
+    private Template compileWithLayout(String filename, String layoutFilename, String templateText, String layoutTemplateText) throws IOException, ClassNotFoundException {
+        
+    	// template + layout cache (cache-wise) will look similar to:
+    	// sales.html-WithLayout-ecommerce.html
+    	final StringBuilder compositeTemplateName = new StringBuilder();
+    	compositeTemplateName.append(filename).append(KEY_TAG_FOR_TEMPLATE_NAME_WITH_LAYOUT).append(layoutFilename);
+    	
+    	final String compositeTemplateNameString = compositeTemplateName.toString();
+    	    	
+    	Template compositeTemplate = getTemplateFromCache(compositeTemplateNameString);
+
+        if (compositeTemplate == null) {
+        	
+        	// We need to find something like ${TemplateBody} or $TemplateBody inside the 
+        	// layoutTemplateText, and replace it with the entire templateText
+        	// this way we will create a single, unified template, comprising both layout and the main body        	
+        	String fullTemplateText = layoutTemplateText.replace(PLACEHOLDER_TEMPLATE_BODY, templateText);
+        	
+            compositeTemplate = handlebars.compileInline(fullTemplateText);
+            putLayoutTemplateToCache(compositeTemplateNameString, fullTemplateText, compositeTemplate);
+        }
+
+        return compositeTemplate;
+    }       
 
     public void registerHelper(String name, Helper<?> helper) {
         handlebars.registerHelper(name, helper);
