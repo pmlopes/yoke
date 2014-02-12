@@ -31,6 +31,13 @@ import java.util.Map;
 
 public class Jade4JEngine extends AbstractEngine<JadeTemplate> {
 
+    private static final String placeholderPrefix = "#{";
+    private static final String placeholderSuffix = "}";
+    
+    // The expectation is that in Handlebars, the layout template will include something like #{TemplateBody}
+    // that will be replaced with the main template
+    private static final String PLACEHOLDER_TEMPLATE_BODY = placeholderPrefix + KEY_FOR_TEMPLATE_BODY_INSIDE_LAYOUT + placeholderSuffix;	
+
     private JadeConfiguration config = new JadeConfiguration();
 
     @Override
