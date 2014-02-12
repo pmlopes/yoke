@@ -29,6 +29,8 @@ import org.vertx.java.core.buffer.Buffer;
 import java.io.StringReader;
 import java.util.Map;
 
+import java.io.IOException;
+
 public class Jade4JEngine extends AbstractEngine<JadeTemplate> {
 
     private static final String placeholderPrefix = "#{";
