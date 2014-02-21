@@ -127,13 +127,17 @@ public class YokeTester {
 
                 @Override
                 public HttpServerRequest bodyHandler(Handler<Buffer> bodyHandler) {
-                    bodyHandler.handle(body);
+                    if(bodyHandler != null){
+                        bodyHandler.handle(body);
+                    }
                     return this;
                 }
 
                 @Override
                 public HttpServerRequest dataHandler(Handler<Buffer> handler) {
-                    handler.handle(body);
+                    if(handler != null){
+                        handler.handle(body);
+                    }
                     return this;
                 }
 
@@ -149,7 +153,9 @@ public class YokeTester {
 
                 @Override
                 public HttpServerRequest endHandler(Handler<Void> endHandler) {
-                    endHandler.handle(null);
+                    if(endHandler != null){
+                        endHandler.handle(null);
+                    }
                     return this;
                 }
                 @Override
