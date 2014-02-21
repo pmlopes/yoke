@@ -235,6 +235,15 @@ public class GYokeResponse extends YokeResponse implements org.vertx.groovy.core
             }
         });
     }
+    
+    public void render(final String template, final String layoutTemplate, final Closure<Object> next) {
+        render(template, layoutTemplate, new Handler<Object>() {
+            @Override
+            public void handle(Object event) {
+                next.call(event);
+            }
+        });
+    }       
 
     @Override
     public GYokeResponse putHeader(String name, String value) {

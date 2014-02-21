@@ -134,4 +134,20 @@ public final class Context implements Map<String, Object> {
 
         return ro.entrySet();
     }
+    
+    // this new method was necessary for the Jade4JEngine - that one was trying to force convert the Map (Context) to Hashmap
+    // and the entrySet() method of the Context class, being called by putAll in HashMap, was throwing java.lang.UnsupportedOperationException
+    // at line 131: values.addAll(ro.values());
+    public HashMap<String, Object> getHashMap() {
+    	    	
+    	if (rw != null) {    		
+    		HashMap<String, Object> hmap = (rw instanceof HashMap) ? (HashMap) rw : new HashMap<String, Object>(rw);    		
+    		if (ro != null) {
+    			hmap.putAll(ro);
+    		}    		
+    		return hmap;  
+         }
+
+         return  (ro instanceof HashMap) ? (HashMap) ro : new HashMap<String, Object>(ro);
+    }    
 }
