@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.JSON;
+import io.netty.handler.codec.http.HttpHeaders;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
@@ -18,6 +19,8 @@ import java.util.HashMap;
  * Parse request bodies, supports *application/json*, *application/x-www-form-urlencoded*, and *multipart/form-data*.
  *
  * Once data has been parsed the result is visible in the field `body` of the request.
+ *
+ * The body may be a map, a list, or a raw buffer if an unknown content type is provided.
  *
  * If the content type was *multipart/form-data* and there were uploaded files the files are ```files()``` returns
  * `Map<String, HttpServerFileUpload>`.
@@ -65,22 +68,27 @@ public class BodyParser extends Middleware {
      * @param next middleware to be called next
      */
     private void parseJson(final YokeRequest request, final Buffer buffer, final Handler<Object> next) {
-        try {
-            String content = buffer.toString();
-            if (content.length() > 0) {
-                try {
-                    request.setBody(JSON.decode(content));
-                } catch (DecodeException e) {
-                    next.handle(400);
-                    return;
-                }
-                next.handle(null);
-            } else {
-                next.handle(400);
-            }
-        } catch (DecodeException ex) {
-            next.handle(ex);
+        if (buffer.length() == 0) {
+            next.handle(400);
+            return;
         }
+
+        try {
+            request.setBody(JSON.decode(buffer.toString()));
+        } catch (DecodeException e) {
+            next.handle(e);
+            return;
+        }
+        next.handle(null);
+    }
+
+    private boolean hasNoBody(YokeRequest request){
+        final String method = request.method();
+        if ("GET".equals(method) || "HEAD".equals(method)) return true;
+
+        if(!request.hasBody()) return true;
+
+        return false;
     }
 
     /** Handler for the parser. When the request method is GET or HEAD this is a Noop middleware.
@@ -92,90 +100,112 @@ public class BodyParser extends Middleware {
      */
     @Override
     public void handle(final YokeRequest request, final Handler<Object> next) {
-        final String method = request.method();
-
-        // GET and HEAD have no setBody
-        if ("GET".equals(method) || "HEAD".equals(method)) {
+        if(hasNoBody(request)){
             next.handle(null);
-        } else {
+            return;
+        }
 
-            // has no body
-            MultiMap headers = request.headers();
-            if (!headers.contains("transfer-encoding") && !headers.contains("content-length")) {
+        final ContentType type = ContentType.parse(request);
+        final Buffer buffer = type.hasBuffer() ? new Buffer(0) : null;
+
+        // enable the parsing at Vert.x level
+        request.expectMultiPart(true);
+
+        if (type == ContentType.MULTIPART) {
+            request.uploadHandler(uploadHandler(request, next));
+        }
+
+        if(buffer != null || request.bodyLengthLimit() != -1){
+            request.dataHandler(dataHandler(request, next, buffer));
+        }
+
+        request.endHandler(new Handler<Void>() {
+            @Override
+            public void handle(Void _void) {
+                if (type == ContentType.JSON) {
+                    parseJson(request, buffer, next);
+                    return;
+                }
+
+                if(type == ContentType.OTHER){
+                    request.setBody(buffer);
+                }
                 next.handle(null);
-                return;
             }
+        });
+    }
 
-            final String contentType = request.getHeader("content-type");
+    private Handler<HttpServerFileUpload> uploadHandler(final YokeRequest request, final Handler<Object> next) {
+        return new Handler<HttpServerFileUpload>() {
+            @Override
+            public void handle(final HttpServerFileUpload fileUpload) {
+                if (request.files() == null) {
+                    request.setFiles(new HashMap<String, YokeFileUpload>());
+                }
+                YokeFileUpload upload = new YokeFileUpload(vertx, fileUpload, uploadDir);
 
-            final boolean isJSON = contentType != null && contentType.contains("application/json");
-            final boolean isMULTIPART = contentType != null && contentType.contains("multipart/form-data");
-            final boolean isURLENCODEC = contentType != null && contentType.contains("application/x-www-form-urlencoded");
-            final Buffer buffer = (!isMULTIPART && !isURLENCODEC) ? new Buffer(0) : null;
-
-            // enable the parsing at Vert.x level
-            request.expectMultiPart(true);
-
-            if (isMULTIPART) {
-                request.uploadHandler(new Handler<HttpServerFileUpload>() {
+                // setup callbacks
+                fileUpload.exceptionHandler(new Handler<Throwable>() {
                     @Override
-                    public void handle(final HttpServerFileUpload fileUpload) {
-                        if (request.files() == null) {
-                            request.setFiles(new HashMap<String, YokeFileUpload>());
-                        }
-                        YokeFileUpload upload = new YokeFileUpload(vertx, fileUpload, uploadDir);
-
-                        // setup callbacks
-                        fileUpload.exceptionHandler(new Handler<Throwable>() {
-                            @Override
-                            public void handle(Throwable throwable) {
-                                next.handle(throwable);
-                            }
-                        });
-
-                        // stream to the generated path
-                        fileUpload.streamToFileSystem(upload.path());
-                        // store a reference in the request
-                        request.files().put(fileUpload.name(), upload);
+                    public void handle(Throwable throwable) {
+                        next.handle(throwable);
                     }
                 });
+
+                // stream to the generated path
+                fileUpload.streamToFileSystem(upload.path());
+                // store a reference in the request
+                request.files().put(fileUpload.name(), upload);
             }
+        };
+    }
 
-            request.dataHandler(new Handler<Buffer>() {
-                long size = 0;
-                final long limit = request.bodyLengthLimit();
+    private Handler<Buffer> dataHandler(final YokeRequest request, final Handler<Object> next, final Buffer buffer) {
+        return new Handler<Buffer>() {
+            long size = 0;
+            final long limit = request.bodyLengthLimit();
 
-                @Override
-                public void handle(Buffer event) {
-                    if (limit != -1) {
-                        size += event.length();
-                        if (size < limit) {
-                            if (!isMULTIPART && !isURLENCODEC) {
-                                buffer.appendBuffer(event);
-                            }
-                        } else {
-                            request.dataHandler(null);
-                            request.endHandler(null);
-                            next.handle(413);
-                        }
-                    } else {
-                        if (!isMULTIPART && !isURLENCODEC) {
-                            buffer.appendBuffer(event);
-                        }
+            @Override
+            public void handle(Buffer event) {
+                if (limit == -1) {
+                    if(buffer != null){
+                        buffer.appendBuffer(event);
                     }
+                    return;
                 }
-            });
 
-            request.endHandler(new Handler<Void>() {
-                @Override
-                public void handle(Void _void) {
-                    if (isJSON) {
-                        parseJson(request, buffer, next);
-                    } else {
-                        next.handle(null);
+                size += event.length();
+                if (size < limit) {
+                    if(buffer != null){
+                        buffer.appendBuffer(event);
                     }
+                } else {
+                    request.dataHandler(null);
+                    request.endHandler(null);
+                    next.handle(413);
                 }
-            });
+            }
+        };
+    }
+
+    private enum ContentType {
+        JSON,
+        MULTIPART,
+        URLENCODEC,
+        OTHER;
+
+        public static ContentType parse(YokeRequest request) {
+            String type = request.getHeader("content-type");
+            if(type == null) return OTHER;
+            String lowerType = type.toLowerCase();
+            if(lowerType.startsWith("application/json")) return JSON;
+            if(lowerType.startsWith(HttpHeaders.Values.MULTIPART_FORM_DATA)) return MULTIPART;
+            if(lowerType.startsWith(HttpHeaders.Values.APPLICATION_X_WWW_FORM_URLENCODED)) return URLENCODEC;
+            return OTHER;
+        }
+
+        public boolean hasBuffer(){
+            return this != MULTIPART && this != URLENCODEC;
         }
     }
 }

@@ -49,4 +49,15 @@ public interface Engine {
      * @param handler  The future result handler with a Buffer in case of success
      */
     void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler);
+    
+    /**
+     * The implementation of the render engine with layout support. The implementation should render both the main template and the layout template with the context in an
+     * asynchronous way.
+     *
+     * @param filename String representing the file path to the template
+     * @param layoutFilename String representing the file path to the layout template
+     * @param context  Map with key values that might get substituted in the template
+     * @param handler  The future result handler with a Buffer in case of success
+     */    
+    void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler);    
 }

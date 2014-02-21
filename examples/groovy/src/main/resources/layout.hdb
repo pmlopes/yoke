@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="/content/css/style.css" />
+	<title>Groovy Example with Layout and Template</title>
+</head>
+
+<body>
+
+<div id="wrapper">    
+    <div class="pageContent">
+
+	<div class="themeHeader">
+		<div class="title">Yoke for Vert.x</div>
+		<div class="subTitle paleYellow">An easy way to build web applications</div>
+	</div>
+
+	<br/>
+
+	<h1>This is part of the header of a {{engineName}} layout. Template body below.</h1>
+
+	{{TemplateBody}}
+
+	<h1>This is part of the footer of a {{engineName}} layout. Template body above.</h1>
+
+	</div><!-- END div id="wrapper" -->
+</div><!-- END div class="page-content" -->
+
+</body>
+</html>

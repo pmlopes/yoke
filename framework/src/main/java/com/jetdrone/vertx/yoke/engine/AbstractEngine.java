@@ -28,6 +28,14 @@ public abstract class AbstractEngine<T> implements Engine {
     protected Vertx vertx;
 
     private final LRUCache<String, T> cache = new LRUCache<>(1024);
+    
+    // this will act as a linchpin for the composite template key
+    // e.g. a cached key like this: HomePage-WithLayout-MainLayout
+    public final static String KEY_TAG_FOR_TEMPLATE_NAME_WITH_LAYOUT = "-WithLayout-";
+    
+    // The main placeholder text. For example, in Groovy engine, the layout template
+    // should have ${TemplateBody} somewhere inside to get replaced with the real template raw content
+    public final static String KEY_FOR_TEMPLATE_BODY_INSIDE_LAYOUT = "TemplateBody";    
 
     @Override
     public void setVertx(Vertx vertx) {
@@ -152,7 +160,13 @@ public abstract class AbstractEngine<T> implements Engine {
      * Gets the compiled value from cache this is a synchronous operation since there is no blocking or I/O
      */
     public T getTemplateFromCache(String filename) {
-        return cache.get(filename).compiled;
+    	
+    	LRUCache.CacheEntry<String, T> cachedTemplate = cache.get(filename);
+    	
+    	// this is to avoid null pointer exception in case of the layout composite template
+    	if (cachedTemplate == null) return null;
+    	
+        return cachedTemplate.compiled;
     }
 
     /**
@@ -161,6 +175,20 @@ public abstract class AbstractEngine<T> implements Engine {
     public void putTemplateToCache(String filename, T template) {
         cache.putCompiled(filename, template);
     }
+    
+    public void putLayoutTemplateToCache(String filename, String raw, T template) {
+        
+    	// to avoid a null pointer exception because the cache key is composite
+    	// we have both main template and the layout template in cache because of the "read" method
+    	// but we don't have the combined product
+    	if (getTemplateFromCache(filename) == null) {
+    		
+        	Date lastModified = new Date();
+    		cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, raw));    		
+    	}    	
+    	
+    	cache.putCompiled(filename, template);
+    }      
 
     /**
      * Removes an entry from cache
