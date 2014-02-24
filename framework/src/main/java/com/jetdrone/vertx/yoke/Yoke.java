@@ -414,7 +414,12 @@ public class Yoke {
 
                                 if (request.path().startsWith(mountedMiddleware.mount)) {
                                     Middleware middlewareItem = mountedMiddleware.middleware;
-                                    middlewareItem.handle(request, this);
+                                    try {
+                                        middlewareItem.handle(request, this);
+                                    } catch (RuntimeException e) {
+                                        // in the case of runtime exceptions, let the error handler handle it...
+                                        handle(e);
+                                    }
                                 } else {
                                     // the middleware was not mounted on this uri, skip to the next entry
                                     handle(null);
