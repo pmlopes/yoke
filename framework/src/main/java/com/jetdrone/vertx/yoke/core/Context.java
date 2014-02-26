@@ -141,13 +141,13 @@ public final class Context implements Map<String, Object> {
     public HashMap<String, Object> getHashMap() {
     	    	
     	if (rw != null) {    		
-    		HashMap<String, Object> hmap = (rw instanceof HashMap) ? (HashMap) rw : new HashMap<String, Object>(rw);    		
+    		HashMap<String, Object> hmap = (rw instanceof HashMap) ? (HashMap) rw : new HashMap<>(rw);
     		if (ro != null) {
     			hmap.putAll(ro);
     		}    		
     		return hmap;  
          }
 
-         return  (ro instanceof HashMap) ? (HashMap) ro : new HashMap<String, Object>(ro);
+         return  (ro instanceof HashMap) ? (HashMap) ro : new HashMap<>(ro);
     }    
 }

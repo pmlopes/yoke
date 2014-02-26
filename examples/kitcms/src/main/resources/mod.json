@@ -1,4 +1,4 @@
 {
   "main": "com.jetdrone.vertx.kitcms.KitCMS",
-  "includes": "com.jetdrone~yoke~1.0.5-SNAPSHOT,io.vertx~mod-redis-client~1.1.2"
+  "includes": "com.jetdrone~yoke~1.0.5,io.vertx~mod-redis-client~1.1.2"
 }

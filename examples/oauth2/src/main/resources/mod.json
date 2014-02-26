@@ -1,4 +1,3 @@
 {
-  "main": "com.jetdrone.vertx.oauth2.Oauth2",
-  "includes": "com.jetdrone~yoke-extras~1.0.5-SNAPSHOT"
+  "main": "com.jetdrone.vertx.oauth2.Oauth2"
 }
