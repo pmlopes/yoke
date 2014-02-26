@@ -7,8 +7,10 @@ import com.jetdrone.vertx.yoke.core.impl.GroovyRequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
+import org.codehaus.groovy.runtime.MethodClosure;
 import org.vertx.groovy.platform.Container;
 import org.vertx.groovy.platform.Verticle;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 
 import org.vertx.groovy.core.Vertx;
@@ -158,9 +160,8 @@ public class GYoke {
      * @param key unique identifier
      * @param value Any non null value, nulls are not saved
      */
-    public GYoke set(String key, Object value) {
+    public void putAt(String key, Object value) {
         jYoke.set(key, value);
-        return this;
     }
 
     /**
@@ -205,8 +206,30 @@ public class GYoke {
      * @param handler Closure tho allow asynchronous result handling
      */
     @SuppressWarnings("unchecked")
-    public GYoke deploy(Object config, Closure handler) {
+    public GYoke deploy(Object config, final Closure handler) {
         if (config instanceof List) {
+
+            class WaitForClosure {
+                int latch;
+                boolean handled = false;
+
+                WaitForClosure(int size) {
+                    latch = size;
+                }
+
+                void call(AsyncResult<String> event) {
+                    latch--;
+                    if (handler != null) {
+                        if (!handled && (event.failed() || latch == 0)) {
+                            handled = true;
+                            handler.call(event.failed() ? event.cause() : null);
+                        }
+                    }
+                }
+            }
+
+            MethodClosure waitFor = new MethodClosure(new WaitForClosure(((List) config).size()), "call");
+
             for (Object o : (List) config) {
                 Map mod = (Map) o;
 
@@ -223,9 +246,9 @@ public class GYoke {
                 multiThreaded = multiThreaded == null ? false : multiThreaded;
 
                 if (module != null) {
-                    deploy(module, true, false, false, instances, modConfig, handler);
+                    deploy(module, true, false, false, instances, modConfig, waitFor);
                 } else {
-                    deploy(verticle, false, worker, multiThreaded, instances, modConfig, handler);
+                    deploy(verticle, false, worker, multiThreaded, instances, modConfig, waitFor);
                 }
             }
         } else {

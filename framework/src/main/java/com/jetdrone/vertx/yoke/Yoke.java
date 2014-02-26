@@ -516,6 +516,8 @@ public class Yoke {
             return deploy(new JsonArray().addObject(config.asObject()));
         }
 
+        System.err.println(config.asArray().size());
+
         // wait for all deployments before calling the real handler
         Handler<AsyncResult<String>> waitFor = new Handler<AsyncResult<String>>() {
 
@@ -524,8 +526,12 @@ public class Yoke {
 
             @Override
             public void handle(AsyncResult<String> event) {
+                latch--;
+
+                System.err.println(!handled + " " + event.failed() + " " + (latch == 0) + " = " + (!handled && (event.failed() || latch == 0)));
+
                 if (handler != null) {
-                    if (!handled && (event.failed() || --latch == 0)) {
+                    if (!handled && (event.failed() || latch == 0)) {
                         handled = true;
                         handler.handle(event.failed() ? event.cause() : null);
                     }
