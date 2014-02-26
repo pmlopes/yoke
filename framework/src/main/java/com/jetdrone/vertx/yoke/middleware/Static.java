@@ -67,8 +67,11 @@ public class Static extends Middleware {
      * @param includeHidden    in the directory listing show dot files
      */
     public Static(String root, long maxAge, boolean directoryListing, boolean includeHidden) {
-        if (root.endsWith("/")) {
-            root = root.substring(0, root.length() - 1);
+        // if the root is not empty it should end with / for convenience
+        if (!"".equals(root)) {
+            if (!root.endsWith("/")) {
+                root = root + "/";
+            }
         }
         this.root = root;
         this.maxAge = maxAge;
