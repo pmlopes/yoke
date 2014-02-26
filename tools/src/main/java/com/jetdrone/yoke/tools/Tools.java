@@ -209,7 +209,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                 "{\n" +
                 "  \"main\": \"" + owner + "." + module + ".App\",\n" +
-                "  \"includes\": \"com.jetdrone~yoke~1.0.5\"\n" +
+                "  \"includes\": \"com.jetdrone~yoke~1.0.6-SNAPSHOT\"\n" +
                 "}\n");
 
         mkdir(module + "/src/test/java");
@@ -236,7 +236,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                 "{\n" +
                         "  \"main\": \"App.groovy\",\n" +
-                        "  \"includes\": \"com.jetdrone~yoke~1.0.5\"\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~1.0.6-SNAPSHOT\"\n" +
                         "}\n");
     }
 
@@ -254,7 +254,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                 "{\n" +
                         "  \"main\": \"App.js\",\n" +
-                        "  \"includes\": \"com.jetdrone~yoke~1.0.5\"\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~1.0.6-SNAPSHOT\"\n" +
                         "}\n");
     }
 
