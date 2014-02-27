@@ -72,6 +72,13 @@ test {
 
 }
 
+jar {
+    manifest {
+        attributes "Implementation-Version": version
+        attributes "Main-Class" : 'com.jetdrone.vertx.yoke.tools.Tools'
+    }
+}
+
 /*
 If you're uploading stuff to Maven, Gradle needs to generate a POM.
 Please edit the details below.
