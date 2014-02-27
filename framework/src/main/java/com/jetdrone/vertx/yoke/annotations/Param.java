@@ -11,10 +11,10 @@ import java.lang.annotation.Target;
 /**
  * # Path
  *
- * Annotate a method with the path to be mounted in the middleware chain.
+ * Annotate a method with the param to be mounted in the middleware chain.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
-public @interface Path {
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD, ElementType.LOCAL_VARIABLE})
+public @interface Param {
     String value();
 }

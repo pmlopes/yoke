@@ -13,6 +13,7 @@ import org.vertx.java.core.Vertx;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -815,22 +816,6 @@ public class Router extends Middleware {
         }
     }
 
-    private static String getPath(Object o, Method m) {
-        // read the method one
-        Path p = m.getAnnotation(Path.class);
-        if (p != null) {
-             // method path is present
-            return p.value();
-        }
-
-        p = o.getClass().getAnnotation(Path.class);
-        if (p != null) {
-            // top level path is present
-            return p.value();
-        }
-        throw new RuntimeException("Cannot infer the path for this method");
-    }
-
     private static Middleware wrap(final Object o, final Method m, final boolean simple, final String[] consumes, final String[] produces) {
         return new Middleware() {
             @Override
@@ -888,7 +873,26 @@ public class Router extends Middleware {
         Router router = new Router();
 
         for (Object o : objs) {
+
+            boolean staticOnly = false;
+
+            // when the Object is a Class then all markers have been added to static fields
+            if (o instanceof Class) {
+                staticOnly = true;
+            }
+
             for (final Method m : o.getClass().getMethods()) {
+
+                if (staticOnly) {
+                    if (!Modifier.isStatic(m.getModifiers())) {
+                        continue;
+                    }
+                }
+
+                if (!Modifier.isPublic(m.getModifiers())) {
+                    continue;
+                }
+
                 Annotation[] annotations = m.getAnnotations();
                 // this method is not annotated
                 if (annotations == null) {
@@ -912,8 +916,6 @@ public class Router extends Middleware {
                 if (type == 0) {
                     continue;
                 }
-
-                String path = getPath(o, m);
 
                 String[] produces = null;
                 String[] consumes = null;
@@ -947,34 +949,34 @@ public class Router extends Middleware {
 
                 for (Annotation a : annotations) {
                     if (a instanceof GET) {
-                        router.get(path, wrap(o, m, type == 1, consumes, produces));
+                        router.get(((GET) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof PUT) {
-                        router.put(path, wrap(o, m, type == 1, consumes, produces));
+                        router.put(((PUT) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof POST) {
-                        router.post(path, wrap(o, m, type == 1, consumes, produces));
+                        router.post(((POST) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof DELETE) {
-                        router.delete(path, wrap(o, m, type == 1, consumes, produces));
+                        router.delete(((DELETE) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof OPTIONS) {
-                        router.options(path, wrap(o, m, type == 1, consumes, produces));
+                        router.options(((OPTIONS) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof HEAD) {
-                        router.head(path, wrap(o, m, type == 1, consumes, produces));
+                        router.head(((HEAD) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof TRACE) {
-                        router.trace(path, wrap(o, m, type == 1, consumes, produces));
+                        router.trace(((TRACE) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof PATCH) {
-                        router.patch(path, wrap(o, m, type == 1, consumes, produces));
+                        router.patch(((PATCH) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof CONNECT) {
-                        router.connect(path, wrap(o, m, type == 1, consumes, produces));
+                        router.connect(((CONNECT) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                     if (a instanceof ALL) {
-                        router.all(path, wrap(o, m, type == 1, consumes, produces));
+                        router.all(((ALL) a).value(), wrap(o, m, type == 1, consumes, produces));
                     }
                 }
             }

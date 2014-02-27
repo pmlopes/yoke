@@ -14,6 +14,7 @@ import java.lang.annotation.Target;
  * Annotate a method that will handle the HTTP DELETE method requests for a given path.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.LOCAL_VARIABLE})
 public @interface DELETE {
+    String value();
 }

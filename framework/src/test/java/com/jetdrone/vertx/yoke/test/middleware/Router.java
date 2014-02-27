@@ -3,7 +3,6 @@ package com.jetdrone.vertx.yoke.test.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.annotations.GET;
-import com.jetdrone.vertx.yoke.annotations.Path;
 import com.jetdrone.vertx.yoke.annotations.Produces;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
@@ -19,9 +18,8 @@ import static org.vertx.testtools.VertxAssert.*;
 
 public class Router extends TestVerticle {
 
-    @Path("/ws")
     public static class TestRouter {
-        @GET
+        @GET("/ws")
         public void get(YokeRequest request) {
             request.response().end("Hello ws!");
         }
@@ -42,9 +40,8 @@ public class Router extends TestVerticle {
         });
     }
 
-    @Path("/ws")
     public static class TestRouter2 {
-        @GET
+        @GET("/ws")
         @Produces({"text/plain"})
         public void get(YokeRequest request) {
             request.response().end("Hello ws!");
