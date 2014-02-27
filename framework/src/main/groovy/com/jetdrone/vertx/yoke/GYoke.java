@@ -7,10 +7,8 @@ import com.jetdrone.vertx.yoke.core.impl.GroovyRequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
-import org.codehaus.groovy.runtime.MethodClosure;
 import org.vertx.groovy.platform.Container;
 import org.vertx.groovy.platform.Verticle;
-import org.vertx.groovy.core.AsyncResult;
 import org.vertx.java.core.Handler;
 
 import org.vertx.groovy.core.Vertx;
@@ -206,16 +204,16 @@ public class GYoke {
      * @param handler Closure tho allow asynchronous result handling
      */
     @SuppressWarnings("unchecked")
-    public GYoke deploy(Object config, final Closure handler) {
+    public GYoke deploy(final Object config, final Closure handler) {
         if (config instanceof List) {
 
             final class WaitForClosure extends Closure {
                 int latch;
                 boolean handled = false;
 
-                WaitForClosure(int size) {
+                WaitForClosure() {
                     super(GYoke.this);
-                    latch = size;
+                    latch = ((List) config).size();
                 }
 
                 @Override
@@ -230,14 +228,18 @@ public class GYoke {
                                 handled = true;
                                 handler.call(gAsyncResult.isFailed() ? gAsyncResult.getCause() : null);
                             }
-                        }
-
-                        else if (arguments[0] instanceof org.vertx.java.core.AsyncResult) {
+                        } else if (arguments[0] instanceof org.vertx.java.core.AsyncResult) {
                             org.vertx.java.core.AsyncResult jAsyncResult = (org.vertx.java.core.AsyncResult) arguments[0];
 
                             if (!handled && (jAsyncResult.failed() || latch == 0)) {
                                 handled = true;
                                 handler.call(jAsyncResult.failed() ? jAsyncResult.cause() : null);
+                            }
+                        } else {
+                            // this is strange, assume yoke style, not null is error
+                            if (!handled && (arguments[0] != null || latch == 0)) {
+                                handled = true;
+                                handler.call(arguments[0] != null ? arguments[0] : null);
                             }
                         }
                     }
@@ -245,7 +247,7 @@ public class GYoke {
                 }
             }
 
-            WaitForClosure waitFor = new WaitForClosure(((List) config).size());
+            final WaitForClosure waitFor = new WaitForClosure();
 
             for (Object o : (List) config) {
                 Map mod = (Map) o;
