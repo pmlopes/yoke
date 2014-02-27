@@ -54,9 +54,6 @@ repositories {
   }
   maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   mavenCentral()
-  // extra repositories
-  // jade4j
-  maven { url "https://raw.github.com/neuland/jade4j/master/releases" }
 }
 
 dependencies {

@@ -181,20 +181,6 @@ public abstract class AbstractEngine<T> implements Engine {
         cache.putCompiled(filename, template);
     }
     
-    public void putLayoutTemplateToCache(String filename, String raw, T template) {
-        
-    	// to avoid a null pointer exception because the cache key is composite
-    	// we have both main template and the layout template in cache because of the "read" method
-    	// but we don't have the combined product
-    	if (getTemplateFromCache(filename) == null) {
-    		
-        	Date lastModified = new Date();
-    		cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, raw));    		
-    	}    	
-    	
-    	cache.putCompiled(filename, template);
-    }      
-
     /**
      * Removes an entry from cache
      */
