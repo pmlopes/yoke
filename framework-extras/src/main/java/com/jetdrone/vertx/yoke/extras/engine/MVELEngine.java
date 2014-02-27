@@ -30,6 +30,14 @@ import java.util.Map;
 
 public class MVELEngine extends AbstractEngine<CompiledTemplate> {
 
+    public MVELEngine() {
+        super();
+    }
+
+    public MVELEngine(String templateBodyKey) {
+        super(templateBodyKey);
+    }
+
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         read(filename, new AsyncResultHandler<String>() {
@@ -48,13 +56,6 @@ public class MVELEngine extends AbstractEngine<CompiledTemplate> {
             }
         });
     }
-    
-    @Override
-    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
-       
-    	// todo: implement proper layout support like in Groovy Template Engine    	
-    	
-    }       
 
     private CompiledTemplate compile(String filename, String templateText) throws IOException {
 
