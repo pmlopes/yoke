@@ -10,7 +10,7 @@ import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.vertx.groovy.platform.Container;
 import org.vertx.groovy.platform.Verticle;
-import org.vertx.java.core.AsyncResult;
+import org.vertx.groovy.core.AsyncResult;
 import org.vertx.java.core.Handler;
 
 import org.vertx.groovy.core.Vertx;
@@ -209,26 +209,43 @@ public class GYoke {
     public GYoke deploy(Object config, final Closure handler) {
         if (config instanceof List) {
 
-            class WaitForClosure {
+            final class WaitForClosure extends Closure {
                 int latch;
                 boolean handled = false;
 
                 WaitForClosure(int size) {
+                    super(GYoke.this);
                     latch = size;
                 }
 
-                void call(AsyncResult<String> event) {
-                    latch--;
+                @Override
+                public Object call(Object... arguments) {
                     if (handler != null) {
-                        if (!handled && (event.failed() || latch == 0)) {
-                            handled = true;
-                            handler.call(event.failed() ? event.cause() : null);
+                        latch--;
+
+                        if (arguments[0] instanceof org.vertx.groovy.core.AsyncResult) {
+                            org.vertx.groovy.core.AsyncResult gAsyncResult = (org.vertx.groovy.core.AsyncResult) arguments[0];
+
+                            if (!handled && (gAsyncResult.isFailed() || latch == 0)) {
+                                handled = true;
+                                handler.call(gAsyncResult.isFailed() ? gAsyncResult.getCause() : null);
+                            }
+                        }
+
+                        else if (arguments[0] instanceof org.vertx.java.core.AsyncResult) {
+                            org.vertx.java.core.AsyncResult jAsyncResult = (org.vertx.java.core.AsyncResult) arguments[0];
+
+                            if (!handled && (jAsyncResult.failed() || latch == 0)) {
+                                handled = true;
+                                handler.call(jAsyncResult.failed() ? jAsyncResult.cause() : null);
+                            }
                         }
                     }
+                    return null;
                 }
             }
 
-            MethodClosure waitFor = new MethodClosure(new WaitForClosure(((List) config).size()), "call");
+            WaitForClosure waitFor = new WaitForClosure(((List) config).size());
 
             for (Object o : (List) config) {
                 Map mod = (Map) o;
