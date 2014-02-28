@@ -211,43 +211,37 @@ public class GYoke {
                 int latch;
                 boolean handled = false;
 
-                WaitForClosure() {
-                    super(GYoke.this);
+                WaitForClosure(Object owner, Object thisObject) {
+                    super(owner, thisObject);
+                    maximumNumberOfParameters = 1;
                     latch = ((List) config).size();
                 }
 
-                @Override
-                public Object call(Object... arguments) {
+                public Object doCall(org.vertx.groovy.core.AsyncResult argument) {
                     if (handler != null) {
                         latch--;
 
-                        if (arguments[0] instanceof org.vertx.groovy.core.AsyncResult) {
-                            org.vertx.groovy.core.AsyncResult gAsyncResult = (org.vertx.groovy.core.AsyncResult) arguments[0];
-
-                            if (!handled && (gAsyncResult.isFailed() || latch == 0)) {
-                                handled = true;
-                                handler.call(gAsyncResult.isFailed() ? gAsyncResult.getCause() : null);
-                            }
-                        } else if (arguments[0] instanceof org.vertx.java.core.AsyncResult) {
-                            org.vertx.java.core.AsyncResult jAsyncResult = (org.vertx.java.core.AsyncResult) arguments[0];
-
-                            if (!handled && (jAsyncResult.failed() || latch == 0)) {
-                                handled = true;
-                                handler.call(jAsyncResult.failed() ? jAsyncResult.cause() : null);
-                            }
-                        } else {
-                            // this is strange, assume yoke style, not null is error
-                            if (!handled && (arguments[0] != null || latch == 0)) {
-                                handled = true;
-                                handler.call(arguments[0] != null ? arguments[0] : null);
-                            }
+                        if (!handled && (argument.isFailed() || latch == 0)) {
+                            handled = true;
+                            handler.call(argument.isFailed() ? argument.getCause() : null);
                         }
                     }
-                    return null;
+                    return Closure.DONE;
+                }
+                public Object doCall(org.vertx.java.core.AsyncResult argument) {
+                    if (handler != null) {
+                        latch--;
+
+                        if (!handled && (argument.failed() || latch == 0)) {
+                            handled = true;
+                            handler.call(argument.failed() ? argument.cause() : null);
+                        }
+                    }
+                    return Closure.DONE;
                 }
             }
 
-            final WaitForClosure waitFor = new WaitForClosure();
+            final WaitForClosure waitFor = new WaitForClosure(this, this);
 
             for (Object o : (List) config) {
                 Map mod = (Map) o;
