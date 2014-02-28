@@ -520,6 +520,8 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return loadSession;
             case "localAddress":
                 return localAddress();
+            case "locale":
+                return locale();
             case "method":
                 return method();
             case "netSocket":

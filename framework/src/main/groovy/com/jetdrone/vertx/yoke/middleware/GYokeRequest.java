@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -236,6 +237,10 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
 
     public String getQuery() {
         return query();
+    }
+
+    public Locale getLocale() {
+        return locale();
     }
 
     public GYokeResponse getResponse() {

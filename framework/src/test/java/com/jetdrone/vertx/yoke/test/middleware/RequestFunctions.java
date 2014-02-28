@@ -10,6 +10,8 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.testtools.TestVerticle;
 
+import java.util.Locale;
+
 import static org.vertx.testtools.VertxAssert.*;
 
 public class RequestFunctions extends TestVerticle {
@@ -57,6 +59,60 @@ public class RequestFunctions extends TestVerticle {
         // second time send the authorization header
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("x-forward-for", "123.456.123.456, 111.111.11.11");
+
+        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+    }
+
+    @Test
+    public void testLocale() {
+        Yoke yoke = new Yoke(this);
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+                assertEquals(new Locale("da", "dk"), request.locale());
+                testComplete();
+            }
+        });
+
+        // second time send the authorization header
+        MultiMap headers = new CaseInsensitiveMultiMap();
+        headers.add("Accept-Language", "en-gb;q=0.8, en;q=0.7, da_DK;q=0.9");
+
+        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+    }
+
+    @Test
+    public void testLocale2() {
+        Yoke yoke = new Yoke(this);
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+                assertEquals(new Locale("da"), request.locale());
+                testComplete();
+            }
+        });
+
+        // second time send the authorization header
+        MultiMap headers = new CaseInsensitiveMultiMap();
+        headers.add("Accept-Language", "da, en-gb;q=0.8, en;q=0.7");
+
+        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+    }
+
+    @Test
+    public void testLocale3() {
+        Yoke yoke = new Yoke(this);
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+                assertEquals(new Locale("en", "gb"), request.locale());
+                testComplete();
+            }
+        });
+
+        // second time send the authorization header
+        MultiMap headers = new CaseInsensitiveMultiMap();
+        headers.add("Accept-Language", "en-gb");
 
         new YokeTester(vertx, yoke).request("GET", "/", headers, null);
     }

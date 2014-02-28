@@ -571,6 +571,37 @@ public class YokeRequest implements HttpServerRequest {
         return request;
     }
 
+    /** Read the default locale for this request
+     *
+     * @return Locale (best match if more than one)
+     */
+    public Locale locale() {
+        String languages = getHeader("Accept-Language");
+        if (languages != null) {
+            // parse
+            String[] acceptLanguages = languages.split(" *, *");
+            // sort on quality
+            Arrays.sort(acceptLanguages, ACCEPT_X_COMPARATOR);
+
+            String bestLanguage = acceptLanguages[0];
+
+            int idx = bestLanguage.indexOf(';');
+
+            if (idx != -1) {
+                bestLanguage = bestLanguage.substring(0, idx).trim();
+            }
+
+            String[] parts = bestLanguage.split("_|-");
+            switch (parts.length) {
+                case 3: return new Locale(parts[0], parts[1], parts[2]);
+                case 2: return new Locale(parts[0], parts[1]);
+                case 1: return new Locale(parts[0]);
+            }
+        }
+
+        return Locale.getDefault();
+    }
+
     @Override
     public HttpVersion version() {
         return request.version();
