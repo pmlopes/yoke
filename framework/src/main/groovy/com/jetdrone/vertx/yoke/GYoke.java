@@ -228,6 +228,7 @@ public class GYoke {
                     }
                     return Closure.DONE;
                 }
+
                 public Object doCall(org.vertx.java.core.AsyncResult argument) {
                     if (handler != null) {
                         latch--;
