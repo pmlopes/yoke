@@ -79,7 +79,8 @@ public class Static extends Middleware {
         this.directoryListing = directoryListing;
         this.directoryTemplate = Utils.readResourceToBuffer(getClass(), "directory.html").toString();
 
-        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
+        //ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS zzz");
+        ISODATE = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz"); //see http://stackoverflow.com/questions/1930158/how-to-parse-date-from-http-last-modified-header
         ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
