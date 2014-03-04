@@ -127,7 +127,7 @@ public final class Context implements Map<String, Object> {
     @Override
     public Set<Entry<String, Object>> entrySet() {
         if (rw != null) {
-            Set<Entry<String, Object>> entries = rw.entrySet();
+            Set<Entry<String, Object>> entries = new HashSet<>(rw.entrySet());
             entries.addAll(ro.entrySet());
             return entries;
         }
