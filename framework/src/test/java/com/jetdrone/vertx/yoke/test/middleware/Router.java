@@ -172,4 +172,27 @@ public class Router extends TestVerticle {
             }
         });
     }
+
+    @Test
+    public void testDash() {
+        final Yoke yoke = new Yoke(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
+            get("/api-stable", new Middleware() {
+                @Override
+                public void handle(YokeRequest request, Handler<Object> next) {
+                    request.response().end("OK");
+                }
+            });
+        }});
+
+        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+
+        yokeAssert.request("GET", "/api-stable", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
 }
