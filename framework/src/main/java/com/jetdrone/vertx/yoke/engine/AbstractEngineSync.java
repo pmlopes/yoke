@@ -5,9 +5,7 @@ package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.util.LRUCache;
-import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -18,13 +16,13 @@ import java.util.Date;
 import java.util.Map;
 
 /**
- * # AbstractEngine
+ * # AbstractEngineSync
  *
  * Engine represents a Template Engine that can be registered with Yoke. Any template engine just needs to
  * extend this abstract class. The class provides access to the Vertx object so the engine might do I/O
  * operations in the context of the module.
  */
-public abstract class AbstractEngine<T> implements Engine {
+public abstract class AbstractEngineSync<T> implements Engine {
 
     public static final String DEFAULT_TEMPLATEBODY_KEY = "TemplateBody";
 
@@ -35,12 +33,12 @@ public abstract class AbstractEngine<T> implements Engine {
     // The main placeholder text. For example, in Groovy engine, the layout template
     // should have ${TemplateBody} somewhere inside to get replaced with the real template raw content
     private final String templateBodyKey;
-    
-    public AbstractEngine() {
+
+    public AbstractEngineSync() {
         this(DEFAULT_TEMPLATEBODY_KEY);
     }
 
-    public AbstractEngine(String templateBodyKey) {
+    public AbstractEngineSync(String templateBodyKey) {
         this.templateBodyKey = templateBodyKey;
     }
 
@@ -63,63 +61,38 @@ public abstract class AbstractEngine<T> implements Engine {
      * Verifies if a file in the filesystem is still fresh against the cache. Errors are treated as not fresh.
      *
      * @param filename File to look for
-     * @param next next asynchronous handler
      */
-    public void isFresh(final String filename, final Handler<Boolean> next) {
+    public boolean isFresh(final String filename) {
         final FileSystem fileSystem = vertx.fileSystem();
 
-        fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
-            @Override
-            public void handle(AsyncResult<FileProps> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(false);
-                } else {
-                    LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
-                    final Date lastModified = asyncResult.result().lastModifiedTime();
+        try {
+            FileProps fileProps = fileSystem.propsSync(filename);
+            LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
+            final Date lastModified = fileProps.lastModifiedTime();
 
-                    if (cacheEntry == null) {
-                        next.handle(false);
-                    } else {
-                        if (cacheEntry.isFresh(lastModified)) {
-                            next.handle(true);
-                        } else {
-                            // not fresh anymore, purge it
-                            cache.remove(filename);
-                            next.handle(false);
-                        }
-                    }
-                }
+            if (cacheEntry == null) {
+                return false;
             }
-        });
+            if (cacheEntry.isFresh(lastModified)) {
+                return true;
+            }
+            // not fresh anymore, purge it
+            cache.remove(filename);
+            return false;
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
-    private void loadToCache(final String filename, final Handler<Throwable> next) {
+    private void loadToCache(final String filename) {
         final FileSystem fileSystem = vertx.fileSystem();
 
-        fileSystem.props(filename, new AsyncResultHandler<FileProps>() {
-            @Override
-            public void handle(AsyncResult<FileProps> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(asyncResult.cause());
-                } else {
-                    final Date lastModified = asyncResult.result().lastModifiedTime();
-                    // load from the file system
-                    fileSystem.readFile(filename, new AsyncResultHandler<Buffer>() {
-                        @Override
-                        public void handle(AsyncResult<Buffer> asyncResult) {
-                            if (asyncResult.failed()) {
-                                next.handle(asyncResult.cause());
-                            } else {
-                                // cache the result
-                                String result = asyncResult.result().toString(contentEncoding());
-                                cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, result));
-                                next.handle(null);
-                            }
-                        }
-                    });
-                }
-            }
-        });
+        FileProps fileProps = fileSystem.propsSync(filename);
+        final Date lastModified = fileProps.lastModifiedTime();
+        // load from the file system
+        Buffer content = fileSystem.readFileSync(filename);
+        // cache the result
+        cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, content.toString(contentEncoding())));
     }
 
     /**
@@ -129,31 +102,16 @@ public abstract class AbstractEngine<T> implements Engine {
      * if it is loads into a string
      * returns the string or the cached value
      */
-    public void read(final String filename, final AsyncResultHandler<String> handler) {
-        isFresh(filename, new Handler<Boolean>() {
-            @Override
-            public void handle(Boolean fresh) {
-                if (fresh) {
-                    String cachedValue = getFileFromCache(filename);
-                    if (cachedValue != null) {
-                        handler.handle(new YokeAsyncResult<>(null, cachedValue));
-                        return;
-                    }
-                }
-                // either fresh is false or cachedValue is null
-                loadToCache(filename, new Handler<Throwable>() {
-                    @Override
-                    public void handle(Throwable error) {
-                        if (error != null) {
-                            handler.handle(new YokeAsyncResult<String>(error, null));
-                            return;
-                        }
-                        // no error
-                        handler.handle(new YokeAsyncResult<>(null, getFileFromCache(filename)));
-                    }
-                });
+    public String read(final String filename) {
+        if (isFresh(filename)) {
+            String cachedValue = getFileFromCache(filename);
+            if (cachedValue != null) {
+                return cachedValue;
             }
-        });
+        }
+        // either fresh is false or cachedValue is null
+        loadToCache(filename);
+        return getFileFromCache(filename);
     }
 
     /**
@@ -167,12 +125,12 @@ public abstract class AbstractEngine<T> implements Engine {
      * Gets the compiled value from cache this is a synchronous operation since there is no blocking or I/O
      */
     public T getTemplateFromCache(String filename) {
-    	
-    	LRUCache.CacheEntry<String, T> cachedTemplate = cache.get(filename);
-    	
-    	// this is to avoid null pointer exception in case of the layout composite template
-    	if (cachedTemplate == null) return null;
-    	
+
+        LRUCache.CacheEntry<String, T> cachedTemplate = cache.get(filename);
+
+        // this is to avoid null pointer exception in case of the layout composite template
+        if (cachedTemplate == null) return null;
+
         return cachedTemplate.compiled;
     }
 
@@ -182,7 +140,7 @@ public abstract class AbstractEngine<T> implements Engine {
     public void putTemplateToCache(String filename, T template) {
         cache.putCompiled(filename, template);
     }
-    
+
     /**
      * Removes an entry from cache
      */
@@ -217,5 +175,4 @@ public abstract class AbstractEngine<T> implements Engine {
             }
         });
     }
-
 }
