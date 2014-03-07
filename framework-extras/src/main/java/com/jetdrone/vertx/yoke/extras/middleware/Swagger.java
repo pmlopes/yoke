@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.extras.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -111,21 +112,29 @@ public class Swagger extends Middleware {
         }
     }
 
-    public void createResource(String path) {
-        Swagger.Resource resource = new Swagger.Resource(path, null);
+    public void createResource(Yoke yoke, final String path) {
+        final Swagger.Resource resource = new Swagger.Resource(path, null);
         resources.add(resource);
-        // TODO: also need to add this path to the server
 
-//        // GET
-//        JsonObject result = new JsonObject()
-//                .putString("swaggerVersion", "1.0")
-//                .putString("apiVersion", apiVersion)
-//                .putString("basePath", basePath == null ? "http://" + request.getHeader("host", "localhost") : basePath);
-//
-//        result.resourcePath = path;
-//        result.apis = Object.keys(resource.apis).map(function(k) { return resource.apis[k]; });
-//        result.models = resource.models;
-//
-//        res.send(result);
+        yoke.use(path, new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                if ("GET".equals(request.method())) {
+                    // GET
+                    JsonObject result = new JsonObject()
+                            .putString("swaggerVersion", "1.0")
+                            .putString("apiVersion", apiVersion)
+                            .putString("basePath", basePath == null ? "http://" + request.getHeader("host", "localhost") : basePath);
+
+                    result.putString("resourcePath", path);
+                    JsonArray apis = new JsonArray();
+                    result.putArray("apis", apis);
+
+//                    result.apis = Object.keys(resource.apis).map(function(k) { return resource.apis[k]; });
+                    result.putObject("models", resource.models);
+                    request.response().end(result);
+                }
+            }
+        });
     }
 }
