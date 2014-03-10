@@ -2,6 +2,7 @@ package com.jetdrone.vertx.yoke.extras.test.engine;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.middleware.ErrorHandler;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -99,49 +100,55 @@ public class HandlebarsEngine extends TestVerticle {
         }
     }
 
-//    @Test
-//    public void testReuse() {
-//        Yoke yoke = new Yoke(this);
-//        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
-//        yoke.use(new Middleware() {
-//            @Override
-//            public void handle(YokeRequest request, Handler<Object> next) {
-//                request.response().render("views/home.hbs");
-//            }
-//        });
-//
-//        new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
-//            @Override
-//            public void handle(Response resp) {
-//                assertEquals(200, resp.getStatusCode());
-//                assertEquals("<h1>Title</h1>\n" +
-//                        "<p>Home page</p>\n" +
-//                        "<span>Powered by Handlebars.java</span>", resp.body.toString());
-//                testComplete();
-//            }
-//        });
-//    }
-//
-//    @Test
-//    public void testPartials() {
-//        Yoke yoke = new Yoke(this);
-//        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
-//        yoke.use(new Middleware() {
-//            @Override
-//            public void handle(YokeRequest request, Handler<Object> next) {
-//                request.response().render("views/home2.hbs");
-//            }
-//        });
-//
-//        new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
-//            @Override
-//            public void handle(Response resp) {
-//                assertEquals(200, resp.getStatusCode());
-//                assertEquals("<h1>Title</h1>\n" +
-//                        "<p>Home page</p>\n" +
-//                        "<span>Powered by Handlebars.java</span>", resp.body.toString());
-//                testComplete();
-//            }
-//        });
-//    }
+    @Test
+    public void testReuse() {
+        Yoke yoke = new Yoke(this);
+        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                request.response().render("views/home.hbs");
+            }
+        });
+
+        new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
+                assertEquals("<h1>Yoke</h1>\n" +
+                        "<p>Home page</p>\n" +
+                        "<span>Powered by Handlebars.java</span>", resp.body.toString());
+                testComplete();
+            }
+        });
+    }
+
+    @Test
+    public void testPartials() {
+        Yoke yoke = new Yoke(this);
+        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                request.response().render("views/home2.hbs");
+            }
+        });
+
+        new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(200, resp.getStatusCode());
+                assertEquals("\n" +
+                        "\n" +
+                        "<h1>Yoke</h1>\n" +
+                        "\n" +
+                        "\n" +
+                        "<p>Home page</p>\n" +
+                        "\n" +
+                        "\n" +
+                        "<span>Powered by Handlebars.java</span>", resp.body.toString());
+                testComplete();
+            }
+        });
+    }
 }

@@ -84,6 +84,16 @@ public abstract class AbstractEngineSync<T> implements Engine {
         }
     }
 
+    /**
+     * Returns the last modified time for the cache entry
+     *
+     * @param filename File to look for
+     */
+    public long lastModified(final String filename) {
+        LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
+        return cacheEntry.lastModified;
+    }
+
     private void loadToCache(final String filename) {
         final FileSystem fileSystem = vertx.fileSystem();
 

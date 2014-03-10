@@ -18,58 +18,87 @@ package com.jetdrone.vertx.yoke.extras.engine;
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
-import com.jetdrone.vertx.yoke.engine.AbstractEngine;
+import com.github.jknack.handlebars.io.TemplateLoader;
+import com.github.jknack.handlebars.io.TemplateSource;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.engine.AbstractEngineSync;
 import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class HandlebarsEngine extends AbstractEngine<Template> {
+public class HandlebarsEngine extends AbstractEngineSync<Template> {
 
-    private final Handlebars handlebars = new Handlebars();
+    private final Handlebars handlebars;
 
     public HandlebarsEngine() {
-        super();
+        this(DEFAULT_TEMPLATEBODY_KEY);
     }
 
     public HandlebarsEngine(String templateBodyKey) {
         super(templateBodyKey);
-    }
-
-    @Override
-    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
-        read(filename, new AsyncResultHandler<String>() {
+        handlebars = new Handlebars(new TemplateLoader() {
             @Override
-            public void handle(AsyncResult<String> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
-                } else {
-                    try {
-                        Template template = compile(filename, asyncResult.result());
-                        next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
-                    } catch (IOException ex) {
-                        next.handle(new YokeAsyncResult<Buffer>(ex));
-                    }
+            public TemplateSource sourceAt(final String location) throws IOException {
+                try {
+                    return new TemplateSource() {
+                        @Override
+                        public String content() throws IOException {
+                            // load from the file system
+                            return read(location);
+                        }
+
+                        @Override
+                        public String filename() {
+                            return location;
+                        }
+
+                        @Override
+                        public long lastModified() {
+                            return HandlebarsEngine.this.lastModified(location);
+                        }
+                    };
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    throw new IOException(e);
                 }
+            }
+
+            @Override
+            public String resolve(String location) {
+                return location;
+            }
+
+            @Override
+            public String getPrefix() {
+                return "";
+            }
+
+            @Override
+            public String getSuffix() {
+                return "";
             }
         });
     }
 
-    private Template compile(String filename, String templateText) throws IOException {
+    @Override
+    public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
+        try {
+            Template template = getTemplateFromCache(filename);
 
-        Template template = getTemplateFromCache(filename);
+            if (template == null) {
+                // real compile
+                template = handlebars.compile(filename);
+                putTemplateToCache(filename, template);
+            }
 
-        if (template == null) {
-            // real compile
-            template = handlebars.compileInline(templateText);
-            putTemplateToCache(filename, template);
+            next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            next.handle(new YokeAsyncResult<Buffer>(ex));
         }
-
-        return template;
     }
 
     public void registerHelper(String name, Helper<?> helper) {
