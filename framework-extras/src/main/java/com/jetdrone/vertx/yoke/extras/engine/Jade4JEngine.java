@@ -33,10 +33,14 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
 
     private final JadeConfiguration config = new JadeConfiguration();
 
+    private final String prefix;
+    private final String extension;
+
     public Jade4JEngine(final String views, final String extension) {
         super(null);
 
-        final String prefix = views.endsWith("/") ? views : views + "/";
+        prefix = views.length() > 0 && views.endsWith("/") ? views : views + "/";
+        this.extension = extension;
 
         config.setTemplateLoader(new TemplateLoader() {
             @Override
@@ -48,22 +52,22 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
             public Reader getReader(String name) throws IOException {
                 return new StringReader(read(resolve(name)));
             }
-
-            public String resolve(String location) {
-                String normalized = normalize(location);
-                if (normalized.endsWith(extension)) {
-                    return prefix + normalized;
-                }
-                return prefix + normalized + extension;
-            }
-
-            protected String normalize(final String location) {
-                if (location.startsWith("/")) {
-                    return location.substring(1);
-                }
-                return location;
-            }
         });
+    }
+
+    private String resolve(String location) {
+        String normalized = normalize(location);
+        if (normalized.endsWith(extension)) {
+            return prefix + normalized;
+        }
+        return prefix + normalized + extension;
+    }
+
+    private String normalize(final String location) {
+        if (location.startsWith("/")) {
+            return location.substring(1);
+        }
+        return location;
     }
 
     @Override
@@ -74,16 +78,16 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         try {
-            JadeTemplate template = getTemplateFromCache(filename);
+            JadeTemplate template = getTemplateFromCache(resolve(filename));
 
             if (template == null) {
                 // real compile
-                template = config.getTemplate(filename);
-                putTemplateToCache(filename, template);
+                template = config.getTemplate(resolve(filename)); // missing resolved path
+                putTemplateToCache(resolve(filename), template); // missing resolved path
             }
 
             next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));
         }

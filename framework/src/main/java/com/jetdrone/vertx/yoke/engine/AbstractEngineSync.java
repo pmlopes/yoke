@@ -91,6 +91,9 @@ public abstract class AbstractEngineSync<T> implements Engine {
      */
     public long lastModified(final String filename) {
         LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
+        if (cacheEntry == null) {
+            return -1;
+        }
         return cacheEntry.lastModified;
     }
 

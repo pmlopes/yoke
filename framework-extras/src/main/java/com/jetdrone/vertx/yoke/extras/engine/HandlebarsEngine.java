@@ -36,7 +36,7 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
     public HandlebarsEngine(final String views, final String extension) {
         super(null);
 
-        final String prefix = views.endsWith("/") ? views : views + "/";
+        final String prefix = views.length() > 0 && views.endsWith("/") ? views : views + "/";
 
         handlebars = new Handlebars(new TemplateLoader() {
             @Override
