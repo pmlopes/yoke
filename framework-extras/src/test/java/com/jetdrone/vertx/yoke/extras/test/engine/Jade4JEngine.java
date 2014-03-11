@@ -31,7 +31,7 @@ public class Jade4JEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("jade", new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine());
+            yoke.engine("jade", new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("", ""));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -77,7 +77,7 @@ public class Jade4JEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("jade", new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine());
+            yoke.engine("jade", new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("", ""));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
