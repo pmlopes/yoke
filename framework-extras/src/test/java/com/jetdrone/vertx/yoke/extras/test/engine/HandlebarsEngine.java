@@ -2,7 +2,6 @@ package com.jetdrone.vertx.yoke.extras.test.engine;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.middleware.ErrorHandler;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -32,7 +31,7 @@ public class HandlebarsEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
+            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".html"));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -65,7 +64,7 @@ public class HandlebarsEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
+            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".html"));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -103,7 +102,7 @@ public class HandlebarsEngine extends TestVerticle {
     @Test
     public void testReuse() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
+        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".hbs"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -126,7 +125,7 @@ public class HandlebarsEngine extends TestVerticle {
     @Test
     public void testPartials() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine());
+        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".hbs"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

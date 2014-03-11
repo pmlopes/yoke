@@ -33,12 +33,11 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
 
     private final Handlebars handlebars;
 
-    public HandlebarsEngine() {
-        this(DEFAULT_TEMPLATEBODY_KEY);
-    }
+    public HandlebarsEngine(final String views, final String extension) {
+        super(null);
 
-    public HandlebarsEngine(String templateBodyKey) {
-        super(templateBodyKey);
+        final String prefix = views.endsWith("/") ? views : views + "/";
+
         handlebars = new Handlebars(new TemplateLoader() {
             @Override
             public TemplateSource sourceAt(final String location) throws IOException {
@@ -47,7 +46,7 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
                         @Override
                         public String content() throws IOException {
                             // load from the file system
-                            return read(location);
+                            return read(resolve(location));
                         }
 
                         @Override
@@ -68,17 +67,28 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
 
             @Override
             public String resolve(String location) {
+                String normalized = normalize(location);
+                if (normalized.endsWith(extension)) {
+                    return prefix + normalized;
+                }
+                return prefix + normalized + extension;
+            }
+
+            protected String normalize(final String location) {
+                if (location.startsWith("/")) {
+                    return location.substring(1);
+                }
                 return location;
             }
 
             @Override
             public String getPrefix() {
-                return "";
+                return prefix;
             }
 
             @Override
             public String getSuffix() {
-                return "";
+                return extension;
             }
         });
     }
@@ -99,6 +109,10 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));
         }
+    }
+
+    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
+        handler.handle(new YokeAsyncResult<Buffer>(new UnsupportedOperationException()));
     }
 
     public void registerHelper(String name, Helper<?> helper) {

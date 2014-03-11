@@ -15,52 +15,77 @@
  */
 package com.jetdrone.vertx.yoke.extras.engine;
 
-import com.jetdrone.vertx.yoke.engine.AbstractEngine;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
+import com.jetdrone.vertx.yoke.engine.AbstractEngineSync;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.JadeTemplate;
-import de.neuland.jade4j.template.ReaderTemplateLoader;
+import de.neuland.jade4j.template.TemplateLoader;
 import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.Map;
 
-public class Jade4JEngine extends AbstractEngine<JadeTemplate> {
+public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
 
-    private JadeConfiguration config = new JadeConfiguration();
+    private final JadeConfiguration config = new JadeConfiguration();
 
-    public Jade4JEngine() {
-        super();
+    public Jade4JEngine(final String views, final String extension) {
+        super(null);
+
+        final String prefix = views.endsWith("/") ? views : views + "/";
+
+        config.setTemplateLoader(new TemplateLoader() {
+            @Override
+            public long getLastModified(String name) throws IOException {
+                return Jade4JEngine.this.lastModified(name);
+            }
+
+            @Override
+            public Reader getReader(String name) throws IOException {
+                return new StringReader(read(resolve(name)));
+            }
+
+            public String resolve(String location) {
+                String normalized = normalize(location);
+                if (normalized.endsWith(extension)) {
+                    return prefix + normalized;
+                }
+                return prefix + normalized + extension;
+            }
+
+            protected String normalize(final String location) {
+                if (location.startsWith("/")) {
+                    return location.substring(1);
+                }
+                return location;
+            }
+        });
     }
 
-    public Jade4JEngine(String templateBodyKey) {
-        super(templateBodyKey);
+    @Override
+    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
+        handler.handle(new YokeAsyncResult<Buffer>(new UnsupportedOperationException()));
     }
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
-        read(filename, new AsyncResultHandler<String>() {
-            @Override
-            public void handle(AsyncResult<String> asyncResult) {
-                if (asyncResult.failed()) {
-                    next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
-                } else {
-                    try {
-                        JadeTemplate template = getTemplateFromCache(filename);
-                        if(template == null) {
-                            config.setTemplateLoader(new ReaderTemplateLoader(new StringReader(asyncResult.result()), filename));
-                            template = config.getTemplate(filename);
-                            putTemplateToCache(filename, template);
-                        }
-                        next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));
-                    } catch (Exception ex) {
-                        next.handle(new YokeAsyncResult<Buffer>(ex));
-                    }
-                }
+        try {
+            JadeTemplate template = getTemplateFromCache(filename);
+
+            if (template == null) {
+                // real compile
+                template = config.getTemplate(filename);
+                putTemplateToCache(filename, template);
             }
-        });
+
+            next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            next.handle(new YokeAsyncResult<Buffer>(ex));
+        }
     }
 }
