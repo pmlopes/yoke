@@ -4,7 +4,7 @@
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
-import com.jetdrone.vertx.yoke.util.LRUCache;
+import com.jetdrone.vertx.yoke.core.impl.LRUCache;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -154,6 +154,16 @@ public abstract class AbstractEngine<T> implements Engine {
                 });
             }
         });
+    }
+
+    /**
+     * Returns the last modified time for the cache entry
+     *
+     * @param filename File to look for
+     */
+    public long lastModified(final String filename) {
+        LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
+        return cacheEntry.lastModified;
     }
 
     /**

@@ -1,7 +1,7 @@
 /**
  * Copyright 2011-2014 the original author or authors.
  */
-package com.jetdrone.vertx.yoke.util;
+package com.jetdrone.vertx.yoke.core.impl;
 
 import java.util.Date;
 import java.util.LinkedHashMap;

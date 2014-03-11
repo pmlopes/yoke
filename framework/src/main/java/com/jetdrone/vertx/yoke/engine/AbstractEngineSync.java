@@ -4,7 +4,7 @@
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
-import com.jetdrone.vertx.yoke.util.LRUCache;
+import com.jetdrone.vertx.yoke.core.impl.LRUCache;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
