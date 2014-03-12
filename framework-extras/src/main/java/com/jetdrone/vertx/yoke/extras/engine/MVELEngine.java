@@ -39,6 +39,11 @@ public class MVELEngine extends AbstractEngine<CompiledTemplate> {
     }
 
     @Override
+    public String extension() {
+        return ".mvel";
+    }
+
+    @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         read(filename, new AsyncResultHandler<String>() {
             @Override

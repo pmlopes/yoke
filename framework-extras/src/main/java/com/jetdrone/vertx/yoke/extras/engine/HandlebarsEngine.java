@@ -32,11 +32,17 @@ import java.util.Map;
 public class HandlebarsEngine extends AbstractEngineSync<Template> {
 
     private final Handlebars handlebars;
+    private final String prefix;
+    private final String extension = ".hbs";
 
-    public HandlebarsEngine(final String views, final String extension) {
+    public HandlebarsEngine(final String views) {
         super(null);
 
-        final String prefix = views.length() > 0 && views.endsWith("/") ? views : views + "/";
+        if ("".equals(views)) {
+            prefix = views;
+        } else {
+            prefix = views.endsWith("/") ? views : views + "/";
+        }
 
         handlebars = new Handlebars(new TemplateLoader() {
             @Override
@@ -67,18 +73,7 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
 
             @Override
             public String resolve(String location) {
-                String normalized = normalize(location);
-                if (normalized.endsWith(extension)) {
-                    return prefix + normalized;
-                }
-                return prefix + normalized + extension;
-            }
-
-            protected String normalize(final String location) {
-                if (location.startsWith("/")) {
-                    return location.substring(1);
-                }
-                return location;
+                return HandlebarsEngine.this.resolve(location);
             }
 
             @Override
@@ -94,18 +89,38 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
     }
 
     @Override
+    public String extension() {
+        return extension;
+    }
+
+    private String resolve(String location) {
+        String normalized = normalize(location);
+        if (normalized.endsWith(extension)) {
+            return prefix + normalized;
+        }
+        return prefix + normalized + extension;
+    }
+
+    private String normalize(final String location) {
+        if (location.startsWith("/")) {
+            return location.substring(1);
+        }
+        return location;
+    }
+
+    @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         try {
-            Template template = getTemplateFromCache(filename);
+            Template template = getTemplateFromCache(resolve(filename));
 
             if (template == null) {
                 // real compile
                 template = handlebars.compile(filename);
-                putTemplateToCache(filename, template);
+                putTemplateToCache(resolve(filename), template);
             }
 
             next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));
         }

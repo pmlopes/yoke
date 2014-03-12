@@ -39,6 +39,11 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
         super(templateBodyKey);
     }
 
+    @Override
+    public String extension() {
+        return ".shtml";
+    }
+
     /**
      * An interpreter for strings with named placeholders.
      *

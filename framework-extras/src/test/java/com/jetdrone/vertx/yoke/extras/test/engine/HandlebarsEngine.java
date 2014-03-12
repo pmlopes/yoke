@@ -9,8 +9,6 @@ import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.testtools.TestVerticle;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,20 +21,13 @@ public class HandlebarsEngine extends TestVerticle {
     @Test
     public void testEngine() {
         try {
-            // create a temp template
-            File temp = File.createTempFile("template", ".html");
-            FileOutputStream out = new FileOutputStream(temp);
-            out.write("Hello {{name}}!".getBytes());
-            out.close();
-            final String location = temp.getAbsolutePath();
-
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".html"));
+            yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("views"));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
                     request.put("name", "Paulo");
-                    request.response().render(location, next);
+                    request.response().render("template.hbs", next);
                 }
             });
 
@@ -56,15 +47,8 @@ public class HandlebarsEngine extends TestVerticle {
     @Test
     public void testEngine2() {
         try {
-            // create a temp template
-            File temp = File.createTempFile("template", ".html");
-            FileOutputStream out = new FileOutputStream(temp);
-            out.write("<html><body><ul>{{#blogs}}<li>{{name}}</li>{{/blogs}}</ul></body></html>".getBytes());
-            out.close();
-            final String location = temp.getAbsolutePath();
-
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".html"));
+            yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("views"));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -82,7 +66,7 @@ public class HandlebarsEngine extends TestVerticle {
                     blogs.add(blog3);
 
                     request.put("blogs", blogs);
-                    request.response().render(location, next);
+                    request.response().render("template2.hbs", next);
                 }
             });
 
@@ -102,7 +86,7 @@ public class HandlebarsEngine extends TestVerticle {
     @Test
     public void testReuse() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".hbs"));
+        yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine(""));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -125,7 +109,7 @@ public class HandlebarsEngine extends TestVerticle {
     @Test
     public void testPartials() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine("", ".hbs"));
+        yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine(""));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

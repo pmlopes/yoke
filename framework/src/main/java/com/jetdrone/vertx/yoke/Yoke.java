@@ -288,12 +288,11 @@ public class Yoke {
      * registered you can use the method render in the YokeResponse to
      * render a template.
      *
-     * @param extension The file extension for this template engine e.g.: .jsp
      * @param engine    The implementation of the engine
      */
-    public Yoke engine(String extension, Engine engine) {
+    public Yoke engine(Engine engine) {
         engine.setVertx(vertx);
-        engineMap.put(extension, engine);
+        engineMap.put(engine.extension(), engine);
         return this;
     }
 

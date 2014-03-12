@@ -21,7 +21,7 @@ public class ExtrasExample extends Verticle {
     @Override
     public void start() {
         final Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new HandlebarsEngine());
+        yoke.engine(new HandlebarsEngine("views"));
 
         yoke.use(new BodyParser());
         yoke.use(new ErrorHandler(true));
@@ -74,7 +74,7 @@ public class ExtrasExample extends Verticle {
                 users.add(user);
 
                 request.put("users", users);
-                request.response().render("views/handlebars.hbs");
+                request.response().render("handlebars.hbs");
             }
         });
 

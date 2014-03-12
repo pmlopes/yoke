@@ -22,14 +22,14 @@ public class StringPlaceholderEngine extends TestVerticle {
     public void testEngine() {
         try {
             // create a temp template
-            File temp = File.createTempFile("template", ".html");
+            File temp = File.createTempFile("template", ".shtml");
             FileOutputStream out = new FileOutputStream(temp);
             out.write("Hello ${name}!".getBytes());
             out.close();
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
+            yoke.engine(new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -55,7 +55,7 @@ public class StringPlaceholderEngine extends TestVerticle {
     public void testEngineFunctions() {
         try {
             // create a temp template
-            File temp = File.createTempFile("template", ".html");
+            File temp = File.createTempFile("template", ".shtml");
             FileOutputStream out = new FileOutputStream(temp);
             out.write("Hello ${fnName('Lopes')}!".getBytes());
             out.close();
@@ -68,7 +68,7 @@ public class StringPlaceholderEngine extends TestVerticle {
                     return "Paulo " + args[0];
                 }
             });
-            yoke.engine("html", new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
+            yoke.engine(new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {

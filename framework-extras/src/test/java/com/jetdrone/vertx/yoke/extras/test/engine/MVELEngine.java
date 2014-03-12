@@ -24,14 +24,14 @@ public class MVELEngine extends TestVerticle {
     public void testBasicObjectAccess() {
         try {
             // create a temp template
-            File temp = File.createTempFile("template", ".html");
+            File temp = File.createTempFile("template", ".mvel");
             FileOutputStream out = new FileOutputStream(temp);
             out.write("<h1>@{name}</h1>".getBytes());
             out.close();
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.MVELEngine());
+            yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.MVELEngine());
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -57,14 +57,14 @@ public class MVELEngine extends TestVerticle {
     public void testSimpleIteration() {
         try {
             // create a temp template
-            File temp = File.createTempFile("template", ".html");
+            File temp = File.createTempFile("template", ".mvel");
             FileOutputStream out = new FileOutputStream(temp);
             out.write(("<p>@foreach{index : alphabetical}<a href=\"@{index.uri}\">@{index.description}</a>@end{}</p>").getBytes());
             out.close();
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine("html", new com.jetdrone.vertx.yoke.extras.engine.MVELEngine());
+            yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.MVELEngine());
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {

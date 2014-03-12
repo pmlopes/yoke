@@ -9,13 +9,6 @@ import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.testtools.TestVerticle;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static org.vertx.testtools.VertxAssert.*;
 
 public class Jade4JEngine extends TestVerticle {
@@ -23,7 +16,7 @@ public class Jade4JEngine extends TestVerticle {
     @Test
     public void testEngine() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("jade", new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("views", ".jade"));
+        yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -44,7 +37,7 @@ public class Jade4JEngine extends TestVerticle {
     @Test
     public void testEngine2() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("jade", new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("views", ".jade"));
+        yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

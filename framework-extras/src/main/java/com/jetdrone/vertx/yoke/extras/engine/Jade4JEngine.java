@@ -34,13 +34,16 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
     private final JadeConfiguration config = new JadeConfiguration();
 
     private final String prefix;
-    private final String extension;
+    private final String extension = ".jade";
 
-    public Jade4JEngine(final String views, final String extension) {
+    public Jade4JEngine(final String views) {
         super(null);
 
-        prefix = views.length() > 0 && views.endsWith("/") ? views : views + "/";
-        this.extension = extension;
+        if ("".equals(views)) {
+            prefix = views;
+        } else {
+            prefix = views.endsWith("/") ? views : views + "/";
+        }
 
         config.setTemplateLoader(new TemplateLoader() {
             @Override
@@ -71,6 +74,11 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
     }
 
     @Override
+    public String extension() {
+        return extension;
+    }
+
+    @Override
     public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
         handler.handle(new YokeAsyncResult<Buffer>(new UnsupportedOperationException()));
     }
@@ -82,8 +90,8 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
 
             if (template == null) {
                 // real compile
-                template = config.getTemplate(resolve(filename)); // missing resolved path
-                putTemplateToCache(resolve(filename), template); // missing resolved path
+                template = config.getTemplate(filename);
+                putTemplateToCache(resolve(filename), template);
             }
 
             next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));

@@ -74,14 +74,13 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     public void render(final String template, final Handler<Object> next) {
-        
     	render(template, null, next);
     }    
     
     public void render(final String template, String layoutTemplate, final Handler<Object> next) {
         int sep = template.lastIndexOf('.');
         if (sep != -1) {
-            String extension = template.substring(sep + 1);
+            String extension = template.substring(sep);
 
             final Engine renderEngine = engines.get(extension);
 

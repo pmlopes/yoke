@@ -23,7 +23,7 @@ public class Persona extends Verticle {
     @Override
     public void start() {
         final Yoke yoke = new Yoke(this);
-        yoke.engine("html", new StringPlaceholderEngine());
+        yoke.engine(new StringPlaceholderEngine());
 
         Mac secret = Utils.newHmacSHA256("secret here");
 
@@ -54,7 +54,7 @@ public class Persona extends Verticle {
                             }
                         }
 
-                        request.response().render("views/index.html", next);
+                        request.response().render("views/index.shtml", next);
                     }
                 })
                 .post("/auth/logout", new Middleware() {

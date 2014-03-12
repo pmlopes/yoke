@@ -143,11 +143,10 @@ public class GYoke {
      * registered you can use the method render in the YokeResponse to
      * render a template.
      *
-     * @param extension The file extension for this template engine e.g.: .jsp
      * @param engine The implementation of the engine
      */
-    public GYoke engine(String extension, Engine engine) {
-        jYoke.engine(extension, engine);
+    public GYoke engine(Engine engine) {
+        jYoke.engine(engine);
         return this;
     }
 

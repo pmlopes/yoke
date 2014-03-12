@@ -31,6 +31,11 @@ public class GroovyTemplateEngine extends AbstractEngine<Template> {
     private final TemplateEngine engine = new SimpleTemplateEngine();
 
     @Override
+    public String extension() {
+        return ".gsp";
+    }
+
+    @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         read(filename, new AsyncResultHandler<String>() {
             @Override

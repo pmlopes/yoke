@@ -47,6 +47,9 @@ function MicroTemplateEngine() {
                     }
                 }
             }));
+        },
+        extension: function() {
+            return ".ejs";
         }
     });
 }
