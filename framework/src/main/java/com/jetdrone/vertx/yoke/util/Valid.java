@@ -1,206 +1,137 @@
 package com.jetdrone.vertx.yoke.util;
 
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
+
+import java.util.regex.Pattern;
+
 public final class Valid {
 
     private Valid() {}
 
-    static boolean isObject(Object field) {
+    private static final Pattern DATETIME = Pattern.compile("^\\d{4}-(?:0[0-9]|1[0-2])-[0-9]{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$");
+    private static final Pattern DATE = Pattern.compile("^\\d{4}-(?:0[0-9]|1[0-2])-[0-9]{2}$");
+    private static final Pattern TIME = Pattern.compile("^\\d{2}:\\d{2}:\\d{2}$");
+    private static final Pattern EMAIL = Pattern.compile("^(?:[\\w!#\\$%&'\\*\\+\\-/=\\?\\^`\\{\\|\\}~]+\\.)*[\\w!#\\$%&'\\*\\+\\-/=\\?\\^`\\{\\|\\}~]+@(?:(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-](?!\\.)){0,61}[a-zA-Z0-9]?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9\\-](?!$)){0,61}[a-zA-Z0-9]?)|(?:\\[(?:(?:[01]?\\d{1,2}|2[0-4]\\d|25[0-5])\\.){3}(?:[01]?\\d{1,2}|2[0-4]\\d|25[0-5])\\]))$");
+    private static final Pattern IPADDRESS = Pattern.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+    private static final Pattern IPV6ADDRESS = Pattern.compile("^\\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(\\.(25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)){3}))|:)))(%.+)?\\s*$");
+    private static final Pattern URI = Pattern.compile("^[a-zA-Z][a-zA-Z0-9+-.]*:[^\\s]*$");
+    private static final Pattern HOSTNAME = Pattern.compile("^(([a-zA-Z]|[a-zA-Z][a-zA-Z0-9\\-]*[a-zA-Z0-9])\\.)*([A-Za-z]|[A-Za-z][A-Za-z0-9\\-]*[A-Za-z0-9])$");
+    private static final Pattern ALPHA = Pattern.compile("^[a-zA-Z]+$");
+    private static final Pattern ALPHANUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
+
+    public static enum is {
+        // base json types
+        JsonObject,
+        JsonArray,
+        String,
+        Number,
+        Boolean,
+        Null,
+        // specific types
+        Integer,
+        Long,
+        Double,
+        // json schema validations
+        DateTime,
+        Date,
+        Time,
+        Email,
+        IPAddress,
+        IPV6Address,
+        URI,
+        Hostname,
+        Alpha,
+        Alphanumeric
+    }
+
+    private static boolean field(Object field, boolean optional, is what) {
+        // null is handled as a special case
+        if(field == null) {
+            return optional || what == is.Null;
+        }
+
+        switch (what) {
+            // base json types
+            case JsonObject:
+                return field instanceof JsonObject;
+            case JsonArray:
+                return field instanceof JsonArray;
+            case String:
+                return field instanceof String;
+            case Number:
+                return field instanceof Number;
+            case Boolean:
+                return field instanceof Boolean;
+            // specific types
+            case Integer:
+                return field instanceof Integer;
+            case Long:
+                return field instanceof Long;
+            case Double:
+                return field instanceof Double;
+            // json schema validations
+            case DateTime:
+                if (field instanceof CharSequence) {
+                    return DATETIME.matcher((CharSequence) field).matches();
+                }
+                break;
+            case Date:
+                if (field instanceof CharSequence) {
+                    return DATE.matcher((CharSequence) field).matches();
+                }
+                break;
+            case Time:
+                if (field instanceof CharSequence) {
+                    return TIME.matcher((CharSequence) field).matches();
+                }
+                break;
+            case Email:
+                if (field instanceof CharSequence) {
+                    return EMAIL.matcher((CharSequence) field).matches();
+                }
+                break;
+            case IPAddress:
+                if (field instanceof CharSequence) {
+                    return IPADDRESS.matcher((CharSequence) field).matches();
+                }
+                break;
+            case IPV6Address:
+                if (field instanceof CharSequence) {
+                    return IPV6ADDRESS.matcher((CharSequence) field).matches();
+                }
+                break;
+            case URI:
+                if (field instanceof CharSequence) {
+                    return URI.matcher((CharSequence) field).matches();
+                }
+                break;
+            case Hostname:
+                if (field instanceof CharSequence) {
+                    return HOSTNAME.matcher((CharSequence) field).matches();
+                }
+                break;
+            case Alpha:
+                if (field instanceof CharSequence) {
+                    return ALPHA.matcher((CharSequence) field).matches();
+                }
+                break;
+            case Alphanumeric:
+                if (field instanceof CharSequence) {
+                    return ALPHANUMERIC.matcher((CharSequence) field).matches();
+                }
+                break;
+        }
+
+        // unknown
         return false;
     }
 
-    static boolean isArray(Object field) {
-        return false;
+    public static boolean field(Object field, is what) {
+        return field(field, false, what);
     }
 
-    static boolean isString(Object field) {
-        return false;
-    }
-
-    static boolean isNumber(Object field) {
-        return false;
-    }
-
-    static boolean isBoolean(Object field) {
-        return false;
-    }
-
-    static boolean isNull(Object field) {
-        return false;
-    }
-
-    // sub numeric types
-
-    static boolean isInt(Object field) {
-        return false;
-    }
-
-    static boolean isLong(Object field) {
-        return false;
-    }
-
-    static boolean isDouble(Object field) {
-        return false;
-    }
-
-    // extra types
-
-    static boolean isDateTime(Object field) {
-        return false;
-    }
-
-    static boolean isDate(Object field) {
-        return false;
-    }
-
-    static boolean isTime(Object field) {
-        return false;
-    }
-
-    static boolean isEmail(Object field) {
-        return false;
-    }
-
-    static boolean isIpAddress(Object field) {
-        return false;
-    }
-
-    static boolean isIpV6Address(Object field) {
-        return false;
-    }
-
-    static boolean isURI(Object field) {
-        return false;
-    }
-
-    static boolean isColor(Object field) {
-        return false;
-    }
-
-    static boolean isHostname(Object field) {
-        return false;
-    }
-
-    static boolean isAlpha(Object field) {
-        return false;
-    }
-
-    static boolean isAlphanumeric(Object field) {
-        return false;
-    }
-
-    static boolean isUTCMillisec(Object field) {
-        return false;
-    }
-
-    static boolean isRegex(Object field) {
-        return false;
-    }
-
-    static boolean isStyle(Object field) {
-        return false;
-    }
-
-    static boolean isPhone(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullObject(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullArray(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullString(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullNumber(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullBoolean(Object field) {
-        return false;
-    }
-
-    static boolean isNotNull(Object field) {
-        return false;
-    }
-
-    // sub numeric types
-
-    static boolean isNotNullInt(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullLong(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullDouble(Object field) {
-        return false;
-    }
-
-    // extra types
-
-    static boolean isNotNullDateTime(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullDate(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullTime(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullEmail(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullIpAddress(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullIpV6Address(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullURI(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullColor(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullHostname(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullAlpha(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullAlphanumeric(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullUTCMillisec(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullRegex(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullStyle(Object field) {
-        return false;
-    }
-
-    static boolean isNotNullPhone(Object field) {
-        return false;
+    public static boolean optionalField(Object field, is what) {
+        return field(field, true, what);
     }
 }
