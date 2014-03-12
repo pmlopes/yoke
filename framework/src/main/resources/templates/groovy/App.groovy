@@ -7,7 +7,7 @@ import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
 // Create a new Yoke Application
 GYoke app = new GYoke(vertx, container)
 // define engines
-app.engine('html', new GroovyTemplateEngine())
+app.engine(new GroovyTemplateEngine())
 // define middleware
 app.use(new Favicon())
 app.use(new Logger())
@@ -27,7 +27,7 @@ if (System.getenv('DEV') != null) {
 // define routes
 router.get('/') { request ->
     request.put('title', 'My Yoke Application')
-    request.response.render('views/index.html')
+    request.response.render('views/index.gsp')
 }
 
 // define routes
