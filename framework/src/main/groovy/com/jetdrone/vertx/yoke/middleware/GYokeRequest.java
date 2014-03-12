@@ -12,6 +12,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.net.NetSocket;
 
@@ -36,7 +37,16 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
      */
     @SuppressWarnings("unchecked")
     public <R> R getAt(String name) {
-        return get(name);
+        // do some conversions for JsonObject/JsonArray
+        Object o = context.get(name);
+
+        if (o instanceof JsonObject) {
+            return (R) ((JsonObject) o).toMap();
+        }
+        if (o instanceof JsonArray) {
+            return (R) ((JsonArray) o).toList();
+        }
+        return (R) o;
     }
 
     /**

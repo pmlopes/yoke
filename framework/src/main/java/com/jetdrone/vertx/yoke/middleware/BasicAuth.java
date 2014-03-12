@@ -78,7 +78,7 @@ public class BasicAuth extends Middleware {
      *       yoke.use("/admin", new AuthHandler() {
      *         public void handle(String user, String password, Handler next) {
      *           // a better example would be fetching user from a DB
-     *           if ("user".equals(user) && "pass".equals(password)) {
+     *           if ("user".equals(user) &amp;&amp; "pass".equals(password)) {
      *             next.handle(true);
      *           } else {
      *             next.handle(false);
@@ -103,7 +103,7 @@ public class BasicAuth extends Middleware {
      *       yoke.use("/admin", new AuthHandler() {
      *         public void handle(String user, String password, Handler next) {
      *           // a better example would be fetching user from a DB
-     *           if ("user".equals(user) && "pass".equals(password)) {
+     *           if ("user".equals(user) &amp;&amp; "pass".equals(password)) {
      *             next.handle(true);
      *           } else {
      *             next.handle(false);

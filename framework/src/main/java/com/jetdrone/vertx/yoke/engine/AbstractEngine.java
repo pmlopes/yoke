@@ -128,6 +128,9 @@ public abstract class AbstractEngine<T> implements Engine {
      * Verifies if the file last modified date is newer than on the cache
      * if it is loads into a string
      * returns the string or the cached value
+     *
+     * @param filename File to read
+     * @param handler Async handler
      */
     public void read(final String filename, final AsyncResultHandler<String> handler) {
         isFresh(filename, new Handler<Boolean>() {
@@ -160,6 +163,7 @@ public abstract class AbstractEngine<T> implements Engine {
      * Returns the last modified time for the cache entry
      *
      * @param filename File to look for
+     * @return last modified time in millis
      */
     public long lastModified(final String filename) {
         LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);

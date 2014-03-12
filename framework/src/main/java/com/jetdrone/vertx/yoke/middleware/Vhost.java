@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 /**
  * # Vhost
- * <p/>
+ *
  * Setup vhost for the given *hostname* and *server*.
  */
 public class Vhost extends Middleware {

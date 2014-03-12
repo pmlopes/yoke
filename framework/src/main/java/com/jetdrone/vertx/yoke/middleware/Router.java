@@ -52,7 +52,7 @@ public class Router extends Middleware {
      *
      * <pre>
      * new Router() {{
-     *   get("/hello", new Handler<YokeRequest>() {
+     *   get("/hello", new Handler&lt;YokeRequest&gt;() {
      *     public void handle(YokeRequest request) {
      *       request.response().end("Hello World!");
      *     }

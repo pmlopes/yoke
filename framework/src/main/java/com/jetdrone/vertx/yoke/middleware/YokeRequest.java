@@ -60,7 +60,7 @@ public class YokeRequest implements HttpServerRequest {
     // the wrapped response
     private final YokeResponse response;
     // the request context
-    private final Context context;
+    protected final Context context;
     // is this request secure
     private final boolean secure;
     // session data store
@@ -92,7 +92,16 @@ public class YokeRequest implements HttpServerRequest {
      */
     @SuppressWarnings("unchecked")
     public <R> R get(String name) {
-        return (R) context.get(name);
+        // do some conversions for JsonObject/JsonArray
+        Object o = context.get(name);
+
+        if (o instanceof Map) {
+            return (R) new JsonObject((Map) o);
+        }
+        if (o instanceof List) {
+            return (R) new JsonArray((List) o);
+        }
+        return (R) o;
     }
 
     /** Allow getting properties in a generified way and return defaultValue if the key does not exist.
@@ -434,16 +443,16 @@ public class YokeRequest implements HttpServerRequest {
      * req.is('html');
      * req.is('text/html');
      * req.is('text/*');
-     * // => true
+     * // returns true
      *
      * // When Content-Type is application/json
      * req.is('json');
      * req.is('application/json');
      * req.is('application/*');
-     * // => true
+     * // returns true
      *
      * req.is('html');
-     * // => false
+     * // returns false
      *
      * @param type content type
      * @return true if content type is of type

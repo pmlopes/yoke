@@ -246,7 +246,7 @@ public class Yoke {
      * API.
      *
      * <pre>
-     * yoke.use("/login", new Handler<YokeRequest>() {
+     * yoke.use("/login", new Handler&lt;YokeRequest&gt;() {
      *   public void handle(YokeRequest request) {
      *     request.response.end("Hello");
      *   }
@@ -270,7 +270,7 @@ public class Yoke {
      * Adds a Handler to a route.
      *
      * <pre>
-     * yoke.use("/login", new Handler<YokeRequest>() {
+     * yoke.use("/login", new Handler&lt;YokeRequest&gt;() {
      *   public void handle(YokeRequest request) {
      *     request.response.end("Hello");
      *   }

@@ -80,7 +80,7 @@ public abstract class Middleware {
      * Example that always returns Hello:
      * <pre>
      * class HelloMiddleware extends Middleware {
-     *   public void handle(YokeRequest request, Handler<Object> next) {
+     *   public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
      *     request.response.end("Hello");
      *   }
      * }
@@ -89,7 +89,7 @@ public abstract class Middleware {
      * Example that always raises an internal server error:
      * <pre>
      * class HelloMiddleware extends Middleware {
-     *   public void handle(YokeRequest request, Handler<Object> next) {
+     *   public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
      *     next.handle("Something went wrong!");
      *   }
      * }
@@ -98,7 +98,7 @@ public abstract class Middleware {
      * Example that passes the control to the next middleware:
      * <pre>
      * class HelloMiddleware extends Middleware {
-     *   public void handle(YokeRequest request, Handler<Object> next) {
+     *   public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
      *     // when the error is null, then the chain will execute
      *     // the next Middleware until the chain is complete,
      *     // when that happens a 404 error is returned since no

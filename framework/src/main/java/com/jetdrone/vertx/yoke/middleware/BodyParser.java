@@ -19,7 +19,7 @@ import java.util.HashMap;
  * Once data has been parsed the result is visible in the field `body` of the request.
  *
  * If the content type was *multipart/form-data* and there were uploaded files the files are ```files()``` returns
- * `Map<String, HttpServerFileUpload>`.
+ * `Map&lt;String, HttpServerFileUpload&gt;`.
  *
  * ### Limitations
  *

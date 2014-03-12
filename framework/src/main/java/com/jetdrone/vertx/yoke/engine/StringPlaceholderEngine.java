@@ -48,8 +48,8 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
      * An interpreter for strings with named placeholders.
      *
      * For example given the string "hello ${myName}" and the map <code>
-     *      <p>Map<String, Object> map = new HashMap<String, Object>();</p>
-     *      <p>map.put("myName", "world");</p>
+     *      Map&lt;String, Object&gt; map = new HashMap&lt;&gt;();
+     *      map.put("myName", "world");
      * </code>
      *
      * the call returns "hello world"

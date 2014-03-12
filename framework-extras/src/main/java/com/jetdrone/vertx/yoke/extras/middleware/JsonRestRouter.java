@@ -133,7 +133,7 @@ public class JsonRestRouter extends Router {
                             return;
                         }
 
-                        if (event.result() == 0) {
+                        if (event.result().intValue() == 0) {
                             request.response().setStatusCode(404);
                             request.response().end();
                         } else {
@@ -217,7 +217,7 @@ public class JsonRestRouter extends Router {
                                         return;
                                     }
 
-                                    if (event.result() == 0) {
+                                    if (event.result().intValue() == 0) {
                                         // nothing was updated
                                         request.response().setStatusCode(404);
                                         request.response().end();
@@ -256,7 +256,7 @@ public class JsonRestRouter extends Router {
                             return;
                         }
 
-                        if (event.result() == 0) {
+                        if (event.result().intValue() == 0) {
                             // nothing was updated
                             request.response().setStatusCode(404);
                             request.response().end();
