@@ -2,6 +2,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.YokeException;
+import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -89,6 +90,7 @@ public class Validator extends Middleware {
 
         private final JsonObject EMPTY = new JsonObject();
         private final SimpleNumberComparator NUMBERCOMPARATOR = new SimpleNumberComparator();
+        private final ThreadLocalUTCDateFormat DATEFORMAT = new ThreadLocalUTCDateFormat();
 
         private final int type;
         private final String path;
@@ -335,6 +337,42 @@ public class Validator extends Middleware {
             });
             return this;
         }
+
+//        public Checker between(final Date min, final Date max) {
+//            assertions.add(new Assert() {
+//                @Override
+//                public void ok(final YokeRequest request) throws YokeException {
+//
+//                    final Object field = get(request);
+//
+//                    if (field == null) {
+//                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+//                    }
+//
+//                    if (field instanceof String) {
+//                        if (DATETIME.matcher((CharSequence) field).matches()) {
+//                            long millis = DATEFORMAT.parse((String) field).getTime();
+//                            // parse date
+//                            if (millis >= min.getTime() && millis < max.getTime()) {
+//                                return;
+//                            }
+//                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+//                        }
+//                        if (DATE.matcher((CharSequence) field).matches()) {
+//                            long millis = 0;
+//                            // parse date
+//                            if (millis >= min.getTime() && millis < max.getTime()) {
+//                                return;
+//                            }
+//                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+//                        }
+//                    }
+//                    // unknown
+//                    throw new YokeException(400, "Failed to validate");
+//                }
+//            });
+//            return this;
+//        }
 
         public Checker size(Number max) {
             between(0, max);
