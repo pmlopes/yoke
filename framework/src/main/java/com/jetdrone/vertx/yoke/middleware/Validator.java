@@ -9,6 +9,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -303,13 +304,13 @@ public class Validator extends Middleware {
 
                     if (field instanceof String) {
                         int len = ((String) field).length();
-                        if (len >= min.intValue() && len < max.intValue()) {
+                        if (len >= min.intValue() && len <= max.intValue()) {
                             return;
                         }
                         throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                     }
                     if (field instanceof Number) {
-                        if (NUMBERCOMPARATOR.compare((Number) field, min) >= 0 && NUMBERCOMPARATOR.compare((Number) field, max) < 0) {
+                        if (NUMBERCOMPARATOR.compare((Number) field, min) >= 0 && NUMBERCOMPARATOR.compare((Number) field, max) <= 0) {
                             return;
                         }
                         throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
@@ -317,7 +318,7 @@ public class Validator extends Middleware {
 
                     if (field instanceof List) {
                         int len = ((List) field).size();
-                        if (len >= min.intValue() && len < max.intValue()) {
+                        if (len >= min.intValue() && len <= max.intValue()) {
                             return;
                         }
                         throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
@@ -325,7 +326,7 @@ public class Validator extends Middleware {
 
                     if (field instanceof JsonArray) {
                         int len = ((JsonArray) field).size();
-                        if (len >= min.intValue() && len < max.intValue()) {
+                        if (len >= min.intValue() && len <= max.intValue()) {
                             return;
                         }
                         throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
@@ -338,41 +339,49 @@ public class Validator extends Middleware {
             return this;
         }
 
-//        public Checker between(final Date min, final Date max) {
-//            assertions.add(new Assert() {
-//                @Override
-//                public void ok(final YokeRequest request) throws YokeException {
-//
-//                    final Object field = get(request);
-//
-//                    if (field == null) {
-//                        throw new YokeException(400, "'" + path + "' cannot be NULL");
-//                    }
-//
-//                    if (field instanceof String) {
-//                        if (DATETIME.matcher((CharSequence) field).matches()) {
-//                            long millis = DATEFORMAT.parse((String) field).getTime();
-//                            // parse date
-//                            if (millis >= min.getTime() && millis < max.getTime()) {
-//                                return;
-//                            }
-//                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
-//                        }
-//                        if (DATE.matcher((CharSequence) field).matches()) {
-//                            long millis = 0;
-//                            // parse date
-//                            if (millis >= min.getTime() && millis < max.getTime()) {
-//                                return;
-//                            }
-//                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
-//                        }
-//                    }
-//                    // unknown
-//                    throw new YokeException(400, "Failed to validate");
-//                }
-//            });
-//            return this;
-//        }
+        public Checker between(final Date min, final Date max) {
+            assertions.add(new Assert() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (DATETIME.matcher((CharSequence) field).matches()) {
+                            long millis;
+                            try {
+                                millis = DATEFORMAT.parse((String) field).getTime();
+                            } catch (ParseException e) {
+                                throw new YokeException(400, "Failed to validate", e);
+                            }
+                            if (millis >= min.getTime() && millis <= max.getTime()) {
+                                return;
+                            }
+                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                        }
+                        if (DATE.matcher((CharSequence) field).matches()) {
+                            long millis;
+                            try {
+                                millis = DATEFORMAT.parse(field + "T00:00:00Z").getTime();
+                            } catch (ParseException e) {
+                                throw new YokeException(400, "Failed to validate", e);
+                            }
+                            if (millis >= min.getTime() && millis <= max.getTime()) {
+                                return;
+                            }
+                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                        }
+                    }
+                    // unknown
+                    throw new YokeException(400, "Failed to validate");
+                }
+            });
+            return this;
+        }
 
         public Checker size(Number max) {
             between(0, max);
@@ -395,6 +404,10 @@ public class Validator extends Middleware {
 
     public Checker requestContext(String key) {
         return new Checker(3, key);
+    }
+
+    public Checker requestHeader(String name) {
+        return new Checker(4, name);
     }
 
     public Validator addAssert(Assert assertion) {
