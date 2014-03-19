@@ -15,6 +15,10 @@ import java.util.regex.Pattern;
 
 public class Validator extends Middleware {
 
+    public static interface Assertion {
+        public void ok(YokeRequest request) throws YokeException;
+    }
+
     private static final Pattern DATETIME = Pattern.compile("^\\d{4}-(?:0[0-9]|1[0-2])-[0-9]{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$");
     private static final Pattern DATE = Pattern.compile("^\\d{4}-(?:0[0-9]|1[0-2])-[0-9]{2}$");
     private static final Pattern TIME = Pattern.compile("^\\d{2}:\\d{2}:\\d{2}$");
@@ -77,7 +81,7 @@ public class Validator extends Middleware {
     }
 
     private final boolean failOnFirstError;
-    private final List<Assert> assertions = new ArrayList<>();
+    private final List<Assertion> assertions = new ArrayList<>();
 
     public Validator() {
         this(false);
@@ -89,7 +93,7 @@ public class Validator extends Middleware {
 
     public final class Checker {
 
-        private final JsonObject EMPTY = new JsonObject();
+        private final JsonObject EMPTY = new JsonObject(Collections.EMPTY_MAP);
         private final SimpleNumberComparator NUMBERCOMPARATOR = new SimpleNumberComparator();
         private final ThreadLocalUTCDateFormat DATEFORMAT = new ThreadLocalUTCDateFormat();
 
@@ -148,6 +152,8 @@ public class Validator extends Middleware {
                     return json.getField(optional ? keys[keys.length - 1].substring(1) : keys[keys.length - 1]);
                 case 3:
                     return request.get(path);
+                case 4:
+                    return request.getHeader(path);
                 default:
                     throw new YokeException(400, "Unknown source " + type);
             }
@@ -158,7 +164,7 @@ public class Validator extends Middleware {
         }
 
         public Checker is(final Type type) {
-            assertions.add(new Assert() {
+            assertions.add(new Assertion() {
                 @Override
                 public void ok(final YokeRequest request) throws YokeException {
 
@@ -277,7 +283,7 @@ public class Validator extends Middleware {
         }
 
         public Checker exists() {
-            assertions.add(new Assert() {
+            assertions.add(new Assertion() {
                 @Override
                 public void ok(final YokeRequest request) throws YokeException {
 
@@ -292,7 +298,7 @@ public class Validator extends Middleware {
         }
 
         public Checker between(final Number min, final Number max) {
-            assertions.add(new Assert() {
+            assertions.add(new Assertion() {
                 @Override
                 public void ok(final YokeRequest request) throws YokeException {
 
@@ -340,7 +346,7 @@ public class Validator extends Middleware {
         }
 
         public Checker between(final Date min, final Date max) {
-            assertions.add(new Assert() {
+            assertions.add(new Assertion() {
                 @Override
                 public void ok(final YokeRequest request) throws YokeException {
 
@@ -383,34 +389,213 @@ public class Validator extends Middleware {
             return this;
         }
 
-        public Checker size(Number max) {
-            between(0, max);
+        public Checker lessThan(final Number max) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        int len = ((String) field).length();
+                        if (len < max.intValue()) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                    }
+                    if (field instanceof Number) {
+                        if (NUMBERCOMPARATOR.compare((Number) field, max) < 0) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                    }
+
+                    if (field instanceof List) {
+                        int len = ((List) field).size();
+                        if (len < max.intValue()) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                    }
+
+                    if (field instanceof JsonArray) {
+                        int len = ((JsonArray) field).size();
+                        if (len < max.intValue()) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                    }
+
+                    // unknown
+                    throw new YokeException(400, "Failed to validate");
+                }
+            });
+            return this;
+        }
+
+        public Checker greaterThan(final Number min) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        int len = ((String) field).length();
+                        if (len > min.intValue()) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                    }
+                    if (field instanceof Number) {
+                        if (NUMBERCOMPARATOR.compare((Number) field, min) > 0) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                    }
+
+                    if (field instanceof List) {
+                        int len = ((List) field).size();
+                        if (len > min.intValue()) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                    }
+
+                    if (field instanceof JsonArray) {
+                        int len = ((JsonArray) field).size();
+                        if (len > min.intValue()) {
+                            return;
+                        }
+                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                    }
+
+                    // unknown
+                    throw new YokeException(400, "Failed to validate");
+                }
+            });
+            return this;
+        }
+
+        public Checker before(final Date max) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (DATETIME.matcher((CharSequence) field).matches()) {
+                            long millis;
+                            try {
+                                millis = DATEFORMAT.parse((String) field).getTime();
+                            } catch (ParseException e) {
+                                throw new YokeException(400, "Failed to validate", e);
+                            }
+                            if (millis < max.getTime()) {
+                                return;
+                            }
+                            throw new YokeException(400, "'" + path + "' is after [" + max + "] be NULL");
+                        }
+                        if (DATE.matcher((CharSequence) field).matches()) {
+                            long millis;
+                            try {
+                                millis = DATEFORMAT.parse(field + "T00:00:00Z").getTime();
+                            } catch (ParseException e) {
+                                throw new YokeException(400, "Failed to validate", e);
+                            }
+                            if (millis < max.getTime()) {
+                                return;
+                            }
+                            throw new YokeException(400, "'" + path + "' is after [" + max + "] be NULL");
+                        }
+                    }
+                    // unknown
+                    throw new YokeException(400, "Failed to validate");
+                }
+            });
+            return this;
+        }
+
+        public Checker after(final Date min) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (DATETIME.matcher((CharSequence) field).matches()) {
+                            long millis;
+                            try {
+                                millis = DATEFORMAT.parse((String) field).getTime();
+                            } catch (ParseException e) {
+                                throw new YokeException(400, "Failed to validate", e);
+                            }
+                            if (millis > min.getTime()) {
+                                return;
+                            }
+                            throw new YokeException(400, "'" + path + "' is before [" + min + "] be NULL");
+                        }
+                        if (DATE.matcher((CharSequence) field).matches()) {
+                            long millis;
+                            try {
+                                millis = DATEFORMAT.parse(field + "T00:00:00Z").getTime();
+                            } catch (ParseException e) {
+                                throw new YokeException(400, "Failed to validate", e);
+                            }
+                            if (millis > min.getTime()) {
+                                return;
+                            }
+                            throw new YokeException(400, "'" + path + "' is before [" + min + "] be NULL");
+                        }
+                    }
+                    // unknown
+                    throw new YokeException(400, "Failed to validate");
+                }
+            });
             return this;
         }
     }
 
 
-    public Checker requestParam(String name) {
+    public Checker param(String name) {
         return new Checker(0, name);
     }
 
-    public Checker requestForm(String name) {
+    public Checker formParam(String name) {
         return new Checker(1, name);
     }
 
-    public Checker requestBody(String path) {
+    public Checker body(String path) {
         return new Checker(2, path);
     }
 
-    public Checker requestContext(String key) {
+    public Checker context(String key) {
         return new Checker(3, key);
     }
 
-    public Checker requestHeader(String name) {
+    public Checker header(String name) {
         return new Checker(4, name);
     }
 
-    public Validator addAssert(Assert assertion) {
+    public Validator add(Assertion assertion) {
         assertions.add(assertion);
         return this;
     }
@@ -421,7 +606,7 @@ public class Validator extends Middleware {
         StringBuilder failures = null;
 
         // check all items n fail throw YokeException 400
-        for (Assert assertion : assertions) {
+        for (Assertion assertion : assertions) {
             try {
                 assertion.ok(request);
             } catch (YokeException e) {

@@ -24,8 +24,8 @@ public class Validator extends TestVerticle {
         final Yoke yoke = new Yoke(this);
 
         com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            requestParam("from").is(Type.DateTime);
-            requestParam("to").is(Type.DateTime);
+            param("from").is(Type.DateTime);
+            param("to").is(Type.DateTime);
         }};
 
         yoke.use(new Router().get("/search/:from/:to", validator, new Middleware() {
@@ -55,12 +55,12 @@ public class Validator extends TestVerticle {
     public void testJsonBodyValidator() {
 
         com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            requestParam("from").is(Type.DateTime);
-            requestParam("to").is(Type.DateTime);
-            requestBody("user.login").exists();
-            requestBody("user.login").is(Type.String);
-            requestBody("user.password").exists();
-            requestBody("user.password").is(Type.String);
+            param("from").is(Type.DateTime);
+            param("to").is(Type.DateTime);
+            body("user.login").exists();
+            body("user.login").is(Type.String);
+            body("user.password").exists();
+            body("user.password").is(Type.String);
         }};
 
 
@@ -94,7 +94,7 @@ public class Validator extends TestVerticle {
     public void testJsonBodyValidatorOptional() {
 
         com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            requestBody("user.?login").is(Type.String);
+            body("user.?login").is(Type.String);
         }};
 
 
@@ -128,7 +128,7 @@ public class Validator extends TestVerticle {
     public void testJsonBodyValidatorRequired() {
 
         com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            requestBody("user.?login").is(Type.String);
+            body("user.?login").is(Type.String);
         }};
 
 
