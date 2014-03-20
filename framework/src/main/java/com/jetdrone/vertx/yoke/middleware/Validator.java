@@ -842,7 +842,7 @@ public class Validator extends Middleware {
 
         StringBuilder failures = null;
 
-        // check all items n fail throw YokeException 400
+        // check all items, on fail throw YokeException 400
         for (Assertion assertion : assertions) {
             try {
                 assertion.ok(request);
