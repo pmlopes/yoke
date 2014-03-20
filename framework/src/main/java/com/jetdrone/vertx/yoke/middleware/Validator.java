@@ -15,8 +15,19 @@ import java.util.regex.Pattern;
 
 public class Validator extends Middleware {
 
-    public static interface Assertion {
-        public void ok(YokeRequest request) throws YokeException;
+    public static abstract class Assertion {
+
+        public final int errorCode;
+
+        public Assertion() {
+            this(400);
+        }
+
+        public Assertion(int code) {
+            this.errorCode = code;
+        }
+
+        public abstract void ok(YokeRequest request) throws YokeException;
     }
 
     private static final Pattern DATETIME = Pattern.compile("^\\d{4}-(?:0[0-9]|1[0-2])-[0-9]{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$");
@@ -176,7 +187,7 @@ public class Validator extends Middleware {
                         if (optional || type == Type.Null) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     switch (type) {
@@ -185,98 +196,98 @@ public class Validator extends Middleware {
                             if (field instanceof JsonObject || field instanceof Map) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case JsonArray:
                             if (field instanceof JsonArray || field instanceof List) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case String:
                             if (field instanceof String) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Number:
                             if (field instanceof Number) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Boolean:
                             if (field instanceof Boolean) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                             // specific types
                         case Integer:
                             if (field instanceof Integer) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Long:
                             if (field instanceof Long) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Double:
                             if (field instanceof Double) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                             // json schema validations
                         case DateTime:
                             if (field instanceof CharSequence && DATETIME.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Date:
                             if (field instanceof CharSequence && DATE.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Time:
                             if (field instanceof CharSequence && TIME.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Email:
                             if (field instanceof CharSequence && EMAIL.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case IPAddress:
                             if (field instanceof CharSequence && IPADDRESS.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case IPV6Address:
                             if (field instanceof CharSequence && IPV6ADDRESS.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case URI:
                             if (field instanceof CharSequence && URI.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Hostname:
                             if (field instanceof CharSequence && HOSTNAME.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Alpha:
                             if (field instanceof CharSequence && ALPHA.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                         case Alphanumeric:
                             if (field instanceof CharSequence && ALPHANUMERIC.matcher((CharSequence) field).matches()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is not " + type.name());
+                            throw new YokeException(errorCode, "'" + path + "' is not " + type.name());
                     }
 
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
                 }
             });
             return this;
@@ -290,7 +301,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
                 }
             });
@@ -305,7 +316,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     if (field instanceof String) {
@@ -313,13 +324,13 @@ public class Validator extends Middleware {
                         if (len >= min.intValue() && len <= max.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                     }
                     if (field instanceof Number) {
                         if (NUMBERCOMPARATOR.compare((Number) field, min) >= 0 && NUMBERCOMPARATOR.compare((Number) field, max) <= 0) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                     }
 
                     if (field instanceof List) {
@@ -327,7 +338,7 @@ public class Validator extends Middleware {
                         if (len >= min.intValue() && len <= max.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                     }
 
                     if (field instanceof JsonArray) {
@@ -335,11 +346,11 @@ public class Validator extends Middleware {
                         if (len >= min.intValue() && len <= max.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                     }
 
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
                 }
             });
             return this;
@@ -353,7 +364,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     if (field instanceof String) {
@@ -362,28 +373,28 @@ public class Validator extends Middleware {
                             try {
                                 millis = DATEFORMAT.parse((String) field).getTime();
                             } catch (ParseException e) {
-                                throw new YokeException(400, "Failed to validate", e);
+                                throw new YokeException(errorCode, "Failed to validate", e);
                             }
                             if (millis >= min.getTime() && millis <= max.getTime()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                            throw new YokeException(errorCode, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                         }
                         if (DATE.matcher((CharSequence) field).matches()) {
                             long millis;
                             try {
                                 millis = DATEFORMAT.parse(field + "T00:00:00Z").getTime();
                             } catch (ParseException e) {
-                                throw new YokeException(400, "Failed to validate", e);
+                                throw new YokeException(errorCode, "Failed to validate", e);
                             }
                             if (millis >= min.getTime() && millis <= max.getTime()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
+                            throw new YokeException(errorCode, "'" + path + "' is outside the range [" + min + ":" + max + "] be NULL");
                         }
                     }
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
                 }
             });
             return this;
@@ -397,7 +408,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     if (field instanceof String) {
@@ -405,13 +416,13 @@ public class Validator extends Middleware {
                         if (len < max.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside greater than [" + max + "] be NULL");
                     }
                     if (field instanceof Number) {
                         if (NUMBERCOMPARATOR.compare((Number) field, max) < 0) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside greater than [" + max + "] be NULL");
                     }
 
                     if (field instanceof List) {
@@ -419,7 +430,7 @@ public class Validator extends Middleware {
                         if (len < max.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside greater than [" + max + "] be NULL");
                     }
 
                     if (field instanceof JsonArray) {
@@ -427,11 +438,11 @@ public class Validator extends Middleware {
                         if (len < max.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is outside greater than [" + max + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is outside greater than [" + max + "] be NULL");
                     }
 
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
                 }
             });
             return this;
@@ -445,7 +456,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     if (field instanceof String) {
@@ -453,13 +464,13 @@ public class Validator extends Middleware {
                         if (len > min.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is less than [" + min + "] be NULL");
                     }
                     if (field instanceof Number) {
                         if (NUMBERCOMPARATOR.compare((Number) field, min) > 0) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is less than [" + min + "] be NULL");
                     }
 
                     if (field instanceof List) {
@@ -467,7 +478,7 @@ public class Validator extends Middleware {
                         if (len > min.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is less than [" + min + "] be NULL");
                     }
 
                     if (field instanceof JsonArray) {
@@ -475,11 +486,11 @@ public class Validator extends Middleware {
                         if (len > min.intValue()) {
                             return;
                         }
-                        throw new YokeException(400, "'" + path + "' is less than [" + min + "] be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' is less than [" + min + "] be NULL");
                     }
 
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
                 }
             });
             return this;
@@ -493,7 +504,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     if (field instanceof String) {
@@ -502,28 +513,28 @@ public class Validator extends Middleware {
                             try {
                                 millis = DATEFORMAT.parse((String) field).getTime();
                             } catch (ParseException e) {
-                                throw new YokeException(400, "Failed to validate", e);
+                                throw new YokeException(errorCode, "Failed to validate", e);
                             }
                             if (millis < max.getTime()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is after [" + max + "] be NULL");
+                            throw new YokeException(errorCode, "'" + path + "' is after [" + max + "] be NULL");
                         }
                         if (DATE.matcher((CharSequence) field).matches()) {
                             long millis;
                             try {
                                 millis = DATEFORMAT.parse(field + "T00:00:00Z").getTime();
                             } catch (ParseException e) {
-                                throw new YokeException(400, "Failed to validate", e);
+                                throw new YokeException(errorCode, "Failed to validate", e);
                             }
                             if (millis < max.getTime()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is after [" + max + "] be NULL");
+                            throw new YokeException(errorCode, "'" + path + "' is after [" + max + "] be NULL");
                         }
                     }
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
                 }
             });
             return this;
@@ -537,7 +548,7 @@ public class Validator extends Middleware {
                     final Object field = get(request);
 
                     if (field == null) {
-                        throw new YokeException(400, "'" + path + "' cannot be NULL");
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
                     }
 
                     if (field instanceof String) {
@@ -546,28 +557,254 @@ public class Validator extends Middleware {
                             try {
                                 millis = DATEFORMAT.parse((String) field).getTime();
                             } catch (ParseException e) {
-                                throw new YokeException(400, "Failed to validate", e);
+                                throw new YokeException(errorCode, "Failed to validate", e);
                             }
                             if (millis > min.getTime()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is before [" + min + "] be NULL");
+                            throw new YokeException(errorCode, "'" + path + "' is before [" + min + "] be NULL");
                         }
                         if (DATE.matcher((CharSequence) field).matches()) {
                             long millis;
                             try {
                                 millis = DATEFORMAT.parse(field + "T00:00:00Z").getTime();
                             } catch (ParseException e) {
-                                throw new YokeException(400, "Failed to validate", e);
+                                throw new YokeException(errorCode, "Failed to validate", e);
                             }
                             if (millis > min.getTime()) {
                                 return;
                             }
-                            throw new YokeException(400, "'" + path + "' is before [" + min + "] be NULL");
+                            throw new YokeException(errorCode, "'" + path + "' is before [" + min + "] be NULL");
                         }
                     }
                     // unknown
-                    throw new YokeException(400, "Failed to validate");
+                    throw new YokeException(errorCode, "Failed to validate");
+                }
+            });
+            return this;
+        }
+
+        public Checker equals(final String value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+                    final Object field = get(request);
+                    final boolean optional = isOptional();
+
+                    // null is handled as a special case
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (value.equals(field)) {
+                            return;
+                        }
+                        throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                    }
+                }
+            });
+            return this;
+        }
+
+        public Checker equals(final Number value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+                    final Object field = get(request);
+                    final boolean optional = isOptional();
+
+                    // null is handled as a special case
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof Number) {
+                        if (value.equals(field)) {
+                            return;
+                        }
+                        throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                    }
+                }
+            });
+            return this;
+        }
+
+        public Checker equals(final Date value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (DATETIME.matcher((CharSequence) field).matches()) {
+                            Date date;
+                            try {
+                                date = DATEFORMAT.parse((String) field);
+                            } catch (ParseException e) {
+                                throw new YokeException(errorCode, "Failed to validate", e);
+                            }
+                            if (value.equals(date)) {
+                                return;
+                            }
+                            throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                        }
+                        if (DATE.matcher((CharSequence) field).matches()) {
+                            Date date;
+                            try {
+                                date = DATEFORMAT.parse(field + "T00:00:00Z");
+                            } catch (ParseException e) {
+                                throw new YokeException(errorCode, "Failed to validate", e);
+                            }
+                            if (value.equals(date)) {
+                                return;
+                            }
+                            throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                        }
+                    }
+                    // unknown
+                    throw new YokeException(errorCode, "Failed to validate");
+                }
+            });
+            return this;
+        }
+
+        public Checker equals(final Boolean value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+                    final Object field = get(request);
+                    final boolean optional = isOptional();
+
+                    // null is handled as a special case
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof Boolean) {
+                        if (value.equals(field)) {
+                            return;
+                        }
+                        throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                    }
+                }
+            });
+            return this;
+        }
+
+        public Checker notEquals(final String value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+                    final Object field = get(request);
+                    final boolean optional = isOptional();
+
+                    // null is handled as a special case
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (!value.equals(field)) {
+                            return;
+                        }
+                        throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                    }
+                }
+            });
+            return this;
+        }
+
+        public Checker notEquals(final Number value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+                    final Object field = get(request);
+                    final boolean optional = isOptional();
+
+                    // null is handled as a special case
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof Number) {
+                        if (!value.equals(field)) {
+                            return;
+                        }
+                        throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                    }
+                }
+            });
+            return this;
+        }
+
+        public Checker notEquals(final Date value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+
+                    final Object field = get(request);
+
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof String) {
+                        if (DATETIME.matcher((CharSequence) field).matches()) {
+                            Date date;
+                            try {
+                                date = DATEFORMAT.parse((String) field);
+                            } catch (ParseException e) {
+                                throw new YokeException(errorCode, "Failed to validate", e);
+                            }
+                            if (!value.equals(date)) {
+                                return;
+                            }
+                            throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                        }
+                        if (DATE.matcher((CharSequence) field).matches()) {
+                            Date date;
+                            try {
+                                date = DATEFORMAT.parse(field + "T00:00:00Z");
+                            } catch (ParseException e) {
+                                throw new YokeException(errorCode, "Failed to validate", e);
+                            }
+                            if (!value.equals(date)) {
+                                return;
+                            }
+                            throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                        }
+                    }
+                    // unknown
+                    throw new YokeException(errorCode, "Failed to validate");
+                }
+            });
+            return this;
+        }
+
+        public Checker notEquals(final Boolean value) {
+            assertions.add(new Assertion() {
+                @Override
+                public void ok(final YokeRequest request) throws YokeException {
+                    final Object field = get(request);
+                    final boolean optional = isOptional();
+
+                    // null is handled as a special case
+                    if (field == null) {
+                        throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    }
+
+                    if (field instanceof Boolean) {
+                        if (!value.equals(field)) {
+                            return;
+                        }
+                        throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
+                    }
                 }
             });
             return this;
