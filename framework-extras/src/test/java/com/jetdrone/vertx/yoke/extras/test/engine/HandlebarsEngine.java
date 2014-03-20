@@ -1,22 +1,27 @@
 package com.jetdrone.vertx.yoke.extras.test.engine;
 
-import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.test.Response;
-import com.jetdrone.vertx.yoke.test.YokeTester;
-import org.junit.Test;
-import org.vertx.java.core.Handler;
-import org.vertx.testtools.TestVerticle;
+import static org.vertx.testtools.VertxAssert.assertEquals;
+import static org.vertx.testtools.VertxAssert.fail;
+import static org.vertx.testtools.VertxAssert.testComplete;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.vertx.testtools.VertxAssert.*;
+import org.junit.Test;
+import org.vertx.java.core.Handler;
+import org.vertx.testtools.TestVerticle;
+
+import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.test.Response;
+import com.jetdrone.vertx.yoke.test.YokeTester;
 
 public class HandlebarsEngine extends TestVerticle {
+	
+		private static final String NEWLINE = System.getProperty("line.separator");
 
     @Test
     public void testEngine() {
@@ -98,8 +103,8 @@ public class HandlebarsEngine extends TestVerticle {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
-                assertEquals("<h1>Yoke</h1>\n" +
-                        "<p>Home page</p>\n" +
+                assertEquals("<h1>Yoke</h1>" + NEWLINE +
+                        "<p>Home page</p>" + NEWLINE +
                         "<span>Powered by Handlebars.java</span>", resp.body.toString());
                 testComplete();
             }
@@ -121,14 +126,14 @@ public class HandlebarsEngine extends TestVerticle {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
-                assertEquals("\n" +
-                        "\n" +
-                        "<h1>Yoke</h1>\n" +
-                        "\n" +
-                        "\n" +
-                        "<p>Home page</p>\n" +
-                        "\n" +
-                        "\n" +
+                assertEquals(NEWLINE +
+                				NEWLINE +
+                        "<h1>Yoke</h1>" + NEWLINE +
+                        NEWLINE +
+                        NEWLINE +
+                        "<p>Home page</p>" + NEWLINE +
+                        NEWLINE +
+                        NEWLINE +
                         "<span>Powered by Handlebars.java</span>", resp.body.toString());
                 testComplete();
             }
