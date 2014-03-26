@@ -121,6 +121,65 @@ public class ErrorHandler extends Middleware {
         }
     }
 
+    private boolean sendError(YokeRequest request, String mime, int errorCode, String errorMessage, List<String> stackTrace) {
+
+        YokeResponse response = request.response();
+
+        if (mime.startsWith("text/html")) {
+            StringBuilder stack = new StringBuilder();
+            for (String s : stackTrace) {
+                stack.append("<li>");
+                stack.append(s);
+                stack.append("</li>");
+            }
+
+            response.setContentType("text/html");
+            response.end(
+                    errorTemplate.replace("{title}", (String) request.get("title"))
+                            .replace("{errorCode}", Integer.toString(errorCode))
+                            .replace("{errorMessage}", errorMessage)
+                            .replace("{stackTrace}", stack.toString())
+            );
+            return true;
+        }
+
+        if (mime.startsWith("application/json")) {
+            JsonObject jsonError = new JsonObject();
+            jsonError.putObject("error", new JsonObject().putNumber("code", errorCode).putString("message", errorMessage));
+            if (!stackTrace.isEmpty()) {
+                JsonArray stack = new JsonArray();
+                for (String t : stackTrace) {
+                    stack.addString(t);
+                }
+                jsonError.putArray("stack", stack);
+            }
+            response.setContentType("application/json", "UTF-8");
+            response.end(jsonError.encode());
+            return true;
+        }
+
+        if (mime.startsWith("text/plain")) {
+            response.setContentType("text/plain");
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Error ");
+            sb.append(errorCode);
+            sb.append(": ");
+            sb.append(errorMessage);
+
+            for (String t : stackTrace) {
+                sb.append("\tat ");
+                sb.append(t);
+                sb.append("\n");
+            }
+
+            response.end(sb.toString());
+            return true;
+        }
+
+        return false;
+    }
+
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
 
@@ -141,50 +200,25 @@ public class ErrorHandler extends Middleware {
 
         List<String> stackTrace = getStackTrace(request.get("error"));
 
-        String accept = request.getHeader("accept", "text/plain");
+        // does the response already set the mime type?
+        String mime = response.getHeader("content-type");
 
-        if (accept.contains("html")) {
-            StringBuilder stack = new StringBuilder();
-            for (String s : stackTrace) {
-                stack.append("<li>");
-                stack.append(s);
-                stack.append("</li>");
+        if (mime != null) {
+            if (sendError(request, mime, errorCode, errorMessage, stackTrace)) {
+                return;
             }
-
-            response.setContentType("text/html");
-            response.end(
-                    errorTemplate.replace("{title}", (String) request.get("title"))
-                            .replace("{errorCode}", Integer.toString(errorCode))
-                            .replace("{errorMessage}", errorMessage)
-                            .replace("{stackTrace}", stack.toString()));
-        } else if (accept.contains("json")) {
-            JsonObject jsonError = new JsonObject();
-            jsonError.putObject("error", new JsonObject().putNumber("code", errorCode).putString("message", errorMessage));
-            if (!stackTrace.isEmpty()) {
-                JsonArray stack = new JsonArray();
-                for (String t : stackTrace) {
-                    stack.addString(t);
-                }
-                jsonError.putArray("stack", stack);
-            }
-            response.setContentType("application/json", "UTF-8");
-            response.end(jsonError.encode());
-        } else {
-            response.setContentType("text/plain");
-
-            StringBuilder sb = new StringBuilder();
-            sb.append("Error ");
-            sb.append(errorCode);
-            sb.append(": ");
-            sb.append(errorMessage);
-
-            for (String t : stackTrace) {
-                sb.append("\tat ");
-                sb.append(t);
-                sb.append("\n");
-            }
-
-            response.end(sb.toString());
         }
+
+        // respect the client accept order
+        List<String> acceptedMimes = request.sortedHeader("accept");
+
+        for (String accept : acceptedMimes) {
+            if (sendError(request, accept, errorCode, errorMessage, stackTrace)) {
+                return;
+            }
+        }
+
+        // fall back plain/text
+        sendError(request, "text/plain", errorCode, errorMessage, stackTrace);
     }
 }

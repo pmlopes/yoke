@@ -21,10 +21,7 @@ import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.http.HttpServerRequest {
 
@@ -314,6 +311,10 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
 
     public NetSocket getNetSocket() {
         return netSocket();
+    }
+
+    public List<String> getSortedHeader(String header) {
+        return sortedHeader(header);
     }
 
     @Override

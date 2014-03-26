@@ -406,7 +406,7 @@ public class YokeRequest implements HttpServerRequest {
      * if the request string starts with it.
      */
     public String accepts(String... types) {
-        String accept = getHeader("accept");
+        String accept = getHeader("Accept");
         // accept anything when accept is not present
         if (accept == null) {
             return types[0];
@@ -434,21 +434,34 @@ public class YokeRequest implements HttpServerRequest {
         return null;
     }
 
-    /** Returns the array of accepted (language/type/charset) ordered by quality.
+    /** Returns the array of accept-? ordered by quality.
      */
-    public String[] accept(String header) {
-        String accept = getHeader("accept-" + header);
+    public List<String> sortedHeader(String header) {
+        String accept = getHeader(header);
         // accept anything when accept is not present
         if (accept == null) {
-            return new String[0];
+            return Collections.emptyList();
         }
 
         // parse
-        String[] acceptTypes = accept.split(" *, *");
+        String[] items = accept.split(" *, *");
         // sort on quality
-        Arrays.sort(acceptTypes, ACCEPT_X_COMPARATOR);
+        Arrays.sort(items, ACCEPT_X_COMPARATOR);
 
-        return acceptTypes;
+        List<String> list = new ArrayList<>(items.length);
+
+        for (String item : items) {
+            // find any ; e.g.: "application/json;q=0.8"
+            int space = item.indexOf(';');
+
+            if (space != -1) {
+                list.add(item.substring(0, space));
+            } else {
+                list.add(item);
+            }
+        }
+
+        return list;
     }
 
     /** Check if the incoming request contains the "Content-Type"

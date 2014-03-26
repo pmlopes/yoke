@@ -50,6 +50,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
     private Scriptable params;
     private Callable pause;
     private Callable resume;
+    private Callable sortedHeader;
     private Callable uploadHandler;
 
     public JSYokeRequest(HttpServerRequest request, JSYokeResponse response, boolean secure, Context context, SessionStore store) {
@@ -579,6 +580,24 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                     };
                 }
                 return resume;
+            case "sortedHeader":
+                if (sortedHeader == null) {
+                    sortedHeader = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeRequest.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
+                            }
+
+                            if (JSUtil.is(args, String.class)) {
+                                return toScriptable(JSYokeRequest.this.sortedHeader((String) args[0]));
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+                }
+                return sortedHeader;
             case "uploadHandler":
                 if (uploadHandler == null) {
                     uploadHandler = new Callable() {
