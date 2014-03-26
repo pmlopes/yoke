@@ -434,6 +434,23 @@ public class YokeRequest implements HttpServerRequest {
         return null;
     }
 
+    /** Returns the array of accepted (language/type/charset) ordered by quality.
+     */
+    public String[] accept(String header) {
+        String accept = getHeader("accept-" + header);
+        // accept anything when accept is not present
+        if (accept == null) {
+            return new String[0];
+        }
+
+        // parse
+        String[] acceptTypes = accept.split(" *, *");
+        // sort on quality
+        Arrays.sort(acceptTypes, ACCEPT_X_COMPARATOR);
+
+        return acceptTypes;
+    }
+
     /** Check if the incoming request contains the "Content-Type"
      * header field, and it contains the give mime `type`.
      *
