@@ -21,9 +21,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.util.Set;
 
 public final class Utils {
@@ -126,15 +124,30 @@ public final class Utils {
     }
 
     /**
-     * Creates a new HmacSHA256 Message Authentication Code
+     * Creates a new Message Authentication Code
+     * @param algorithm algorithm to use e.g.: HmacSHA256
      * @param secret The secret key used to create signatures
      * @return Mac implementation
      */
-    public static Mac newHmacSHA256(String secret) {
+    public static Mac newHmac(String algorithm, String secret) {
         try {
-            Mac hmacSHA256 = Mac.getInstance("HmacSHA256");
-            hmacSHA256.init(new SecretKeySpec(secret.getBytes(), hmacSHA256.getAlgorithm()));
-            return hmacSHA256;
+            Mac hmac = Mac.getInstance(algorithm);
+            hmac.init(new SecretKeySpec(secret.getBytes(), hmac.getAlgorithm()));
+            return hmac;
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Signature newSignature(String algorithm) {
+        try {
+            KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+            PrivateKey privateKey = keyPair.getPrivate();
+
+            Signature instance = Signature.getInstance(algorithm);
+            instance.initSign(privateKey);
+
+            return instance;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }

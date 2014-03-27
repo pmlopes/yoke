@@ -41,6 +41,12 @@ public class Validator extends Middleware {
     private static final Pattern ALPHA = Pattern.compile("^[a-zA-Z]+$");
     private static final Pattern ALPHANUMERIC = Pattern.compile("^[a-zA-Z0-9]+$");
 
+    private static final Map<String, Object> EMPTY_MAP = Collections.emptyMap();
+    private static final JsonObject EMPTY = new JsonObject(EMPTY_MAP);
+
+    private static final SimpleNumberComparator NUMBERCOMPARATOR = new SimpleNumberComparator();
+    private static final ThreadLocalUTCDateFormat DATEFORMAT = new ThreadLocalUTCDateFormat();
+
     private static class SimpleNumberComparator implements Comparator<Number> {
         @Override
         public int compare(Number o1, Number o2) {
@@ -103,10 +109,6 @@ public class Validator extends Middleware {
     }
 
     public final class Checker {
-
-        private final JsonObject EMPTY = new JsonObject(Collections.EMPTY_MAP);
-        private final SimpleNumberComparator NUMBERCOMPARATOR = new SimpleNumberComparator();
-        private final ThreadLocalUTCDateFormat DATEFORMAT = new ThreadLocalUTCDateFormat();
 
         private final int type;
         private final String path;
