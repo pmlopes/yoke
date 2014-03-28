@@ -24,13 +24,13 @@ final class Promise<T> {
     public void cancel(Object error) {
         if (!canceled) {
             canceled = true;
-            if (handler instanceof AsyncResultHandler) {
-                handler.handle(new YokeAsyncResult<T>(error, null));
-                handler = null;
-                return;
-            }
             if (handler != null) {
-                handler.handle(null);
+                if (handler instanceof AsyncResultHandler) {
+                    handler.handle(new YokeAsyncResult<T>(error, null));
+                    handler = null;
+                    return;
+                }
+                handler.handle(error);
                 handler = null;
             }
         }
@@ -40,12 +40,12 @@ final class Promise<T> {
     public void resolve(T value) {
         if (!canceled && !resolved) {
             resolved = true;
-            if (handler instanceof AsyncResultHandler) {
-                handler.handle(new YokeAsyncResult<>(value));
-                handler = null;
-                return;
-            }
             if (handler != null) {
+                if (handler instanceof AsyncResultHandler) {
+                    handler.handle(new YokeAsyncResult<>(value));
+                    handler = null;
+                    return;
+                }
                 handler.handle(value);
                 handler = null;
             }

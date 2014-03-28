@@ -17,7 +17,7 @@ public class FormAuthExample extends Verticle {
     @Override
     public void start() {
 
-        final Mac hmac = Utils.newHmacSHA256("abracadabra");
+        final Mac hmac = Utils.newHmac("HmacSHA256", "abracadabra");
 
         final Yoke app = new Yoke(this);
 

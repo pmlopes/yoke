@@ -22,7 +22,7 @@ public abstract class OAuth2 {
     private final String access_token_uri = "/oauth/access_token";
 
     private final Key cryptoKey = Utils.newCryptoKey("secret");
-    private final Mac signMac = Utils.newHmacSHA256("sign");
+    private final Mac signMac = Utils.newHmac("HmacSHA256", "sign");
 
     public OAuth2() {
 

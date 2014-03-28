@@ -21,49 +21,46 @@ public final class JWT {
 
     public JWT(final String secret) {
         CRYPTO_MAP.put("HS256", new Crypto() {
+            final Mac mac = Utils.newHmac("HmacSHA256", secret);
+
             @Override
             public byte[] sign(byte[] payload) {
-                final Mac mac = Utils.newHmac("HmacSHA256", secret);
                 return mac.doFinal(payload);
             }
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                final Mac mac = Utils.newHmac("HmacSHA256", secret);
                 return Arrays.equals(payload, mac.doFinal(payload));
             }
         });
         CRYPTO_MAP.put("HS348", new Crypto() {
+            final Mac mac = Utils.newHmac("HmacSHA348", secret);
             @Override
             public byte[] sign(byte[] payload) {
-                final Mac mac = Utils.newHmac("HmacSHA348", secret);
                 return mac.doFinal(payload);
             }
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                final Mac mac = Utils.newHmac("HmacSHA348", secret);
                 return Arrays.equals(payload, mac.doFinal(payload));
             }
         });
         CRYPTO_MAP.put("HS512", new Crypto() {
+            final Mac mac = Utils.newHmac("HmacSHA512", secret);
             @Override
             public byte[] sign(byte[] payload) {
-                final Mac mac = Utils.newHmac("HmacSHA512", secret);
                 return mac.doFinal(payload);
             }
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                final Mac mac = Utils.newHmac("HmacSHA512", secret);
                 return Arrays.equals(payload, mac.doFinal(payload));
             }
         });
         CRYPTO_MAP.put("RS256", new Crypto() {
-
+            final Signature sig = Utils.newSignature("SHA256withRSA");
             @Override
             public byte[] sign(byte[] payload) {
-                final Signature sig = Utils.newSignature("SHA256withRSA");
                 try {
                     sig.update(payload);
                     return sig.sign();
@@ -74,7 +71,6 @@ public final class JWT {
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                final Signature sig = Utils.newSignature("SHA256withRSA");
                 try {
                     sig.update(payload);
                     return sig.verify(signature);
@@ -85,7 +81,11 @@ public final class JWT {
         });
     }
 
-    public JsonObject decode(String token, boolean noVerify) {
+    public JsonObject decode(final String token) {
+        return decode(token, false);
+    }
+
+    public JsonObject decode(final String token, boolean noVerify) {
         String[] segments = token.split("\\.");
         if (segments.length != 3) {
             throw new RuntimeException("Not enough or too many segments");
