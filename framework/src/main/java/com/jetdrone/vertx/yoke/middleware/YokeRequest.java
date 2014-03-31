@@ -350,6 +350,18 @@ public class YokeRequest implements HttpServerRequest {
      */
     public JsonObject createSession() {
         final String sessionId = UUID.randomUUID().toString();
+        return createSession(sessionId);
+    }
+
+
+    /** Create a new Session with custom Id and store it with the underlying storage.
+     * Internally create a entry in the request context under the name "session" and add a end handler to save that
+     * object once the execution is terminated. Custom session id could be used with external auth provider like mod-auth-mgr.
+     *
+     * @param sessionId custom session id
+     * @return {JsonObject} session
+     */
+    public JsonObject createSession(final String sessionId) {
         final JsonObject session = new JsonObject().putString("id", sessionId);
 
         put("session", session);
@@ -357,17 +369,21 @@ public class YokeRequest implements HttpServerRequest {
         response().headersHandler(new Handler<Void>() {
             @Override
             public void handle(Void event) {
-                JsonObject session = get("session");
-                if (session != null) {
-                    store.set(sessionId, session, new Handler<Object>() {
-                        @Override
-                        public void handle(Object error) {
-                            if (error != null) {
-                                // TODO: better handling of errors
-                                System.err.println(error);
+                int responseStatus = response().getStatusCode();
+                // Only save on success status code
+                if (responseStatus >= 200 && responseStatus < 300) {
+                    JsonObject session = get("session");
+                    if (session != null) {
+                        store.set(sessionId, session, new Handler<Object>() {
+                            @Override
+                            public void handle(Object error) {
+                                if (error != null) {
+                                    // TODO: better handling of errors
+                                    System.err.println(error);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         });
