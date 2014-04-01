@@ -12,33 +12,91 @@ public class GSwagger extends Swagger {
             super(path, description);
         }
 
-        public void get(String path, Map<String, Object> operation) {
+        public GResource get(String path, Map<String, Object> operation) {
             super.get(path, new JsonObject(operation));
+            return this;
         }
-        public void get(String path, String summary, Map<String, Object> operation) {
+        public GResource get(String path, String summary, Map<String, Object> operation) {
             super.get(path, summary, new JsonObject(operation));
+            return this;
         }
-        public void post(String path, Map<String, Object> operation) {
+        public GResource post(String path, Map<String, Object> operation) {
             super.post(path, new JsonObject(operation));
+            return this;
         }
-        public void post(String path, String summary, Map<String, Object> operation) {
+        public GResource post(String path, String summary, Map<String, Object> operation) {
             super.post(path, summary, new JsonObject(operation));
+            return this;
         }
-        public void put(String path, Map<String, Object> operation) {
+        public GResource put(String path, Map<String, Object> operation) {
             super.put(path, new JsonObject(operation));
+            return this;
         }
-        public void put(String path, String summary, Map<String, Object> operation) {
+        public GResource put(String path, String summary, Map<String, Object> operation) {
             super.put(path, summary, new JsonObject(operation));
+            return this;
         }
-        public void delete(String path, Map<String, Object> operation) {
+        public GResource delete(String path, Map<String, Object> operation) {
             super.delete(path, new JsonObject(operation));
+            return this;
         }
-        public void delete(String path, String summary, Map<String, Object> operation) {
+        public GResource delete(String path, String summary, Map<String, Object> operation) {
             super.delete(path, summary, new JsonObject(operation));
+            return this;
+        }
+        public GResource options(String path, Map<String, Object> operation) {
+            super.options(path, new JsonObject(operation));
+            return this;
+        }
+        public GResource options(String path, String summary, Map<String, Object> operation) {
+            super.options(path, summary, new JsonObject(operation));
+            return this;
+        }
+        public GResource trace(String path, Map<String, Object> operation) {
+            super.trace(path, new JsonObject(operation));
+            return this;
+        }
+        public GResource trace(String path, String summary, Map<String, Object> operation) {
+            super.trace(path, summary, new JsonObject(operation));
+            return this;
+        }
+        public GResource head(String path, Map<String, Object> operation) {
+            super.head(path, new JsonObject(operation));
+            return this;
+        }
+        public GResource head(String path, String summary, Map<String, Object> operation) {
+            super.head(path, summary, new JsonObject(operation));
+            return this;
+        }
+        public GResource connect(String path, Map<String, Object> operation) {
+            super.connect(path, new JsonObject(operation));
+            return this;
+        }
+        public GResource connect(String path, String summary, Map<String, Object> operation) {
+            super.connect(path, summary, new JsonObject(operation));
+            return this;
+        }
+        public GResource patch(String path, Map<String, Object> operation) {
+            super.patch(path, new JsonObject(operation));
+            return this;
+        }
+        public GResource patch(String path, String summary, Map<String, Object> operation) {
+            super.patch(path, summary, new JsonObject(operation));
+            return this;
+        }
+
+        public GResource produces(String... mimes) {
+            super.produces(mimes);
+            return this;
+        }
+
+        public GResource consumes(String... mimes) {
+            super.consumes(mimes);
+            return this;
         }
 
         public GResource addModel(String name, Map<String, Object> model) {
-            models.putObject(name, new JsonObject(model));
+            super.addModel(name, new JsonObject(model));
             return this;
         }
     }

@@ -8,7 +8,11 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Swagger extends Middleware {
 
@@ -58,43 +62,98 @@ public class Swagger extends Middleware {
             return this;
         }
 
-        public void get(String path, JsonObject operation) {
+        public Resource get(String path, JsonObject operation) {
             get(path, "", operation);
+            return this;
         }
-        public void get(String path, String summary, JsonObject operation) {
+        public Resource get(String path, String summary, JsonObject operation) {
             verb("GET", path, summary, operation);
+            return this;
         }
-        public void post(String path, JsonObject operation) {
+        public Resource post(String path, JsonObject operation) {
             post(path, "", operation);
+            return this;
         }
-        public void post(String path, String summary, JsonObject operation) {
+        public Resource post(String path, String summary, JsonObject operation) {
             verb("POST", path, summary, operation);
+            return this;
         }
-        public void put(String path, JsonObject operation) {
+        public Resource put(String path, JsonObject operation) {
             put(path, "", operation);
+            return this;
         }
-        public void put(String path, String summary, JsonObject operation) {
+        public Resource put(String path, String summary, JsonObject operation) {
             verb("PUT", path, summary, operation);
+            return this;
         }
-        public void delete(String path, JsonObject operation) {
+        public Resource delete(String path, JsonObject operation) {
             delete(path, "", operation);
+            return this;
         }
-        public void delete(String path, String summary, JsonObject operation) {
+        public Resource delete(String path, String summary, JsonObject operation) {
             verb("DELETE", path, summary, operation);
+            return this;
         }
-
-        // TODO: missing verbs
+        public Resource options(String path, JsonObject operation) {
+            options(path, "", operation);
+            return this;
+        }
+        public Resource options(String path, String summary, JsonObject operation) {
+            verb("OPTIONS", path, summary, operation);
+            return this;
+        }
+        public Resource head(String path, JsonObject operation) {
+            head(path, "", operation);
+            return this;
+        }
+        public Resource head(String path, String summary, JsonObject operation) {
+            verb("HEAD", path, summary, operation);
+            return this;
+        }
+        public Resource trace(String path, JsonObject operation) {
+            trace(path, "", operation);
+            return this;
+        }
+        public Resource trace(String path, String summary, JsonObject operation) {
+            verb("TRACE", path, summary, operation);
+            return this;
+        }
+        public Resource connect(String path, JsonObject operation) {
+            connect(path, "", operation);
+            return this;
+        }
+        public Resource connect(String path, String summary, JsonObject operation) {
+            verb("CONNECT", path, summary, operation);
+            return this;
+        }
+        public Resource patch(String path, JsonObject operation) {
+            patch(path, "", operation);
+            return this;
+        }
+        public Resource patch(String path, String summary, JsonObject operation) {
+            verb("PATCH", path, summary, operation);
+            return this;
+        }
 
         public Resource addModel(String name, JsonObject model) {
+            model.putString("id", name);
             models.putObject(name, model);
             return this;
         }
 
         private void verb(String verb, String path, String summary, JsonObject operation) {
+            // translate from yoke format to swagger format
+            Matcher m =  Pattern.compile(":([A-Za-z][A-Za-z0-9_]*)").matcher(path);
+            StringBuffer sb = new StringBuffer();
+            while (m.find()) {
+                m.appendReplacement(sb, "\\{$1\\}");
+            }
+            m.appendTail(sb);
+
             operation.putString("method", verb);
             operation.putString("summary", summary);
 
-            JsonObject api = getApi(path);
+            JsonObject api = getApi(sb.toString());
             api.getArray("operations").addObject(operation);
         }
     }
@@ -109,13 +168,11 @@ public class Swagger extends Middleware {
         this.apiVersion = apiVersion;
     }
 
-    // TODO: validation
     public Swagger setInfo(JsonObject info) {
         this.info = info;
         return this;
     }
 
-    // TODO: validation
     public Swagger setAuthorizations(JsonObject authorizations) {
         this.authorizations = authorizations;
         return this;

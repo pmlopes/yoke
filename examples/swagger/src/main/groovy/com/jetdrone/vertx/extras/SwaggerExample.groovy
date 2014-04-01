@@ -30,36 +30,59 @@ public class SwaggerExample extends Verticle {
         yoke.use(swagger);
         yoke.use(new Static("swagger-ui-2.0.12"));
 
-        GSwagger.GResource pets;
-
-        pets = swagger.createResource(yoke, "/pet", "Operations about pets")
-                .produces("application/json", "application/xml", "text/plain", "text/html");
-
-        pets.get("/pet/{petId}", "Find pet by ID", [
-                notes           : "Returns a pet based on ID",
-                type            : "Pet",
-                nickname        : "getPetById",
-                authorizations  : [:],
-                parameters      : [
-                        [
-                                name         : "petId",
-                                description  : "ID of pet that needs to be fetched",
-                                required     : true,
-                                type         : "integer",
-                                format       : "int64",
-                                paramType    : "path",
-                                allowMultiple: false,
-                                minimum      : "1.0",
-                                maximum      : "100000.0"
+        swagger.createResource(yoke, "/pet", "Operations about pets")
+                .produces("application/json", "application/xml", "text/plain", "text/html")
+                .addModel("Pet", [
+                    required: ["id", "name"],
+                    properties: [
+                        id: [
+                            type: "integer",
+                            format: "int64",
+                            description: "unique identifier for the pet",
+                            minimum: "0.0",
+                            maximum: "100.0"
+                        ],
+                        name: [
+                            type: "string"
+                        ],
+                        photoUrls: [
+                            type: "array",
+                            items: [
+                                type: "string"
+                            ]
+                        ],
+                        status: [
+                            type: "string",
+                            description: "pet status in the store",
+                            enum: ["available", "pending", "sold"]
                         ]
-                ],
-                responseMessages: [
-                        [code: 400, message: "Invalid ID supplied"],
-                        [code: 404, message: "Pet not found"]
-                ]
-        ]);
+                    ]
+                ])
+                .get("/pet/:petId", "Find pet by ID", [
+                        notes           : "Returns a pet based on ID",
+                        type            : "Pet",
+                        nickname        : "getPetById",
+                        authorizations  : [:],
+                        parameters      : [
+                                [
+                                        name         : "petId",
+                                        description  : "ID of pet that needs to be fetched",
+                                        required     : true,
+                                        type         : "integer",
+                                        format       : "int64",
+                                        paramType    : "path",
+                                        allowMultiple: false,
+                                        minimum      : "1.0",
+                                        maximum      : "100000.0"
+                                ]
+                        ],
+                        responseMessages: [
+                                [code: 400, message: "Invalid ID supplied"],
+                                [code: 404, message: "Pet not found"]
+                        ]
+                ]);
 
-        yoke.use(new GRouter().get("/pet/:id") { req ->
+        yoke.use(new GRouter().get("/pet/:petId") { req ->
             req.response.end()
         });
 
