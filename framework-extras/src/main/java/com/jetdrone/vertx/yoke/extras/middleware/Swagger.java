@@ -18,6 +18,7 @@ public class Swagger extends Middleware {
         final String description;
 
         JsonArray produces;
+        JsonArray consumes;
 
         JsonObject models = new JsonObject();
         JsonObject apis = new JsonObject();
@@ -43,6 +44,15 @@ public class Swagger extends Middleware {
             produces = new JsonArray();
             for (String mime : mimes) {
                 produces.addString(mime);
+            }
+
+            return this;
+        }
+
+        public Resource consumes(String... mimes) {
+            consumes = new JsonArray();
+            for (String mime : mimes) {
+                consumes.addString(mime);
             }
 
             return this;
@@ -119,6 +129,10 @@ public class Swagger extends Middleware {
         }
     }
 
+    protected Swagger.Resource createResource(String path, String description) {
+        return new Swagger.Resource(path, description);
+    }
+
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
         String path = getBasePath();
@@ -167,7 +181,7 @@ public class Swagger extends Middleware {
             normalizedPath = path;
         }
 
-        final Swagger.Resource resource = new Swagger.Resource(normalizedPath, description);
+        final Swagger.Resource resource = createResource(normalizedPath, description);
         resources.add(resource);
 
         yoke.use(getBasePath() + normalizedPath, new Middleware() {
@@ -182,8 +196,8 @@ public class Swagger extends Middleware {
                     JsonObject result = new JsonObject()
                             .putString("apiVersion", apiVersion)
                             .putString("swaggerVersion", "1.2")
-                            .putString("basePath", path)
-                            .putString("resourcePath", path);
+                            .putString("basePath", "/")
+                            .putString("resourcePath", normalizedPath);
 
                     if (resource.produces != null) {
                         result.putArray("produces", resource.produces);
