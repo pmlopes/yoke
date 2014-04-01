@@ -33,12 +33,6 @@ runMod - runs the module. This is similar to executing vertx runmod from the com
          not use the version of Vert.x installed and on the PATH to run it. Instead it uses the version of Vert.x
          that the module was compiled and tested against.
 
-runModIDEA - run the module from the project resources in IDEA. This allows you to run the module without building it
-first!
-
-runModEclipse - run the module from the project resources in Eclipse. This allows you to run the module without
-building it  first!
-
 pullInDeps - pulls in all dependencies of the module into a nested module directory
 
 uploadArchives - upload the module zip file (and jar if one has been created) to Nexus. You will need to

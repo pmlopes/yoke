@@ -42,6 +42,7 @@ project.ext.moduleName = "$modowner~$modname~$version"
 
 configurations {
   provided
+  compile.extendsFrom provided
   testCompile.extendsFrom provided
 }
 
@@ -100,10 +101,10 @@ sourceSets {
 }
 
 task copyMod( type:Copy, dependsOn: 'classes', description: 'Assemble the module into the local mods directory' ) {
-  into "$projectDir/build/mods/$moduleName"
+  into "$buildDir/mods/$moduleName"
   from compileJava
   from "$projectDir/src/main/resources"
-  into( "lib" ) {
+  into( 'lib' ) {
     from configurations.compile
   }
 }
@@ -123,7 +124,9 @@ task sourceJar(type: Jar) {
   from sourceSets.main.java
 }
 
-javadoc.classpath += configurations.provided
+javadoc {
+    classpath = configurations.compile + configurations.provided
+}
 
 task javadocJar(type: Jar) {
   description = 'Builds a javadoc jar artifact suitable for maven deployment.'
@@ -185,7 +188,7 @@ def doInit() {
       "$projectDir/bin\r\n" +
       "$projectDir/out/production/${project.name}\r\n" +
       "$projectDir/out/test/${project.name}\r\n" +
-      "$projectDir/build/deps\r\n";
+      "$buildDir/deps\r\n";
     cpFile << defaultCp;
   }
   def args = ['create-module-link', moduleName]
@@ -212,7 +215,7 @@ def setSysProps() {
   System.setProperty("vertx.clusterManagerFactory", "org.vertx.java.spi.cluster.impl.hazelcast.HazelcastClusterManagerFactory")
   String modsDir = System.getenv("VERTX_MODS")
   if (modsDir == null) {
-    modsDir = "$buildDir/build/mods";
+    modsDir = "$buildDir/mods";
   }
   System.setProperty("vertx.mods", modsDir)
 }

@@ -42,6 +42,7 @@ project.ext.moduleName = "$modowner~$modname~$version"
 
 configurations {
   provided
+  compile.extendsFrom provided
   testCompile.extendsFrom provided
 }
 
@@ -123,7 +124,9 @@ task sourceJar(type: Jar) {
   from sourceSets.main.java
 }
 
-javadoc.classpath += configurations.provided
+javadoc {
+    classpath = configurations.compile + configurations.provided
+}
 
 task javadocJar(type: Jar) {
   description = 'Builds a javadoc jar artifact suitable for maven deployment.'
@@ -158,7 +161,14 @@ task init(description: 'Create module link and CP file') << {
   doInit()
 }
 
-task runMod(description: 'Run the module') << {
+task collectDeps(type: Copy) {
+  destinationDir = file("build")
+  into("deps") {
+    from configurations.compile
+  }
+}
+
+task runMod(description: 'Run the module', dependsOn: collectDeps) << {
   setSysProps()
   // We also init here - this means for single module builds the user doesn't have to explicitly init -
   // they can just do runMod
@@ -177,7 +187,8 @@ def doInit() {
       "src/main/resources\r\n" +
       "bin\r\n" +
       "out/production/${project.name}\r\n" +
-      "out/test/${project.name}";
+      "out/test/${project.name}\r\n" +
+      "build/deps\r\n";
     cpFile << defaultCp;
   }
   def args = ['create-module-link', moduleName]
