@@ -55,16 +55,16 @@ public class YokeRequest implements HttpServerRequest {
         }
     };
 
-    // the original request
-    private final HttpServerRequest request;
-    // the wrapped response
-    private final YokeResponse response;
+    // the original request (if extensions need to access it, use the accessor)
+    final private HttpServerRequest request;
+    // the wrapped response (if extensions need to access it, use the accessor)
+    final private YokeResponse response;
     // the request context
-    protected final Context context;
-    // is this request secure
-    private final boolean secure;
+    final protected Context context;
+    // is this request secure (if extensions need to access it, use the accessor)
+    final private boolean secure;
     // session data store
-    private final SessionStore store;
+    final protected SessionStore store;
 
     // we can overrride the setMethod
     private String method;
