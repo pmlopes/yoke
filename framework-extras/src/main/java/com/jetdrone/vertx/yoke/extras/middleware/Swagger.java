@@ -12,15 +12,19 @@ import java.util.List;
 
 public class Swagger extends Middleware {
 
-    static class Resource {
+    public static class Resource {
 
         final String path;
-        final JsonObject models;
-        final JsonObject apis = new JsonObject();
+        final String description;
 
-        Resource(String path, JsonObject models) {
+        JsonArray produces;
+
+        JsonObject models = new JsonObject();
+        JsonObject apis = new JsonObject();
+
+        Resource(String path, String description) {
             this.path = path;
-            this.models = models == null ? new JsonObject() : models;
+            this.description = description;
         }
 
         private JsonObject getApi(String path) {
@@ -28,7 +32,6 @@ public class Swagger extends Middleware {
             if (api == null) {
                 api = new JsonObject()
                         .putString("path", path)
-                        .putString("description", "")
                         .putArray("operations", new JsonArray());
 
                 apis.putObject(path, api);
@@ -36,35 +39,50 @@ public class Swagger extends Middleware {
             return api;
         }
 
-        void get(String path, JsonObject operation) {
-            get(path, "", operation);
+        public Resource produces(String... mimes) {
+            produces = new JsonArray();
+            for (String mime : mimes) {
+                produces.addString(mime);
+            }
 
+            return this;
         }
-        void get(String path, String summary, JsonObject operation) {
+
+        public void get(String path, JsonObject operation) {
+            get(path, "", operation);
+        }
+        public void get(String path, String summary, JsonObject operation) {
             verb("GET", path, summary, operation);
         }
-        void post(String path, JsonObject operation) {
+        public void post(String path, JsonObject operation) {
             post(path, "", operation);
         }
-        void post(String path, String summary, JsonObject operation) {
+        public void post(String path, String summary, JsonObject operation) {
             verb("POST", path, summary, operation);
         }
-        void put(String path, JsonObject operation) {
+        public void put(String path, JsonObject operation) {
             put(path, "", operation);
         }
-        void put(String path, String summary, JsonObject operation) {
+        public void put(String path, String summary, JsonObject operation) {
             verb("PUT", path, summary, operation);
         }
-        void delete(String path, JsonObject operation) {
+        public void delete(String path, JsonObject operation) {
             delete(path, "", operation);
         }
-        void delete(String path, String summary, JsonObject operation) {
+        public void delete(String path, String summary, JsonObject operation) {
             verb("DELETE", path, summary, operation);
         }
 
+        // TODO: missing verbs
+
+        public Resource addModel(String name, JsonObject model) {
+            models.putObject(name, model);
+            return this;
+        }
+
         private void verb(String verb, String path, String summary, JsonObject operation) {
+            operation.putString("method", verb);
             operation.putString("summary", summary);
-            operation.putString("httpMethod", verb);
 
             JsonObject api = getApi(path);
             api.getArray("operations").addObject(operation);
@@ -74,67 +92,117 @@ public class Swagger extends Middleware {
     private final List<Resource> resources = new ArrayList<>();
 
     private final String apiVersion;
-    private final String basePath;
+    private JsonObject info;
+    private JsonObject authorizations;
 
-    public Swagger() {
-        this("0.1", null);
-    }
-
-    public Swagger(String basePath) {
-        this("0.1", basePath);
-    }
-
-    public Swagger(String apiVersion, String basePath) {
+    public Swagger(String apiVersion) {
         this.apiVersion = apiVersion;
-        this.basePath = basePath;
+    }
+
+    // TODO: validation
+    public Swagger setInfo(JsonObject info) {
+        this.info = info;
+        return this;
+    }
+
+    // TODO: validation
+    public Swagger setAuthorizations(JsonObject authorizations) {
+        this.authorizations = authorizations;
+        return this;
+    }
+
+    private String getBasePath() {
+        if ("/".equals(mount)) {
+            return "/api-docs";
+        } else {
+            return mount + "/api-docs";
+        }
     }
 
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
-        if ("GET".equals(request.method())) {
-            JsonObject result = new JsonObject()
-                    .putString("swaggerVersion", "1.0")
-                    .putString("apiVersion", apiVersion)
-                    .putString("basePath", basePath == null ? "http://" + request.getHeader("host", "localhost") : basePath);
+        String path = getBasePath();
 
-            JsonArray apis = new JsonArray();
-            result.putArray("apis", apis);
+        if (path.equals(request.normalizedPath())) {
+            if ("GET".equals(request.method())) {
+                JsonObject result = new JsonObject()
+                        .putString("apiVersion", apiVersion)
+                        .putString("swaggerVersion", "1.2");
 
-            for (Resource r : resources) {
-                apis.addObject(new JsonObject()
-                        .putString("path", r.path)
-                        .putString("description", ""));
+                JsonArray apis = new JsonArray();
+                result.putArray("apis", apis);
+
+                for (Resource r : resources) {
+                    apis.addObject(new JsonObject()
+                            .putString("path", r.path)
+                            .putString("description", r.description));
+                }
+
+                if (authorizations != null) {
+                    result.putObject("authorizations", authorizations);
+                }
+
+                result.putObject("info", info);
+
+                request.response().end(result);
+            } else {
+                next.handle(405);
             }
-
-            request.response().end(result);
         } else {
-            next.handle(405);
+            next.handle(null);
         }
     }
 
-    public void createResource(Yoke yoke, final String path) {
-        final Swagger.Resource resource = new Swagger.Resource(path, null);
+    public Swagger.Resource createResource(Yoke yoke, final String path) {
+        return createResource(yoke, path, "");
+    }
+
+    public Swagger.Resource createResource(Yoke yoke, final String path, final String description) {
+
+        final String normalizedPath;
+
+        if (path.charAt(0) != '/') {
+            normalizedPath = "/" + path;
+        } else {
+            normalizedPath = path;
+        }
+
+        final Swagger.Resource resource = new Swagger.Resource(normalizedPath, description);
         resources.add(resource);
 
-        yoke.use(path, new Middleware() {
+        yoke.use(getBasePath() + normalizedPath, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
                 if ("GET".equals(request.method())) {
-                    // GET
-                    JsonObject result = new JsonObject()
-                            .putString("swaggerVersion", "1.0")
-                            .putString("apiVersion", apiVersion)
-                            .putString("basePath", basePath == null ? "http://" + request.getHeader("host", "localhost") : basePath);
+                    if (!request.normalizedPath().equals(getBasePath() + normalizedPath)) {
+                        next.handle(null);
+                        return;
+                    }
 
-                    result.putString("resourcePath", path);
+                    JsonObject result = new JsonObject()
+                            .putString("apiVersion", apiVersion)
+                            .putString("swaggerVersion", "1.2")
+                            .putString("basePath", path)
+                            .putString("resourcePath", path);
+
+                    if (resource.produces != null) {
+                        result.putArray("produces", resource.produces);
+                    }
+
                     JsonArray apis = new JsonArray();
                     result.putArray("apis", apis);
 
-//                    result.apis = Object.keys(resource.apis).map(function(k) { return resource.apis[k]; });
+                    for (String key : resource.apis.getFieldNames()) {
+                        apis.addObject(resource.apis.getObject(key));
+                    }
                     result.putObject("models", resource.models);
                     request.response().end(result);
+                } else {
+                    next.handle(400);
                 }
             }
         });
+
+        return resource;
     }
 }
