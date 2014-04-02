@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+// TODO: add api_key validator
+// TODO: remove yoke as arg, use router? maybe?
 public class Swagger extends Middleware {
 
     public static class Resource {
@@ -65,7 +67,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource get(String path, String summary, JsonObject operation) {
-            verb("GET", path, summary, operation);
+            addOperation("GET", path, summary, operation);
             return this;
         }
         public Resource post(String path, JsonObject operation) {
@@ -73,7 +75,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource post(String path, String summary, JsonObject operation) {
-            verb("POST", path, summary, operation);
+            addOperation("POST", path, summary, operation);
             return this;
         }
         public Resource put(String path, JsonObject operation) {
@@ -81,7 +83,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource put(String path, String summary, JsonObject operation) {
-            verb("PUT", path, summary, operation);
+            addOperation("PUT", path, summary, operation);
             return this;
         }
         public Resource delete(String path, JsonObject operation) {
@@ -89,7 +91,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource delete(String path, String summary, JsonObject operation) {
-            verb("DELETE", path, summary, operation);
+            addOperation("DELETE", path, summary, operation);
             return this;
         }
         public Resource options(String path, JsonObject operation) {
@@ -97,7 +99,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource options(String path, String summary, JsonObject operation) {
-            verb("OPTIONS", path, summary, operation);
+            addOperation("OPTIONS", path, summary, operation);
             return this;
         }
         public Resource head(String path, JsonObject operation) {
@@ -105,7 +107,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource head(String path, String summary, JsonObject operation) {
-            verb("HEAD", path, summary, operation);
+            addOperation("HEAD", path, summary, operation);
             return this;
         }
         public Resource trace(String path, JsonObject operation) {
@@ -113,7 +115,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource trace(String path, String summary, JsonObject operation) {
-            verb("TRACE", path, summary, operation);
+            addOperation("TRACE", path, summary, operation);
             return this;
         }
         public Resource connect(String path, JsonObject operation) {
@@ -121,7 +123,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource connect(String path, String summary, JsonObject operation) {
-            verb("CONNECT", path, summary, operation);
+            addOperation("CONNECT", path, summary, operation);
             return this;
         }
         public Resource patch(String path, JsonObject operation) {
@@ -129,7 +131,7 @@ public class Swagger extends Middleware {
             return this;
         }
         public Resource patch(String path, String summary, JsonObject operation) {
-            verb("PATCH", path, summary, operation);
+            addOperation("PATCH", path, summary, operation);
             return this;
         }
 
@@ -139,7 +141,7 @@ public class Swagger extends Middleware {
             return this;
         }
 
-        private void verb(String verb, String path, String summary, JsonObject operation) {
+        protected void addOperation(String verb, String path, String summary, JsonObject operation) {
             // translate from yoke format to swagger format
             Matcher m =  Pattern.compile(":([A-Za-z][A-Za-z0-9_]*)").matcher(path);
             StringBuffer sb = new StringBuffer();
