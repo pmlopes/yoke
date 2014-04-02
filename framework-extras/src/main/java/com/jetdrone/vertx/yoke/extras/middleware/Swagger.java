@@ -8,9 +8,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -258,6 +256,10 @@ public class Swagger extends Middleware {
 
                     if (resource.produces != null) {
                         result.putArray("produces", resource.produces);
+                    }
+
+                    if (resource.consumes != null) {
+                        result.putArray("consumes", resource.consumes);
                     }
 
                     JsonArray apis = new JsonArray();
