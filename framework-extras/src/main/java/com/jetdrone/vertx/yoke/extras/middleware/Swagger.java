@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.yoke.extras.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -13,8 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // TODO: add api_key validator
-// TODO: remove yoke as arg, use router? maybe?
-public class Swagger extends Middleware {
+public class Swagger {
 
     public static class Resource {
 
@@ -160,42 +159,30 @@ public class Swagger extends Middleware {
 
     private final List<Resource> resources = new ArrayList<>();
 
+    private final Router router;
+    private final String prefix;
     private final String apiVersion;
+
     private JsonObject info;
     private JsonObject authorizations;
 
-    public Swagger(String apiVersion) {
+    public Swagger(final Router router, final String apiVersion) {
+        this(router, "/", apiVersion);
+    }
+
+    public Swagger(final Router router, final String prefix, final String apiVersion) {
+        this.router = router;
         this.apiVersion = apiVersion;
-    }
 
-    public Swagger setInfo(JsonObject info) {
-        this.info = info;
-        return this;
-    }
-
-    public Swagger setAuthorizations(JsonObject authorizations) {
-        this.authorizations = authorizations;
-        return this;
-    }
-
-    private String getBasePath() {
-        if ("/".equals(mount)) {
-            return "/api-docs";
+        if (prefix.endsWith("/")) {
+            this.prefix = prefix + "api-docs";
         } else {
-            return mount + "/api-docs";
+            this.prefix = prefix + "/api-docs";
         }
-    }
 
-    protected Swagger.Resource createResource(String path, String description) {
-        return new Swagger.Resource(path, description);
-    }
-
-    @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
-        String path = getBasePath();
-
-        if (path.equals(request.normalizedPath())) {
-            if ("GET".equals(request.method())) {
+        this.router.get(this.prefix, new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
                 JsonObject result = new JsonObject()
                         .putString("apiVersion", apiVersion)
                         .putString("swaggerVersion", "1.2");
@@ -216,19 +203,29 @@ public class Swagger extends Middleware {
                 result.putObject("info", info);
 
                 request.response().end(result);
-            } else {
-                next.handle(405);
             }
-        } else {
-            next.handle(null);
-        }
+        });
     }
 
-    public Swagger.Resource createResource(Yoke yoke, final String path) {
-        return createResource(yoke, path, "");
+    public Swagger setInfo(JsonObject info) {
+        this.info = info;
+        return this;
     }
 
-    public Swagger.Resource createResource(Yoke yoke, final String path, final String description) {
+    public Swagger setAuthorizations(JsonObject authorizations) {
+        this.authorizations = authorizations;
+        return this;
+    }
+
+    protected Swagger.Resource createSwaggerResource(String path, String description) {
+        return new Swagger.Resource(path, description);
+    }
+
+    public Swagger.Resource createResource(final String path) {
+        return createResource(path, "");
+    }
+
+    public Swagger.Resource createResource(final String path, final String description) {
 
         final String normalizedPath;
 
@@ -238,43 +235,34 @@ public class Swagger extends Middleware {
             normalizedPath = path;
         }
 
-        final Swagger.Resource resource = createResource(normalizedPath, description);
+        final Swagger.Resource resource = createSwaggerResource(normalizedPath, description);
         resources.add(resource);
 
-        yoke.use(getBasePath() + normalizedPath, new Middleware() {
+        router.get(prefix + normalizedPath, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
-                if ("GET".equals(request.method())) {
-                    if (!request.normalizedPath().equals(getBasePath() + normalizedPath)) {
-                        next.handle(null);
-                        return;
-                    }
+                JsonObject result = new JsonObject()
+                        .putString("apiVersion", apiVersion)
+                        .putString("swaggerVersion", "1.2")
+                        .putString("basePath", "/")
+                        .putString("resourcePath", normalizedPath);
 
-                    JsonObject result = new JsonObject()
-                            .putString("apiVersion", apiVersion)
-                            .putString("swaggerVersion", "1.2")
-                            .putString("basePath", "/")
-                            .putString("resourcePath", normalizedPath);
-
-                    if (resource.produces != null) {
-                        result.putArray("produces", resource.produces);
-                    }
-
-                    if (resource.consumes != null) {
-                        result.putArray("consumes", resource.consumes);
-                    }
-
-                    JsonArray apis = new JsonArray();
-                    result.putArray("apis", apis);
-
-                    for (String key : resource.apis.getFieldNames()) {
-                        apis.addObject(resource.apis.getObject(key));
-                    }
-                    result.putObject("models", resource.models);
-                    request.response().end(result);
-                } else {
-                    next.handle(400);
+                if (resource.produces != null) {
+                    result.putArray("produces", resource.produces);
                 }
+
+                if (resource.consumes != null) {
+                    result.putArray("consumes", resource.consumes);
+                }
+
+                JsonArray apis = new JsonArray();
+                result.putArray("apis", apis);
+
+                for (String key : resource.apis.getFieldNames()) {
+                    apis.addObject(resource.apis.getObject(key));
+                }
+                result.putObject("models", resource.models);
+                request.response().end(result);
             }
         });
 

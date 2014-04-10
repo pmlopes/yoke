@@ -14,7 +14,8 @@ public class SwaggerExample extends Verticle {
     def start() {
 
         final GYoke yoke = new GYoke(this);
-        final GSwagger swagger = new GSwagger("1.0.0");
+        final GRouter router = new GRouter();
+        final GSwagger swagger = new GSwagger(router, "1.0.0");
 
         swagger.setInfo([
                 title            : "Swagger Sample App",
@@ -29,8 +30,9 @@ public class SwaggerExample extends Verticle {
         yoke.use(new ErrorHandler(true));
         yoke.use(swagger);
         yoke.use(new Static("swagger-ui-2.0.12"));
+        yoke.use(router);
 
-        swagger.createResource(yoke, "/pet", "Operations about pets")
+        swagger.createResource("/pet", "Operations about pets")
                 .produces("application/json", "application/xml", "text/plain", "text/html")
                 .addModel("Pet", [
                     required: ["id", "name"],
@@ -82,9 +84,9 @@ public class SwaggerExample extends Verticle {
                         ]
                 ]);
 
-        yoke.use(new GRouter().get("/pet/:petId") { req ->
+        router.get("/pet/:petId") { req ->
             req.response.end()
-        });
+        }
 
         yoke.listen(8080);
 

@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.extras.middleware;
 
-import com.jetdrone.vertx.yoke.GYoke;
+import com.jetdrone.vertx.yoke.middleware.GRouter;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.Map;
@@ -101,8 +101,12 @@ public class GSwagger extends Swagger {
         }
     }
 
-    public GSwagger(String apiVersion) {
-        super(apiVersion);
+    public GSwagger(GRouter router, String apiVersion) {
+        super(router.toJavaRouter(), apiVersion);
+    }
+
+    public GSwagger(GRouter router, String prefix, String apiVersion) {
+        super(router.toJavaRouter(), prefix, apiVersion);
     }
 
     public GSwagger setInfo(Map<String, Object> info) {
@@ -116,15 +120,15 @@ public class GSwagger extends Swagger {
     }
 
     @Override
-    protected GSwagger.GResource createResource(String path, String description) {
+    protected GSwagger.GResource createSwaggerResource(String path, String description) {
         return new GSwagger.GResource(path, description);
     }
 
-    public GSwagger.GResource createResource(GYoke yoke, final String path, final String description) {
-        return (GResource) super.createResource(yoke.toJavaYoke(), path, description);
+    public GSwagger.GResource createResource(final String path, final String description) {
+        return (GResource) super.createResource(path, description);
     }
 
-    public GSwagger.GResource createResource(GYoke yoke, final String path) {
-        return (GResource) super.createResource(yoke.toJavaYoke(), path);
+    public GSwagger.GResource createResource(final String path) {
+        return (GResource) super.createResource(path);
     }
 }

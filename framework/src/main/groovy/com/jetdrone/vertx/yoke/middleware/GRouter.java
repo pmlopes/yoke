@@ -295,4 +295,8 @@ public class GRouter extends Middleware {
         jRouter.param(param, pattern);
         return this;
     }
+
+    public Router toJavaRouter() {
+        return jRouter;
+    }
 }
