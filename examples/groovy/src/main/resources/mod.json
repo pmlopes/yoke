@@ -1,4 +1,4 @@
 {
   "main": "GroovyExample.groovy",
-  "includes": "com.jetdrone~yoke~1.0.7-SNAPSHOT,com.jetdrone~yoke-extras~1.0.7-SNAPSHOT"
+  "includes": "com.jetdrone~yoke~1.0.7,com.jetdrone~yoke-extras~1.0.7"
 }
