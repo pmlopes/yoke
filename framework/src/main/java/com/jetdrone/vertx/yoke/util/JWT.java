@@ -163,6 +163,6 @@ public final class JWT {
     }
 
     private static String base64urlEscape(String str) {
-        return str.replaceAll("\\+", "-").replaceAll("\\/", "_").replaceAll("=", "");
+        return str.replaceAll("\\+", "-").replaceAll("/", "_").replaceAll("=", "");
     }
 }

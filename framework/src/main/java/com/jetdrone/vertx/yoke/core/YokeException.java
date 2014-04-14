@@ -32,7 +32,7 @@ public class YokeException extends Throwable {
     }
 
     public YokeException(Number code, String message, String cause) {
-        super(message, new Throwable(cause));
+        super(message, new RuntimeException(cause));
         this.code = code;
     }
 

@@ -25,7 +25,7 @@ YokeTester.prototype.request = function(method, url, headers, body, callback) {
 
 function toMultiMap(json) {
     var headers = new org.vertx.java.core.http.CaseInsensitiveMultiMap();
-    for (k in json) {
+    for (var k in json) {
         if (json.hasOwnProperty(k)) {
             headers.add(k, json[k]);
         }
