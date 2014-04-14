@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.core;
 
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 
 /**
@@ -39,7 +40,7 @@ public class YokeAsyncResult<T> implements AsyncResult<T> {
      *
      * @param throwable the error that was thrown.
      */
-    public YokeAsyncResult(Throwable throwable) {
+    public YokeAsyncResult(@NotNull Throwable throwable) {
         this.throwable = throwable;
         this.result = null;
     }

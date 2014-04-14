@@ -3,6 +3,8 @@
  */
 package com.jetdrone.vertx.yoke;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +39,7 @@ public class MimeType {
      *
      * @param in InputStream
      */
-    private static void loadFile(InputStream in) {
+    private static void loadFile(@NotNull InputStream in) {
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
             String l;
@@ -71,7 +73,7 @@ public class MimeType {
      * @param defaultMimeType what to return if not found
      * @return mime type
      */
-    public static String getMime(String file, String defaultMimeType) {
+    public static String getMime(@NotNull String file, String defaultMimeType) {
         int sep = file.lastIndexOf('.');
         if (sep != -1) {
             String extension = file.substring(sep + 1, file.length());
@@ -92,7 +94,7 @@ public class MimeType {
      * @param file path to a file with extension
      * @return mime type
      */
-    public static String getMime(String file) {
+    public static String getMime(@NotNull String file) {
         return getMime(file, "text/plain");
     }
 
@@ -104,7 +106,7 @@ public class MimeType {
      * @param fallback if not found returns fallback
      * @return charset string
      */
-    public static String getCharset(String mime, String fallback) {
+    public static String getCharset(@NotNull String mime, String fallback) {
         // TODO: exceptions json and which other should also be marked as text
         if (mime.startsWith("text")) {
             return defaultContentEncoding;
@@ -119,7 +121,7 @@ public class MimeType {
      * @param mime the mime type to query
      * @return charset string
      */
-    public static String getCharset(String mime) {
+    public static String getCharset(@NotNull String mime) {
         return getCharset(mime, null);
     }
 }

@@ -61,6 +61,7 @@ dependencies {
   provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   provided "org.mozilla:rhino:$rhinoVersion"
+  provided "org.jetbrains:annotations:13.0"
 
 }
 

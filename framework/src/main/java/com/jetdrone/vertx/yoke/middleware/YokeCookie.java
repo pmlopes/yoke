@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.util.Utils;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.DefaultCookie;
+import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.Mac;
 import java.util.Set;
@@ -188,7 +189,16 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public int compareTo(Cookie o) {
+    public int compareTo(@NotNull Cookie o) {
         return nettyCookie.compareTo(o);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o != null && o instanceof Cookie) {
+            return compareTo((Cookie) o) == 0;
+        }
+
+        return false;
     }
 }

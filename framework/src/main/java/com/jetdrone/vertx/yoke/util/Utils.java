@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -31,7 +32,7 @@ public final class Utils {
 
     private final static char[] HEXARRAY = "0123456789ABCDEF".toCharArray();
 
-    public static String hex(byte[] bytes) {
+    public static String hex(@NotNull byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
         int v;
         for ( int j = 0; j < bytes.length; j++ ) {
@@ -50,7 +51,7 @@ public final class Utils {
         return padded;
     }
 
-    public static String base64(final byte[] stringArray) {
+    public static String base64(final @NotNull byte[] stringArray) {
 
         final StringBuilder encoded = new StringBuilder();
 
@@ -77,7 +78,7 @@ public final class Utils {
     /**
      * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
      */
-    public static Buffer readResourceToBuffer(Class<?> clazz, String resource) {
+    public static Buffer readResourceToBuffer(@NotNull Class<?> clazz, @NotNull String resource) {
         try {
             Buffer buffer = new Buffer(0);
 
@@ -104,7 +105,7 @@ public final class Utils {
     /**
      * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
      */
-    public static String readResourceToString(Class<?> clazz, String resource) {
+    public static String readResourceToString(@NotNull Class<?> clazz, @NotNull String resource) {
         try {
             try (Reader r = new BufferedReader(new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8"))) {
 
@@ -129,7 +130,7 @@ public final class Utils {
      * @param secret The secret key used to create signatures
      * @return Mac implementation
      */
-    public static Mac newHmac(String algorithm, String secret) {
+    public static Mac newHmac(@NotNull String algorithm, @NotNull String secret) {
         try {
             Mac hmac = Mac.getInstance(algorithm);
             hmac.init(new SecretKeySpec(secret.getBytes(), hmac.getAlgorithm()));
@@ -139,7 +140,7 @@ public final class Utils {
         }
     }
 
-    public static Signature newSignature(String algorithm) {
+    public static Signature newSignature(@NotNull String algorithm) {
         try {
             KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
             PrivateKey privateKey = keyPair.getPrivate();
@@ -158,14 +159,14 @@ public final class Utils {
      * @param secret The secret key used to create signatures
      * @return Key implementation
      */
-    public static Key newCryptoKey(String secret) {
+    public static Key newCryptoKey(@NotNull String secret) {
         return new SecretKeySpec(secret.getBytes(), "AES");
     }
 
     /**
      * Signs a String value with a given MAC
      */
-    public static String sign(String val, Mac mac) {
+    public static String sign(@NotNull String val, @NotNull Mac mac) {
         mac.reset();
         return val + "." + base64(mac.doFinal(val.getBytes()));
     }
@@ -173,7 +174,7 @@ public final class Utils {
     /**
      * Returns the original value is the signature is correct. Null otherwise.
      */
-    public static String unsign(String val, Mac mac) {
+    public static String unsign(@NotNull String val, @NotNull Mac mac) {
         int idx = val.lastIndexOf('.');
 
         if (idx == -1) {
@@ -187,7 +188,7 @@ public final class Utils {
         return null;
     }
 
-    public static String encrypt(String val, Key key) {
+    public static String encrypt(@NotNull String val, @NotNull Key key) {
         try {
             Cipher c = Cipher.getInstance("AES");
             c.init(Cipher.ENCRYPT_MODE, key);
@@ -198,7 +199,7 @@ public final class Utils {
         }
     }
 
-    public static String decrypt(String val, Key key) {
+    public static String decrypt(@NotNull String val, @NotNull Key key) {
         try {
             Cipher c = Cipher.getInstance("AES");
             c.init(Cipher.DECRYPT_MODE, key);
@@ -210,7 +211,7 @@ public final class Utils {
         }
     }
 
-    public static String escape(String html) {
+    public static String escape(@NotNull String html) {
         return html
                 .replaceAll("&", "&amp;")
                 .replaceAll("\"", "&quot;")
@@ -221,7 +222,7 @@ public final class Utils {
     private static final TransformerFactory TRANSFORMER_FACTORY = TransformerFactory.newInstance();
     private static final String XSLT = Utils.readResourceToString(Utils.class, "xml-to-json.xsl");
 
-    public static JsonObject xmlToJson(String xml) throws TransformerException {
+    public static JsonObject xmlToJson(@NotNull String xml) throws TransformerException {
         // allocate the size of the xml (this is probably is more than needed but avoid re-allocations)
         StringWriter out = new StringWriter(xml.length());
 
@@ -233,7 +234,7 @@ public final class Utils {
 
     private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
 
-    public static String jsonToXml(JsonObject json, String rootName) throws XMLStreamException {
+    public static String jsonToXml(@NotNull JsonObject json, @NotNull String rootName) throws XMLStreamException {
         Writer xml = new StringWriter();
         // Create an XML stream writer
         XMLStreamWriter xmlw = XML_OUTPUT_FACTORY.createXMLStreamWriter(xml);
@@ -315,7 +316,7 @@ public final class Utils {
         }
     }
 
-    public static String encodeURIComponent(String s) {
+    public static String encodeURIComponent(@NotNull String s) {
         String result;
 
         try {
@@ -333,7 +334,7 @@ public final class Utils {
         return result;
     }
 
-    public static String decodeURIComponent(String s) {
+    public static String decodeURIComponent(@NotNull String s) {
         String result;
 
         try {

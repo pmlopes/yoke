@@ -23,6 +23,8 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 import org.vertx.java.platform.Verticle;
 
+import org.jetbrains.annotations.*;
+
 import java.util.*;
 
 /**
@@ -89,7 +91,7 @@ public class Yoke {
      *
      * @param verticle the main verticle
      */
-    public Yoke(Verticle verticle) {
+    public Yoke(@NotNull Verticle verticle) {
         this(verticle.getVertx(), verticle.getContainer(), new DefaultRequestWrapper());
     }
 
@@ -111,7 +113,7 @@ public class Yoke {
      *
      * @param vertx
      */
-    public Yoke(Vertx vertx) {
+    public Yoke(@NotNull Vertx vertx) {
         this(vertx, null, new DefaultRequestWrapper());
     }
 
@@ -133,7 +135,7 @@ public class Yoke {
      *
      * @param vertx
      */
-    public Yoke(Vertx vertx, Container container) {
+    public Yoke(@NotNull Vertx vertx, Container container) {
         this(vertx, container, new DefaultRequestWrapper());
     }
 
@@ -157,7 +159,7 @@ public class Yoke {
      * @param container
      * @param requestWrapper
      */
-    public Yoke(Vertx vertx, Container container, RequestWrapper requestWrapper) {
+    public Yoke(@NotNull Vertx vertx, Container container, @NotNull RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.container = container;
         this.requestWrapper = requestWrapper;
@@ -180,7 +182,7 @@ public class Yoke {
          * @param mount      Mount path
          * @param middleware Middleware to use on the path.
          */
-        private MountedMiddleware(String mount, Middleware middleware) {
+        private MountedMiddleware(@NotNull String mount, @NotNull Middleware middleware) {
             this.mount = mount;
             this.middleware = middleware;
         }
@@ -210,7 +212,7 @@ public class Yoke {
      * @param route      The route prefix for the middleware
      * @param middleware The middleware add to the chain
      */
-    public Yoke use(String route, Middleware... middleware) {
+    public Yoke use(@NotNull String route, @NotNull Middleware... middleware) {
         for (Middleware m : middleware) {
             // when the type of middleware is error handler then the route is ignored and
             // the middleware is extracted from the execution chain into a special placeholder
@@ -232,7 +234,7 @@ public class Yoke {
      *
      * @param middleware The middleware add to the chain
      */
-    public Yoke use(Middleware... middleware) {
+    public Yoke use(@NotNull Middleware... middleware) {
         return use("/", middleware);
     }
 
@@ -256,7 +258,7 @@ public class Yoke {
      * @param route   The route prefix for the middleware
      * @param handler The Handler to add
      */
-    public Yoke use(String route, final Handler<YokeRequest> handler) {
+    public Yoke use(@NotNull String route, final @NotNull Handler<YokeRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -278,7 +280,7 @@ public class Yoke {
      * </pre>
      * @param handler The Handler to add
      */
-    public Yoke use(Handler<YokeRequest> handler) {
+    public Yoke use(@NotNull Handler<YokeRequest> handler) {
         return use("/", handler);
     }
 
@@ -290,7 +292,7 @@ public class Yoke {
      *
      * @param engine    The implementation of the engine
      */
-    public Yoke engine(Engine engine) {
+    public Yoke engine(@NotNull Engine engine) {
         engine.setVertx(vertx);
         engineMap.put(engine.extension(), engine);
         return this;
@@ -301,7 +303,7 @@ public class Yoke {
      */
     protected SessionStore store;
 
-    public Yoke store(SessionStore store) {
+    public Yoke store(@NotNull SessionStore store) {
         this.store = store;
         return this;
     }
@@ -313,7 +315,7 @@ public class Yoke {
      * @param key   unique identifier
      * @param value Any non null value, nulls are not saved
      */
-    public Yoke set(String key, Object value) {
+    public Yoke set(@NotNull String key, Object value) {
         if (value == null) {
             defaultContext.remove(key);
         } else {
@@ -340,7 +342,7 @@ public class Yoke {
      * @param handler for asynchronous result of the listen operation
      * @return {Yoke}
      */
-    public Yoke listen(int port, Handler<Boolean> handler) {
+    public Yoke listen(int port, @NotNull Handler<Boolean> handler) {
         return listen(port, "0.0.0.0", handler);
     }
 
@@ -350,7 +352,7 @@ public class Yoke {
      * @param port the server TCP port
      * @return {Yoke}
      */
-    public Yoke listen(int port, String address) {
+    public Yoke listen(int port, @NotNull String address) {
         return listen(port, address, null);
     }
 
@@ -361,7 +363,7 @@ public class Yoke {
      * @param handler for asynchronous result of the listen operation
      * @return {Yoke}
      */
-    public Yoke listen(int port, String address, final Handler<Boolean> handler) {
+    public Yoke listen(int port, @NotNull String address, final Handler<Boolean> handler) {
         HttpServer server = vertx.createHttpServer();
 
         listen(server);
@@ -385,7 +387,7 @@ public class Yoke {
      * @param server
      * @return {Yoke}
      */
-    public Yoke listen(final HttpServer server) {
+    public Yoke listen(final @NotNull HttpServer server) {
         // is this server HTTPS?
         final boolean secure = server.isSSL();
 
@@ -481,7 +483,7 @@ public class Yoke {
      *
      * @param config either a json object or a json array.
      */
-    public Yoke deploy(JsonElement config) {
+    public Yoke deploy(@NotNull JsonElement config) {
         return deploy(config, null);
     }
 
@@ -505,12 +507,10 @@ public class Yoke {
      * @param config either a json object or a json array.
      * @param handler A handler that is called once all middleware is deployed or on error.
      */
-    public Yoke deploy(final JsonElement config, final Handler<Object> handler) {
+    public Yoke deploy(final @NotNull JsonElement config, final Handler<Object> handler) {
         if (config.isObject()) {
             return deploy(new JsonArray().addObject(config.asObject()));
         }
-
-        System.err.println(config.asArray().size());
 
         // wait for all deployments before calling the real handler
         Handler<AsyncResult<String>> waitFor = new Handler<AsyncResult<String>>() {
@@ -521,9 +521,6 @@ public class Yoke {
             @Override
             public void handle(AsyncResult<String> event) {
                 latch--;
-
-                System.err.println(!handled + " " + event.failed() + " " + (latch == 0) + " = " + (!handled && (event.failed() || latch == 0)));
-
                 if (handler != null) {
                     if (!handled && (event.failed() || latch == 0)) {
                         handled = true;

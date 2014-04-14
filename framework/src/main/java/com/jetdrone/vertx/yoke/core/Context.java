@@ -3,6 +3,8 @@
  */
 package com.jetdrone.vertx.yoke.core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /** # Context
@@ -24,7 +26,7 @@ public final class Context implements Map<String, Object> {
      *
      * @param ro parent context
      */
-    public Context(Map<String, Object> ro) {
+    public Context(@NotNull Map<String, Object> ro) {
         this.ro = ro;
     }
 
@@ -39,7 +41,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public boolean containsKey(Object o) {
+    public boolean containsKey(@NotNull Object o) {
         if (rw != null) {
             if (rw.containsKey(o)) {
                 return true;
@@ -61,7 +63,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public Object get(Object o) {
+    public Object get(@NotNull Object o) {
         if (rw != null) {
             if (rw.containsKey(o)) {
                 return rw.get(o);
@@ -72,7 +74,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public Object put(String s, Object o) {
+    public Object put(@NotNull String s, Object o) {
         if (rw == null) {
             rw = new LinkedHashMap<>();
         }
@@ -80,7 +82,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public Object remove(Object o) {
+    public Object remove(@NotNull Object o) {
         if (rw == null) {
             return null;
         }
@@ -88,7 +90,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public void putAll(Map<? extends String, ?> map) {
+    public void putAll(@NotNull Map<? extends String, ?> map) {
         if (rw == null) {
             rw = new LinkedHashMap<>();
         }
@@ -103,7 +105,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public Set<String> keySet() {
+    public @NotNull Set<String> keySet() {
         if (rw != null) {
             Set<String> keys = rw.keySet();
             keys.addAll(ro.keySet());
@@ -114,7 +116,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public Collection<Object> values() {
+    public @NotNull Collection<Object> values() {
         if (rw != null) {
             Collection<Object> values = rw.values();
             values.addAll(ro.values());
@@ -125,7 +127,7 @@ public final class Context implements Map<String, Object> {
     }
 
     @Override
-    public Set<Entry<String, Object>> entrySet() {
+    public @NotNull Set<Entry<String, Object>> entrySet() {
         if (rw != null) {
             Set<Entry<String, Object>> entries = new HashSet<>(rw.entrySet());
             entries.addAll(ro.entrySet());

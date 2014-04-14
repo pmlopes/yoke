@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.core;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * # YokeException
@@ -17,31 +18,31 @@ public class YokeException extends Throwable {
 
     private final Number code;
 
-    public YokeException(Number code) {
+    public YokeException(@NotNull Number code) {
         this(code, HttpResponseStatus.valueOf(code.intValue()).reasonPhrase());
     }
 
-    public YokeException(Number code, String message) {
+    public YokeException(@NotNull Number code, @NotNull String message) {
         super(message);
         this.code = code;
     }
 
-    public YokeException(Number code, String message, Throwable cause) {
+    public YokeException(@NotNull Number code, @NotNull String message, @NotNull Throwable cause) {
         super(message, cause);
         this.code = code;
     }
 
-    public YokeException(Number code, String message, String cause) {
+    public YokeException(@NotNull Number code, @NotNull String message, @NotNull String cause) {
         super(message, new RuntimeException(cause));
         this.code = code;
     }
 
-    public YokeException(String message) {
+    public YokeException(@NotNull String message) {
         super(message);
         this.code = 500;
     }
 
-    public YokeException(Number code, Throwable cause) {
+    public YokeException(@NotNull Number code, @NotNull Throwable cause) {
         super(cause);
         this.code = code;
     }
