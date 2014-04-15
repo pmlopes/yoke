@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.extras
 
-import com.jetdrone.vertx.yoke.extras.middleware.GSwagger
+import com.jetdrone.vertx.yoke.middleware.GSwagger
 import com.jetdrone.vertx.yoke.middleware.BodyParser
 import com.jetdrone.vertx.yoke.middleware.ErrorHandler
 import com.jetdrone.vertx.yoke.middleware.GRouter

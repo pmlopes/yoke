@@ -55,8 +55,8 @@ dependencies {
   provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   // get yoke jar from parent
   compile project(':framework')
-  // get yoke jar for extras
-  compile project(':framework-extras')
+  // get jar for swagger
+  compile project(':middleware:swagger')
 }
 
 test {

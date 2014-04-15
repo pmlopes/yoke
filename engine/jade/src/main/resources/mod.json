@@ -1,0 +1,9 @@
+{
+  "description": "Jade for Yoke a middleware framework for Vert.x",
+  "licenses": ["The Apache Software License Version 2.0"],
+  "author": "Paulo Lopes <pmlopes@gmail.com>",
+
+  "developers": ["pmlopes"],
+  "keywords": ["middleware", "webapp", "framework", "web", "yoke", "connect", "router", "app", "api", "jade"],
+  "homepage": "http://pmlopes.github.io/yoke/"
+}

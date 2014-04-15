@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.extras;
 
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.extras.engine.HandlebarsEngine;
+import com.jetdrone.vertx.yoke.engine.HandlebarsEngine;
 import com.jetdrone.vertx.yoke.extras.middleware.JsonRestRouter;
 import com.jetdrone.vertx.yoke.extras.store.MongoDbStore;
 import com.jetdrone.vertx.yoke.middleware.*;

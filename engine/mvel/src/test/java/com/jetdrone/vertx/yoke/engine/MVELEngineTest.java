@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke.extras.test.engine;
+package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
@@ -18,7 +18,7 @@ import java.util.Map;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class MVELEngine extends TestVerticle {
+public class MVELEngineTest extends TestVerticle {
 
     @Test
     public void testBasicObjectAccess() {
@@ -31,7 +31,7 @@ public class MVELEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.MVELEngine());
+            yoke.engine(new MVELEngine());
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -64,7 +64,7 @@ public class MVELEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.MVELEngine());
+            yoke.engine(new MVELEngine());
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {

@@ -57,6 +57,8 @@ dependencies {
   compile project(':framework')
   // get yoke jar for extras
   compile project(':framework-extras')
+  // get the jar for the handlebars engine
+  compile project(':engine:handlebars')
 }
 
 test {

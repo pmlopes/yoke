@@ -1,4 +1,12 @@
+// base project
 include 'framework'
+// middleware
+include 'middleware:swagger'
+// engines
+include 'engine:handlebars'
+include 'engine:jade'
+include 'engine:mvel'
+
 include 'framework-extras'
 include 'examples:extras'
 include 'examples:groovy'

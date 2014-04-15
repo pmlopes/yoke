@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke.extras.test.engine;
+package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
@@ -11,12 +11,12 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Jade4JEngine extends TestVerticle {
+public class Jade4JEngineTest extends TestVerticle {
 
     @Test
     public void testEngine() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("views"));
+        yoke.engine(new Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -37,7 +37,7 @@ public class Jade4JEngine extends TestVerticle {
     @Test
     public void testEngine2() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new com.jetdrone.vertx.yoke.extras.engine.Jade4JEngine("views"));
+        yoke.engine(new Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

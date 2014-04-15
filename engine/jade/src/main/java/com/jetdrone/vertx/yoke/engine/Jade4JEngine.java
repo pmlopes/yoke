@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jetdrone.vertx.yoke.extras.engine;
+package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import com.jetdrone.vertx.yoke.engine.AbstractEngineSync;

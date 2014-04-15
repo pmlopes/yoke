@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jetdrone.vertx.yoke.extras.engine;
+package com.jetdrone.vertx.yoke.engine;
 
-import com.jetdrone.vertx.yoke.engine.AbstractEngine;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.mvel2.templates.CompiledTemplate;
 import org.mvel2.templates.TemplateCompiler;
