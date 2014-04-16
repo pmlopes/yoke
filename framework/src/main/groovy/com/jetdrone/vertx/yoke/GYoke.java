@@ -206,6 +206,15 @@ public class GYoke {
     public GYoke deploy(final Object config, final Closure handler) {
         if (config instanceof List) {
 
+            if (((List) config).size() == 0) {
+                if (handler == null) {
+                    return this;
+                } else {
+                    handler.call((Object) null);
+                    return this;
+                }
+            }
+
             final class WaitForClosure extends Closure {
                 int latch;
                 boolean handled = false;

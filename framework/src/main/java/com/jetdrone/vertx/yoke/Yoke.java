@@ -508,8 +508,18 @@ public class Yoke {
      * @param handler A handler that is called once all middleware is deployed or on error.
      */
     public Yoke deploy(final @NotNull JsonElement config, final Handler<Object> handler) {
+
+        if (config.isArray() && config.asArray().size() == 0) {
+            if (handler == null) {
+                return this;
+            } else {
+                handler.handle(null);
+                return this;
+            }
+        }
+
         if (config.isObject()) {
-            return deploy(new JsonArray().addObject(config.asObject()));
+            return deploy(new JsonArray().addObject(config.asObject()), handler);
         }
 
         // wait for all deployments before calling the real handler
