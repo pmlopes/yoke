@@ -2,7 +2,7 @@ package com.jetdrone.vertx.bench;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.extras.engine.MVELEngine;
+import com.jetdrone.vertx.yoke.engine.MVELEngine;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;

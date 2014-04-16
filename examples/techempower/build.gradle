@@ -55,7 +55,7 @@ dependencies {
   //provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   provided project(':framework')
   // get yoke jar for extras
-  provided project(':framework-extras')
+  provided project(':engine:mvel')
 }
 
 test {
