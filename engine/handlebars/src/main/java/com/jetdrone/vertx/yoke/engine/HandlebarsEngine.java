@@ -26,6 +26,7 @@ import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -47,28 +48,30 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
         handlebars = new Handlebars(new TemplateLoader() {
             @Override
             public TemplateSource sourceAt(final String location) throws IOException {
-                try {
-                    return new TemplateSource() {
-                        @Override
-                        public String content() throws IOException {
-                            // load from the file system
-                            return read(resolve(location));
-                        }
+                // load from the file system
+                final String buffer = read(resolve(location));
 
-                        @Override
-                        public String filename() {
-                            return location;
-                        }
-
-                        @Override
-                        public long lastModified() {
-                            return HandlebarsEngine.this.lastModified(location);
-                        }
-                    };
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new IOException(e);
+                if (buffer == null) {
+                    throw new FileNotFoundException(location);
                 }
+
+                return new TemplateSource() {
+                    @Override
+                    public String content() throws IOException {
+                        // load from the file system
+                        return buffer;
+                    }
+
+                    @Override
+                    public String filename() {
+                        return location;
+                    }
+
+                    @Override
+                    public long lastModified() {
+                        return HandlebarsEngine.this.lastModified(location);
+                    }
+                };
             }
 
             @Override

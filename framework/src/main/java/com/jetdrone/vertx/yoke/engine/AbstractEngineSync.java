@@ -100,12 +100,14 @@ public abstract class AbstractEngineSync<T> implements Engine {
     private void loadToCache(final String filename) {
         final FileSystem fileSystem = vertx.fileSystem();
 
-        FileProps fileProps = fileSystem.propsSync(filename);
-        final Date lastModified = fileProps.lastModifiedTime();
-        // load from the file system
-        Buffer content = fileSystem.readFileSync(filename);
-        // cache the result
-        cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, content.toString(contentEncoding())));
+        if (fileSystem.existsSync(filename)) {
+            FileProps fileProps = fileSystem.propsSync(filename);
+            final Date lastModified = fileProps.lastModifiedTime();
+            // load from the file system
+            Buffer content = fileSystem.readFileSync(filename);
+            // cache the result
+            cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, content.toString(contentEncoding())));
+        }
     }
 
     /**
@@ -131,6 +133,12 @@ public abstract class AbstractEngineSync<T> implements Engine {
      * Gets the content of the file from cache this is a synchronous operation since there is no blocking or I/O
      */
     private String getFileFromCache(String filename) {
+        LRUCache.CacheEntry<String, T> cachedTemplate = cache.get(filename);
+
+        if (cachedTemplate == null) {
+            return null;
+        }
+
         return cache.get(filename).raw;
     }
 
@@ -142,7 +150,9 @@ public abstract class AbstractEngineSync<T> implements Engine {
         LRUCache.CacheEntry<String, T> cachedTemplate = cache.get(filename);
 
         // this is to avoid null pointer exception in case of the layout composite template
-        if (cachedTemplate == null) return null;
+        if (cachedTemplate == null) {
+            return null;
+        }
 
         return cachedTemplate.compiled;
     }
