@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * Annotate a method with the param to be mounted in the middleware chain.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface Param {
     String value();
 }
