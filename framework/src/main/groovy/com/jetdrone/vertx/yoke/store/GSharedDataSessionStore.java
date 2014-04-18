@@ -33,12 +33,7 @@ public class GSharedDataSessionStore extends SharedDataSessionStore {
         get(sid, new Handler<JsonObject>() {
             @Override
             public void handle(JsonObject sess) {
-                if (sess == null) {
-                    callback.call(sess);
-                    return;
-                }
-
-                callback.call(sess.toMap());
+                callback.call(sess == null ? null : sess.toMap());
             }
         });
     }
@@ -59,7 +54,7 @@ public class GSharedDataSessionStore extends SharedDataSessionStore {
             @Override
             public void handle(JsonArray sessions) {
                 if (sessions == null) {
-                    callback.call(sessions);
+                    callback.call((List) null);
                     return;
                 }
                 List<Map<String, ?>> gSessions = new ArrayList<>();

@@ -365,7 +365,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                             }
 
                             if (is(args, CharSequence.class, Iterable.class)) {
-                                JSYokeResponse.this.putHeader((CharSequence) args[0], (Iterable) args[1]);
+                                JSYokeResponse.this.putHeader((CharSequence) args[0], (Iterable<CharSequence>) args[1]);
                                 return Undefined.instance;
                             }
 
@@ -399,7 +399,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                             }
 
                             if (is(args, CharSequence.class, Iterable.class)) {
-                                JSYokeResponse.this.putTrailer((CharSequence) args[0], (Iterable) args[1]);
+                                JSYokeResponse.this.putTrailer((CharSequence) args[0], (Iterable<CharSequence>) args[1]);
                                 return Undefined.instance;
                             }
 

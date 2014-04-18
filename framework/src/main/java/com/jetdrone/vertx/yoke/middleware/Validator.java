@@ -7,6 +7,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.ParseException;
@@ -47,7 +48,7 @@ public class Validator extends Middleware {
     private static final SimpleNumberComparator NUMBERCOMPARATOR = new SimpleNumberComparator();
     private static final ThreadLocalUTCDateFormat DATEFORMAT = new ThreadLocalUTCDateFormat();
 
-    private static class SimpleNumberComparator implements Comparator<Number> {
+    private static class SimpleNumberComparator implements Comparator<Number>, Serializable {
         @Override
         public int compare(Number o1, Number o2) {
             if (o1 instanceof Short && o2 instanceof Short) {
