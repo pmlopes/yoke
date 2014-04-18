@@ -9,6 +9,7 @@ import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import groovy.text.TemplateEngine;
 import org.codehaus.groovy.control.CompilationFailedException;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -71,7 +72,7 @@ public class GroovyTemplateEngine extends AbstractEngine<Template> {
 
         template.make(context).writeTo(new Writer() {
             @Override
-            public void write(char[] cbuf, int off, int len) throws IOException {
+            public void write(@NotNull char[] cbuf, int off, int len) throws IOException {
                 buffer.append(cbuf, off, len);
             }
 

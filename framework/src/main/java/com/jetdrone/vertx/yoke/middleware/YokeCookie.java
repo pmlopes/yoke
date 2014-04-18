@@ -195,10 +195,7 @@ public class YokeCookie implements Cookie {
 
     @Override
     public boolean equals(Object o) {
-        if (o != null && o instanceof Cookie) {
-            return compareTo((Cookie) o) == 0;
-        }
+        return o != null && o instanceof Cookie && compareTo((Cookie) o) == 0;
 
-        return false;
     }
 }
