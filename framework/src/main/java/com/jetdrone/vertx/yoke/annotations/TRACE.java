@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * Annotate a method that will handle the HTTP TRACE method requests for a given path.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.LOCAL_VARIABLE})
+@Target({ElementType.METHOD, ElementType.FIELD})
 public @interface TRACE {
     String value();
 }

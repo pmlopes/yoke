@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD, ElementType.LOCAL_VARIABLE})
+@Target({ElementType.METHOD, ElementType.TYPE, ElementType.FIELD})
 public @interface Consumes {
     String[] value();
 }
