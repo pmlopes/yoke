@@ -17,63 +17,119 @@ package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
+import org.thymeleaf.Arguments;
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.TemplateProcessingParameters;
 import org.thymeleaf.context.IContext;
+import org.thymeleaf.context.VariablesMap;
+import org.thymeleaf.messageresolver.IMessageResolver;
+import org.thymeleaf.messageresolver.MessageResolution;
+import org.thymeleaf.resourceresolver.IResourceResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
+import org.vertx.java.core.file.FileSystem;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
+import java.util.Locale;
 import java.util.Map;
 
 public class ThymeleafEngine implements Engine {
 
-    private final TemplateEngine engine;
-
-    private final String prefix;
-    private final String extension = ".html";
+    private final TemplateEngine engine = new TemplateEngine();
+    private final TemplateResolver templateResolver;
 
     public ThymeleafEngine(final String views) {
+        String prefix;
         if ("".equals(views)) {
             prefix = views;
         } else {
             prefix = views.endsWith("/") ? views : views + "/";
         }
 
-        TemplateResolver templateResolver = new TemplateResolver();
+        templateResolver = new TemplateResolver();
 
         // XHTML is the default mode, but we will set it anyway for better understanding of code
         templateResolver.setTemplateMode("XHTML");
-        // This will convert "home" to "/WEB-INF/templates/home.html"
         templateResolver.setPrefix(prefix);
-        templateResolver.setSuffix(extension);
-        // Set template cache TTL to 1 hour. If not set, entries would live in cache until expelled by LRU
-        templateResolver.setCacheTTLMs(3600000L);
-
-        engine = new TemplateEngine();
-        engine.setTemplateResolver(templateResolver);
     }
 
     @Override
     public void setVertx(Vertx vertx) {
+        final FileSystem fs = vertx.fileSystem();
+
+        templateResolver.setResourceResolver(new IResourceResolver() {
+
+            @Override
+            public String getName() {
+                return "Yoke/Thymeleaf";
+            }
+
+            @Override
+            public InputStream getResourceAsStream(TemplateProcessingParameters templateProcessingParameters, String resourceName) {
+
+                if (!fs.existsSync(resourceName)) {
+                    return null;
+                }
+
+                final Buffer buffer = fs.readFileSync(resourceName);
+
+                return new InputStream() {
+                    int pos = 0;
+
+                    @Override
+                    public int read() throws IOException {
+                        if (pos == buffer.length()) {
+                            return -1;
+                        }
+
+                        return buffer.getByte(pos++);
+                    }
+                };
+            }
+        });
+
+        engine.setTemplateResolver(templateResolver);
+//        engine.setMessageResolver(new IMessageResolver() {
+//            @Override
+//            public String getName() {
+//                return "Yoke/Thymeleaf";
+//            }
+//
+//            @Override
+//            public Integer getOrder() {
+//                return 1;
+//            }
+//
+//            @Override
+//            public MessageResolution resolveMessage(Arguments arguments, String key, Object[] messageParameters) {
+//                return null;
+//            }
+//
+//            @Override
+//            public void initialize() {
+//
+//            }
+//        });
     }
 
     @Override
     public String contentType() {
-        return null;
+        return "text/html";
     }
 
     @Override
     public String contentEncoding() {
-        return null;
+        return "UTF-8";
     }
 
     @Override
     public String extension() {
-        return extension;
+        return ".html";
     }
 
     @Override
@@ -87,9 +143,7 @@ public class ThymeleafEngine implements Engine {
         final Buffer buffer = new Buffer();
 
         try {
-            // TODO: resolve filename
-            // TODO: convert context to IContext
-            engine.process(filename, (IContext) null, new Writer() {
+            engine.process(filename, toIContext(context), new Writer() {
                 @Override
                 public void write(char[] cbuf, int off, int len) throws IOException {
                     buffer.appendString(new String(cbuf, off, len));
@@ -107,5 +161,27 @@ public class ThymeleafEngine implements Engine {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));
         }
+    }
+
+    private IContext toIContext(final Map<String, Object> context) {
+
+        final VariablesMap<String, Object> variables = new VariablesMap<>(context);
+
+        return new IContext() {
+            @Override
+            public VariablesMap<String, Object> getVariables() {
+                return variables;
+            }
+
+            @Override
+            public Locale getLocale() {
+                return Locale.getDefault();
+            }
+
+            @Override
+            public void addContextExecutionInfo(String templateName) {
+
+            }
+        };
     }
 }
