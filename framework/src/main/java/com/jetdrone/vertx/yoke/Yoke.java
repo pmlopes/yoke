@@ -4,8 +4,12 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.core.MountedMiddleware;
 import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
+import com.jetdrone.vertx.yoke.jmx.ContextMBean;
+import com.jetdrone.vertx.yoke.jmx.EngineMBean;
+import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
@@ -25,6 +29,8 @@ import org.vertx.java.platform.Verticle;
 
 import org.jetbrains.annotations.*;
 
+import javax.management.*;
+import java.lang.management.ManagementFactory;
 import java.util.*;
 
 /**
@@ -167,24 +173,16 @@ public class Yoke {
         defaultContext.put("x-powered-by", true);
         defaultContext.put("trust-proxy", true);
         store = new SharedDataSessionStore(vertx, "yoke.sessiondata");
-    }
 
-    /**
-     * Mounted middleware represents a binding of a Middleware instance to a specific url path.
-     */
-    private static class MountedMiddleware {
-        final String mount;
-        final Middleware middleware;
+        //Get the MBean server
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
-        /**
-         * Constructs a new Mounted Middleware
-         *
-         * @param mount      Mount path
-         * @param middleware Middleware to use on the path.
-         */
-        private MountedMiddleware(@NotNull String mount, @NotNull Middleware middleware) {
-            this.mount = mount;
-            this.middleware = middleware;
+        try {
+            mbs.registerMBean(new MiddlewareMBean(middlewareList), new ObjectName("com.jetdrone.yoke.jmx:type=Middleware@" + hashCode()));
+//            mbs.registerMBean(new EngineMBean(engineMap), new ObjectName("com.jetdrone.yoke.jmx:type=Engine@" + hashCode()));
+//            mbs.registerMBean(new ContextMBean(defaultContext), new ObjectName("com.jetdrone.yoke.jmx:type=Context@" + hashCode()));
+        } catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
+            throw new RuntimeException(e);
         }
     }
 
