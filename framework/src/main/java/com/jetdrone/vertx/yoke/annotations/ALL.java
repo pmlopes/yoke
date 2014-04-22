@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  * Annotate a method that will handle all known HTTP methods request for a given path.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD})
 public @interface ALL {
     String value();
 }

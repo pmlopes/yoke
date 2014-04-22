@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * Annotate a method that will handle the HTTP PATCH method requests for a given path.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
+@Target({ElementType.METHOD})
 public @interface PATCH {
     String value();
 }
