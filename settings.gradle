@@ -6,6 +6,7 @@ include 'middleware:swagger'
 include 'engine:handlebars'
 include 'engine:jade'
 include 'engine:mvel'
+include 'engine:thymeleaf'
 
 include 'framework-extras'
 include 'examples:extras'
