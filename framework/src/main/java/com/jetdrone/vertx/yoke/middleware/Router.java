@@ -4,11 +4,20 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
+import java.lang.annotation.Annotation;
+import java.lang.invoke.CallSite;
+import java.lang.invoke.ConstantCallSite;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -809,5 +818,281 @@ public class Router extends Middleware {
             this.paramNames = paramNames;
             this.middleware = middleware;
         }
+    }
+
+    private static Middleware wrap(final Object o, final MethodHandle m, final boolean simple, final String[] consumes, final String[] produces) {
+        return new Middleware() {
+            @Override
+            public void handle(YokeRequest request, Handler<Object> next) {
+                try {
+                    // we only know how to process certain media types
+                    if (consumes != null) {
+                        boolean canConsume = false;
+                        for (String c : consumes) {
+                            if (request.is(c)) {
+                                canConsume = true;
+                                break;
+                            }
+                        }
+
+                        if (!canConsume) {
+                            // 415 Unsupported Media Type (we don't know how to handle this media)
+                            next.handle(415);
+                            return;
+                        }
+                    }
+
+                    // the object was marked with a specific content type
+                    if (produces != null) {
+                        String bestContentType = request.accepts(produces);
+
+                        // the client does not know how to handle our content type, return 406
+                        if (bestContentType == null) {
+                            next.handle(406);
+                            return;
+                        }
+
+                        // mark the response with the correct content type (which allows middleware to know it later on)
+                        request.response().setContentType(bestContentType);
+                    }
+
+                    if (simple) {
+                        m.invoke(o, request);
+                    } else {
+                        m.invoke(o, request, next);
+                    }
+                } catch (Throwable e) {
+                    next.handle(e);
+                }
+            }
+        };
+    }
+
+    /**
+     * Builds a Router from an annotated Java Object
+     */
+    public static Router from(Object... objs) {
+
+        final Router router = new Router();
+        final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+
+        try {
+            for (Object o : objs) {
+
+                for (final Field f : o.getClass().getFields()) {
+                    // skip static methods
+                    if (Modifier.isStatic(f.getModifiers())) {
+                        continue;
+                    }
+
+                    // skip non public methods
+                    if (!Modifier.isPublic(f.getModifiers())) {
+                        continue;
+                    }
+
+                    Annotation[] annotations = f.getAnnotations();
+                    // this method is not annotated
+                    if (annotations == null) {
+                        continue;
+                    }
+
+                    if (Pattern.class.isAssignableFrom(f.getDeclaringClass())) {
+                        for (Annotation a : annotations) {
+                            if (a instanceof Param) {
+                                router.param(((Param) a).value(), (Pattern) f.get(o));
+                            }
+                        }
+                    }
+
+                    if (Middleware.class.isAssignableFrom(f.getDeclaringClass())) {
+                        MethodHandle methodHandle = lookup.unreflect(f.getClass().getMethod("handle", YokeRequest.class, Handler.class));
+                        CallSite callSite = new ConstantCallSite(methodHandle);
+                        methodHandle = callSite.dynamicInvoker();
+
+                        String[] produces = null;
+                        String[] consumes = null;
+
+                        // identify produces/consumes for content negotiation
+                        for (Annotation a : annotations) {
+                            if (a instanceof Consumes) {
+                                consumes = ((Consumes) a).value();
+                            }
+                            if (a instanceof Produces) {
+                                produces = ((Produces) a).value();
+                            }
+                        }
+
+                        // if still null inspect class
+                        if (consumes == null) {
+                            Annotation c = o.getClass().getAnnotation(Consumes.class);
+                            if (c != null) {
+                                // top level consumes is present
+                                consumes = ((Consumes) c).value();
+                            }
+                        }
+
+                        if (produces == null) {
+                            Annotation p = o.getClass().getAnnotation(Produces.class);
+                            if (p != null) {
+                                // top level consumes is present
+                                produces = ((Produces) p).value();
+                            }
+                        }
+
+                        for (Annotation a : annotations) {
+                            if (a instanceof GET) {
+                                router.get(((GET) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof PUT) {
+                                router.put(((PUT) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof POST) {
+                                router.post(((POST) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof DELETE) {
+                                router.delete(((DELETE) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof OPTIONS) {
+                                router.options(((OPTIONS) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof HEAD) {
+                                router.head(((HEAD) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof TRACE) {
+                                router.trace(((TRACE) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof PATCH) {
+                                router.patch(((PATCH) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof CONNECT) {
+                                router.connect(((CONNECT) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                            if (a instanceof ALL) {
+                                router.all(((ALL) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+
+                            if (a instanceof Param) {
+                                router.param(((Param) a).value(), wrap(o, methodHandle, false, consumes, produces));
+                            }
+                        }
+                    }
+                }
+
+                for (final Method m : o.getClass().getMethods()) {
+
+                    // skip static methods
+                    if (Modifier.isStatic(m.getModifiers())) {
+                        continue;
+                    }
+
+                    // skip non public methods
+                    if (!Modifier.isPublic(m.getModifiers())) {
+                        continue;
+                    }
+
+                    Annotation[] annotations = m.getAnnotations();
+                    // this method is not annotated
+                    if (annotations == null) {
+                        continue;
+                    }
+
+                    Class[] paramTypes = m.getParameterTypes();
+                    int type = 0;
+
+                    if (paramTypes != null) {
+                        if (paramTypes.length == 1 && YokeRequest.class.isAssignableFrom(paramTypes[0])) {
+                            // single argument handler
+                            type = 1;
+                        }
+                        if (paramTypes.length == 2 && YokeRequest.class.isAssignableFrom(paramTypes[0]) && Handler.class.isAssignableFrom(paramTypes[1])) {
+                            // double argument handler
+                            type = 2;
+                        }
+                    }
+
+                    if (type == 0) {
+                        continue;
+                    }
+
+                    MethodHandle methodHandle = lookup.unreflect(m);
+                    CallSite callSite = new ConstantCallSite(methodHandle);
+                    methodHandle = callSite.dynamicInvoker();
+
+//                    // handle Param
+//                    for (Annotation a : annotations) {
+//                        if (a instanceof Param) {
+//
+//                        }
+//                    }
+//
+                    String[] produces = null;
+                    String[] consumes = null;
+
+                    // identify produces/consumes for content negotiation
+                    for (Annotation a : annotations) {
+                        if (a instanceof Consumes) {
+                            consumes = ((Consumes) a).value();
+                        }
+                        if (a instanceof Produces) {
+                            produces = ((Produces) a).value();
+                        }
+                    }
+
+                    // if still null inspect class
+                    if (consumes == null) {
+                        Annotation c = o.getClass().getAnnotation(Consumes.class);
+                        if (c != null) {
+                            // top level consumes is present
+                            consumes = ((Consumes) c).value();
+                        }
+                    }
+
+                    if (produces == null) {
+                        Annotation p = o.getClass().getAnnotation(Produces.class);
+                        if (p != null) {
+                            // top level consumes is present
+                            produces = ((Produces) p).value();
+                        }
+                    }
+
+                    for (Annotation a : annotations) {
+                        if (a instanceof GET) {
+                            router.get(((GET) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof PUT) {
+                            router.put(((PUT) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof POST) {
+                            router.post(((POST) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof DELETE) {
+                            router.delete(((DELETE) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof OPTIONS) {
+                            router.options(((OPTIONS) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof HEAD) {
+                            router.head(((HEAD) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof TRACE) {
+                            router.trace(((TRACE) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof PATCH) {
+                            router.patch(((PATCH) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof CONNECT) {
+                            router.connect(((CONNECT) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                        if (a instanceof ALL) {
+                            router.all(((ALL) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
+                        }
+                    }
+                }
+            }
+        } catch (IllegalAccessException | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+
+        return router;
     }
 }
