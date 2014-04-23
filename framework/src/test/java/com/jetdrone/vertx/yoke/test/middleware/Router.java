@@ -20,7 +20,7 @@ public class Router extends TestVerticle {
 
     public static class TestRouter {
         @GET("/ws")
-        public void get(YokeRequest request) {
+        public void get(YokeRequest request, Handler<Object> next) {
             request.response().end("Hello ws!");
         }
     }
@@ -43,7 +43,7 @@ public class Router extends TestVerticle {
     public static class TestRouter2 {
         @GET("/ws")
         @Produces({"text/plain"})
-        public void get(YokeRequest request) {
+        public void get(YokeRequest request, Handler<Object> next) {
             request.response().end("Hello ws!");
         }
     }

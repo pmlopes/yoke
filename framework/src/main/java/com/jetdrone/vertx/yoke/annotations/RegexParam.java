@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface Param {
+public @interface RegexParam {
     String value();
+    String regex();
 }

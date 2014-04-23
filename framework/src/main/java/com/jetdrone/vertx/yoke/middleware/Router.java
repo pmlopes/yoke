@@ -10,14 +10,8 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
-import java.lang.annotation.Annotation;
-import java.lang.invoke.CallSite;
-import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -820,7 +814,7 @@ public class Router extends Middleware {
         }
     }
 
-    private static Middleware wrap(final Object o, final MethodHandle m, final boolean simple, final String[] consumes, final String[] produces) {
+    private static Middleware wrap(final Object o, final MethodHandle m, final String[] consumes, final String[] produces) {
         return new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -856,11 +850,8 @@ public class Router extends Middleware {
                         request.response().setContentType(bestContentType);
                     }
 
-                    if (simple) {
-                        m.invoke(o, request);
-                    } else {
-                        m.invoke(o, request, next);
-                    }
+                    m.invoke(o, request, next);
+
                 } catch (Throwable e) {
                     next.handle(e);
                 }
@@ -868,229 +859,150 @@ public class Router extends Middleware {
         };
     }
 
+    public static Router from(Object... objs) {
+        final Router router = new Router();
+        from(router, objs);
+
+        return router;
+    }
+
     /**
      * Builds a Router from an annotated Java Object
      */
-    public static Router from(Object... objs) {
+    public static Router from(final Router router, Object... objs) {
+        for (Object o : objs) {
 
-        final Router router = new Router();
-        final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
+            final Class c = o.getClass();
 
-        try {
-            for (Object o : objs) {
+            Produces clazzProducesAnn = Processor.getAnnotation(c, Produces.class);
+            Consumes clazzConsumesAnn = Processor.getAnnotation(c, Consumes.class);
 
-                for (final Field f : o.getClass().getFields()) {
-                    // skip static methods
-                    if (Modifier.isStatic(f.getModifiers())) {
-                        continue;
-                    }
+            String[] clazzProduces = clazzProducesAnn != null ? clazzProducesAnn.value() : null;
+            String[] clazzConsumes = clazzConsumesAnn != null ? clazzConsumesAnn.value() : null;
 
-                    // skip non public methods
-                    if (!Modifier.isPublic(f.getModifiers())) {
-                        continue;
-                    }
+            for (final Method m : c.getMethods()) {
+                Produces producesAnn = Processor.getAnnotation(m, Produces.class);
+                Consumes consumesAnn = Processor.getAnnotation(m, Consumes.class);
 
-                    Annotation[] annotations = f.getAnnotations();
-                    // this method is not annotated
-                    if (annotations == null) {
-                        continue;
-                    }
+                String[] produces = producesAnn != null ? producesAnn.value() : null;
+                String[] consumes = consumesAnn != null ? consumesAnn.value() : null;
 
-                    if (Pattern.class.isAssignableFrom(f.getDeclaringClass())) {
-                        for (Annotation a : annotations) {
-                            if (a instanceof Param) {
-                                router.param(((Param) a).value(), (Pattern) f.get(o));
-                            }
-                        }
-                    }
-
-                    if (Middleware.class.isAssignableFrom(f.getDeclaringClass())) {
-                        MethodHandle methodHandle = lookup.unreflect(f.getClass().getMethod("handle", YokeRequest.class, Handler.class));
-                        CallSite callSite = new ConstantCallSite(methodHandle);
-                        methodHandle = callSite.dynamicInvoker();
-
-                        String[] produces = null;
-                        String[] consumes = null;
-
-                        // identify produces/consumes for content negotiation
-                        for (Annotation a : annotations) {
-                            if (a instanceof Consumes) {
-                                consumes = ((Consumes) a).value();
-                            }
-                            if (a instanceof Produces) {
-                                produces = ((Produces) a).value();
-                            }
-                        }
-
-                        // if still null inspect class
-                        if (consumes == null) {
-                            Annotation c = o.getClass().getAnnotation(Consumes.class);
-                            if (c != null) {
-                                // top level consumes is present
-                                consumes = ((Consumes) c).value();
-                            }
-                        }
-
-                        if (produces == null) {
-                            Annotation p = o.getClass().getAnnotation(Produces.class);
-                            if (p != null) {
-                                // top level consumes is present
-                                produces = ((Produces) p).value();
-                            }
-                        }
-
-                        for (Annotation a : annotations) {
-                            if (a instanceof GET) {
-                                router.get(((GET) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof PUT) {
-                                router.put(((PUT) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof POST) {
-                                router.post(((POST) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof DELETE) {
-                                router.delete(((DELETE) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof OPTIONS) {
-                                router.options(((OPTIONS) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof HEAD) {
-                                router.head(((HEAD) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof TRACE) {
-                                router.trace(((TRACE) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof PATCH) {
-                                router.patch(((PATCH) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof CONNECT) {
-                                router.connect(((CONNECT) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                            if (a instanceof ALL) {
-                                router.all(((ALL) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-
-                            if (a instanceof Param) {
-                                router.param(((Param) a).value(), wrap(o, methodHandle, false, consumes, produces));
-                            }
-                        }
-                    }
+                if (produces == null) {
+                    produces = clazzProduces;
+                }
+                if (consumes == null) {
+                    consumes = clazzConsumes;
                 }
 
-                for (final Method m : o.getClass().getMethods()) {
+                RegexParam regexParam = Processor.getAnnotation(m, RegexParam.class);
 
-                    // skip static methods
-                    if (Modifier.isStatic(m.getModifiers())) {
-                        continue;
+                // process the methods that have both YokeRequest and Handler
+
+                if (Processor.isCompatible(m, ALL.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    // skip non public methods
-                    if (!Modifier.isPublic(m.getModifiers())) {
-                        continue;
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.all(Processor.getAnnotation(m, ALL.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, CONNECT.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    Annotation[] annotations = m.getAnnotations();
-                    // this method is not annotated
-                    if (annotations == null) {
-                        continue;
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.connect(Processor.getAnnotation(m, CONNECT.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, OPTIONS.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    Class[] paramTypes = m.getParameterTypes();
-                    int type = 0;
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.options(Processor.getAnnotation(m, OPTIONS.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, HEAD.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
 
-                    if (paramTypes != null) {
-                        if (paramTypes.length == 1 && YokeRequest.class.isAssignableFrom(paramTypes[0])) {
-                            // single argument handler
-                            type = 1;
-                        }
-                        if (paramTypes.length == 2 && YokeRequest.class.isAssignableFrom(paramTypes[0]) && Handler.class.isAssignableFrom(paramTypes[1])) {
-                            // double argument handler
-                            type = 2;
-                        }
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    if (type == 0) {
-                        continue;
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.head(Processor.getAnnotation(m, HEAD.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, GET.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    MethodHandle methodHandle = lookup.unreflect(m);
-                    CallSite callSite = new ConstantCallSite(methodHandle);
-                    methodHandle = callSite.dynamicInvoker();
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.get(Processor.getAnnotation(m, GET.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, POST.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
 
-//                    // handle Param
-//                    for (Annotation a : annotations) {
-//                        if (a instanceof Param) {
-//
-//                        }
-//                    }
-//
-                    String[] produces = null;
-                    String[] consumes = null;
-
-                    // identify produces/consumes for content negotiation
-                    for (Annotation a : annotations) {
-                        if (a instanceof Consumes) {
-                            consumes = ((Consumes) a).value();
-                        }
-                        if (a instanceof Produces) {
-                            produces = ((Produces) a).value();
-                        }
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    // if still null inspect class
-                    if (consumes == null) {
-                        Annotation c = o.getClass().getAnnotation(Consumes.class);
-                        if (c != null) {
-                            // top level consumes is present
-                            consumes = ((Consumes) c).value();
-                        }
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.post(Processor.getAnnotation(m, POST.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, PUT.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    if (produces == null) {
-                        Annotation p = o.getClass().getAnnotation(Produces.class);
-                        if (p != null) {
-                            // top level consumes is present
-                            produces = ((Produces) p).value();
-                        }
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.put(Processor.getAnnotation(m, PUT.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, PATCH.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
 
-                    for (Annotation a : annotations) {
-                        if (a instanceof GET) {
-                            router.get(((GET) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof PUT) {
-                            router.put(((PUT) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof POST) {
-                            router.post(((POST) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof DELETE) {
-                            router.delete(((DELETE) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof OPTIONS) {
-                            router.options(((OPTIONS) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof HEAD) {
-                            router.head(((HEAD) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof TRACE) {
-                            router.trace(((TRACE) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof PATCH) {
-                            router.patch(((PATCH) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof CONNECT) {
-                            router.connect(((CONNECT) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
-                        if (a instanceof ALL) {
-                            router.all(((ALL) a).value(), wrap(o, methodHandle, type == 1, consumes, produces));
-                        }
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.patch(Processor.getAnnotation(m, PATCH.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+                if (Processor.isCompatible(m, DELETE.class, YokeRequest.class, Handler.class)) {
+                    if (regexParam != null) {
+                        String name = regexParam.value();
+                        String regex = regexParam.regex();
+
+                        router.param(name, Pattern.compile(regex));
                     }
+
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.delete(Processor.getAnnotation(m, DELETE.class).value(), wrap(o, methodHandle, consumes, produces));
+                }
+
+                if (Processor.isCompatible(m, Param.class, YokeRequest.class, Handler.class)) {
+                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
+                    router.param(Processor.getAnnotation(m, Param.class).value(), wrap(o, methodHandle, null, null));
                 }
             }
-        } catch (IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
         }
 
         return router;
