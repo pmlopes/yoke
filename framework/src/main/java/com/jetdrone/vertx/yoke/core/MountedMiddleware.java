@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class MountedMiddleware {
     public final String mount;
     public final Middleware middleware;
+    public boolean enabled = true;
 
     /**
      * Constructs a new Mounted Middleware

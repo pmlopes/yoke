@@ -8,8 +8,7 @@ import com.jetdrone.vertx.yoke.core.MountedMiddleware;
 import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
-import com.jetdrone.vertx.yoke.jmx.EngineMBean;
-import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
+import com.jetdrone.vertx.yoke.jmx.MountedMiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
@@ -45,6 +44,9 @@ import java.util.*;
  * Yoke has no extra dependencies than Vert.x itself so it is self contained.
  */
 public class Yoke {
+
+    //Get the MBean server
+    private final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
     /**
      * Vert.x instance
@@ -174,14 +176,12 @@ public class Yoke {
         defaultContext.put("trust-proxy", true);
         store = new SharedDataSessionStore(vertx, "yoke.sessiondata");
 
-        //Get the MBean server
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
+        // register on JMX
         try {
-            mbs.registerMBean(new MiddlewareMBean(middlewareList), new ObjectName("com.jetdrone.yoke.jmx:type=Middleware@" + hashCode()));
-//            mbs.registerMBean(new EngineMBean(engineMap), new ObjectName("com.jetdrone.yoke.jmx:type=Engine@" + hashCode()));
-//            mbs.registerMBean(new ContextMBean(defaultContext), new ObjectName("com.jetdrone.yoke.jmx:type=Context@" + hashCode()));
-        } catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
+            mbs.registerMBean(new ContextMBean(defaultContext), new ObjectName("com.jetdrone.yoke:instance=@" + hashCode() + ",type=DefaultContext@" + defaultContext.hashCode()));
+        } catch (InstanceAlreadyExistsException e) {
+            // ignore
+        } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
             throw new RuntimeException(e);
         }
     }
@@ -218,7 +218,15 @@ public class Yoke {
             if (m.isErrorHandler()) {
                 errorHandler = m;
             } else {
-                middlewareList.add(new MountedMiddleware(route, m));
+                MountedMiddleware mm = new MountedMiddleware(route, m);
+                middlewareList.add(mm);
+
+                // register on JMX
+                try {
+                    mbs.registerMBean(new MountedMiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:instance=@" + hashCode() + ",type=MountedMiddleware@" + middlewareList.size()));
+                } catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             // initialize the middleware with the current Vert.x and Logger
@@ -411,12 +419,17 @@ public class Yoke {
                             if (currentMiddleware < middlewareList.size()) {
                                 MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
 
-                                if (request.path().startsWith(mountedMiddleware.mount)) {
-                                    Middleware middlewareItem = mountedMiddleware.middleware;
-                                    middlewareItem.handle(request, this);
-                                } else {
-                                    // the middleware was not mounted on this uri, skip to the next entry
+                                if (!mountedMiddleware.enabled) {
+                                    // the middleware is disabled
                                     handle(null);
+                                } else {
+                                    if (request.path().startsWith(mountedMiddleware.mount)) {
+                                        Middleware middlewareItem = mountedMiddleware.middleware;
+                                        middlewareItem.handle(request, this);
+                                    } else {
+                                        // the middleware was not mounted on this uri, skip to the next entry
+                                        handle(null);
+                                    }
                                 }
                             } else {
                                 HttpServerResponse response = request.response();

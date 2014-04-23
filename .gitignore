@@ -20,3 +20,4 @@ docs
 .yardopts
 # Benchmark crap
 node_modules
+vertx_classpath.txt
