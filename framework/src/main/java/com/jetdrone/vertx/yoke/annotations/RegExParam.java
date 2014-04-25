@@ -15,8 +15,7 @@ import java.util.regex.Pattern;
  * Annotate a method with the param to be mounted in the middleware chain.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD})
-public @interface RegexParam {
+@Target({ElementType.FIELD})
+public @interface RegExParam {
     String value();
-    String regex();
 }

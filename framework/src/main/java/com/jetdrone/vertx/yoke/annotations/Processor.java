@@ -1,18 +1,72 @@
 package com.jetdrone.vertx.yoke.annotations;
 
+import com.jetdrone.vertx.yoke.annotations.processors.ContentNegotiationProcessorHandler;
+import com.jetdrone.vertx.yoke.annotations.processors.RegExParamProcessorHandler;
+import com.jetdrone.vertx.yoke.annotations.processors.RouterProcessorHandler;
+import com.jetdrone.vertx.yoke.middleware.Router;
+
 import java.lang.annotation.Annotation;
 import java.lang.invoke.CallSite;
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 
 public final class Processor {
 
     private static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 
-    private Processor() {}
+    private static final List<AnnotationHandler> handlers = new ArrayList<>();
+
+    private Processor() {
+    }
+
+    static {
+        handlers.add(new ContentNegotiationProcessorHandler());
+        handlers.add(new RegExParamProcessorHandler());
+        handlers.add(new RouterProcessorHandler());
+    }
+
+    public static void registerProcessor(String className) {
+        try {
+            Class processor = Class.forName(className);
+
+            // if already registered skip
+            for (AnnotationHandler annotationHandler : handlers) {
+                if (annotationHandler.getClass().equals(processor)) {
+                    // skip
+                    return;
+                }
+            }
+
+            if (AnnotationHandler.class.isAssignableFrom(processor)) {
+                // always insert before router processor
+                handlers.add(handlers.size() - 1, (AnnotationHandler) processor.newInstance());
+            }
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void process(Router router, Object instance) {
+        final Class clazz = instance.getClass();
+
+        for (final Field field : clazz.getFields()) {
+            for (AnnotationHandler handler : handlers) {
+                handler.process(router, instance, clazz, field);
+            }
+        }
+
+        for (final Method method : clazz.getMethods()) {
+            for (AnnotationHandler handler : handlers) {
+                handler.process(router, instance, clazz, method);
+            }
+        }
+    }
 
     public static MethodHandle getMethodHandle(Method m, Class<?>... paramTypes) {
         try {
@@ -55,6 +109,23 @@ public final class Processor {
         return false;
     }
 
+    public static boolean isCompatible(Field f, Class<? extends Annotation> annotation, Class<?> type) {
+        if (getAnnotation(f, annotation) != null) {
+            Class<?> fieldType = f.getType();
+
+            if (fieldType != null) {
+                if (!type.isAssignableFrom(fieldType)) {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+
+            return true;
+        }
+        return false;
+    }
+
     @SuppressWarnings("unchecked")
     public static <T extends Annotation> T getAnnotation(Method m, Class<T> annotation) {
         // skip static methods
@@ -67,6 +138,33 @@ public final class Processor {
         }
 
         Annotation[] annotations = m.getAnnotations();
+        // this method is not annotated
+        if (annotations == null) {
+            return null;
+        }
+
+        // verify if the method is annotated
+        for (Annotation ann : annotations) {
+            if (ann.annotationType().equals(annotation)) {
+                return (T) ann;
+            }
+        }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Annotation> T getAnnotation(Field f, Class<T> annotation) {
+        // skip non final methods
+        if (!Modifier.isFinal(f.getModifiers())) {
+            return null;
+        }
+        // skip non public methods
+        if (!Modifier.isPublic(f.getModifiers())) {
+            return null;
+        }
+
+        Annotation[] annotations = f.getAnnotations();
         // this method is not annotated
         if (annotations == null) {
             return null;

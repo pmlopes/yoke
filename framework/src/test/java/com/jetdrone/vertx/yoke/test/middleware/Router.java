@@ -4,6 +4,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.annotations.GET;
 import com.jetdrone.vertx.yoke.annotations.Produces;
+import com.jetdrone.vertx.yoke.annotations.RegExParam;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
@@ -195,4 +196,31 @@ public class Router extends TestVerticle {
             }
         });
     }
+
+    public static class R2 {
+
+        @RegExParam("userId")
+        public final Pattern userId = Pattern.compile("[1-9][0-9]");
+
+        @GET("/api/:userId")
+        public void handle(YokeRequest request, Handler<Object> next) {
+            request.response().end("OK");
+        }
+    }
+
+    @Test
+    public void testRouterWithRegExAnnParamsFail() {
+        Yoke yoke = new Yoke(this);
+        yoke.use(com.jetdrone.vertx.yoke.middleware.Router.from(new R2()));
+
+        // the pattern expects 2 digits
+        new YokeTester(vertx, yoke).request("GET", "/api/1", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(400, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
+
 }

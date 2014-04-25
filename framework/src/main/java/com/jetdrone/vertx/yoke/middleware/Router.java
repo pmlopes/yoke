@@ -11,7 +11,6 @@ import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -871,138 +870,7 @@ public class Router extends Middleware {
      */
     public static Router from(final Router router, Object... objs) {
         for (Object o : objs) {
-
-            final Class c = o.getClass();
-
-            Produces clazzProducesAnn = Processor.getAnnotation(c, Produces.class);
-            Consumes clazzConsumesAnn = Processor.getAnnotation(c, Consumes.class);
-
-            String[] clazzProduces = clazzProducesAnn != null ? clazzProducesAnn.value() : null;
-            String[] clazzConsumes = clazzConsumesAnn != null ? clazzConsumesAnn.value() : null;
-
-            for (final Method m : c.getMethods()) {
-                Produces producesAnn = Processor.getAnnotation(m, Produces.class);
-                Consumes consumesAnn = Processor.getAnnotation(m, Consumes.class);
-
-                String[] produces = producesAnn != null ? producesAnn.value() : null;
-                String[] consumes = consumesAnn != null ? consumesAnn.value() : null;
-
-                if (produces == null) {
-                    produces = clazzProduces;
-                }
-                if (consumes == null) {
-                    consumes = clazzConsumes;
-                }
-
-                RegexParam regexParam = Processor.getAnnotation(m, RegexParam.class);
-
-                // process the methods that have both YokeRequest and Handler
-
-                if (Processor.isCompatible(m, ALL.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.all(Processor.getAnnotation(m, ALL.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, CONNECT.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.connect(Processor.getAnnotation(m, CONNECT.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, OPTIONS.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.options(Processor.getAnnotation(m, OPTIONS.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, HEAD.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.head(Processor.getAnnotation(m, HEAD.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, GET.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.get(Processor.getAnnotation(m, GET.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, POST.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.post(Processor.getAnnotation(m, POST.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, PUT.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.put(Processor.getAnnotation(m, PUT.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, PATCH.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.patch(Processor.getAnnotation(m, PATCH.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-                if (Processor.isCompatible(m, DELETE.class, YokeRequest.class, Handler.class)) {
-                    if (regexParam != null) {
-                        String name = regexParam.value();
-                        String regex = regexParam.regex();
-
-                        router.param(name, Pattern.compile(regex));
-                    }
-
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.delete(Processor.getAnnotation(m, DELETE.class).value(), wrap(o, methodHandle, consumes, produces));
-                }
-
-                if (Processor.isCompatible(m, Param.class, YokeRequest.class, Handler.class)) {
-                    MethodHandle methodHandle = Processor.getMethodHandle(m, YokeRequest.class, Handler.class);
-                    router.param(Processor.getAnnotation(m, Param.class).value(), wrap(o, methodHandle, null, null));
-                }
-            }
+            Processor.process(router, o);
         }
 
         return router;

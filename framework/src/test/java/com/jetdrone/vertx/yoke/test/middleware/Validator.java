@@ -6,6 +6,7 @@ import com.jetdrone.vertx.yoke.middleware.*;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import com.jetdrone.vertx.yoke.util.validation.Type;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -14,6 +15,7 @@ import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
+import static com.jetdrone.vertx.yoke.util.Validator.that;
 import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.testComplete;
 
@@ -23,14 +25,19 @@ public class Validator extends TestVerticle {
     public void testParam() {
         final Yoke yoke = new Yoke(this);
 
-        com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            param("from").is(Type.DateTime);
-            param("to").is(Type.DateTime);
-        }};
-
-        yoke.use(new Router().get("/search/:from/:to", validator, new Middleware() {
+        yoke.use(new Router().get("/search/:from/:to", new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
+                com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
+                    that("param:from").is(Type.DateTime),
+                    that("param:to").is(Type.DateTime)
+                );
+
+                if (!validator.isValid(request)) {
+                    next.handle(400);
+                    return;
+                }
+
                 request.response().end();
             }
         }));
@@ -54,23 +61,27 @@ public class Validator extends TestVerticle {
     @Test
     public void testJsonBodyValidator() {
 
-        com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            param("from").is(Type.DateTime);
-            param("to").is(Type.DateTime);
-            body("user.login").exists();
-            body("user.login").is(Type.String);
-            body("user.password").exists();
-            body("user.password").is(Type.String);
-        }};
-
-
         final JsonObject json = new JsonObject().putObject("user", new JsonObject().putString("login", "paulo").putString("password", "pwd"));
 
         Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
-        yoke.use(new Router().post("/search/:from/:to", validator, new Middleware() {
+        yoke.use(new Router().post("/search/:from/:to", new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
+                com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
+                    that("param:from").is(Type.DateTime),
+                    that("param:to").is(Type.DateTime),
+                    that("body:user.login").exists(),
+                    that("body:user.login").is(Type.String),
+                    that("body:user.password").exists(),
+                    that("body:user.password").is(Type.String)
+                );
+
+                if (!validator.isValid(request)) {
+                    next.handle(400);
+                    return;
+                }
+
                 request.response().end();
             }
         }));
@@ -93,18 +104,23 @@ public class Validator extends TestVerticle {
     @Test
     public void testJsonBodyValidatorOptional() {
 
-        com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            body("user.?login").is(Type.String);
-        }};
-
-
         final JsonObject json = new JsonObject().putObject("user", new JsonObject());
 
         Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
-        yoke.use(validator, new Middleware() {
+        yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
+
+                com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
+                    that("body:user.?login").is(Type.String)
+                );
+
+                if (!validator.isValid(request)) {
+                    next.handle(400);
+                    return;
+                }
+
                 request.response().end();
             }
         });
@@ -127,18 +143,22 @@ public class Validator extends TestVerticle {
     @Test
     public void testJsonBodyValidatorRequired() {
 
-        com.jetdrone.vertx.yoke.middleware.Validator validator = new com.jetdrone.vertx.yoke.middleware.Validator() {{
-            body("user.?login").is(Type.String);
-        }};
-
-
         final JsonObject json = new JsonObject().putObject("user", new JsonObject());
 
         Yoke yoke = new Yoke(this);
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
-        yoke.use(validator, new Middleware() {
+        yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
+                com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
+                    that("body:user.?login").is(Type.String)
+                );
+
+                if (!validator.isValid(request)) {
+                    next.handle(400);
+                    return;
+                }
+
                 request.response().end();
             }
         });
