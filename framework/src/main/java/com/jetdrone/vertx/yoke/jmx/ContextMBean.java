@@ -89,20 +89,32 @@ public class ContextMBean implements DynamicMBean {
                     defaultContext.get(name) instanceof Boolean);
         }
 
-//        MBeanOperationInfo[] opers = {
-//                new MBeanOperationInfo(
-//                        "reload",
-//                        "Reload properties from file",
-//                        null,   // no parameters
-//                        "void",
-//                        MBeanOperationInfo.ACTION)
-//        };
+        MBeanOperationInfo[] opers = {
+                new MBeanOperationInfo(
+                        "remove",
+                        "Remove a key from the global context",
+                        new MBeanParameterInfo[] {
+                                new MBeanParameterInfo("key", "java.lang.String", "Key to remove")
+                        },
+                        "void",
+                        MBeanOperationInfo.ACTION),
+                new MBeanOperationInfo(
+                        "put",
+                        "Put a new entry in the global context",
+                        new MBeanParameterInfo[] {
+                                new MBeanParameterInfo("key", "java.lang.String", "Key"),
+                                new MBeanParameterInfo("value", "java.lang.Object", "Value")
+                        },
+                        "void",
+                        MBeanOperationInfo.ACTION)
+        };
+
         return new MBeanInfo(
                 this.getClass().getName(),
                 "Property Manager MBean",
                 attrs,
                 null,  // constructors
-                null,  // operations
+                opers,  // operations
                 null); // notifications
     }
 }
