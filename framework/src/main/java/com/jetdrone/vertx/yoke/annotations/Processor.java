@@ -33,8 +33,14 @@ public final class Processor {
 
     public static void registerProcessor(String className) {
         try {
-            Class processor = Class.forName(className);
+            registerProcessor(Class.forName(className));
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public static void registerProcessor(Class processor) {
+        try {
             // if already registered skip
             for (AnnotationHandler annotationHandler : handlers) {
                 if (annotationHandler.getClass().equals(processor)) {
@@ -47,7 +53,7 @@ public final class Processor {
                 // always insert before router processor
                 handlers.add(handlers.size() - 1, (AnnotationHandler) processor.newInstance());
             }
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
