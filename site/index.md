@@ -1,7 +1,8 @@
 # Yoke
 
-Yoke is a minimal and flexible polyglot middleware framework for [Vert.x](http://www.vertx.io), providing a robust set
-of features for building single and multi-page, and hybrid web applications.
+Yoke ```com.jetdrone~yoke~1.0.9``` is a minimal and flexible polyglot middleware framework for
+[Vert.x](http://www.vertx.io), providing a robust set of features for building single and multi-page, and hybrid web
+applications.
 
 
 ## Middleware
@@ -15,7 +16,7 @@ Yoke provides a thin layer of features fundamental to any web application, witho
 love in Vert.x.
 
 
-### Java
+## Java
 
 ``` java
 Yoke yoke = new Yoke(vertx)
@@ -30,7 +31,7 @@ Yoke yoke = new Yoke(vertx)
     })).listen(3000);
 ```
 
-### Groovy
+## Groovy
 
 ``` groovy
 def yoke = new GYoke(vertx)
@@ -42,7 +43,7 @@ def yoke = new GYoke(vertx)
     }).listen(3000)
 ```
 
-### JavaScript
+## JavaScript
 
 ``` js
 var yoke = new Yoke()
@@ -52,26 +53,6 @@ var yoke = new Yoke()
     .all("/hello", function (request) {
       request.response().end('Hello World!');
     })).listen(3000);
-```
-
-
-## Installation
-
-### Vert.x module
-
-Vert.x 2 module:
-
-```com.jetdrone~yoke~1.0.9```
-
-### Maven artifact
-
-``` xml
-<dependency>
-  <groupId>com.jetdrone</groupId>
-  <artifactId>yoke</artifactId>
-  <version>1.0.9</version>
-  <scope>provided</scope>
-</dependency>
 ```
 
 
