@@ -370,8 +370,8 @@ public class YokeRequest implements HttpServerRequest {
             @Override
             public void handle(Void event) {
                 int responseStatus = response().getStatusCode();
-                // Only save on success status code
-                if (responseStatus >= 200 && responseStatus < 300) {
+                // Only save on success and redirect status codes
+                if (responseStatus >= 200 && responseStatus < 400) {
                     JsonObject session = get("session");
                     if (session != null) {
                         store.set(sessionId, session, new Handler<Object>() {
@@ -522,15 +522,8 @@ public class YokeRequest implements HttpServerRequest {
         if (type.contains("*")) {
             String[] parts = type.split("/");
             String[] ctParts = ct.split("/");
-            if ("*".equals(parts[0]) && parts[1].equals(ctParts[1])) {
-                return true;
-            }
+            return "*".equals(parts[0]) && parts[1].equals(ctParts[1]) || "*".equals(parts[1]) && parts[0].equals(ctParts[0]);
 
-            if ("*".equals(parts[1]) && parts[0].equals(ctParts[0])) {
-                return true;
-            }
-
-            return false;
         }
 
         return ct.contains(type);

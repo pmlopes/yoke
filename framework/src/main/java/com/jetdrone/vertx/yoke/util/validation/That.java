@@ -162,6 +162,8 @@ public final class That {
                 }
 
                 switch (type) {
+                    case Any:
+                        return;
                     // base json types
                     case JsonObject:
                         if (field instanceof JsonObject || field instanceof Map) {

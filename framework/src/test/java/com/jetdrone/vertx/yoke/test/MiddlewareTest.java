@@ -12,10 +12,6 @@ import org.vertx.testtools.TestVerticle;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.TransformerException;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
-
 import static org.vertx.testtools.VertxAssert.*;
 
 public class MiddlewareTest extends TestVerticle {
@@ -71,22 +67,4 @@ public class MiddlewareTest extends TestVerticle {
 
         testComplete();
     }
-
-//    @Test
-//    public void testDateParser() throws ParseException {
-//        String date = "2014-04-08T09:24:32.000 UTC";
-//
-//        SimpleDateFormat ISODATE;
-//
-//        ISODATE = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
-//
-//        ISODATE.parse(date);
-//
-//        ISODATE = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-//        ISODATE.setTimeZone(TimeZone.getTimeZone("UTC"));
-//
-//
-//        ISODATE.parse(date);
-//    }
 }
