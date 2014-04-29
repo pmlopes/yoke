@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.util.validation;
 
 public enum Type {
+    Any,
     // base json types
     JsonObject,
     JsonArray,
