@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 import java.util.regex.Pattern;
 
 /**
- * # Path
+ * # RegExParam
  *
- * Annotate a method with the param to be mounted in the middleware chain.
+ * Annotate a field with the param to be mounted in the middleware chain.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD})
