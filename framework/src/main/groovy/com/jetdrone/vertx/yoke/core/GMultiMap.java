@@ -25,6 +25,9 @@ public class GMultiMap implements MultiMap {
             if (out.size() == 1) {
                 return out.get(0);
             }
+            if (out.size() == 0) {
+                return null;
+            }
         }
         return out;
     }

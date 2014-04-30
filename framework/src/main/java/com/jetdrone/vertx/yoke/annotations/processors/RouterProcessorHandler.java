@@ -19,7 +19,6 @@ public class RouterProcessorHandler implements AnnotationHandler {
 
         if (Processor.isCompatible(method, ALL.class, YokeRequest.class, Handler.class)) {
             MethodHandle methodHandle = Processor.getMethodHandle(method, YokeRequest.class, Handler.class);
-
             router.all(Processor.getAnnotation(method, ALL.class).value(), wrap(instance, methodHandle));
         }
         if (Processor.isCompatible(method, CONNECT.class, YokeRequest.class, Handler.class)) {

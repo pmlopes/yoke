@@ -10,7 +10,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
-import java.lang.invoke.MethodHandle;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -768,7 +767,7 @@ public class Router extends Middleware {
                     @Override
                     public void handle(String param) {
                         if (hasNext()) {
-                            params.add(param, m.group(param));
+                            params.set(param, m.group(param));
                             Middleware paramMiddleware = paramProcessors.get(param);
                             if (paramMiddleware != null) {
                                 paramMiddleware.handle(request, new Handler<Object>() {
@@ -792,7 +791,7 @@ public class Router extends Middleware {
             } else {
                 // Un-named params
                 for (int i = 0; i < m.groupCount(); i++) {
-                    params.add("param" + i, m.group(i + 1));
+                    params.set("param" + i, m.group(i + 1));
                 }
                 binding.middleware.handle(request, next);
             }
@@ -811,51 +810,6 @@ public class Router extends Middleware {
             this.paramNames = paramNames;
             this.middleware = middleware;
         }
-    }
-
-    private static Middleware wrap(final Object o, final MethodHandle m, final String[] consumes, final String[] produces) {
-        return new Middleware() {
-            @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
-                try {
-                    // we only know how to process certain media types
-                    if (consumes != null) {
-                        boolean canConsume = false;
-                        for (String c : consumes) {
-                            if (request.is(c)) {
-                                canConsume = true;
-                                break;
-                            }
-                        }
-
-                        if (!canConsume) {
-                            // 415 Unsupported Media Type (we don't know how to handle this media)
-                            next.handle(415);
-                            return;
-                        }
-                    }
-
-                    // the object was marked with a specific content type
-                    if (produces != null) {
-                        String bestContentType = request.accepts(produces);
-
-                        // the client does not know how to handle our content type, return 406
-                        if (bestContentType == null) {
-                            next.handle(406);
-                            return;
-                        }
-
-                        // mark the response with the correct content type (which allows middleware to know it later on)
-                        request.response().setContentType(bestContentType);
-                    }
-
-                    m.invoke(o, request, next);
-
-                } catch (Throwable e) {
-                    next.handle(e);
-                }
-            }
-        };
     }
 
     public static Router from(Object... objs) {

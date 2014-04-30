@@ -37,6 +37,11 @@ public abstract class AsyncIterator<T> implements Handler<T> {
         }
     }
 
+    public final void done() {
+        end = true;
+        handle(null);
+    }
+
     public final void remove() {
         iterator.remove();
     }
