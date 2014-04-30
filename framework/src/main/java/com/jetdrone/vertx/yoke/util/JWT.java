@@ -33,8 +33,8 @@ public final class JWT {
                 return Arrays.equals(payload, mac.doFinal(payload));
             }
         });
-        CRYPTO_MAP.put("HS348", new Crypto() {
-            final Mac mac = Utils.newHmac("HmacSHA348", secret);
+        CRYPTO_MAP.put("HS384", new Crypto() {
+            final Mac mac = Utils.newHmac("HmacSHA384", secret);
             @Override
             public byte[] sign(byte[] payload) {
                 return mac.doFinal(payload);
