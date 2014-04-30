@@ -186,6 +186,7 @@ public final class Processor {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Annotation> T getAnnotation(Class c, Class<T> annotation) {
         // skip non public classes
         if (!Modifier.isPublic(c.getModifiers())) {
