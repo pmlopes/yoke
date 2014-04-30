@@ -63,8 +63,16 @@ public final class That {
     public That(String path) {
         int sep = path.indexOf(":");
 
-        String type = path.substring(0, sep);
-        this.path = path.substring(sep + 1);
+        String type;
+
+        // defaults to param
+        if (sep == -1) {
+            type = "param";
+            this.path = path;
+        } else {
+            type = path.substring(0, sep);
+            this.path = path.substring(sep + 1);
+        }
 
         switch (type) {
             case "param":
