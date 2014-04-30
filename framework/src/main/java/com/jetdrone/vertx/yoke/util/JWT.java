@@ -30,7 +30,7 @@ public final class JWT {
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                return Arrays.equals(payload, mac.doFinal(payload));
+                return Arrays.equals(signature, mac.doFinal(payload));
             }
         });
         CRYPTO_MAP.put("HS384", new Crypto() {
@@ -42,7 +42,7 @@ public final class JWT {
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                return Arrays.equals(payload, mac.doFinal(payload));
+                return Arrays.equals(signature, mac.doFinal(payload));
             }
         });
         CRYPTO_MAP.put("HS512", new Crypto() {
@@ -54,7 +54,7 @@ public final class JWT {
 
             @Override
             public boolean verify(byte[] signature, byte[] payload) {
-                return Arrays.equals(payload, mac.doFinal(payload));
+                return Arrays.equals(signature, mac.doFinal(payload));
             }
         });
         CRYPTO_MAP.put("RS256", new Crypto() {
@@ -110,7 +110,7 @@ public final class JWT {
             // verify signature. `sign` will return base64 string.
             String signingInput = headerSeg + "." + payloadSeg;
 
-            if (!crypto.verify(signatureSeg.getBytes(), signingInput.getBytes())) {
+            if (!crypto.verify(Base64.decode(base64urlUnescape(signatureSeg), Base64.DONT_BREAK_LINES), signingInput.getBytes())) {
                 throw new RuntimeException("Signature verification failed");
             }
         }
@@ -139,13 +139,13 @@ public final class JWT {
         String headerSegment = base64urlEncode(header.encode());
         String payloadSegment = base64urlEncode(payload.encode());
         String signingInput = headerSegment + "." + payloadSegment;
-        String signSegment = base64urlEscape(Base64.encodeBytes(crypto.sign(signingInput.getBytes())));
+        String signSegment = base64urlEscape(Base64.encodeBytes(crypto.sign(signingInput.getBytes()), Base64.DONT_BREAK_LINES));
 
         return headerSegment + "." + payloadSegment + "." + signSegment;
     }
 
     private static String base64urlDecode(String str) {
-        return new String(Base64.decode(base64urlUnescape(str)));
+        return new String(Base64.decode(base64urlUnescape(str), Base64.DONT_BREAK_LINES));
     }
 
     private static String base64urlUnescape(String str) {
@@ -159,7 +159,7 @@ public final class JWT {
     }
 
     private static String base64urlEncode(String str) {
-        return base64urlEscape(Base64.encodeBytes(str.getBytes()));
+        return base64urlEscape(Base64.encodeBytes(str.getBytes(), Base64.DONT_BREAK_LINES));
     }
 
     private static String base64urlEscape(String str) {
