@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
@@ -57,7 +58,14 @@ public class Router extends Middleware {
      * </pre>
      */
     public Router() {
+    }
 
+    private void init(Vertx vertx, String mount, List<PatternBinding> bindings) {
+        for (PatternBinding binding : bindings) {
+            for (Middleware m : binding.middleware) {
+                m.init(vertx, mount);
+            }
+        }
     }
 
     @Override
@@ -65,42 +73,14 @@ public class Router extends Middleware {
         super.init(vertx, mount);
         // since this call can happen after the bindings are in place we need to update all bindings to have a reference
         // to the vertx object
-        for (PatternBinding binding : getBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : putBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : postBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : deleteBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : optionsBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : headBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : traceBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : connectBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
-        for (PatternBinding binding : patchBindings) {
-            binding.middleware.init(vertx, mount);
-        }
-
+        init(vertx, mount, getBindings);
+        init(vertx, mount, putBindings);
+        init(vertx, mount, postBindings);
+        init(vertx, mount, deleteBindings);
+        init(vertx, mount, optionsBindings);
+        init(vertx, mount, headBindings);
+        init(vertx, mount, traceBindings);
+        init(vertx, mount, connectBindings);
         return this;
     }
 
@@ -144,9 +124,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router get(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, getBindings);
-        }
+        addPattern(pattern, handlers, getBindings);
         return this;
     }
 
@@ -170,9 +148,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router put(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, putBindings);
-        }
+        addPattern(pattern, handlers, putBindings);
         return this;
     }
 
@@ -196,9 +172,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router post(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, postBindings);
-        }
+        addPattern(pattern, handlers, postBindings);
         return this;
     }
 
@@ -222,9 +196,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router delete(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, deleteBindings);
-        }
+        addPattern(pattern, handlers, deleteBindings);
         return this;
     }
 
@@ -248,9 +220,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router options(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, optionsBindings);
-        }
+        addPattern(pattern, handlers, optionsBindings);
         return this;
     }
 
@@ -274,9 +244,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router head(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, headBindings);
-        }
+        addPattern(pattern, handlers, headBindings);
         return this;
     }
 
@@ -300,9 +268,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router trace(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, traceBindings);
-        }
+        addPattern(pattern, handlers, traceBindings);
         return this;
     }
 
@@ -326,9 +292,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router connect(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, connectBindings);
-        }
+        addPattern(pattern, handlers, connectBindings);
         return this;
     }
 
@@ -352,9 +316,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router patch(String pattern, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addPattern(pattern, handler, patchBindings);
-        }
+        addPattern(pattern, handlers, patchBindings);
         return this;
     }
 
@@ -414,9 +376,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router get(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, getBindings);
-        }
+        addRegEx(regex, handlers, getBindings);
         return this;
     }
 
@@ -440,9 +400,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router put(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, putBindings);
-        }
+        addRegEx(regex, handlers, putBindings);
         return this;
     }
 
@@ -466,9 +424,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router post(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, postBindings);
-        }
+        addRegEx(regex, handlers, postBindings);
         return this;
     }
 
@@ -492,9 +448,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router delete(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, deleteBindings);
-        }
+        addRegEx(regex, handlers, deleteBindings);
         return this;
     }
 
@@ -518,9 +472,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router options(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, optionsBindings);
-        }
+        addRegEx(regex, handlers, optionsBindings);
         return this;
     }
 
@@ -544,9 +496,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router head(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, headBindings);
-        }
+        addRegEx(regex, handlers, headBindings);
         return this;
     }
 
@@ -570,9 +520,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router trace(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, traceBindings);
-        }
+        addRegEx(regex, handlers, traceBindings);
         return this;
     }
 
@@ -596,9 +544,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router connect(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, connectBindings);
-        }
+        addRegEx(regex, handlers, connectBindings);
         return this;
     }
 
@@ -622,9 +568,7 @@ public class Router extends Middleware {
      * @param handlers The middleware to call
      */
     public Router patch(Pattern regex, Middleware... handlers) {
-        for (Middleware handler : handlers) {
-            addRegEx(regex, handler, patchBindings);
-        }
+        addRegEx(regex, handlers, patchBindings);
         return this;
     }
 
@@ -700,7 +644,7 @@ public class Router extends Middleware {
         });
     }
 
-    private void addPattern(String input, Middleware handler, List<PatternBinding> bindings) {
+    private void addPattern(String input, Middleware[] handler, List<PatternBinding> bindings) {
         // We need to search for any :<token name> tokens in the String and replace them with named capture groups
         Matcher m =  Pattern.compile(":([A-Za-z][A-Za-z0-9_]*)").matcher(input);
         StringBuffer sb = new StringBuffer();
@@ -718,18 +662,49 @@ public class Router extends Middleware {
         if (sb.charAt(sb.length() - 1) != '/') {
             sb.append("\\/?$");
         }
-        String regex = sb.toString();
-        PatternBinding binding = new PatternBinding(Pattern.compile(regex), groups, handler);
+
+        Pattern regex = Pattern.compile(sb.toString());
+        boolean exists = false;
+        // verify if the binding already exists, if yes add to it
+        for (PatternBinding pb : bindings) {
+            if (pb.pattern.equals(regex)) {
+                pb.addMiddleware(handler);
+                exists = true;
+                break;
+            }
+        }
+
+        if (!exists) {
+            PatternBinding binding = new PatternBinding(regex, groups, handler);
+            bindings.add(binding);
+        }
+
         // also pass the vertx object to the routes
-        handler.init(vertx, mount);
-        bindings.add(binding);
+        for (Middleware h : handler) {
+            h.init(vertx, mount);
+        }
     }
 
-    private void addRegEx(Pattern regex, Middleware handler, List<PatternBinding> bindings) {
-        PatternBinding binding = new PatternBinding(regex, null, handler);
+    private void addRegEx(Pattern regex, Middleware handler[], List<PatternBinding> bindings) {
+        boolean exists = false;
+        // verify if the binding already exists, if yes add to it
+        for (PatternBinding pb : bindings) {
+            if (pb.pattern.equals(regex)) {
+                pb.addMiddleware(handler);
+                exists = true;
+                break;
+            }
+        }
+
+        if (!exists) {
+            PatternBinding binding = new PatternBinding(regex, null, handler);
+            bindings.add(binding);
+        }
+
         // also pass the vertx object to the routes
-        handler.init(vertx, mount);
-        bindings.add(binding);
+        for (Middleware h : handler) {
+            h.init(vertx, mount);
+        }
     }
 
     private void route(final YokeRequest request, final Handler<Object> next, final List<PatternBinding> bindings) {
@@ -784,7 +759,26 @@ public class Router extends Middleware {
                                 next();
                             }
                         } else {
-                            binding.middleware.handle(request, next);
+                            // middlewares
+                            new AsyncIterator<Middleware>(binding.middleware) {
+                                @Override
+                                public void handle(Middleware middleware) {
+                                    if (hasNext()) {
+                                        middleware.handle(request, new Handler<Object>() {
+                                            @Override
+                                            public void handle(Object err) {
+                                                if (err == null) {
+                                                    next();
+                                                } else {
+                                                    next.handle(err);
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        next.handle(null);
+                                    }
+                                }
+                            };
                         }
                     }
                 };
@@ -793,7 +787,27 @@ public class Router extends Middleware {
                 for (int i = 0; i < m.groupCount(); i++) {
                     params.set("param" + i, m.group(i + 1));
                 }
-                binding.middleware.handle(request, next);
+
+                // middlewares
+                new AsyncIterator<Middleware>(binding.middleware) {
+                    @Override
+                    public void handle(Middleware middleware) {
+                        if (hasNext()) {
+                            middleware.handle(request, new Handler<Object>() {
+                                @Override
+                                public void handle(Object err) {
+                                    if (err == null) {
+                                        next();
+                                    } else {
+                                        next.handle(err);
+                                    }
+                                }
+                            });
+                        } else {
+                            next.handle(null);
+                        }
+                    }
+                };
             }
         } else {
             next.handle(null);
@@ -802,17 +816,21 @@ public class Router extends Middleware {
 
     private static class PatternBinding {
         final Pattern pattern;
-        final Middleware middleware;
+        final List<Middleware> middleware = new ArrayList<>();
         final Set<String> paramNames;
 
-        private PatternBinding(Pattern pattern, Set<String> paramNames, Middleware middleware) {
+        private PatternBinding(@NotNull Pattern pattern, Set<String> paramNames, @NotNull Middleware[] middleware) {
             this.pattern = pattern;
             this.paramNames = paramNames;
-            this.middleware = middleware;
+            Collections.addAll(this.middleware, middleware);
+        }
+
+        void addMiddleware(@NotNull Middleware[] middleware) {
+            Collections.addAll(this.middleware, middleware);
         }
     }
 
-    public static Router from(Object... objs) {
+    public static Router from(@NotNull Object... objs) {
         final Router router = new Router();
         from(router, objs);
 
@@ -822,7 +840,7 @@ public class Router extends Middleware {
     /**
      * Builds a Router from an annotated Java Object
      */
-    public static Router from(final Router router, Object... objs) {
+    public static Router from(@NotNull final Router router, @NotNull Object... objs) {
         for (Object o : objs) {
             Processor.process(router, o);
         }
