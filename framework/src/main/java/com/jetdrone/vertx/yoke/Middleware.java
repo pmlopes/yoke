@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 
@@ -58,7 +59,7 @@ public abstract class Middleware {
      * @param mount the configured mount path.
      * @return self
      */
-    public Middleware init(Vertx vertx, String mount) {
+    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
         this.vertx = vertx;
         this.mount = mount;
 
@@ -112,5 +113,5 @@ public abstract class Middleware {
      * @param next    The callback to inform that the next middleware in the chain should be used. A value different from
      *                null represents an error and in that case the error handler middleware will be executed.
      */
-    public abstract void handle(final YokeRequest request, final Handler<Object> next);
+    public abstract void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next);
 }

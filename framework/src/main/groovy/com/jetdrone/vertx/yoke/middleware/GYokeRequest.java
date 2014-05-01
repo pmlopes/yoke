@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.GMultiMap;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.groovy.core.http.HttpServerFileUpload;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
@@ -176,7 +177,7 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
         return files;
     }
 
-    public GYokeFileUpload getFile(String name) {
+    public GYokeFileUpload getFile(@NotNull final String name) {
         return getFiles().get(name);
     }
 

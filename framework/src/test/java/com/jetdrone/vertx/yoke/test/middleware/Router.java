@@ -8,6 +8,7 @@ import com.jetdrone.vertx.yoke.annotations.RegExParam;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -180,7 +181,7 @@ public class Router extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api-stable", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                     request.response().end("OK");
                 }
             });

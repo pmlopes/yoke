@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.store.SessionStore;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;
@@ -76,7 +77,7 @@ public class YokeRequest implements HttpServerRequest {
     // control flags
     private boolean expectMultiPartCalled = false;
 
-    public YokeRequest(HttpServerRequest request, YokeResponse response, boolean secure, Context context, SessionStore store) {
+    public YokeRequest(@NotNull final HttpServerRequest request, @NotNull final YokeResponse response, final boolean secure, @NotNull final Context context, @NotNull final SessionStore store) {
         this.context = context;
         this.request = request;
         this.method = request.method();
@@ -91,7 +92,7 @@ public class YokeRequest implements HttpServerRequest {
      * @return {R} The found object
      */
     @SuppressWarnings("unchecked")
-    public <R> R get(String name) {
+    public <R> R get(@NotNull final String name) {
         // do some conversions for JsonObject/JsonArray
         Object o = context.get(name);
 
@@ -110,7 +111,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param defaultValue value returned when the key does not exist
      * @return {R} The found object
      */
-    public <R> R get(String name, R defaultValue) {
+    public <R> R get(@NotNull final String name, R defaultValue) {
         if (context.containsKey(name)) {
             return get(name);
         } else {
@@ -125,7 +126,7 @@ public class YokeRequest implements HttpServerRequest {
      * @return {R} the previous value or null
      */
     @SuppressWarnings("unchecked")
-    public <R> R put(String name, R value) {
+    public <R> R put(@NotNull final String name, R value) {
         if (value == null) {
             return (R) context.remove(name);
         }
@@ -137,7 +138,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return The found object
      */
-    public String getHeader(String name) {
+    public String getHeader(@NotNull final String name) {
         return headers().get(name);
     }
 
@@ -146,7 +147,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {List} The list of all found objects
      */
-    public List<String> getAllHeaders(String name) {
+    public List<String> getAllHeaders(@NotNull final String name) {
         return headers().getAll(name);
     }
 
@@ -156,7 +157,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
-    public String getHeader(String name, String defaultValue) {
+    public String getHeader(@NotNull final String name, String defaultValue) {
         if (headers().contains(name)) {
             return getHeader(name);
         } else {
@@ -177,7 +178,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return The found object
      */
-    public YokeCookie getCookie(String name) {
+    public YokeCookie getCookie(@NotNull final String name) {
         if (cookies != null) {
             for (YokeCookie c : cookies) {
                 if (name.equals(c.getName())) {
@@ -193,7 +194,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return The found objects
      */
-    public List<YokeCookie> getAllCookies(String name) {
+    public List<YokeCookie> getAllCookies(@NotNull final String name) {
         List<YokeCookie> foundCookies = new ArrayList<>();
         if (cookies != null) {
             for (YokeCookie c : cookies) {
@@ -213,7 +214,7 @@ public class YokeRequest implements HttpServerRequest {
     /** Package level mutator for the overrided setMethod
      * @param newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
      */
-    void setMethod(String newMethod) {
+    void setMethod(@NotNull final String newMethod) {
         this.method = newMethod.toUpperCase();
     }
 
@@ -274,7 +275,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     /** Get an uploaded file */
-    public YokeFileUpload getFile(String name) {
+    public YokeFileUpload getFile(@NotNull final String name) {
         if (files == null) {
             return null;
         }
@@ -325,7 +326,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param sessionId the id to load
      * @param handler the success/complete handler
      */
-    public void loadSession(String sessionId, final Handler<Object> handler) {
+    public void loadSession(final String sessionId, final Handler<Object> handler) {
         if (sessionId == null) {
             handler.handle(null);
             return;
@@ -361,7 +362,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param sessionId custom session id
      * @return {JsonObject} session
      */
-    public JsonObject createSession(final String sessionId) {
+    public JsonObject createSession(@NotNull final String sessionId) {
         final JsonObject session = new JsonObject().putString("id", sessionId);
 
         put("session", session);
@@ -395,7 +396,7 @@ public class YokeRequest implements HttpServerRequest {
         return secure;
     }
 
-    private static String[] splitMime(String mime) {
+    private static String[] splitMime(@NotNull String mime) {
         // find any ; e.g.: "application/json;q=0.8"
         int space = mime.indexOf(';');
 
@@ -421,7 +422,7 @@ public class YokeRequest implements HttpServerRequest {
      * The type value must be a single mime type string such as "application/json" and is validated by checking
      * if the request string starts with it.
      */
-    public String accepts(String... types) {
+    public String accepts(@NotNull final String... types) {
         String accept = getHeader("Accept");
         // accept anything when accept is not present
         if (accept == null) {
@@ -452,7 +453,7 @@ public class YokeRequest implements HttpServerRequest {
 
     /** Returns the array of accept-? ordered by quality.
      */
-    public List<String> sortedHeader(String header) {
+    public List<String> sortedHeader(@NotNull final String header) {
         String accept = getHeader(header);
         // accept anything when accept is not present
         if (accept == null) {
@@ -503,7 +504,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param type content type
      * @return true if content type is of type
      */
-    public boolean is(String type) {
+    public boolean is(@NotNull String type) {
         String ct = getHeader("Content-Type");
         if (ct == null) {
             return false;
@@ -551,7 +552,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {String} The found object
      */
-    public String getParameter(String name) {
+    public String getParameter(@NotNull final String name) {
         return params().get(name);
     }
 
@@ -561,7 +562,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
-    public String getParameter(String name, String defaultValue) {
+    public String getParameter(@NotNull final String name, String defaultValue) {
         String value = getParameter(name);
 
         if (value == null) {
@@ -576,7 +577,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {List} The found object
      */
-    public List<String> getParameterList(String name) {
+    public List<String> getParameterList(@NotNull final String name) {
         return params().getAll(name);
     }
 
@@ -585,7 +586,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {String} The found object
      */
-    public String getFormParameter(String name) {
+    public String getFormParameter(@NotNull final String name) {
         return request.formAttributes().get(name);
     }
 
@@ -595,7 +596,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
-    public String getFormParameter(String name, String defaultValue) {
+    public String getFormParameter(@NotNull final String name, String defaultValue) {
         String value = request.formAttributes().get(name);
 
         if (value == null) {
@@ -610,7 +611,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {List} The found object
      */
-    public List<String> getFormParameterList(String name) {
+    public List<String> getFormParameterList(@NotNull final String name) {
         return request.formAttributes().getAll(name);
     }
 
@@ -776,7 +777,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public YokeRequest expectMultiPart(boolean expect) {
+    public YokeRequest expectMultiPart(final boolean expect) {
         // if we expect
         if (expect) {
             // then only call it once

@@ -69,7 +69,7 @@ public class Router extends Middleware {
     }
 
     @Override
-    public Middleware init(Vertx vertx, String mount) {
+    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
         super.init(vertx, mount);
         // since this call can happen after the bindings are in place we need to update all bindings to have a reference
         // to the vertx object
@@ -85,7 +85,7 @@ public class Router extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
 
         switch (request.method()) {
             case "GET":
@@ -123,7 +123,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router get(String pattern, Middleware... handlers) {
+    public Router get(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, getBindings);
         return this;
     }
@@ -133,7 +133,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router get(String pattern, final Handler<YokeRequest> handler) {
+    public Router get(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return get(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -147,7 +147,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router put(String pattern, Middleware... handlers) {
+    public Router put(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, putBindings);
         return this;
     }
@@ -157,7 +157,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router put(String pattern, final Handler<YokeRequest> handler) {
+    public Router put(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return put(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -171,7 +171,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router post(String pattern, Middleware... handlers) {
+    public Router post(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, postBindings);
         return this;
     }
@@ -181,7 +181,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router post(String pattern, final Handler<YokeRequest> handler) {
+    public Router post(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return post(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -195,7 +195,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router delete(String pattern, Middleware... handlers) {
+    public Router delete(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, deleteBindings);
         return this;
     }
@@ -205,7 +205,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router delete(String pattern, final Handler<YokeRequest> handler) {
+    public Router delete(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return delete(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -219,7 +219,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router options(String pattern, Middleware... handlers) {
+    public Router options(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, optionsBindings);
         return this;
     }
@@ -229,7 +229,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router options(String pattern, final Handler<YokeRequest> handler) {
+    public Router options(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return options(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -243,7 +243,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router head(String pattern, Middleware... handlers) {
+    public Router head(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, headBindings);
         return this;
     }
@@ -253,7 +253,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router head(String pattern, final Handler<YokeRequest> handler) {
+    public Router head(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return head(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -267,7 +267,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router trace(String pattern, Middleware... handlers) {
+    public Router trace(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, traceBindings);
         return this;
     }
@@ -277,7 +277,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router trace(String pattern, final Handler<YokeRequest> handler) {
+    public Router trace(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return trace(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -291,7 +291,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router connect(String pattern, Middleware... handlers) {
+    public Router connect(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, connectBindings);
         return this;
     }
@@ -301,7 +301,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router connect(String pattern, final Handler<YokeRequest> handler) {
+    public Router connect(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return connect(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -315,7 +315,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router patch(String pattern, Middleware... handlers) {
+    public Router patch(@NotNull final String pattern, @NotNull final Middleware... handlers) {
         addPattern(pattern, handlers, patchBindings);
         return this;
     }
@@ -325,7 +325,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router patch(String pattern, final Handler<YokeRequest> handler) {
+    public Router patch(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         return patch(pattern, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -339,7 +339,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router all(String pattern, Middleware... handler) {
+    public Router all(@NotNull final String pattern, @NotNull final Middleware... handler) {
         get(pattern, handler);
         put(pattern, handler);
         post(pattern, handler);
@@ -357,7 +357,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handler The middleware to call
      */
-    public Router all(String pattern, final Handler<YokeRequest> handler) {
+    public Router all(@NotNull final String pattern, @NotNull final Handler<YokeRequest> handler) {
         get(pattern, handler);
         put(pattern, handler);
         post(pattern, handler);
@@ -375,7 +375,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router get(Pattern regex, Middleware... handlers) {
+    public Router get(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, getBindings);
         return this;
     }
@@ -385,7 +385,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router get(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router get(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return get(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -399,7 +399,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router put(Pattern regex, Middleware... handlers) {
+    public Router put(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, putBindings);
         return this;
     }
@@ -409,7 +409,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router put(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router put(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return put(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -423,7 +423,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router post(Pattern regex, Middleware... handlers) {
+    public Router post(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, postBindings);
         return this;
     }
@@ -433,7 +433,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router post(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router post(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return post(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -447,7 +447,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router delete(Pattern regex, Middleware... handlers) {
+    public Router delete(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, deleteBindings);
         return this;
     }
@@ -457,7 +457,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router delete(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router delete(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return delete(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -471,7 +471,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router options(Pattern regex, Middleware... handlers) {
+    public Router options(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, optionsBindings);
         return this;
     }
@@ -481,7 +481,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router options(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router options(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return options(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -495,7 +495,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router head(Pattern regex, Middleware... handlers) {
+    public Router head(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, headBindings);
         return this;
     }
@@ -505,7 +505,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router head(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router head(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return head(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -519,7 +519,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router trace(Pattern regex, Middleware... handlers) {
+    public Router trace(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, traceBindings);
         return this;
     }
@@ -529,7 +529,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router trace(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router trace(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return trace(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -543,7 +543,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router connect(Pattern regex, Middleware... handlers) {
+    public Router connect(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, connectBindings);
         return this;
     }
@@ -553,7 +553,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router connect(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router connect(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return connect(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -567,7 +567,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router patch(Pattern regex, Middleware... handlers) {
+    public Router patch(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
         addRegEx(regex, handlers, patchBindings);
         return this;
     }
@@ -577,7 +577,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router patch(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router patch(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         return patch(regex, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -591,7 +591,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router all(Pattern regex, Middleware... handler) {
+    public Router all(@NotNull final Pattern regex, @NotNull final Middleware... handler) {
         get(regex, handler);
         put(regex, handler);
         post(regex, handler);
@@ -609,7 +609,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handler The middleware to call
      */
-    public Router all(Pattern regex, final Handler<YokeRequest> handler) {
+    public Router all(@NotNull final Pattern regex, @NotNull final Handler<YokeRequest> handler) {
         get(regex, handler);
         put(regex, handler);
         post(regex, handler);
@@ -622,14 +622,14 @@ public class Router extends Middleware {
         return this;
     }
 
-    public Router param(final String paramName, final Middleware handler) {
+    public Router param(@NotNull final String paramName, @NotNull final Middleware handler) {
         // also pass the vertx object to the routes
         handler.init(vertx, mount);
         paramProcessors.put(paramName, handler);
         return this;
     }
 
-    public Router param(final String paramName, final Pattern regex) {
+    public Router param(@NotNull final String paramName, @NotNull final Pattern regex) {
         return param(paramName, new Middleware() {
             @Override
             public void handle(final YokeRequest request, final Handler<Object> next) {
