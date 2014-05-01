@@ -1,4 +1,4 @@
 {
   "main": "com.jetdrone.vertx.bench.TechEmpower",
-  "includes": "com.jetdrone~yoke~1.0.11,com.jetdrone~yoke-extras~1.0.11"
+  "includes": "com.jetdrone~yoke~1.0.12,com.jetdrone~yoke-extras~1.0.12"
 }

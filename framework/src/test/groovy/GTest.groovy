@@ -1,5 +1,6 @@
 import com.jetdrone.vertx.yoke.GYoke
 import com.jetdrone.vertx.yoke.annotations.GET
+import com.jetdrone.vertx.yoke.annotations.Produces
 import com.jetdrone.vertx.yoke.annotations.RegExParam
 import com.jetdrone.vertx.yoke.middleware.Favicon
 import com.jetdrone.vertx.yoke.middleware.GRouter
@@ -48,6 +49,7 @@ class GTest extends TestVerticle {
         }
     }
 
+    @Produces('application/json')
     class Ann2 {
         @RegExParam('username')
         public final Pattern username = ~/^[a-zA-Z0-9]+$/

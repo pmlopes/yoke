@@ -4,6 +4,7 @@ import com.jetdrone.vertx.yoke.annotations.processors.ContentNegotiationProcesso
 import com.jetdrone.vertx.yoke.annotations.processors.RegExParamProcessorHandler;
 import com.jetdrone.vertx.yoke.annotations.processors.RouterProcessorHandler;
 import com.jetdrone.vertx.yoke.middleware.Router;
+import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.CallSite;
@@ -58,7 +59,7 @@ public final class Processor {
         }
     }
 
-    public static void process(Router router, Object instance) {
+    public static void process(@NotNull Router router, @NotNull Object instance) {
         final Class clazz = instance.getClass();
 
         for (final Field field : clazz.getFields()) {

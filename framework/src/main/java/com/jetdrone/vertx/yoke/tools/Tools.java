@@ -10,7 +10,7 @@ public class Tools {
     private static String module;
     private static String version;
 
-    private static final String VERSION = "1.0.11";
+    private static final String VERSION = "1.0.12";
 
     static void write(String path, String value) {
         try {
