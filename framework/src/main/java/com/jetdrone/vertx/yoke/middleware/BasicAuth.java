@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
@@ -39,7 +40,7 @@ public class BasicAuth extends Middleware {
      * @param password the security principal password
      * @param realm the security realm
      */
-    public BasicAuth(final String username, final String password, String realm) {
+    public BasicAuth(@NotNull final String username, @NotNull final String password, @NotNull String realm) {
         this.realm = realm;
         authHandler = new AuthHandler() {
             @Override
@@ -65,7 +66,7 @@ public class BasicAuth extends Middleware {
      * @param username the security principal user name
      * @param password the security principal password
      */
-    public BasicAuth(String username, String password) {
+    public BasicAuth(@NotNull String username, @NotNull String password) {
         this (username, password, "Authentication required");
 
     }
@@ -90,7 +91,7 @@ public class BasicAuth extends Middleware {
      * @param authHandler the authentication handler
      * @param realm the security realm
      */
-    public BasicAuth(String realm, AuthHandler authHandler) {
+    public BasicAuth(@NotNull String realm, @NotNull AuthHandler authHandler) {
         this.realm = realm;
         this.authHandler = authHandler;
     }
@@ -114,7 +115,7 @@ public class BasicAuth extends Middleware {
 
      * @param authHandler the authentication handler
      */
-    public BasicAuth(AuthHandler authHandler) {
+    public BasicAuth(@NotNull AuthHandler authHandler) {
         this("Authentication required", authHandler);
     }
 
@@ -132,7 +133,7 @@ public class BasicAuth extends Middleware {
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         String authorization = request.getHeader("authorization");
 
         if (authorization == null) {
@@ -184,7 +185,7 @@ public class BasicAuth extends Middleware {
      * @param request http yoke request
      * @return realm name
      */
-    public String getRealm(YokeRequest request) {
+    public String getRealm(@NotNull YokeRequest request) {
         return realm;
     }
 }

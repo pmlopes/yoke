@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
@@ -31,13 +32,13 @@ public class Vhost extends Middleware {
      * @param hostname
      * @param handler
      */
-    public Vhost(String hostname, Handler<HttpServerRequest> handler) {
+    public Vhost(@NotNull final String hostname, @NotNull final Handler<HttpServerRequest> handler) {
         this.handler = handler;
         this.regex = Pattern.compile("^" + hostname.replaceAll("\\.", "\\\\.").replaceAll("[*]", "(.*?)") + "$", Pattern.CASE_INSENSITIVE);
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         String host = request.getHeader("host");
         if (host == null) {
             next.handle(null);

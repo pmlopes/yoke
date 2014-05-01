@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import java.util.UUID;
@@ -39,7 +40,7 @@ public class Csrf extends Middleware {
      *
      * @param key name of the context variable to store the token.
      */
-    public Csrf(final String key) {
+    public Csrf(@NotNull final String key) {
         this.key = key;
         valueHandler = new ValueHandler() {
             @Override
@@ -78,7 +79,7 @@ public class Csrf extends Middleware {
      * @param key          name of the context variable to store the token.
      * @param valueHandler the handler for the token validation.
      */
-    public Csrf(String key, ValueHandler valueHandler) {
+    public Csrf(@NotNull String key, @NotNull ValueHandler valueHandler) {
         this.key = key;
         this.valueHandler = valueHandler;
     }
@@ -92,7 +93,7 @@ public class Csrf extends Middleware {
      *
      * @param valueHandler the handler for the token validation.
      */
-    public Csrf(ValueHandler valueHandler) {
+    public Csrf(@NotNull final ValueHandler valueHandler) {
         this("_csrf", valueHandler);
     }
 
@@ -101,7 +102,7 @@ public class Csrf extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
 
         String token = request.get(key);
         // generate CSRF token

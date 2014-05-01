@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import javax.crypto.Mac;
@@ -39,7 +40,7 @@ public class CookieParser extends Middleware {
      *
      * @param hmacSHA256 Mac
      */
-    public CookieParser(Mac hmacSHA256) {
+    public CookieParser(final Mac hmacSHA256) {
         this.hmacSHA256 = hmacSHA256;
     }
 
@@ -56,7 +57,7 @@ public class CookieParser extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         String cookieHeader = request.getHeader("cookie");
 
         if (cookieHeader != null) {

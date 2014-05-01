@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 /** # Timeout
@@ -16,7 +17,7 @@ public class Timeout extends Middleware {
 
     private final long timeout;
 
-    public Timeout(long timeout) {
+    public Timeout(final long timeout) {
         this.timeout = timeout;
     }
 
@@ -24,7 +25,7 @@ public class Timeout extends Middleware {
         this(5000);
     }
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         final YokeResponse response = request.response();
 
         final long timerId = vertx.setTimer(timeout, new Handler<Long>() {

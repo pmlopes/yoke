@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 /**
@@ -29,12 +30,12 @@ public class Limit extends Middleware {
      *
      * @param limit
      */
-    public Limit(long limit) {
+    public Limit(final long limit) {
         this.limit = limit;
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if (request.hasBody()) {
             request.setBodyLengthLimit(limit);
 

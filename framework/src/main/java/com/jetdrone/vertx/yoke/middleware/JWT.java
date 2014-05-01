@@ -2,6 +2,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.YokeException;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import java.util.regex.Pattern;
@@ -13,17 +14,17 @@ public class JWT extends Middleware {
     private final String skip;
     private final com.jetdrone.vertx.yoke.util.JWT jwt;
 
-    public JWT(String secret) {
-        this(null, secret);
+    public JWT(@NotNull String secret) {
+        this(secret, null);
     }
 
-    public JWT(String skip, String secret) {
+    public JWT(@NotNull String secret, String skip) {
         this.skip = skip;
         this.jwt = new com.jetdrone.vertx.yoke.util.JWT(secret);
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         String token = null;
 
         if ("OPTIONS".equals(request.method()) && request.getHeader("access-control-request-headers") != null) {
@@ -61,7 +62,7 @@ public class JWT extends Middleware {
         }
 
         try {
-            request.put("user", jwt.decode(token));
+            request.put("jwt", jwt.decode(token));
             next.handle(null);
         } catch (RuntimeException e) {
             next.handle(new YokeException(401, e));

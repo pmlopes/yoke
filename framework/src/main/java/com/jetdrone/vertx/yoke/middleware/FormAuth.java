@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.util.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
@@ -21,15 +22,15 @@ public class FormAuth extends Middleware {
 
     private final boolean forceSSL;
 
-    public FormAuth(AuthHandler authHandler) {
+    public FormAuth(@NotNull final AuthHandler authHandler) {
         this(false, authHandler);
     }
 
-    public FormAuth(boolean forceSSL, AuthHandler authHandler) {
+    public FormAuth(final boolean forceSSL, @NotNull final AuthHandler authHandler) {
         this(forceSSL, "/login", "/logout", null, authHandler);
     }
 
-    public FormAuth(boolean forceSSL, String loginURI, String logoutURI, String loginTemplate, AuthHandler authHandler) {
+    public FormAuth(final boolean forceSSL, @NotNull final String loginURI, @NotNull final String logoutURI, final String loginTemplate, @NotNull final AuthHandler authHandler) {
         this.authHandler = authHandler;
         this.loginURI = loginURI;
         this.logoutURI = logoutURI;
@@ -42,7 +43,7 @@ public class FormAuth extends Middleware {
     }
 
     @Override
-    public Middleware init(final Vertx vertx, final String mount) {
+    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
         super.init(vertx, mount);
         // trim the initial slash
         String correctedMount = mount;
@@ -55,7 +56,7 @@ public class FormAuth extends Middleware {
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if (request.path().equals(loginURI)) {
             if ("GET".equals(request.method())) {
                 if (loginTemplate != null) {
@@ -126,7 +127,7 @@ public class FormAuth extends Middleware {
 
     public final Middleware RequiredAuth = new Middleware() {
         @Override
-        public void handle(final YokeRequest request, final Handler<Object> next) {
+        public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
             JsonObject session = request.get("session");
 
             if (session != null) {

@@ -21,7 +21,7 @@ public class YokeCookie implements Cookie {
     private String value;
     private boolean signed;
 
-    public YokeCookie(Cookie nettyCookie, Mac hmacSHA256) {
+    public YokeCookie(@NotNull final Cookie nettyCookie, final Mac hmacSHA256) {
         this.nettyCookie = nettyCookie;
         this.hmacSHA256 = hmacSHA256;
 
@@ -40,11 +40,11 @@ public class YokeCookie implements Cookie {
         }
     }
 
-    public YokeCookie(String name, Mac hmacSHA256) {
+    public YokeCookie(@NotNull final String name, final Mac hmacSHA256) {
         this(new DefaultCookie(name, ""), hmacSHA256);
     }
 
-    public YokeCookie(String name, String value) {
+    public YokeCookie(@NotNull final String name, @NotNull final String value) {
         this(new DefaultCookie(name, value), null);
     }
 
@@ -72,7 +72,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
         this.signed = false;
         nettyCookie.setValue(value);
@@ -89,7 +89,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setDomain(String domain) {
+    public void setDomain(final String domain) {
         nettyCookie.setDomain(domain);
     }
 
@@ -99,7 +99,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setPath(String path) {
+    public void setPath(final String path) {
         nettyCookie.setPath(path);
     }
 
@@ -109,7 +109,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setComment(String comment) {
+    public void setComment(final String comment) {
         nettyCookie.setComment(comment);
     }
 
@@ -119,7 +119,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setMaxAge(long maxAge) {
+    public void setMaxAge(final long maxAge) {
         nettyCookie.setMaxAge(maxAge);
     }
 
@@ -129,7 +129,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setVersion(int version) {
+    public void setVersion(final int version) {
         nettyCookie.setVersion(version);
     }
 
@@ -139,7 +139,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setSecure(boolean secure) {
+    public void setSecure(final boolean secure) {
         nettyCookie.setSecure(secure);
     }
 
@@ -149,7 +149,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setHttpOnly(boolean httpOnly) {
+    public void setHttpOnly(final boolean httpOnly) {
         nettyCookie.setHttpOnly(httpOnly);
     }
 
@@ -159,7 +159,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setCommentUrl(String commentUrl) {
+    public void setCommentUrl(final String commentUrl) {
         nettyCookie.setCommentUrl(commentUrl);
     }
 
@@ -169,7 +169,7 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setDiscard(boolean discard) {
+    public void setDiscard(final boolean discard) {
         nettyCookie.setDiscard(discard);
     }
 
@@ -179,22 +179,22 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public void setPorts(int... ports) {
+    public void setPorts(final int... ports) {
         nettyCookie.setPorts(ports);
     }
 
     @Override
-    public void setPorts(Iterable<Integer> ports) {
+    public void setPorts(final Iterable<Integer> ports) {
         nettyCookie.setPorts(ports);
     }
 
     @Override
-    public int compareTo(@NotNull Cookie o) {
+    public int compareTo(@NotNull final Cookie o) {
         return nettyCookie.compareTo(o);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return o != null && o instanceof Cookie && compareTo((Cookie) o) == 0;
 
     }

@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -28,7 +29,7 @@ public class YokeFileUpload {
     private final long size;
     private final String path;
 
-    public YokeFileUpload(Vertx vertx, HttpServerFileUpload fileUpload, String uploadDir) {
+    public YokeFileUpload(@NotNull final Vertx vertx, @NotNull final HttpServerFileUpload fileUpload, @NotNull String uploadDir) {
         this.fileSystem = vertx.fileSystem();
 
         this.filename = fileUpload.filename();
@@ -45,7 +46,7 @@ public class YokeFileUpload {
         this.path = uploadDir + UUID.randomUUID().toString();
     }
 
-    public YokeFileUpload(FileSystem fileSystem, String filename, String name, String contentType, String contentTransferEncoding, Charset charset, long size, String path) {
+    public YokeFileUpload(@NotNull final FileSystem fileSystem, @NotNull final String filename, @NotNull final String name, @NotNull final String contentType, @NotNull final String contentTransferEncoding, @NotNull final Charset charset, final long size, @NotNull final String path) {
         this.fileSystem = fileSystem;
         this.filename = filename;
         this.name = name;
@@ -105,7 +106,7 @@ public class YokeFileUpload {
         return path;
     }
 
-    public void delete(final Handler<Throwable> handler) {
+    public void delete(@NotNull final Handler<Throwable> handler) {
         fileSystem.delete(path, new Handler<AsyncResult<Void>>() {
             @Override
             public void handle(AsyncResult<Void> result) {

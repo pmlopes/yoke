@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.JSON;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerFileUpload;
@@ -42,7 +43,7 @@ public class BodyParser extends Middleware {
      *
      * @param uploadDir upload directory path
      */
-    public BodyParser(String uploadDir) {
+    public BodyParser(@NotNull String uploadDir) {
         this.uploadDir = uploadDir;
     }
 
@@ -65,7 +66,7 @@ public class BodyParser extends Middleware {
      * @param next middleware to be called next
      */
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         final String method = request.method();
 
         // GET and HEAD have no setBody

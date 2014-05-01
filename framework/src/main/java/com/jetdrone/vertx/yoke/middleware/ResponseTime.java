@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 /** # ResponseTime
@@ -12,7 +13,7 @@ import org.vertx.java.core.Handler;
  */
 public class ResponseTime extends Middleware {
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
 
         final long start = System.currentTimeMillis();
         final YokeResponse response = request.response();

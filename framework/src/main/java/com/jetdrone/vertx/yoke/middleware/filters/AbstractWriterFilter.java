@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware.filters;
 
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ public abstract class AbstractWriterFilter implements WriterFilter {
     final OutputStream stream;
     final Buffer buffer = new Buffer();
 
-    public AbstractWriterFilter(Pattern filter) throws IOException {
+    public AbstractWriterFilter(@NotNull final Pattern filter) throws IOException {
         this.filter = filter;
         this.stream = createOutputStream();
     }
@@ -43,40 +44,40 @@ public abstract class AbstractWriterFilter implements WriterFilter {
     }
 
     @Override
-    public void write(Buffer buffer) {
+    public void write(@NotNull final Buffer buffer) {
         write(buffer.getBytes());
     }
 
     @Override
-    public void write(String chunk) {
+    public void write(@NotNull final String chunk) {
         write(chunk.getBytes());
     }
 
     @Override
-    public void write(String chunk, String enc) {
+    public void write(@NotNull final String chunk, @NotNull final String enc) {
         write(chunk.getBytes(Charset.forName(enc)));
     }
 
     @Override
-    public Buffer end(Buffer buffer) {
+    public Buffer end(@NotNull final Buffer buffer) {
         end(buffer.getBytes());
         return buffer;
     }
 
     @Override
-    public Buffer end(String chunk) {
+    public Buffer end(@NotNull final String chunk) {
         end(chunk.getBytes());
         return buffer;
     }
 
     @Override
-    public Buffer end(String chunk, String enc) {
+    public Buffer end(@NotNull final String chunk, @NotNull final String enc) {
         end(chunk.getBytes(Charset.forName(enc)));
         return buffer;
     }
 
     @Override
-    public boolean canFilter(String contentType) {
+    public boolean canFilter(@NotNull final String contentType) {
         return filter.matcher(contentType).find();
     }
 }

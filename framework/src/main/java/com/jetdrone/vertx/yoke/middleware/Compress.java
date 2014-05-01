@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.filters.DeflateWriterFilter;
 import com.jetdrone.vertx.yoke.middleware.filters.GZipWriterFilter;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class Compress extends Middleware {
      *
      * @param filter Regular expression to specify which mime types are allowed to be compressed
      */
-    public Compress(Pattern filter) {
+    public Compress(@NotNull final Pattern filter) {
         this.filter = filter;
     }
 
@@ -45,7 +46,7 @@ public class Compress extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         final String method = request.method();
         final YokeResponse response = request.response();
 

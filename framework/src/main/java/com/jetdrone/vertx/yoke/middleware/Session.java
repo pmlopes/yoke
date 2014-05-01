@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
@@ -21,7 +22,7 @@ public class Session extends Middleware {
     private final Boolean httpOnly;
     private final long maxAge;
 
-    public Session(String name, String path, boolean httpOnly, long maxAge, Mac mac) {
+    public Session(@NotNull final String name, @NotNull final String path, final boolean httpOnly, final long maxAge, @NotNull final Mac mac) {
         this.name = name;
         this.path = path;
         this.httpOnly = httpOnly;
@@ -29,24 +30,24 @@ public class Session extends Middleware {
         hmacSHA256 = mac;
     }
 
-    public Session(String path, boolean httpOnly, long maxAge, Mac mac) {
+    public Session(@NotNull final String path, final boolean httpOnly, final long maxAge, @NotNull final Mac mac) {
         this("yoke.sess", path, httpOnly, maxAge, mac);
     }
 
-    public Session(boolean httpOnly, long maxAge, Mac mac) {
+    public Session(final boolean httpOnly, final long maxAge, @NotNull final Mac mac) {
         this("yoke.sess", "/", httpOnly, maxAge, mac);
     }
 
-    public Session(long maxAge, Mac mac) {
+    public Session(final long maxAge, @NotNull final Mac mac) {
         this("yoke.sess", "/", true, maxAge, mac);
     }
 
-    public Session(Mac mac) {
+    public Session(@NotNull final Mac mac) {
         this("yoke.sess", "/", true, 60 * 60 * 1000, mac);
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         // default session
         final YokeCookie cookie = new YokeCookie(name, hmacSHA256);
         cookie.setPath(path);

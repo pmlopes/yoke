@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonObject;
@@ -20,7 +21,7 @@ public class MethodOverride extends Middleware {
 
     private final String key;
 
-    public MethodOverride(String key) {
+    public MethodOverride(@NotNull final String key) {
         this.key = key;
     }
 
@@ -29,7 +30,7 @@ public class MethodOverride extends Middleware {
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
 
         // other methods than GET, HEAD and OPTIONS may have body
         if (!"GET".equals(request.method()) && !"HEAD".equals(request.method()) && !"OPTIONS".equals(request.method())) {

@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 
 import com.jetdrone.vertx.yoke.store.SessionStore;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
@@ -33,7 +34,7 @@ public class BridgeSecureHandler extends Middleware {
     private final SessionStore sessionStore;
 
     @Override
-    public Middleware init(final Vertx vertx, final String mount) {
+    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
         super.init(vertx, mount);
 
         // register a new handler for the configured address
@@ -74,7 +75,7 @@ public class BridgeSecureHandler extends Middleware {
      * @param authAddress event buss address for authentication module
      * @param sessionStore the store where the session is to be located from
      */
-    public BridgeSecureHandler(final String authAddress, final SessionStore sessionStore) {
+    public BridgeSecureHandler(@NotNull final String authAddress, @NotNull final SessionStore sessionStore) {
         this.authAddress = authAddress;
         this.sessionStore = sessionStore;
     }
@@ -83,12 +84,12 @@ public class BridgeSecureHandler extends Middleware {
      *
      * @param sessionStore the store where the session is to be located from
      */
-    public BridgeSecureHandler(final SessionStore sessionStore) {
+    public BridgeSecureHandler(@NotNull final SessionStore sessionStore) {
         this(DEFAULT_AUTH_ADDRESS, sessionStore);
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         next.handle(null);
     }
 }

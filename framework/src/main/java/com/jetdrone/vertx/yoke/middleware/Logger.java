@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpVersion;
 import org.vertx.java.core.logging.impl.LoggerFactory;
@@ -48,14 +49,14 @@ public class Logger extends Middleware {
      */
     private final Format format;
 
-    public Logger(boolean immediate, Format format) {
+    public Logger(final boolean immediate, @NotNull Format format) {
         this.immediate = immediate;
         this.format = format;
 
         ISODATE = new ThreadLocalUTCDateFormat();
     }
 
-    public Logger(Format format) {
+    public Logger(@NotNull Format format) {
         this(false, format);
     }
 
@@ -138,7 +139,7 @@ public class Logger extends Middleware {
     }
 
     @Override
-    public void handle(final YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         final long start = System.currentTimeMillis();
 
         if (immediate) {

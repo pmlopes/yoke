@@ -3,6 +3,8 @@
  */
 package com.jetdrone.vertx.yoke.middleware.filters;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.regex.Pattern;
@@ -13,7 +15,7 @@ import java.util.zip.GZIPOutputStream;
  */
 public class GZipWriterFilter extends AbstractWriterFilter {
 
-    public GZipWriterFilter(Pattern filter) throws IOException {
+    public GZipWriterFilter(@NotNull final Pattern filter) throws IOException {
         super(filter);
     }
 

@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.util.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.*;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
@@ -66,7 +67,7 @@ public class Static extends Middleware {
      * @param directoryListing generate index pages for directories
      * @param includeHidden    in the directory listing show dot files
      */
-    public Static(String root, long maxAge, boolean directoryListing, boolean includeHidden) {
+    public Static(@NotNull String root, final long maxAge, final boolean directoryListing, final boolean includeHidden) {
         // if the root is not empty it should end with / for convenience
         if (!"".equals(root)) {
             if (!root.endsWith("/")) {
@@ -94,7 +95,7 @@ public class Static extends Middleware {
      * @param root   the root location of the static files in the file system (relative to the main Verticle).
      * @param maxAge cache-control max-age directive
      */
-    public Static(String root, long maxAge) {
+    public Static(@NotNull final String root, final long maxAge) {
         this(root, maxAge, false, false);
     }
 
@@ -109,7 +110,7 @@ public class Static extends Middleware {
      *
      * @param root the root location of the static files in the file system (relative to the main Verticle).
      */
-    public Static(String root) {
+    public Static(@NotNull final String root) {
         this(root, 86400000, false, false);
     }
 
@@ -325,7 +326,7 @@ public class Static extends Middleware {
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if (!"GET".equals(request.method()) && !"HEAD".equals(request.method())) {
             next.handle(null);
         } else {

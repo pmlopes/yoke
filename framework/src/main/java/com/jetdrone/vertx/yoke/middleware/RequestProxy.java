@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.VoidHandler;
@@ -26,19 +27,19 @@ public class RequestProxy extends Middleware {
     private final int port;
     private final boolean secure;
 
-    public RequestProxy(String prefix, String host, int port, boolean secure) {
+    public RequestProxy(@NotNull final String prefix, @NotNull final String host, final int port, final boolean secure) {
         this.prefix = prefix;
         this.host = host;
         this.port = port;
         this.secure = secure;
     }
 
-    public RequestProxy(String prefix, int port, boolean secure) {
+    public RequestProxy(@NotNull final String prefix, final int port, final boolean secure) {
         this(prefix, "localhost", port, secure);
     }
 
     @Override
-    public void handle(final YokeRequest req, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest req, @NotNull final Handler<Object> next) {
         if (!req.uri().startsWith(prefix)) {
           next.handle(null);
           return;

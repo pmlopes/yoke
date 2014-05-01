@@ -5,6 +5,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.util.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -85,7 +86,7 @@ public class Favicon extends Middleware {
      * @param path
      * @param maxAge
      */
-    public Favicon(String path, long maxAge) {
+    public Favicon(final String path, final long maxAge) {
         this.path = path;
         this.maxAge = maxAge;
     }
@@ -123,7 +124,7 @@ public class Favicon extends Middleware {
      * @param mount
      */
     @Override
-    public Middleware init(Vertx vertx, String mount) {
+    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
         try {
             super.init(vertx, mount);
             if (path == null) {
@@ -140,7 +141,7 @@ public class Favicon extends Middleware {
 
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if ("/favicon.ico".equals(request.normalizedPath())) {
             request.response().headers().set(icon.headers);
             request.response().end(icon.body);
