@@ -12,7 +12,7 @@ import java.lang.reflect.Method;
 public class ContentNegotiationProcessorHandler implements AnnotationHandler {
 
     @Override
-    public void process(final Router router, final Object instance, final Class clazz, final Method method) {
+    public void process(final Router router, final Object instance, final Class<?> clazz, final Method method) {
 
         Produces clazzProducesAnn = Processor.getAnnotation(clazz, Produces.class);
         Consumes clazzConsumesAnn = Processor.getAnnotation(clazz, Consumes.class);
@@ -69,7 +69,7 @@ public class ContentNegotiationProcessorHandler implements AnnotationHandler {
     }
 
     @Override
-    public void process(Router router, Object instance, Class clazz, Field field) {
+    public void process(Router router, Object instance, Class<?> clazz, Field field) {
         // NOOP
     }
 

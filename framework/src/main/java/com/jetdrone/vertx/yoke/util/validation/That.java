@@ -33,6 +33,9 @@ public final class That {
     private static final ThreadLocalUTCDateFormat DATEFORMAT = new ThreadLocalUTCDateFormat();
 
     private static class SimpleNumberComparator implements Comparator<Number>, Serializable {
+
+        private static final long serialVersionUID = 1l;
+        
         @Override
         public int compare(Number o1, Number o2) {
             if (o1 instanceof Short && o2 instanceof Short) {

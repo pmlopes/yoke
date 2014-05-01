@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 public class RouterProcessorHandler implements AnnotationHandler {
 
     @Override
-    public void process(final Router router, final Object instance, final Class clazz, final Method method) {
+    public void process(final Router router, final Object instance, final Class<?> clazz, final Method method) {
 
         // process the methods that have both YokeRequest and Handler
 
@@ -61,7 +61,7 @@ public class RouterProcessorHandler implements AnnotationHandler {
     }
 
     @Override
-    public void process(Router router, Object instance, Class clazz, Field field) {
+    public void process(Router router, Object instance, Class<?> clazz, Field field) {
         // NOOP
     }
 

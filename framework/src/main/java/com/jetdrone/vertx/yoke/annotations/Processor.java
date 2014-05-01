@@ -40,7 +40,7 @@ public final class Processor {
         }
     }
 
-    public static void registerProcessor(Class processor) {
+    public static void registerProcessor(Class<?> processor) {
         try {
             // if already registered skip
             for (AnnotationHandler annotationHandler : handlers) {
@@ -60,7 +60,7 @@ public final class Processor {
     }
 
     public static void process(@NotNull Router router, @NotNull Object instance) {
-        final Class clazz = instance.getClass();
+        final Class<?> clazz = instance.getClass();
 
         for (final Field field : clazz.getFields()) {
             for (AnnotationHandler handler : handlers) {
@@ -188,7 +188,7 @@ public final class Processor {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Annotation> T getAnnotation(Class c, Class<T> annotation) {
+    public static <T extends Annotation> T getAnnotation(Class<?> c, Class<T> annotation) {
         // skip non public classes
         if (!Modifier.isPublic(c.getModifiers())) {
             return null;

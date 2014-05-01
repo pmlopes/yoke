@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 public class RegExParamProcessorHandler implements AnnotationHandler {
 
     @Override
-    public void process(Router router, Object instance, Class clazz, Method method) {
+    public void process(Router router, Object instance, Class<?> clazz, Method method) {
         // NOOP
     }
 
     @Override
-    public void process(Router router, Object instance, Class clazz, Field field) {
+    public void process(Router router, Object instance, Class<?> clazz, Field field) {
         boolean staticField = false;
 
         if (Modifier.isStatic(field.getModifiers())) {

@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 
 public interface AnnotationHandler {
 
-    void process(final Router router, final Object instance, final Class clazz, final Method method);
+    void process(final Router router, final Object instance, final Class<?> clazz, final Method method);
 
-    void process(final Router router, final Object instance, final Class clazz, final Field field);
+    void process(final Router router, final Object instance, final Class<?> clazz, final Field field);
 }
