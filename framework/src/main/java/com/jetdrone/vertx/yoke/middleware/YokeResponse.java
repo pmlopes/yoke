@@ -11,6 +11,7 @@ import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
+import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.streams.Pump;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -28,6 +29,8 @@ import java.util.*;
 /** # YokeResponse */
 public class YokeResponse implements HttpServerResponse {
     // the original request
+    private final HttpServerRequest request;
+    // the original response
     private final HttpServerResponse response;
     // the context
     private final Context context;
@@ -45,8 +48,9 @@ public class YokeResponse implements HttpServerResponse {
     private WriterFilter filter;
     private boolean hasBody;
 
-    public YokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
-        this.response = response;
+    public YokeResponse(HttpServerRequest request, Context context, Map<String, Engine> engines) {
+        this.request = request;
+        this.response = request.response();
         this.context = context;
         this.engines = engines;
     }
@@ -353,8 +357,9 @@ public class YokeResponse implements HttpServerResponse {
                     filter = null;
                 }
             }
-            // if there is no content delete content-type, content-encoding
-            if (!hasBody) {
+            // if there is no content and method is not HEAD delete content-type, content-encoding
+            if (!hasBody && !"HEAD".equals(request.method())) {
+                // TODO: respect method override middleware
                 response.headers().remove("content-encoding");
                 response.headers().remove("content-type");
             }

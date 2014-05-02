@@ -15,6 +15,6 @@ public class GroovyRequestWrapper implements RequestWrapper {
 
         @Override
         public YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store) {
-            return new GYokeRequest(request, new GYokeResponse(request.response(), context, engines), secure, context, store);
+            return new GYokeRequest(request, new GYokeResponse(request, context, engines), secure, context, store);
         }
 }

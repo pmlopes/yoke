@@ -13,6 +13,6 @@ public class JSRequestWrapper implements RequestWrapper {
 
     @Override
     public YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store) {
-        return new JSYokeRequest(request, new JSYokeResponse(request.response(), context, engines), secure, context, store);
+        return new JSYokeRequest(request, new JSYokeResponse(request, context, engines), secure, context, store);
     }
 }

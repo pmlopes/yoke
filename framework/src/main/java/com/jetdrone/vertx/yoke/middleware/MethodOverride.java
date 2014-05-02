@@ -43,7 +43,7 @@ public class MethodOverride extends Middleware {
                 String method = urlEncoded.get(key);
                 if (method != null) {
                     urlEncoded.remove(key);
-                    request.setMethod(method);
+                    request.setMethod(method.toUpperCase());
                     next.handle(null);
                     return;
                 }
@@ -54,17 +54,17 @@ public class MethodOverride extends Middleware {
                 String method = json.getString(key);
                 if (method != null) {
                     json.removeField(key);
-                    request.setMethod(method);
+                    request.setMethod(method.toUpperCase());
                     next.handle(null);
                     return;
                 }
             }
         }
 
-        String xHttpMethodOverride = request.getHeader("x-http-setMethod-override");
+        String xHttpMethodOverride = request.getHeader("x-http-setmethod-override");
 
         if (xHttpMethodOverride != null) {
-            request.setMethod(xHttpMethodOverride);
+            request.setMethod(xHttpMethodOverride.toUpperCase());
         }
 
         // if reached the end continue to the next middleware
