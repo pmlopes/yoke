@@ -4,6 +4,8 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.core.YokeCookie;
+import com.jetdrone.vertx.yoke.core.YokeFileUpload;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;

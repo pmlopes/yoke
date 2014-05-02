@@ -3,8 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.core.Context;
-import com.jetdrone.vertx.yoke.core.GMultiMap;
+import com.jetdrone.vertx.yoke.core.*;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import org.jetbrains.annotations.NotNull;

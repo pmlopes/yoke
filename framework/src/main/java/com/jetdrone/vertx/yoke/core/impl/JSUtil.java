@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
-import com.jetdrone.vertx.yoke.middleware.YokeCookie;
-import com.jetdrone.vertx.yoke.middleware.YokeFileUpload;
+import com.jetdrone.vertx.yoke.core.YokeCookie;
+import com.jetdrone.vertx.yoke.core.YokeFileUpload;
 import org.mozilla.javascript.Scriptable;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonElement;

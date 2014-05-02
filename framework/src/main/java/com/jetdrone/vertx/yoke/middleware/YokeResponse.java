@@ -504,6 +504,11 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public YokeResponse write(String chunk, String enc) {
+        if (chunk == null || "".equals(chunk)) {
+            // skip
+            return this;
+        }
+
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -516,6 +521,11 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public YokeResponse write(String chunk) {
+        if (chunk == null || "".equals(chunk)) {
+            // skip
+            return this;
+        }
+
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -528,6 +538,11 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public void end(String chunk) {
+        if (chunk == null || "".equals(chunk)) {
+            // skip
+            return;
+        }
+
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -540,6 +555,11 @@ public class YokeResponse implements HttpServerResponse {
 
     @Override
     public void end(String chunk, String enc) {
+        if (chunk == null || "".equals(chunk)) {
+            // skip
+            return;
+        }
+
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {

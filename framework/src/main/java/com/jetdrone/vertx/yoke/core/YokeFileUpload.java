@@ -1,7 +1,7 @@
 /**
  * Copyright 2011-2014 the original author or authors.
  */
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.core;
 
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;

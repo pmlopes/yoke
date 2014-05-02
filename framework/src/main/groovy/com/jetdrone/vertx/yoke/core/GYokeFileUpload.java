@@ -1,7 +1,7 @@
 /**
  * Copyright 2011-2014 the original author or authors.
  */
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.core;
 
 import groovy.lang.Closure;
 import org.vertx.java.core.AsyncResult;
@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 
 public class GYokeFileUpload extends YokeFileUpload {
 
-    GYokeFileUpload(YokeFileUpload fileUpload) {
+    public GYokeFileUpload(YokeFileUpload fileUpload) {
         super(fileUpload.fileSystem, fileUpload.filename(), fileUpload.name(), fileUpload.contentType(), fileUpload.contentTransferEncoding(), fileUpload.charset(), fileUpload.size(), fileUpload.path());
     }
 

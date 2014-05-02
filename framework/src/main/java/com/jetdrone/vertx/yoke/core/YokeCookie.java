@@ -1,7 +1,7 @@
 /**
  * Copyright 2011-2014 the original author or authors.
  */
-package com.jetdrone.vertx.yoke.middleware;
+package com.jetdrone.vertx.yoke.core;
 
 import com.jetdrone.vertx.yoke.util.Utils;
 import io.netty.handler.codec.http.Cookie;
@@ -191,11 +191,5 @@ public class YokeCookie implements Cookie {
     @Override
     public int compareTo(@NotNull final Cookie o) {
         return nettyCookie.compareTo(o);
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        return o != null && o instanceof Cookie && compareTo((Cookie) o) == 0;
-
     }
 }
