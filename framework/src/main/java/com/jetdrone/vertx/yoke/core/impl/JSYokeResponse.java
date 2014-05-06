@@ -11,7 +11,7 @@ import org.mozilla.javascript.WrappedException;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.streams.ReadStream;
 
@@ -21,8 +21,8 @@ import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
 
 final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
-    public JSYokeResponse(HttpServerRequest request, Context context, Map<String, Engine> engines) {
-        super(request, context, engines);
+    public JSYokeResponse(HttpServerResponse response, Context context, Map<String, Engine> engines) {
+        super(response, context, engines);
     }
 
     private Scriptable prototype, parent;

@@ -83,6 +83,7 @@ public class YokeRequest implements HttpServerRequest {
         this.context = context;
         this.request = request;
         this.method = request.method();
+        response.setMethod(this.method);
         this.response = response;
         this.secure = secure;
         this.store = store;
@@ -218,6 +219,7 @@ public class YokeRequest implements HttpServerRequest {
      */
     void setMethod(@NotNull final String newMethod) {
         this.method = newMethod.toUpperCase();
+        response.setMethod(this.method);
     }
 
     // Package level mutator for the bodyLength
