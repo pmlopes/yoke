@@ -81,6 +81,11 @@ public class Router extends Middleware {
         init(vertx, mount, headBindings);
         init(vertx, mount, traceBindings);
         init(vertx, mount, connectBindings);
+
+        for (String key : paramProcessors.keySet()) {
+            paramProcessors.get(key).init(vertx, mount);
+        }
+
         return this;
     }
 
@@ -624,7 +629,9 @@ public class Router extends Middleware {
 
     public Router param(@NotNull final String paramName, @NotNull final Middleware handler) {
         // also pass the vertx object to the routes
-        handler.init(vertx, mount);
+        if (vertx != null && mount != null) {
+            handler.init(vertx, mount);
+        }
         paramProcessors.put(paramName, handler);
         return this;
     }
@@ -632,7 +639,7 @@ public class Router extends Middleware {
     public Router param(@NotNull final String paramName, @NotNull final Pattern regex) {
         return param(paramName, new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 if (!regex.matcher(request.params().get(paramName)).matches()) {
                     // Bad Request
                     next.handle(400);
@@ -681,7 +688,9 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            h.init(vertx, mount);
+            if (vertx != null && mount != null) {
+                h.init(vertx, mount);
+            }
         }
     }
 
@@ -703,7 +712,9 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            h.init(vertx, mount);
+            if (vertx != null && mount != null) {
+                h.init(vertx, mount);
+            }
         }
     }
 
