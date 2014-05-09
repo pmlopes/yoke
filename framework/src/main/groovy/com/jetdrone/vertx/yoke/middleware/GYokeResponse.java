@@ -8,6 +8,7 @@ import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.GMultiMap;
 import com.jetdrone.vertx.yoke.core.JSON;
 import groovy.lang.Closure;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerResponse;
@@ -34,17 +35,17 @@ public class GYokeResponse extends YokeResponse implements org.vertx.groovy.core
         });
     }
 
-    public GYokeResponse write(Buffer buffer) {
+    public GYokeResponse write(@NotNull Buffer buffer) {
         write(buffer.toJavaBuffer());
         return this;
     }
 
-    public GYokeResponse write(String chunk) {
+    public GYokeResponse write(@NotNull String chunk) {
         super.write(chunk);
         return this;
     }
 
-    public GYokeResponse write(String chunk, String enc) {
+    public GYokeResponse write(@NotNull String chunk, @NotNull String enc) {
         super.write(chunk, enc);
         return this;
     }

@@ -11,6 +11,7 @@ import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.ServerCookieEncoder;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.streams.Pump;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
@@ -504,7 +505,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public YokeResponse write(String chunk, String enc) {
+    public YokeResponse write(@NotNull String chunk, @NotNull String enc) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -516,7 +517,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public YokeResponse write(String chunk) {
+    public YokeResponse write(@NotNull String chunk) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -528,7 +529,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public void end(String chunk) {
+    public void end(@NotNull String chunk) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -540,7 +541,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public void end(String chunk, String enc) {
+    public void end(@NotNull String chunk, @NotNull String enc) {
         hasBody = true;
         triggerHeadersHandlers();
         if (filter == null) {
@@ -552,7 +553,7 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public void end(Buffer chunk) {
+    public void end(@NotNull Buffer chunk) {
         hasBody = true;
         triggerHeadersHandlers();
         response.end(filter == null ? chunk : filter.end(chunk));
