@@ -2,12 +2,14 @@ import com.jetdrone.vertx.yoke.middleware.*
 import com.jetdrone.vertx.yoke.GYoke
 import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
 import com.jetdrone.vertx.yoke.extras.engine.*
+import com.jetdrone.vertx.yoke.engine.HandlebarsEngine
+import com.jetdrone.vertx.yoke.engine.Jade4JEngine
 
 def webServerHost = '192.168.1.6';
 
 new GYoke(vertx, container)
-  .engine('html', new GroovyTemplateEngine())
-  .engine('hdb', new HandlebarsEngine())
+  .engine('html', new GroovyTemplateEngine()) // No signature of method: com.jetdrone.vertx.yoke.GYoke.engine() is applicable for argument types:(java.lang.String, com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine) values: [html, com.jetdr
+  .engine('hdb', new HandlebarsEngine()) // ..
   .engine('jade', new Jade4JEngine())
   .use(new ErrorHandler(true))
   .use("/content", new Static("content"))
