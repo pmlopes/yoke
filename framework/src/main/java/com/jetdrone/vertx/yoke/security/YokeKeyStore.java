@@ -12,10 +12,12 @@ import java.security.cert.*;
 public final class YokeKeyStore {
 
     private final KeyStore ks;
+    private final String keyStoreFileName;
 
     public YokeKeyStore(@NotNull String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
         try {
             ks = KeyStore.getInstance(storeType);
+            keyStoreFileName = fileName;
 
             try (InputStream in = getClass().getResourceAsStream(fileName)) {
                 if (in == null) {
@@ -27,10 +29,10 @@ public final class YokeKeyStore {
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-
     }
-    public YokeKeyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
-        this(KeyStore.getDefaultType(), fileName, keyStorePassword);
+
+    public String keyStoreFileName() {
+        return keyStoreFileName;
     }
 
     public SecretKey getSecretKey(@NotNull String alias, @NotNull String keyPassword) {

@@ -5,12 +5,16 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
+import com.jetdrone.vertx.yoke.jmx.ContextMBean;
+import com.jetdrone.vertx.yoke.jmx.PatternBindingMBean;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 
+import javax.management.*;
+import java.lang.management.ManagementFactory;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -834,6 +838,19 @@ public class Router extends Middleware {
             this.pattern = pattern;
             this.paramNames = paramNames;
             Collections.addAll(this.middleware, middleware);
+
+            //Get the MBean server
+            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+//            // register on JMX
+//            try {
+//                mbs.registerMBean(new PatternBindingMBean(), new ObjectName("com.jetdrone.yoke.router:type=PatternBinding,pattern" + pattern.pattern()));
+//            } catch (InstanceAlreadyExistsException e) {
+//                // ignore
+//            } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
+//                throw new RuntimeException(e);
+//            }
+
         }
 
         void addMiddleware(@NotNull Middleware[] middleware) {

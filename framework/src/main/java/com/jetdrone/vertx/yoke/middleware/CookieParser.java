@@ -29,20 +29,20 @@ public class CookieParser extends Middleware {
     /**
      * Message Signer
      */
-    private final Mac hmacSHA256;
+    private final Mac mac;
 
     /**
      * Instantiates a CookieParser with a given Mac.
      *
      * <pre>
      * Yoke yoke = new Yoke(...);
-     * yoke.use(new CookieParser(Utils.newHmacSHA256("s3cr3t")));
+     * yoke.use(new CookieParser(YokeSecurity.newHmacSHA256("s3cr3t")));
      * </pre>
      *
-     * @param hmacSHA256 Mac
+     * @param mac Mac
      */
-    public CookieParser(final Mac hmacSHA256) {
-        this.hmacSHA256 = hmacSHA256;
+    public CookieParser(final Mac mac) {
+        this.mac = mac;
     }
 
     /**
@@ -66,7 +66,7 @@ public class CookieParser extends Middleware {
             Set<YokeCookie> cookies = new TreeSet<>();
 
             for (Cookie cookie : nettyCookies) {
-                YokeCookie yokeCookie = new YokeCookie(cookie, hmacSHA256);
+                YokeCookie yokeCookie = new YokeCookie(cookie, mac);
                 String value = yokeCookie.getUnsignedValue();
                 // value cannot be null in a cookie if the signature is mismatch then this value will be null
                 // in that case the cookie has been tampered
