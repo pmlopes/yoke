@@ -54,6 +54,9 @@ dependencies {
   provided project(':framework')
   provided project(':framework-extras')
 
+  provided project(':engine:handlebars')
+  provided project(':engine:jade')
+  
   // If you're creating Groovy compiled verticles you may need the following dependencies
   provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
