@@ -8,7 +8,6 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 
 import java.security.MessageDigest;
@@ -131,7 +130,7 @@ public class Favicon extends Middleware {
             if (path == null) {
                 icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {
-                icon = new Icon(vertx().fileSystem().readFileSync(path));
+                icon = new Icon(fileSystem().readFileSync(path));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

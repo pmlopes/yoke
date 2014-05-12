@@ -4,10 +4,12 @@
 package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.file.FileSystem;
 
 /**
  * # Middleware
@@ -68,7 +70,15 @@ public abstract class Middleware {
     }
 
     public EventBus eventBus() {
-        return yoke.vertx().eventBus();
+        return vertx().eventBus();
+    }
+
+    public FileSystem fileSystem() {
+        return vertx().fileSystem();
+    }
+
+    public YokeSecurity security() {
+        return yoke.security();
     }
 
     public Vertx vertx() {

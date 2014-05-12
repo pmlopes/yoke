@@ -10,6 +10,8 @@ import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MountedMiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.security.YokeKeyStore;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.core.YokeException;
@@ -29,7 +31,14 @@ import org.vertx.java.platform.Verticle;
 import org.jetbrains.annotations.*;
 
 import javax.management.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
 import java.util.*;
 
 /**
@@ -316,6 +325,46 @@ public class Yoke {
     public Yoke store(@NotNull SessionStore store) {
         this.store = store;
         return this;
+    }
+
+    protected YokeSecurity security;
+
+    public Yoke keyStore(@NotNull String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
+        try {
+            KeyStore ks = KeyStore.getInstance(storeType);
+
+            try (InputStream in = getClass().getResourceAsStream(fileName)) {
+                if (in == null) {
+                    throw new FileNotFoundException(fileName);
+                }
+
+                ks.load(in, keyStorePassword.toCharArray());
+            }
+        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return this;
+    }
+
+    public Yoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
+        try {
+            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+
+            try (InputStream in = getClass().getResourceAsStream(fileName)) {
+                if (in == null) {
+                    throw new FileNotFoundException(fileName);
+                }
+
+                ks.load(in, keyStorePassword.toCharArray());
+            }
+        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return this;
+    }
+
+    public YokeSecurity security() {
+        return this.security;
     }
 
     /**
