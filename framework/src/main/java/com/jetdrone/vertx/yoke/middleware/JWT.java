@@ -2,6 +2,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.YokeException;
+import com.jetdrone.vertx.yoke.security.YokeKeyStore;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -12,16 +13,41 @@ public class JWT extends Middleware {
 
     private static final Pattern BEARER = Pattern.compile("^Bearer$", Pattern.CASE_INSENSITIVE);
 
+    public interface JWTHandler {
+        public void handle(JsonObject token, Handler<Object> result);
+    }
+
     private final String skip;
     private final com.jetdrone.vertx.yoke.util.JWT jwt;
 
-    public JWT(@NotNull String secret) {
+    private final JWTHandler handler;
+
+    public JWT(@NotNull final String secret) {
         this(secret, null);
     }
 
-    public JWT(@NotNull String secret, String skip) {
+    public JWT(@NotNull final String secret, final String skip) {
+        this(secret, skip, null);
+    }
+
+    public JWT(@NotNull final String secret, final String skip, final JWTHandler handler) {
         this.skip = skip;
         this.jwt = new com.jetdrone.vertx.yoke.util.JWT(secret);
+        this.handler = handler;
+    }
+
+    public JWT(final YokeKeyStore keystore, final String keyPassword) {
+        this(keystore, keyPassword, null);
+    }
+
+    public JWT(final YokeKeyStore keystore, final String keyPassword, final String skip) {
+        this(keystore, keyPassword, skip, null);
+    }
+
+    public JWT(final YokeKeyStore keystore, final String keyPassword, final String skip, final JWTHandler handler) {
+        this.skip = skip;
+        this.jwt = new com.jetdrone.vertx.yoke.util.JWT(keystore, keyPassword);
+        this.handler = handler;
     }
 
     @Override
@@ -94,7 +120,13 @@ public class JWT extends Middleware {
                 }
             }
             request.put("jwt", jwt.decode(token));
-            next.handle(null);
+
+            if (handler == null) {
+                next.handle(null);
+                return;
+            }
+
+            handler.handle(jwtToken, next);
         } catch (RuntimeException e) {
             next.handle(new YokeException(401, e));
         }
