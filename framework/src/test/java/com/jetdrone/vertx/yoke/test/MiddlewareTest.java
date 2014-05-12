@@ -23,7 +23,7 @@ public class MiddlewareTest extends TestVerticle {
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
-                assertNotNull(this.vertx);
+                assertNotNull(this.yoke);
                 testComplete();
             }
         });

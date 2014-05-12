@@ -92,7 +92,7 @@ public class BodyParser extends Middleware {
                         if (request.files() == null) {
                             request.setFiles(new HashMap<String, YokeFileUpload>());
                         }
-                        YokeFileUpload upload = new YokeFileUpload(vertx, fileUpload, uploadDir);
+                        YokeFileUpload upload = new YokeFileUpload(vertx(), fileUpload, uploadDir);
 
                         // setup callbacks
                         fileUpload.exceptionHandler(new Handler<Throwable>() {

@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.eventbus.EventBus;
 
 /**
  * # Middleware
@@ -43,9 +44,9 @@ import org.vertx.java.core.Vertx;
 public abstract class Middleware {
 
     /**
-     * Local Vert.x instance for usage within the middleware. This is useful to use all asynchronous features of it.
+     * Local Yoke instance for usage within the middleware. This is useful to use all asynchronous features of it.
      */
-    protected Vertx vertx;
+    protected Yoke yoke;
 
     /**
      * The configured mount point for this middleware.
@@ -55,15 +56,23 @@ public abstract class Middleware {
     /**
      * Initializes the middleware. This methos is called from Yoke once a middleware is added to the chain.
      *
-     * @param vertx the local Vert.x instance.
+     * @param yoke the local Yoke instance.
      * @param mount the configured mount path.
      * @return self
      */
-    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
-        this.vertx = vertx;
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+        this.yoke = yoke;
         this.mount = mount;
 
         return this;
+    }
+
+    public EventBus eventBus() {
+        return yoke.vertx().eventBus();
+    }
+
+    public Vertx vertx() {
+        return yoke.vertx();
     }
 
     /**

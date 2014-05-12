@@ -4,10 +4,10 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 
 public class FormAuth extends Middleware {
@@ -43,8 +43,8 @@ public class FormAuth extends Middleware {
     }
 
     @Override
-    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
-        super.init(vertx, mount);
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+        super.init(yoke, mount);
         // trim the initial slash
         String correctedMount = mount;
         if (mount.endsWith("/")) {

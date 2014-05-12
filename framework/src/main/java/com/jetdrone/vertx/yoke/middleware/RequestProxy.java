@@ -45,7 +45,7 @@ public class RequestProxy extends Middleware {
           return;
         }
         final String newUri = req.uri().replaceFirst(prefix, "");
-        final HttpClient client = vertx.createHttpClient().setHost(host).setPort(port);
+        final HttpClient client = vertx().createHttpClient().setHost(host).setPort(port);
 
         if (secure) {
             client.setSSL(true);

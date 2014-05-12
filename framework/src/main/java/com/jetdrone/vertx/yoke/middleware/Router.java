@@ -4,14 +4,12 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.annotations.*;
-import com.jetdrone.vertx.yoke.jmx.ContextMBean;
-import com.jetdrone.vertx.yoke.jmx.PatternBindingMBean;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.Vertx;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;
@@ -64,30 +62,30 @@ public class Router extends Middleware {
     public Router() {
     }
 
-    private void init(Vertx vertx, String mount, List<PatternBinding> bindings) {
+    private void init(Yoke yoke, String mount, List<PatternBinding> bindings) {
         for (PatternBinding binding : bindings) {
             for (Middleware m : binding.middleware) {
-                m.init(vertx, mount);
+                m.init(yoke, mount);
             }
         }
     }
 
     @Override
-    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
-        super.init(vertx, mount);
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+        super.init(yoke, mount);
         // since this call can happen after the bindings are in place we need to update all bindings to have a reference
         // to the vertx object
-        init(vertx, mount, getBindings);
-        init(vertx, mount, putBindings);
-        init(vertx, mount, postBindings);
-        init(vertx, mount, deleteBindings);
-        init(vertx, mount, optionsBindings);
-        init(vertx, mount, headBindings);
-        init(vertx, mount, traceBindings);
-        init(vertx, mount, connectBindings);
+        init(yoke, mount, getBindings);
+        init(yoke, mount, putBindings);
+        init(yoke, mount, postBindings);
+        init(yoke, mount, deleteBindings);
+        init(yoke, mount, optionsBindings);
+        init(yoke, mount, headBindings);
+        init(yoke, mount, traceBindings);
+        init(yoke, mount, connectBindings);
 
         for (String key : paramProcessors.keySet()) {
-            paramProcessors.get(key).init(vertx, mount);
+            paramProcessors.get(key).init(yoke, mount);
         }
 
         return this;
@@ -633,8 +631,8 @@ public class Router extends Middleware {
 
     public Router param(@NotNull final String paramName, @NotNull final Middleware handler) {
         // also pass the vertx object to the routes
-        if (vertx != null && mount != null) {
-            handler.init(vertx, mount);
+        if (yoke != null && mount != null) {
+            handler.init(yoke, mount);
         }
         paramProcessors.put(paramName, handler);
         return this;
@@ -692,8 +690,8 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (vertx != null && mount != null) {
-                h.init(vertx, mount);
+            if (yoke != null && mount != null) {
+                h.init(yoke, mount);
             }
         }
     }
@@ -716,8 +714,8 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (vertx != null && mount != null) {
-                h.init(vertx, mount);
+            if (yoke != null && mount != null) {
+                h.init(yoke, mount);
             }
         }
     }

@@ -171,7 +171,7 @@ public class Static extends Middleware {
      * @param next
      */
     private void sendDirectory(final YokeRequest request, final String dir, final Handler<Object> next) {
-        final FileSystem fileSystem = vertx.fileSystem();
+        final FileSystem fileSystem = vertx().fileSystem();
 
         fileSystem.readDir(dir, new AsyncResultHandler<String[]>() {
             @Override
@@ -349,7 +349,7 @@ public class Static extends Middleware {
                 }
             }
 
-            final FileSystem fileSystem = vertx.fileSystem();
+            final FileSystem fileSystem = vertx().fileSystem();
 
             fileSystem.exists(file, new AsyncResultHandler<Boolean>() {
                 @Override

@@ -5,10 +5,10 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.eventbus.Message;
 
@@ -34,11 +34,11 @@ public class BridgeSecureHandler extends Middleware {
     private final SessionStore sessionStore;
 
     @Override
-    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
-        super.init(vertx, mount);
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+        super.init(yoke, mount);
 
         // register a new handler for the configured address
-        vertx.eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
+        eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(final Message<JsonObject> message) {
                 final JsonObject json = new JsonObject();

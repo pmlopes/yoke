@@ -167,7 +167,7 @@ public class Yoke {
      * @param container
      * @param requestWrapper
      */
-    public Yoke(@NotNull Vertx vertx, Container container, @NotNull RequestWrapper requestWrapper) {
+    public Yoke(@NotNull Vertx vertx, @Nullable Container container, @NotNull RequestWrapper requestWrapper) {
         this.vertx = vertx;
         this.container = container;
         this.requestWrapper = requestWrapper;
@@ -184,6 +184,10 @@ public class Yoke {
         } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Vertx vertx() {
+        return vertx;
     }
 
     /**
@@ -230,7 +234,7 @@ public class Yoke {
             }
 
             // initialize the middleware with the current Vert.x and Logger
-            m.init(vertx, route);
+            m.init(this, route);
         }
         return this;
     }

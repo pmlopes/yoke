@@ -4,6 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
@@ -120,17 +121,17 @@ public class Favicon extends Middleware {
     /**
      * Loads the icon from the file system once we get a reference to Vert.x
      *
-     * @param vertx
+     * @param yoke
      * @param mount
      */
     @Override
-    public Middleware init(@NotNull final Vertx vertx, @NotNull final String mount) {
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
         try {
-            super.init(vertx, mount);
+            super.init(yoke, mount);
             if (path == null) {
                 icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {
-                icon = new Icon(vertx.fileSystem().readFileSync(path));
+                icon = new Icon(vertx().fileSystem().readFileSync(path));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
