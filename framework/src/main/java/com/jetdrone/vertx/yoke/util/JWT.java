@@ -1,5 +1,7 @@
 package com.jetdrone.vertx.yoke.util;
 
+import com.jetdrone.vertx.yoke.security.YokeKeyStore;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.impl.Base64;
 
@@ -17,68 +19,66 @@ public final class JWT {
         boolean verify(byte[] signature, byte[] payload);
     }
 
+    private final class CryptoMac implements Crypto {
+        final Mac mac;
+
+        private CryptoMac(final Mac mac) {
+            this.mac = mac;
+        }
+
+        @Override
+        public byte[] sign(byte[] payload) {
+            return mac.doFinal(payload);
+        }
+
+        @Override
+        public boolean verify(byte[] signature, byte[] payload) {
+            return Arrays.equals(signature, mac.doFinal(payload));
+        }
+    }
+
+    private final class CryptoSignature implements Crypto {
+        final Signature sig;
+
+        private CryptoSignature(final Signature signature) {
+            this.sig = signature;
+        }
+
+        @Override
+        public byte[] sign(byte[] payload) {
+            try {
+                sig.update(payload);
+                return sig.sign();
+            } catch (SignatureException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public boolean verify(byte[] signature, byte[] payload) {
+            try {
+                sig.update(payload);
+                return sig.verify(signature);
+            } catch (SignatureException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     private final Map<String, Crypto> CRYPTO_MAP = new HashMap<>();
 
     public JWT(final String secret) {
-        CRYPTO_MAP.put("HS256", new Crypto() {
-            final Mac mac = Utils.newHmac("HmacSHA256", secret);
+        CRYPTO_MAP.put("HS256", new CryptoMac(YokeSecurity.newMac("HmacSHA256", secret)));
+        CRYPTO_MAP.put("HS384", new CryptoMac(YokeSecurity.newMac("HmacSHA384", secret)));
+        CRYPTO_MAP.put("HS512", new CryptoMac(YokeSecurity.newMac("HmacSHA512", secret)));
+        CRYPTO_MAP.put("RS256", new CryptoSignature(YokeSecurity.newSignature("SHA256withRSA")));
+    }
 
-            @Override
-            public byte[] sign(byte[] payload) {
-                return mac.doFinal(payload);
-            }
-
-            @Override
-            public boolean verify(byte[] signature, byte[] payload) {
-                return Arrays.equals(signature, mac.doFinal(payload));
-            }
-        });
-        CRYPTO_MAP.put("HS384", new Crypto() {
-            final Mac mac = Utils.newHmac("HmacSHA384", secret);
-            @Override
-            public byte[] sign(byte[] payload) {
-                return mac.doFinal(payload);
-            }
-
-            @Override
-            public boolean verify(byte[] signature, byte[] payload) {
-                return Arrays.equals(signature, mac.doFinal(payload));
-            }
-        });
-        CRYPTO_MAP.put("HS512", new Crypto() {
-            final Mac mac = Utils.newHmac("HmacSHA512", secret);
-            @Override
-            public byte[] sign(byte[] payload) {
-                return mac.doFinal(payload);
-            }
-
-            @Override
-            public boolean verify(byte[] signature, byte[] payload) {
-                return Arrays.equals(signature, mac.doFinal(payload));
-            }
-        });
-        CRYPTO_MAP.put("RS256", new Crypto() {
-            final Signature sig = Utils.newSignature("SHA256withRSA");
-            @Override
-            public byte[] sign(byte[] payload) {
-                try {
-                    sig.update(payload);
-                    return sig.sign();
-                } catch (SignatureException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            @Override
-            public boolean verify(byte[] signature, byte[] payload) {
-                try {
-                    sig.update(payload);
-                    return sig.verify(signature);
-                } catch (SignatureException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+    public JWT(final YokeKeyStore keystore, final String keyPassword) {
+        CRYPTO_MAP.put("HS256", new CryptoMac(keystore.getMac("HS256", keyPassword)));
+        CRYPTO_MAP.put("HS384", new CryptoMac(keystore.getMac("HS384", keyPassword)));
+        CRYPTO_MAP.put("HS512", new CryptoMac(keystore.getMac("HS512", keyPassword)));
+        CRYPTO_MAP.put("RS256", new CryptoSignature(keystore.getSignature("RS256", keyPassword)));
     }
 
     public JsonObject decode(final String token) {

@@ -3,7 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.core;
 
-import com.jetdrone.vertx.yoke.util.Utils;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.DefaultCookie;
 import org.jetbrains.annotations.NotNull;
@@ -17,13 +17,13 @@ import java.util.Set;
 public class YokeCookie implements Cookie {
 
     private final Cookie nettyCookie;
-    private final Mac hmacSHA256;
+    private final Mac mac;
     private String value;
     private boolean signed;
 
-    public YokeCookie(@NotNull final Cookie nettyCookie, final Mac hmacSHA256) {
+    public YokeCookie(@NotNull final Cookie nettyCookie, final Mac mac) {
         this.nettyCookie = nettyCookie;
-        this.hmacSHA256 = hmacSHA256;
+        this.mac = mac;
 
         // get the original value
         value = nettyCookie.getValue();
@@ -31,17 +31,17 @@ public class YokeCookie implements Cookie {
         if (value.startsWith("s:")) {
             signed = true;
             // if it is signed get the unsigned value
-            if (hmacSHA256 == null) {
+            if (mac == null) {
                 // this is an error
                 value = null;
             } else {
-                value = Utils.unsign(value.substring(2), hmacSHA256);
+                value = YokeSecurity.unsign(value.substring(2), mac);
             }
         }
     }
 
-    public YokeCookie(@NotNull final String name, final Mac hmacSHA256) {
-        this(new DefaultCookie(name, ""), hmacSHA256);
+    public YokeCookie(@NotNull final String name, final Mac mac) {
+        this(new DefaultCookie(name, ""), mac);
     }
 
     public YokeCookie(@NotNull final String name, @NotNull final String value) {
@@ -54,8 +54,8 @@ public class YokeCookie implements Cookie {
     }
 
     public void sign() {
-        if (hmacSHA256 != null) {
-            nettyCookie.setValue("s:" + Utils.sign(value, hmacSHA256));
+        if (mac != null) {
+            nettyCookie.setValue("s:" + YokeSecurity.sign(value, mac));
             signed = true;
         } else {
             signed = false;

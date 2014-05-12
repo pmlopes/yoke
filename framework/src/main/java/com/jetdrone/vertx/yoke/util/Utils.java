@@ -8,9 +8,6 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -22,7 +19,6 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.security.*;
 import java.util.Set;
 
 public final class Utils {
@@ -121,93 +117,6 @@ public final class Utils {
             }
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
-        }
-    }
-
-    /**
-     * Creates a new Message Authentication Code
-     * @param algorithm algorithm to use e.g.: HmacSHA256
-     * @param secret The secret key used to create signatures
-     * @return Mac implementation
-     */
-    public static Mac newHmac(@NotNull String algorithm, @NotNull String secret) {
-        try {
-            Mac hmac = Mac.getInstance(algorithm);
-            hmac.init(new SecretKeySpec(secret.getBytes(), hmac.getAlgorithm()));
-            return hmac;
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Signature newSignature(@NotNull String algorithm) {
-        try {
-            KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
-            PrivateKey privateKey = keyPair.getPrivate();
-
-            Signature instance = Signature.getInstance(algorithm);
-            instance.initSign(privateKey);
-
-            return instance;
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Creates a new Crypto KEY
-     * @param secret The secret key used to create signatures
-     * @return Key implementation
-     */
-    public static Key newCryptoKey(@NotNull String secret) {
-        return new SecretKeySpec(secret.getBytes(), "AES");
-    }
-
-    /**
-     * Signs a String value with a given MAC
-     */
-    public static String sign(@NotNull String val, @NotNull Mac mac) {
-        mac.reset();
-        return val + "." + base64(mac.doFinal(val.getBytes()));
-    }
-
-    /**
-     * Returns the original value is the signature is correct. Null otherwise.
-     */
-    public static String unsign(@NotNull String val, @NotNull Mac mac) {
-        int idx = val.lastIndexOf('.');
-
-        if (idx == -1) {
-            return null;
-        }
-
-        String str = val.substring(0, idx);
-        if (val.equals(sign(str, mac))) {
-            return str;
-        }
-        return null;
-    }
-
-    public static String encrypt(@NotNull String val, @NotNull Key key) {
-        try {
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key);
-            byte[] encVal = c.doFinal(val.getBytes());
-            return base64(encVal);
-        } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String decrypt(@NotNull String val, @NotNull Key key) {
-        try {
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.DECRYPT_MODE, key);
-            byte[] decordedValue = DatatypeConverter.parseBase64Binary(val);
-            byte[] decValue = c.doFinal(decordedValue);
-            return new String(decValue);
-        } catch (IllegalBlockSizeException | InvalidKeyException | BadPaddingException | NoSuchAlgorithmException | NoSuchPaddingException e) {
-            throw new RuntimeException(e);
         }
     }
 

@@ -4,9 +4,9 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.CookieParser;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
-import com.jetdrone.vertx.yoke.util.Utils;
 import org.junit.Test;
 import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
@@ -21,7 +21,7 @@ public class Session extends TestVerticle {
 
     @Test
     public void testSession() {
-        final Mac hmac = Utils.newHmac("HmacSHA256", "keyboard.cat");
+        final Mac hmac = YokeSecurity.newMac("HmacSHA256", "keyboard.cat");
         final Yoke yoke = new Yoke(this);
         yoke.use(new CookieParser(hmac));
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Session(hmac));

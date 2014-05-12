@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.extras.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.util.Utils;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
@@ -10,6 +10,7 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 
+import javax.crypto.Cipher;
 import javax.crypto.Mac;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
@@ -21,8 +22,10 @@ public abstract class OAuth2 {
     private final String authorize_uri = "/oauth/authorize";
     private final String access_token_uri = "/oauth/access_token";
 
-    private final Key cryptoKey = Utils.newCryptoKey("secret");
-    private final Mac signMac = Utils.newHmac("HmacSHA256", "sign");
+    private final Key cryptoKey = YokeSecurity.newKey("secret", "AES");
+    private final Cipher encCipher = YokeSecurity.newCipher(cryptoKey, Cipher.ENCRYPT_MODE);
+    private final Cipher decCipher = YokeSecurity.newCipher(cryptoKey, Cipher.DECRYPT_MODE);
+    private final Mac signMac = YokeSecurity.newMac("HmacSHA256", "sign");
 
     public OAuth2() {
 
@@ -157,7 +160,7 @@ public abstract class OAuth2 {
                     @Override
                     public void handle(String user_id) {
                         // store user_id in an HMAC-protected encrypted query param
-                        String authorize_url = request.uri() + "&" + "x_user_id=" + Utils.sign(Utils.encrypt(user_id, cryptoKey), signMac);
+                        String authorize_url = request.uri() + "&" + "x_user_id=" + YokeSecurity.sign(YokeSecurity.encrypt(user_id, encCipher), signMac);
 
                         // user is logged in, render approval page
                         authorize_form(request, client_id, authorize_url);
@@ -188,7 +191,7 @@ public abstract class OAuth2 {
                         final String user_id;
 
                         try {
-                            user_id = Utils.unsign(Utils.decrypt(x_user_id, cryptoKey), signMac);
+                            user_id = YokeSecurity.unsign(YokeSecurity.decrypt(x_user_id, decCipher), signMac);
                         } catch(RuntimeException e) {
                             next.handle(e);
                             return;
