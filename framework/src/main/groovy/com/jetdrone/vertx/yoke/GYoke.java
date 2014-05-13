@@ -5,8 +5,11 @@ package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.core.impl.GroovyRequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vertx.groovy.platform.Container;
 import org.vertx.groovy.platform.Verticle;
 import org.vertx.java.core.Handler;
@@ -159,6 +162,21 @@ public class GYoke {
      */
     public void putAt(String key, Object value) {
         jYoke.set(key, value);
+    }
+
+
+    public GYoke keyStore(@Nullable String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
+        jYoke.keyStore(storeType, fileName, keyStorePassword);
+        return this;
+    }
+
+    public GYoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
+        jYoke.keyStore(fileName, keyStorePassword);
+        return this;
+    }
+
+    public YokeSecurity security() {
+        return jYoke.security();
     }
 
     /**
