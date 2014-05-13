@@ -1,9 +1,10 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.core.YokeException;
-import com.jetdrone.vertx.yoke.security.YokeKeyStore;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
@@ -18,36 +19,35 @@ public class JWT extends Middleware {
     }
 
     private final String skip;
-    private final com.jetdrone.vertx.yoke.util.JWT jwt;
+
+    private transient String keyPassword;
+    private com.jetdrone.vertx.yoke.util.JWT jwt;
 
     private final JWTHandler handler;
 
-    public JWT(@NotNull final String secret) {
-        this(secret, null);
+    public JWT(final @NotNull String keyPassword) {
+        this(keyPassword, null);
     }
 
-    public JWT(@NotNull final String secret, final String skip) {
-        this(secret, skip, null);
+    public JWT(final @NotNull String keyPassword, final @Nullable String skip) {
+        this(keyPassword, skip, null);
     }
 
-    public JWT(@NotNull final String secret, final String skip, final JWTHandler handler) {
+    public JWT(final @NotNull String keyPassword, final @Nullable String skip, final @Nullable JWTHandler handler) {
+        this.keyPassword = keyPassword;
         this.skip = skip;
-        this.jwt = new com.jetdrone.vertx.yoke.util.JWT(secret);
         this.handler = handler;
     }
 
-    public JWT(final YokeKeyStore keystore, final String keyPassword) {
-        this(keystore, keyPassword, null);
-    }
+    @Override
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+        super.init(yoke, mount);
 
-    public JWT(final YokeKeyStore keystore, final String keyPassword, final String skip) {
-        this(keystore, keyPassword, skip, null);
-    }
+        jwt = new com.jetdrone.vertx.yoke.util.JWT(yoke.security(), keyPassword);
+        // remove from the heap
+        this.keyPassword = null;
 
-    public JWT(final YokeKeyStore keystore, final String keyPassword, final String skip, final JWTHandler handler) {
-        this.skip = skip;
-        this.jwt = new com.jetdrone.vertx.yoke.util.JWT(keystore, keyPassword);
-        this.handler = handler;
+        return this;
     }
 
     @Override

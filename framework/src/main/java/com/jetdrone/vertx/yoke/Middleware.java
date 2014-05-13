@@ -56,6 +56,11 @@ public abstract class Middleware {
     protected String mount;
 
     /**
+     * Internal flag to ensure that middleware is initialized only once
+     */
+    private boolean initialized = false;
+
+    /**
      * Initializes the middleware. This methos is called from Yoke once a middleware is added to the chain.
      *
      * @param yoke the local Yoke instance.
@@ -63,10 +68,20 @@ public abstract class Middleware {
      * @return self
      */
     public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+
+        if (initialized) {
+            throw new RuntimeException("Already Initialized!");
+        }
+
         this.yoke = yoke;
         this.mount = mount;
+        this.initialized = true;
 
         return this;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public EventBus eventBus() {

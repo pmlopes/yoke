@@ -4,7 +4,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine;
 import com.jetdrone.vertx.yoke.middleware.*;
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClient;
@@ -25,7 +24,7 @@ public class Persona extends Verticle {
         final Yoke yoke = new Yoke(this);
         yoke.engine(new StringPlaceholderEngine());
 
-        Mac secret = YokeSecurity.newMac("HmacSHA256", "secret here");
+        final Mac secret = yoke.security().getMac("HmacSHA256", "secret here");
 
         // all environments
         yoke.use(new CookieParser(secret));

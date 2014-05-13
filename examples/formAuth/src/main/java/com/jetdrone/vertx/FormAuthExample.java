@@ -5,7 +5,6 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.AuthHandler;
 import com.jetdrone.vertx.yoke.middleware.FormAuth;
 import com.jetdrone.vertx.yoke.middleware.*;
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
@@ -17,9 +16,9 @@ public class FormAuthExample extends Verticle {
     @Override
     public void start() {
 
-        final Mac hmac = YokeSecurity.newMac("HmacSHA256", "abracadabra");
-
         final Yoke app = new Yoke(this);
+
+        final Mac hmac = app.security().getMac("HmacSHA256", "abracadabra");
 
         app.use(new BodyParser());
         app.use(new CookieParser(hmac));

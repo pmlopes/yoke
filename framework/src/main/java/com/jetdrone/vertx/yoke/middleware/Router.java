@@ -65,7 +65,9 @@ public class Router extends Middleware {
     private void init(Yoke yoke, String mount, List<PatternBinding> bindings) {
         for (PatternBinding binding : bindings) {
             for (Middleware m : binding.middleware) {
-                m.init(yoke, mount);
+                if (!m.isInitialized()) {
+                    m.init(yoke, mount);
+                }
             }
         }
     }
@@ -85,7 +87,10 @@ public class Router extends Middleware {
         init(yoke, mount, connectBindings);
 
         for (String key : paramProcessors.keySet()) {
-            paramProcessors.get(key).init(yoke, mount);
+            final Middleware m = paramProcessors.get(key);
+            if (!m.isInitialized()) {
+                paramProcessors.get(key).init(yoke, mount);
+            }
         }
 
         return this;
@@ -631,7 +636,7 @@ public class Router extends Middleware {
 
     public Router param(@NotNull final String paramName, @NotNull final Middleware handler) {
         // also pass the vertx object to the routes
-        if (yoke != null && mount != null) {
+        if (!handler.isInitialized()) {
             handler.init(yoke, mount);
         }
         paramProcessors.put(paramName, handler);
@@ -690,7 +695,7 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (yoke != null && mount != null) {
+            if (!h.isInitialized()) {
                 h.init(yoke, mount);
             }
         }
@@ -714,7 +719,7 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (yoke != null && mount != null) {
+            if (!h.isInitialized()) {
                 h.init(yoke, mount);
             }
         }

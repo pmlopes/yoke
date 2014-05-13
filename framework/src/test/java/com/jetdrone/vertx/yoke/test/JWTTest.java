@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test;
 
+import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.util.JWT;
 import org.junit.Test;
 import org.vertx.java.core.json.JsonArray;
@@ -14,13 +15,15 @@ public class JWTTest extends TestVerticle {
 
     @Test
     public void testJWT() {
-        JWT jwt = new JWT("secret");
+        YokeSecurity security = new YokeSecurity();
+        JWT jwt = new JWT(security, "secret");
         testComplete();
     }
 
     @Test
     public void testJWT2() {
-        JWT jwt = new JWT("s3cRE7");
+        YokeSecurity security = new YokeSecurity();
+        JWT jwt = new JWT(security, "s3cRE7");
 
         long now = System.currentTimeMillis();
 

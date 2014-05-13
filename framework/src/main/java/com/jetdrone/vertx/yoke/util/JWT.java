@@ -1,6 +1,5 @@
 package com.jetdrone.vertx.yoke.util;
 
-import com.jetdrone.vertx.yoke.security.YokeKeyStore;
 import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.impl.Base64;
@@ -67,18 +66,11 @@ public final class JWT {
 
     private final Map<String, Crypto> CRYPTO_MAP = new HashMap<>();
 
-    public JWT(final String secret) {
-        CRYPTO_MAP.put("HS256", new CryptoMac(YokeSecurity.newMac("HmacSHA256", secret)));
-        CRYPTO_MAP.put("HS384", new CryptoMac(YokeSecurity.newMac("HmacSHA384", secret)));
-        CRYPTO_MAP.put("HS512", new CryptoMac(YokeSecurity.newMac("HmacSHA512", secret)));
-        CRYPTO_MAP.put("RS256", new CryptoSignature(YokeSecurity.newSignature("SHA256withRSA")));
-    }
-
-    public JWT(final YokeKeyStore keystore, final String keyPassword) {
-        CRYPTO_MAP.put("HS256", new CryptoMac(keystore.getMac("HS256", keyPassword)));
-        CRYPTO_MAP.put("HS384", new CryptoMac(keystore.getMac("HS384", keyPassword)));
-        CRYPTO_MAP.put("HS512", new CryptoMac(keystore.getMac("HS512", keyPassword)));
-        CRYPTO_MAP.put("RS256", new CryptoSignature(keystore.getSignature("RS256", keyPassword)));
+    public JWT(final YokeSecurity yokeSecurity, final String keyPassword) {
+        CRYPTO_MAP.put("HS256", new CryptoMac(yokeSecurity.getMac("HS256", keyPassword)));
+        CRYPTO_MAP.put("HS384", new CryptoMac(yokeSecurity.getMac("HS384", keyPassword)));
+        CRYPTO_MAP.put("HS512", new CryptoMac(yokeSecurity.getMac("HS512", keyPassword)));
+        CRYPTO_MAP.put("RS256", new CryptoSignature(yokeSecurity.getSignature("RS256", keyPassword)));
     }
 
     public JsonObject decode(final String token) {

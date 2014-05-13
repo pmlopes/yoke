@@ -10,7 +10,7 @@ import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MountedMiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.security.YokeKeyStore;
+import com.jetdrone.vertx.yoke.security.YokeKeyStoreSecurity;
 import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
@@ -327,11 +327,11 @@ public class Yoke {
         return this;
     }
 
-    protected YokeSecurity security;
+    protected YokeSecurity security = new YokeSecurity();
 
-    public Yoke keyStore(@NotNull String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
+    public Yoke keyStore(@Nullable String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
         try {
-            KeyStore ks = KeyStore.getInstance(storeType);
+            KeyStore ks = KeyStore.getInstance(storeType == null ? KeyStore.getDefaultType() : storeType);
 
             try (InputStream in = getClass().getResourceAsStream(fileName)) {
                 if (in == null) {
@@ -340,6 +340,9 @@ public class Yoke {
 
                 ks.load(in, keyStorePassword.toCharArray());
             }
+
+            this.security = new YokeKeyStoreSecurity(ks);
+
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -347,20 +350,7 @@ public class Yoke {
     }
 
     public Yoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
-        try {
-            KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-
-            try (InputStream in = getClass().getResourceAsStream(fileName)) {
-                if (in == null) {
-                    throw new FileNotFoundException(fileName);
-                }
-
-                ks.load(in, keyStorePassword.toCharArray());
-            }
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        return this;
+        return keyStore(null, fileName, keyStorePassword);
     }
 
     public YokeSecurity security() {

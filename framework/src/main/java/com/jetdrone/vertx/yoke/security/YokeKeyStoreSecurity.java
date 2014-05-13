@@ -3,50 +3,20 @@ package com.jetdrone.vertx.yoke.security;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.*;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.*;
 import java.security.cert.*;
 
-public final class YokeKeyStore {
+public final class YokeKeyStoreSecurity extends YokeSecurity {
 
     private final KeyStore ks;
-    private final String keyStoreFileName;
 
-    public YokeKeyStore(@NotNull String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
-        try {
-            ks = KeyStore.getInstance(storeType);
-            keyStoreFileName = fileName;
-
-            try (InputStream in = getClass().getResourceAsStream(fileName)) {
-                if (in == null) {
-                    throw new FileNotFoundException(fileName);
-                }
-
-                ks.load(in, keyStorePassword.toCharArray());
-            }
-        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+    public YokeKeyStoreSecurity(@NotNull KeyStore ks) {
+        this.ks = ks;
     }
 
-    public String keyStoreFileName() {
-        return keyStoreFileName;
-    }
-
-    public SecretKey getSecretKey(@NotNull String alias, @NotNull String keyPassword) {
+    @Override
+    public Cipher getCipher(@NotNull Key secretKey, int mode) {
         try {
-            return (SecretKey) ks.getKey(alias, keyPassword.toCharArray());
-        } catch (UnrecoverableKeyException | NoSuchAlgorithmException | KeyStoreException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Cipher getCipher(@NotNull String alias, @NotNull String keyPassword, int mode) {
-        try {
-            final SecretKey secretKey = getSecretKey(alias, keyPassword);
-
             Cipher cipher = Cipher.getInstance(secretKey.getAlgorithm());
             cipher.init(mode, secretKey);
 
@@ -56,9 +26,10 @@ public final class YokeKeyStore {
         }
     }
 
+    @Override
     public Mac getMac(@NotNull String alias, @NotNull String keyPassword) {
         try {
-            final SecretKey secretKey = getSecretKey(alias, keyPassword);
+            final Key secretKey = getKey(alias, keyPassword);
 
             Mac mac = Mac.getInstance(secretKey.getAlgorithm());
             mac.init(secretKey);
@@ -69,6 +40,7 @@ public final class YokeKeyStore {
         }
     }
 
+    @Override
     public Signature getSignature(@NotNull String alias, @NotNull String keyPassword) {
         try {
             final PrivateKey privateKey = (PrivateKey) getKey(alias, keyPassword);
@@ -83,6 +55,7 @@ public final class YokeKeyStore {
         }
     }
 
+    @Override
     public Key getKey(@NotNull String alias, @NotNull String keyPassword) {
         try {
             return ks.getKey(alias, keyPassword.toCharArray());

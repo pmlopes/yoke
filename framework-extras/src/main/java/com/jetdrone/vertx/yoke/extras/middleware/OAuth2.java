@@ -22,10 +22,12 @@ public abstract class OAuth2 {
     private final String authorize_uri = "/oauth/authorize";
     private final String access_token_uri = "/oauth/access_token";
 
-    private final Key cryptoKey = YokeSecurity.newKey("secret", "AES");
-    private final Cipher encCipher = YokeSecurity.newCipher(cryptoKey, Cipher.ENCRYPT_MODE);
-    private final Cipher decCipher = YokeSecurity.newCipher(cryptoKey, Cipher.DECRYPT_MODE);
-    private final Mac signMac = YokeSecurity.newMac("HmacSHA256", "sign");
+    private final YokeSecurity security = new YokeSecurity();
+
+    private final Key cryptoKey = security.getKey("AES", "");
+    private final Cipher encCipher = security.getCipher(cryptoKey, Cipher.ENCRYPT_MODE);
+    private final Cipher decCipher = security.getCipher(cryptoKey, Cipher.DECRYPT_MODE);
+    private final Mac signMac = security.getMac("HmacSHA256", "sign");
 
     public OAuth2() {
 

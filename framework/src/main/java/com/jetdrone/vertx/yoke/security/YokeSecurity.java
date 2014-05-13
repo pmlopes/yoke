@@ -7,18 +7,37 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.*;
+import java.util.HashMap;
+import java.util.Map;
 
-public final class YokeSecurity {
+public class YokeSecurity {
+
+    private static final Map<String, String> ALIAS_ALG_MAP = new HashMap<>();
+
+    static {
+        ALIAS_ALG_MAP.put("HS256", "HMacSHA256");
+        ALIAS_ALG_MAP.put("HS384", "HMacSHA384");
+        ALIAS_ALG_MAP.put("HS512", "HMacSHA512");
+        ALIAS_ALG_MAP.put("RS256", "SHA256withRSA");
+    }
+
+    private static String getAlgorithm(String alias) {
+        if (ALIAS_ALG_MAP.containsKey(alias)) {
+            return ALIAS_ALG_MAP.get(alias);
+        } else {
+            return alias;
+        }
+    }
 
     /**
      * Creates a new Message Authentication Code
-     * @param algorithm algorithm to use e.g.: HmacSHA256
+     * @param alias algorithm to use e.g.: HmacSHA256
      * @param secret The secret key used to create signatures
      * @return Mac implementation
      */
-    public static Mac newMac(final @NotNull String algorithm, final @NotNull String secret) {
+    public Mac getMac(final @NotNull String alias, final @NotNull String secret) {
         try {
-            Mac hmac = Mac.getInstance(algorithm);
+            Mac hmac = Mac.getInstance(getAlgorithm(alias));
             hmac.init(new SecretKeySpec(secret.getBytes(), hmac.getAlgorithm()));
             return hmac;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
@@ -26,12 +45,12 @@ public final class YokeSecurity {
         }
     }
 
-    public static Signature newSignature(final @NotNull String algorithm) {
+    public Signature getSignature(final @NotNull String alias, final String secret) {
         try {
             KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
             PrivateKey privateKey = keyPair.getPrivate();
 
-            Signature instance = Signature.getInstance(algorithm);
+            Signature instance = Signature.getInstance(getAlgorithm(alias));
             instance.initSign(privateKey);
 
             return instance;
@@ -45,15 +64,15 @@ public final class YokeSecurity {
      * @param secret The secret key used to create signatures
      * @return Key implementation
      */
-    public static Key newKey(final @NotNull String algorithm, final @NotNull String secret) {
-        return new SecretKeySpec(secret.getBytes(), algorithm);
+    public Key getKey(final @NotNull String alias, final @NotNull String secret) {
+        return new SecretKeySpec(secret.getBytes(), getAlgorithm(alias));
     }
 
     /**
      * Creates a new Cipher
      * @return Cipher implementation
      */
-    public static Cipher newCipher(final @NotNull Key key, int mode) {
+    public Cipher getCipher(final @NotNull Key key, int mode) {
         try {
             Cipher cipher = Cipher.getInstance(key.getAlgorithm());
             cipher.init(mode, key);
@@ -106,5 +125,4 @@ public final class YokeSecurity {
             throw new RuntimeException(e);
         }
     }
-
 }
