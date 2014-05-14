@@ -3,6 +3,7 @@ package com.jetdrone.vertx.yoke.annotations;
 import com.jetdrone.vertx.yoke.middleware.Swagger;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.lang.reflect.Field;
@@ -63,7 +64,59 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
 
         // create operations json
         final JsonObject operations = new JsonObject();
+
+        // add all notes
+        if (doc.notes().length > 0) {
+            StringBuilder sb = new StringBuilder();
+            for (String s : doc.notes()) {
+                sb.append(s);
+                sb.append(' ');
+            }
+
+            String finalNotes = sb.toString();
+            int len = finalNotes.length() - 1;
+            len = len > 0 ? len : 0;
+            finalNotes = finalNotes.substring(0, len);
+            operations.putString("notes", finalNotes);
+        }
+
+        // add nickname (deducted from the method name)
         operations.putString("nickname", method.getName());
+
+        // add parameters
+        if (doc.parameters().length > 0) {
+            JsonArray jsonParameters = new JsonArray();
+            operations.putArray("parameters", jsonParameters);
+
+            for (Parameter parameter : doc.parameters()) {
+                jsonParameters.addObject(
+                        new JsonObject()
+                                .putString("name", parameter.name())
+                                .putString("description", parameter.description())
+                                .putBoolean("required", parameter.required())
+//                                .putString("type", parameter.type())
+//                                .putString("format", parameter.format())
+                                .putString("paramType", parameter.paramType().name())
+                                .putBoolean("allowMultiple", parameter.allowMultiple())
+//                                .putString("minimum", parameter.minimum())
+//                                .putString("maximum", parameter.maximum())
+                );
+            }
+        }
+
+        // add response messages
+        if (doc.responseMessages().length > 0) {
+            JsonArray jsonResponseMessages = new JsonArray();
+            operations.putArray("responseMessages", jsonResponseMessages);
+
+            for (ResponseMessage responseMessage : doc.responseMessages()) {
+                jsonResponseMessages.addObject(
+                        new JsonObject()
+                                .putNumber("code", responseMessage.code())
+                                .putString("message", responseMessage.message())
+                );
+            }
+        }
 
         // process the methods that have both YokeRequest and Handler
 

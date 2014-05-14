@@ -9,6 +9,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface ApiDoc {
     String summary();
+//    String type();
     String[] notes() default {};
-    Param[] params() default {};
+//    Object authorizations();
+    Parameter[] parameters() default {};
+    ResponseMessage[] responseMessages() default {};
 }

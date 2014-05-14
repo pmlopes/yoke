@@ -21,8 +21,11 @@ public class SwaggerTest extends TestVerticle {
         @ApiDoc(
                 summary = "say hello to user name",
                 notes = {"note #1", "note #2"},
-                params = {
-                        @Param(name = "name", description = "User name", required = true)
+                parameters = {
+                        @Parameter(name = "name", description = "User name", required = true)
+                },
+                responseMessages = {
+                        @ResponseMessage(code = 200, message = "No error!")
                 }
         )
         public void sayHello(YokeRequest request, Handler<Object> next) {
