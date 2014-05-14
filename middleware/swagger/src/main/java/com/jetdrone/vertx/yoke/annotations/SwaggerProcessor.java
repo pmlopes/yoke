@@ -17,7 +17,7 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
 
     @Override
     public void process(Swagger swagger, Object instance, Class<?> clazz, Method method) {
-        SwaggerResource res = Processor.getAnnotation(clazz, SwaggerResource.class);
+        Api res = Processor.getAnnotation(clazz, Api.class);
 
         if (res == null) {
             return;
@@ -55,7 +55,7 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
             resource.consumes(produces);
         }
 
-        SwaggerDoc doc = Processor.getAnnotation(method, SwaggerDoc.class);
+        ApiDoc doc = Processor.getAnnotation(method, ApiDoc.class);
 
         if (doc == null) {
             return;
@@ -68,31 +68,31 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
         // process the methods that have both YokeRequest and Handler
 
         if (Processor.isCompatible(method, ALL.class, YokeRequest.class, Handler.class)) {
-            resource.all(Processor.getAnnotation(method, ALL.class).value(), doc.value(), operations);
+            resource.all(Processor.getAnnotation(method, ALL.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, CONNECT.class, YokeRequest.class, Handler.class)) {
-            resource.connect(Processor.getAnnotation(method, CONNECT.class).value(), doc.value(), operations);
+            resource.connect(Processor.getAnnotation(method, CONNECT.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, OPTIONS.class, YokeRequest.class, Handler.class)) {
-            resource.options(Processor.getAnnotation(method, OPTIONS.class).value(), doc.value(), operations);
+            resource.options(Processor.getAnnotation(method, OPTIONS.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, HEAD.class, YokeRequest.class, Handler.class)) {
-            resource.head(Processor.getAnnotation(method, HEAD.class).value(), doc.value(), operations);
+            resource.head(Processor.getAnnotation(method, HEAD.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, GET.class, YokeRequest.class, Handler.class)) {
-            resource.get(Processor.getAnnotation(method, GET.class).value(), doc.value(), operations);
+            resource.get(Processor.getAnnotation(method, GET.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, POST.class, YokeRequest.class, Handler.class)) {
-            resource.post(Processor.getAnnotation(method, POST.class).value(), doc.value(), operations);
+            resource.post(Processor.getAnnotation(method, POST.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, PUT.class, YokeRequest.class, Handler.class)) {
-            resource.put(Processor.getAnnotation(method, PUT.class).value(), doc.value(), operations);
+            resource.put(Processor.getAnnotation(method, PUT.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, PATCH.class, YokeRequest.class, Handler.class)) {
-            resource.patch(Processor.getAnnotation(method, PATCH.class).value(), doc.value(), operations);
+            resource.patch(Processor.getAnnotation(method, PATCH.class).value(), doc.summary(), operations);
         }
         if (Processor.isCompatible(method, DELETE.class, YokeRequest.class, Handler.class)) {
-            resource.delete(Processor.getAnnotation(method, DELETE.class).value(), doc.value(), operations);
+            resource.delete(Processor.getAnnotation(method, DELETE.class).value(), doc.summary(), operations);
         }
     }
 

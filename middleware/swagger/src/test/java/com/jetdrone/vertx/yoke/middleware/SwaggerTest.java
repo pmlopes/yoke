@@ -14,11 +14,17 @@ import static org.vertx.testtools.VertxAssert.assertEquals;
 
 public class SwaggerTest extends TestVerticle {
 
-    @SwaggerResource(path = "/hello", description = "Hello web service")
+    @Api(path = "/hello", description = "Hello web service")
     @Produces("application/json")
     public static class TestSwagger {
         @GET("/hello/:name")
-        @SwaggerDoc("say hello to user name")
+        @ApiDoc(
+                summary = "say hello to user name",
+                notes = {"note #1", "note #2"},
+                params = {
+                        @Param(name = "name", description = "User name", required = true)
+                }
+        )
         public void sayHello(YokeRequest request, Handler<Object> next) {
             request.response().end("Hello " + request.getParameter("name") + "!");
         }

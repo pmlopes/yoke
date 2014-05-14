@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface SwaggerResource {
-    String path();
-    String description();
-
+@Target({ElementType.METHOD})
+public @interface ApiDoc {
+    String summary();
+    String[] notes() default {};
+    Param[] params() default {};
 }
