@@ -636,7 +636,7 @@ public class Router extends Middleware {
 
     public Router param(@NotNull final String paramName, @NotNull final Middleware handler) {
         // also pass the vertx object to the routes
-        if (!handler.isInitialized()) {
+        if (!handler.isInitialized() && isInitialized()) {
             handler.init(yoke, mount);
         }
         paramProcessors.put(paramName, handler);
@@ -695,7 +695,7 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (!h.isInitialized()) {
+            if (!h.isInitialized() && isInitialized()) {
                 h.init(yoke, mount);
             }
         }
@@ -719,7 +719,7 @@ public class Router extends Middleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (!h.isInitialized()) {
+            if (!h.isInitialized() && isInitialized()) {
                 h.init(yoke, mount);
             }
         }
