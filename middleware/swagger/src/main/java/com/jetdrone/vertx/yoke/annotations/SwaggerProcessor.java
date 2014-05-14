@@ -61,34 +61,38 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
             return;
         }
 
+        // create operations json
+        final JsonObject operations = new JsonObject();
+        operations.putString("nickname", method.getName());
+
         // process the methods that have both YokeRequest and Handler
 
         if (Processor.isCompatible(method, ALL.class, YokeRequest.class, Handler.class)) {
-            resource.all(doc.path(), doc.summary(), new JsonObject());
+            resource.all(Processor.getAnnotation(method, ALL.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, CONNECT.class, YokeRequest.class, Handler.class)) {
-            resource.connect(doc.path(), doc.summary(), new JsonObject());
+            resource.connect(Processor.getAnnotation(method, CONNECT.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, OPTIONS.class, YokeRequest.class, Handler.class)) {
-            resource.options(doc.path(), doc.summary(), new JsonObject());
+            resource.options(Processor.getAnnotation(method, OPTIONS.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, HEAD.class, YokeRequest.class, Handler.class)) {
-            resource.head(doc.path(), doc.summary(), new JsonObject());
+            resource.head(Processor.getAnnotation(method, HEAD.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, GET.class, YokeRequest.class, Handler.class)) {
-            resource.get(doc.path(), doc.summary(), new JsonObject());
+            resource.get(Processor.getAnnotation(method, GET.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, POST.class, YokeRequest.class, Handler.class)) {
-            resource.post(doc.path(), doc.summary(), new JsonObject());
+            resource.post(Processor.getAnnotation(method, POST.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, PUT.class, YokeRequest.class, Handler.class)) {
-            resource.put(doc.path(), doc.summary(), new JsonObject());
+            resource.put(Processor.getAnnotation(method, PUT.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, PATCH.class, YokeRequest.class, Handler.class)) {
-            resource.patch(doc.path(), doc.summary(), new JsonObject());
+            resource.patch(Processor.getAnnotation(method, PATCH.class).value(), doc.value(), operations);
         }
         if (Processor.isCompatible(method, DELETE.class, YokeRequest.class, Handler.class)) {
-            resource.delete(doc.path(), doc.summary(), new JsonObject());
+            resource.delete(Processor.getAnnotation(method, DELETE.class).value(), doc.value(), operations);
         }
     }
 

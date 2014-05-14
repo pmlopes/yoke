@@ -50,7 +50,9 @@ public class Swagger {
         public Resource produces(String... mimes) {
             produces = new JsonArray();
             for (String mime : mimes) {
-                produces.addString(mime);
+                if (!produces.contains(mime)) {
+                    produces.addString(mime);
+                }
             }
 
             return this;
@@ -59,7 +61,9 @@ public class Swagger {
         public Resource consumes(String... mimes) {
             consumes = new JsonArray();
             for (String mime : mimes) {
-                consumes.addString(mime);
+                if (!consumes.contains(mime)) {
+                    consumes.addString(mime);
+                }
             }
 
             return this;
@@ -237,42 +241,25 @@ public class Swagger {
         return this;
     }
 
-    protected Swagger.Resource createSwaggerResource(String path, String description) {
+    protected Resource createSwaggerResource(final String path, final String description) {
         // verify if already present
-        for (Swagger.Resource res : resources) {
+        for (Resource res : resources) {
             if (res.path.equals(path)) {
                 return res;
             }
         }
 
-        return new Swagger.Resource(path, description);
-    }
-
-    public Swagger.Resource createResource(final String path) {
-        return createResource(path, "");
-    }
-
-    public Swagger.Resource createResource(final String path, final String description) {
-
-        final String normalizedPath;
-
-        if (path.charAt(0) != '/') {
-            normalizedPath = "/" + path;
-        } else {
-            normalizedPath = path;
-        }
-
-        final Swagger.Resource resource = createSwaggerResource(normalizedPath, description);
+        final Resource resource = new Resource(path, description);
         resources.add(resource);
 
-        router.get(prefix + normalizedPath, new Middleware() {
+        router.get(prefix + path, new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
                 JsonObject result = new JsonObject()
                         .putString("apiVersion", apiVersion)
                         .putString("swaggerVersion", "1.2")
                         .putString("basePath", "/")
-                        .putString("resourcePath", normalizedPath);
+                        .putString("resourcePath", path);
 
                 if (resource.produces != null) {
                     result.putArray("produces", resource.produces);
@@ -294,5 +281,40 @@ public class Swagger {
         });
 
         return resource;
+    }
+
+    public Resource createResource(final String path) {
+        return createResource(path, "");
+    }
+
+    public Resource createResource(final String path, final String description) {
+
+        final String normalizedPath;
+
+        if (path.charAt(0) != '/') {
+            normalizedPath = "/" + path;
+        } else {
+            normalizedPath = path;
+        }
+
+        return createSwaggerResource(normalizedPath, description);
+    }
+
+    public static Swagger from(final Router router, final String version, final Object... objs) {
+        final Swagger swagger = new Swagger(router, version);
+        from(swagger, objs);
+
+        return swagger;
+    }
+
+    /**
+     * Builds a Swagger from an annotated Java Object
+     */
+    public static Swagger from(final Swagger router, final Object... objs) {
+        for (Object o : objs) {
+            Processor.process(router, o);
+        }
+
+        return router;
     }
 }
