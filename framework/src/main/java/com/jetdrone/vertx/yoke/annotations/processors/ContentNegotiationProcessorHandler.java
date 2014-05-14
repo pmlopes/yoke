@@ -9,7 +9,12 @@ import org.vertx.java.core.Handler;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class ContentNegotiationProcessorHandler implements AnnotationHandler {
+public class ContentNegotiationProcessorHandler implements AnnotationHandler<Router> {
+
+    @Override
+    public boolean isFor(Class<?> clazz) {
+        return Router.class.isAssignableFrom(clazz);
+    }
 
     @Override
     public void process(final Router router, final Object instance, final Class<?> clazz, final Method method) {

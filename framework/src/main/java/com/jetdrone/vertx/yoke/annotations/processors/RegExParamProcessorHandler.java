@@ -10,7 +10,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
-public class RegExParamProcessorHandler implements AnnotationHandler {
+public class RegExParamProcessorHandler implements AnnotationHandler<Router> {
+
+    @Override
+    public boolean isFor(Class<?> clazz) {
+        return Router.class.isAssignableFrom(clazz);
+    }
 
     @Override
     public void process(Router router, Object instance, Class<?> clazz, Method method) {

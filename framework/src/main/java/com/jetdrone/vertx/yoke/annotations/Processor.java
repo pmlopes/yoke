@@ -3,7 +3,6 @@ package com.jetdrone.vertx.yoke.annotations;
 import com.jetdrone.vertx.yoke.annotations.processors.ContentNegotiationProcessorHandler;
 import com.jetdrone.vertx.yoke.annotations.processors.RegExParamProcessorHandler;
 import com.jetdrone.vertx.yoke.annotations.processors.RouterProcessorHandler;
-import com.jetdrone.vertx.yoke.middleware.Router;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.Annotation;
@@ -21,7 +20,7 @@ public final class Processor {
 
     private static final MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 
-    private static final List<AnnotationHandler> handlers = new ArrayList<>();
+    private static final List<AnnotationHandler<?>> handlers = new ArrayList<>();
 
     private Processor() {
     }
@@ -43,7 +42,7 @@ public final class Processor {
     public static void registerProcessor(Class<?> processor) {
         try {
             // if already registered skip
-            for (AnnotationHandler annotationHandler : handlers) {
+            for (AnnotationHandler<?> annotationHandler : handlers) {
                 if (annotationHandler.getClass().equals(processor)) {
                     // skip
                     return;
@@ -59,18 +58,25 @@ public final class Processor {
         }
     }
 
-    public static void process(@NotNull Router router, @NotNull Object instance) {
+    @SuppressWarnings("unchecked")
+    public static <T> void process(@NotNull T context, @NotNull Object instance) {
         final Class<?> clazz = instance.getClass();
 
         for (final Field field : clazz.getFields()) {
-            for (AnnotationHandler handler : handlers) {
-                handler.process(router, instance, clazz, field);
+            for (AnnotationHandler<?> handler : handlers) {
+                if (handler.isFor(context.getClass())) {
+                    final AnnotationHandler<T> _handler = (AnnotationHandler<T>) handler;
+                    _handler.process(context, instance, clazz, field);
+                }
             }
         }
 
         for (final Method method : clazz.getMethods()) {
-            for (AnnotationHandler handler : handlers) {
-                handler.process(router, instance, clazz, method);
+            for (AnnotationHandler<?> handler : handlers) {
+                if (handler.isFor(context.getClass())) {
+                    final AnnotationHandler<T> _handler = (AnnotationHandler<T>) handler;
+                    _handler.process(context, instance, clazz, method);
+                }
             }
         }
     }

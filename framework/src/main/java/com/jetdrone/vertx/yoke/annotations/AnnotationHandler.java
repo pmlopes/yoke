@@ -1,13 +1,13 @@
 package com.jetdrone.vertx.yoke.annotations;
 
-import com.jetdrone.vertx.yoke.middleware.Router;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public interface AnnotationHandler {
+public interface AnnotationHandler<T> {
 
-    void process(final Router router, final Object instance, final Class<?> clazz, final Method method);
+    boolean isFor(Class<?> clazz);
 
-    void process(final Router router, final Object instance, final Class<?> clazz, final Field field);
+    void process(final T router, final Object instance, final Class<?> clazz, final Method method);
+
+    void process(final T router, final Object instance, final Class<?> clazz, final Field field);
 }

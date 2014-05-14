@@ -1,6 +1,8 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.annotations.Processor;
+import com.jetdrone.vertx.yoke.annotations.SwaggerProcessor;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -12,6 +14,10 @@ import java.util.regex.Pattern;
 
 // TODO: add api_key validator
 public class Swagger {
+
+    static {
+        Processor.registerProcessor(SwaggerProcessor.class);
+    }
 
     public static class Resource {
 
@@ -59,6 +65,22 @@ public class Swagger {
             return this;
         }
 
+        public Resource all(String path, JsonObject operation) {
+            all(path, "", operation);
+            return this;
+        }
+        public Resource all(String path, String summary, JsonObject operation) {
+            addOperation("GET", path, summary, operation);
+            addOperation("PUT", path, summary, operation);
+            addOperation("POST", path, summary, operation);
+            addOperation("DELETE", path, summary, operation);
+            addOperation("OPTIONS", path, summary, operation);
+            addOperation("HEAD", path, summary, operation);
+            addOperation("TRACE", path, summary, operation);
+            addOperation("CONNECT", path, summary, operation);
+            addOperation("PATCH", path, summary, operation);
+            return this;
+        }
         public Resource get(String path, JsonObject operation) {
             get(path, "", operation);
             return this;
@@ -216,6 +238,13 @@ public class Swagger {
     }
 
     protected Swagger.Resource createSwaggerResource(String path, String description) {
+        // verify if already present
+        for (Swagger.Resource res : resources) {
+            if (res.path.equals(path)) {
+                return res;
+            }
+        }
+
         return new Swagger.Resource(path, description);
     }
 
