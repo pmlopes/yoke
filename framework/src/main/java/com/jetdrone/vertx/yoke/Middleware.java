@@ -80,22 +80,42 @@ public abstract class Middleware {
         return this;
     }
 
+    /**
+     * Read only check if this middleware instance has been initialized.
+     * @return true if the init method has been called
+     */
     public boolean isInitialized() {
         return initialized;
     }
 
+    /**
+     * Get access to the event bus
+     * @return eventBus
+     */
     public EventBus eventBus() {
         return vertx().eventBus();
     }
 
+    /**
+     * Get access to the FileSystem object from Vert.x
+     * @return fileSystem
+     */
     public FileSystem fileSystem() {
         return vertx().fileSystem();
     }
 
+    /**
+     * Get access to the security object from Yoke
+     * @return security
+     */
     public YokeSecurity security() {
         return yoke.security();
     }
 
+    /**
+     * Get access to Vert.x object
+     * @return vertx
+     */
     public Vertx vertx() {
         return yoke.vertx();
     }
