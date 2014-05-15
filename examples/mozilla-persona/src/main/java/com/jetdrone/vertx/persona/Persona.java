@@ -24,7 +24,7 @@ public class Persona extends Verticle {
         final Yoke yoke = new Yoke(this);
         yoke.engine(new StringPlaceholderEngine());
 
-        final Mac secret = yoke.security().getMac("HmacSHA256", "secret here");
+        final Mac secret = yoke.security().getMac("HmacSHA256");
 
         // all environments
         yoke.use(new CookieParser(secret));
