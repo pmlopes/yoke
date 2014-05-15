@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.jmx;
 
 import javax.management.*;
 
-public class PatternBindingMBean implements DynamicMBean {
+public class RouteMBean implements DynamicMBean {
     @Override
     public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException, ReflectionException {
         return null;

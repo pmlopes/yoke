@@ -8,7 +8,7 @@ import com.jetdrone.vertx.yoke.core.MountedMiddleware;
 import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
-import com.jetdrone.vertx.yoke.jmx.MountedMiddlewareMBean;
+import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.security.YokeKeyStoreSecurity;
 import com.jetdrone.vertx.yoke.security.YokeSecurity;
@@ -236,7 +236,7 @@ public class Yoke {
 
                 // register on JMX
                 try {
-                    mbs.registerMBean(new MountedMiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:type=MountedMiddleware@" + hashCode() + ",order=" + middlewareList.size()));
+                    mbs.registerMBean(new MiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:type=Middleware@" + hashCode() + ",order=" + middlewareList.size()));
                 } catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
                     throw new RuntimeException(e);
                 }

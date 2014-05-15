@@ -4,11 +4,11 @@ import com.jetdrone.vertx.yoke.core.MountedMiddleware;
 
 import javax.management.*;
 
-public class MountedMiddlewareMBean implements DynamicMBean {
+public class MiddlewareMBean implements DynamicMBean {
 
     private final MountedMiddleware middleware;
 
-    public MountedMiddlewareMBean(MountedMiddleware middleware) {
+    public MiddlewareMBean(MountedMiddleware middleware) {
         this.middleware = middleware;
     }
 
@@ -102,7 +102,7 @@ public class MountedMiddlewareMBean implements DynamicMBean {
 
         return new MBeanInfo(
                 this.getClass().getName(),
-                "Mounted Middleware Manager MBean",
+                "Middleware Manager MBean",
                 attrs,
                 null,   // constructors
                 null,   // operations

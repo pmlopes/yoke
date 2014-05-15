@@ -6,7 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.annotations.*;
-import com.jetdrone.vertx.yoke.jmx.PatternBindingMBean;
+import com.jetdrone.vertx.yoke.jmx.RouteMBean;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -850,7 +850,7 @@ public class Router extends Middleware {
 
             // register on JMX
             try {
-                mbs.registerMBean(new PatternBindingMBean(), new ObjectName("com.jetdrone.yoke.router:type=PatternBinding@" + hashCode() + ",method=" + verb + ",path=" + ObjectName.quote(route)));
+                mbs.registerMBean(new RouteMBean(), new ObjectName("com.jetdrone.yoke.router:type=Route@" + hashCode() + ",method=" + verb + ",path=" + ObjectName.quote(route)));
             } catch (InstanceAlreadyExistsException e) {
                 // ignore
             } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
