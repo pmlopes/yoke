@@ -18,7 +18,7 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
 
     @Override
     public void process(Swagger swagger, Object instance, Class<?> clazz, Method method) {
-        Api res = Processor.getAnnotation(clazz, Api.class);
+        SwaggerResource res = Processor.getAnnotation(clazz, SwaggerResource.class);
 
         if (res == null) {
             return;
@@ -56,7 +56,7 @@ public class SwaggerProcessor implements AnnotationHandler<Swagger> {
             resource.consumes(produces);
         }
 
-        ApiDoc doc = Processor.getAnnotation(method, ApiDoc.class);
+        SwaggerDoc doc = Processor.getAnnotation(method, SwaggerDoc.class);
 
         if (doc == null) {
             return;

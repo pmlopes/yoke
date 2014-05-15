@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD})
-public @interface ApiDoc {
+public @interface SwaggerDoc {
     String summary();
 //    String type();
     String[] notes() default {};

@@ -14,11 +14,11 @@ import static org.vertx.testtools.VertxAssert.assertEquals;
 
 public class SwaggerTest extends TestVerticle {
 
-    @Api(path = "/hello", description = "Hello web service")
+    @SwaggerResource(path = "/hello", description = "Hello web service")
     @Produces("application/json")
     public static class TestSwagger {
         @GET("/hello/:name")
-        @ApiDoc(
+        @SwaggerDoc(
                 summary = "say hello to user name",
                 notes = {"note #1", "note #2"},
                 parameters = {
