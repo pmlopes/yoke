@@ -7,16 +7,16 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
 public class GJWT extends JWT {
-    public GJWT(final @NotNull String keyPassword) {
-        super(keyPassword);
+    public GJWT() {
+        super();
     }
 
-    public GJWT(final @NotNull String keyPassword, final @Nullable String skip) {
-        super(keyPassword, skip);
+    public GJWT(final @Nullable String skip) {
+        super(skip);
     }
 
-    public GJWT(final @NotNull String keyPassword, final @Nullable String skip, final Closure closure) {
-        super(keyPassword, skip, new JWTHandler() {
+    public GJWT(final @Nullable String skip, final Closure closure) {
+        super(skip, new JWTHandler() {
             @Override
             public void handle(JsonObject token, Handler<Object> result) {
                 closure.call(token.toMap(), result);

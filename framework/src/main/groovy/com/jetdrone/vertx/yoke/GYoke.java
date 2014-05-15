@@ -9,7 +9,6 @@ import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vertx.groovy.platform.Container;
 import org.vertx.groovy.platform.Verticle;
 import org.vertx.java.core.Handler;
@@ -165,13 +164,8 @@ public class GYoke {
     }
 
 
-    public GYoke keyStore(@Nullable String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
-        jYoke.keyStore(storeType, fileName, keyStorePassword);
-        return this;
-    }
-
-    public GYoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
-        jYoke.keyStore(fileName, keyStorePassword);
+    public GYoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull Map<String, String> keyPasswords) {
+        jYoke.keyStore(fileName, keyStorePassword, keyPasswords);
         return this;
     }
 

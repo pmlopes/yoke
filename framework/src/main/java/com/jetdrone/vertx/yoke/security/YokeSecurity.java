@@ -7,10 +7,12 @@ import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.*;
+import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class YokeSecurity {
+public final class YokeSecurity {
 
     private static final Map<String, String> ALIAS_ALG_MAP = new HashMap<>();
 
@@ -29,50 +31,100 @@ public class YokeSecurity {
         }
     }
 
+    private final KeyStore keyStore;
+    private final Map<String, Key> keys;
+    private final String UUID = java.util.UUID.randomUUID().toString();
+
+    public YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final Map<String, String> keyPasswords) {
+        this.keyStore = keyStore;
+
+        Map<String, Key> tmp = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : keyPasswords.entrySet()) {
+            try {
+                tmp.put(entry.getKey(), keyStore.getKey(entry.getKey(), entry.getValue().toCharArray()));
+            } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        keys = Collections.unmodifiableMap(tmp);
+    }
+
+    public YokeSecurity() {
+        keyStore = null;
+        keys = Collections.emptyMap();
+    }
+
     /**
      * Creates a new Message Authentication Code
      * @param alias algorithm to use e.g.: HmacSHA256
-     * @param secret The secret key used to create signatures
      * @return Mac implementation
      */
-    public Mac getMac(final @NotNull String alias, final @NotNull String secret) {
+    public Mac getMac(final @NotNull String alias) {
         try {
-            Mac hmac = Mac.getInstance(getAlgorithm(alias));
-            hmac.init(new SecretKeySpec(secret.getBytes(), hmac.getAlgorithm()));
-            return hmac;
+            final Key secretKey = keys.get(alias);
+
+            Mac mac;
+
+            if (secretKey == null) {
+                mac = Mac.getInstance(getAlgorithm(alias));
+                mac.init(new SecretKeySpec(UUID.getBytes(), mac.getAlgorithm()));
+            } else {
+                mac = Mac.getInstance(secretKey.getAlgorithm());
+                mac.init(secretKey);
+            }
+
+            return mac;
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Signature getSignature(final @NotNull String alias, final String secret) {
+    public Signature getSignature(final @NotNull String alias) {
         try {
-            KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
-            PrivateKey privateKey = keyPair.getPrivate();
+            final PrivateKey privateKey = (PrivateKey) keys.get(alias);
 
-            Signature instance = Signature.getInstance(getAlgorithm(alias));
-            instance.initSign(privateKey);
+            Signature signature;
 
-            return instance;
-        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            if (privateKey == null) {
+                final KeyPair keyPair = KeyPairGenerator.getInstance("RSA").generateKeyPair();
+
+                signature = Signature.getInstance(getAlgorithm(alias));
+                signature.initSign(keyPair.getPrivate());
+            } else {
+                final X509Certificate certificate = (X509Certificate) keyStore.getCertificate(alias);
+
+                signature = Signature.getInstance(certificate.getSigAlgName());
+                signature.initSign(privateKey);
+            }
+
+            return signature;
+        } catch (NoSuchAlgorithmException | InvalidKeyException | KeyStoreException e) {
             throw new RuntimeException(e);
         }
     }
 
     /**
      * Creates a new Crypto KEY
-     * @param secret The secret key used to create signatures
      * @return Key implementation
      */
-    public Key getKey(final @NotNull String alias, final @NotNull String secret) {
-        return new SecretKeySpec(secret.getBytes(), getAlgorithm(alias));
+    public Key getKey(final @NotNull String alias) {
+        final Key key = keys.get(alias);
+
+        if (key == null) {
+            return new SecretKeySpec(UUID.getBytes(), getAlgorithm(alias));
+        } else {
+            return key;
+        }
     }
 
     /**
      * Creates a new Cipher
      * @return Cipher implementation
      */
-    public Cipher getCipher(final @NotNull Key key, int mode) {
+    public static Cipher getCipher(final @NotNull Key key, int mode) {
         try {
             Cipher cipher = Cipher.getInstance(key.getAlgorithm());
             cipher.init(mode, key);

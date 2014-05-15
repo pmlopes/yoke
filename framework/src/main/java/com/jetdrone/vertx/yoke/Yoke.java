@@ -10,7 +10,6 @@ import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.security.YokeKeyStoreSecurity;
 import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
@@ -329,7 +328,7 @@ public class Yoke {
 
     protected YokeSecurity security = new YokeSecurity();
 
-    public Yoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
+    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final Map<String, String> keyPasswords) {
 
         String storeType;
         int idx = fileName.lastIndexOf('.');
@@ -351,7 +350,7 @@ public class Yoke {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new YokeKeyStoreSecurity(ks);
+            this.security = new YokeSecurity(ks, keyPasswords);
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -360,7 +359,7 @@ public class Yoke {
     }
 
     public YokeSecurity security() {
-        return this.security;
+        return security;
     }
 
     /**

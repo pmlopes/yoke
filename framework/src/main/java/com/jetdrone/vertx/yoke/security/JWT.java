@@ -1,6 +1,5 @@
-package com.jetdrone.vertx.yoke.util;
+package com.jetdrone.vertx.yoke.security;
 
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.impl.Base64;
 
@@ -66,11 +65,27 @@ public final class JWT {
 
     private final Map<String, Crypto> CRYPTO_MAP = new HashMap<>();
 
-    public JWT(final YokeSecurity yokeSecurity, final String keyPassword) {
-        CRYPTO_MAP.put("HS256", new CryptoMac(yokeSecurity.getMac("HS256", keyPassword)));
-        CRYPTO_MAP.put("HS384", new CryptoMac(yokeSecurity.getMac("HS384", keyPassword)));
-        CRYPTO_MAP.put("HS512", new CryptoMac(yokeSecurity.getMac("HS512", keyPassword)));
-        CRYPTO_MAP.put("RS256", new CryptoSignature(yokeSecurity.getSignature("RS256", keyPassword)));
+    public JWT(final YokeSecurity security) {
+        try {
+            CRYPTO_MAP.put("HS256", new CryptoMac(security.getMac("HS256")));
+        } catch (RuntimeException e) {
+            // Algorithm not supported
+        }
+        try {
+            CRYPTO_MAP.put("HS384", new CryptoMac(security.getMac("HS384")));
+        } catch (RuntimeException e) {
+            // Algorithm not supported
+        }
+        try {
+            CRYPTO_MAP.put("HS512", new CryptoMac(security.getMac("HS512")));
+        } catch (RuntimeException e) {
+            // Algorithm not supported
+        }
+        try {
+            CRYPTO_MAP.put("RS256", new CryptoSignature(security.getSignature("RS256")));
+        } catch (RuntimeException e) {
+            // Algorithm not supported
+        }
     }
 
     public JsonObject decode(final String token) {

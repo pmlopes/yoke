@@ -20,21 +20,19 @@ public class JWT extends Middleware {
 
     private final String skip;
 
-    private transient String keyPassword;
-    private com.jetdrone.vertx.yoke.util.JWT jwt;
+    private com.jetdrone.vertx.yoke.security.JWT jwt;
 
     private final JWTHandler handler;
 
-    public JWT(final @NotNull String keyPassword) {
-        this(keyPassword, null);
+    public JWT() {
+        this(null);
     }
 
-    public JWT(final @NotNull String keyPassword, final @Nullable String skip) {
-        this(keyPassword, skip, null);
+    public JWT(final @Nullable String skip) {
+        this(skip, null);
     }
 
-    public JWT(final @NotNull String keyPassword, final @Nullable String skip, final @Nullable JWTHandler handler) {
-        this.keyPassword = keyPassword;
+    public JWT(final @Nullable String skip, final @Nullable JWTHandler handler) {
         this.skip = skip;
         this.handler = handler;
     }
@@ -43,10 +41,7 @@ public class JWT extends Middleware {
     public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
         super.init(yoke, mount);
 
-        jwt = new com.jetdrone.vertx.yoke.util.JWT(yoke.security(), keyPassword);
-        // remove from the heap
-        this.keyPassword = null;
-
+        jwt = new com.jetdrone.vertx.yoke.security.JWT(yoke.security());
         return this;
     }
 
