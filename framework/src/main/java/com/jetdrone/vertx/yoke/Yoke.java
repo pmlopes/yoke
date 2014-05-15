@@ -329,9 +329,19 @@ public class Yoke {
 
     protected YokeSecurity security = new YokeSecurity();
 
-    public Yoke keyStore(@Nullable String storeType, @NotNull String fileName, @NotNull String keyStorePassword) {
+    public Yoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
+
+        String storeType;
+        int idx = fileName.lastIndexOf('.');
+
+        if (idx == -1) {
+            storeType = KeyStore.getDefaultType();
+        } else {
+            storeType = fileName.substring(idx + 1);
+        }
+
         try {
-            KeyStore ks = KeyStore.getInstance(storeType == null ? KeyStore.getDefaultType() : storeType);
+            KeyStore ks = KeyStore.getInstance(storeType);
 
             try (InputStream in = getClass().getResourceAsStream(fileName)) {
                 if (in == null) {
@@ -347,10 +357,6 @@ public class Yoke {
             throw new RuntimeException(e);
         }
         return this;
-    }
-
-    public Yoke keyStore(@NotNull String fileName, @NotNull String keyStorePassword) {
-        return keyStore(null, fileName, keyStorePassword);
     }
 
     public YokeSecurity security() {
