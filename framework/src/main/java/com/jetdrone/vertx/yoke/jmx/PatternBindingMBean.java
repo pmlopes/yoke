@@ -9,9 +9,7 @@ public class PatternBindingMBean implements DynamicMBean {
     }
 
     @Override
-    public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
-
-    }
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {}
 
     @Override
     public AttributeList getAttributes(String[] attributes) {
@@ -30,6 +28,13 @@ public class PatternBindingMBean implements DynamicMBean {
 
     @Override
     public MBeanInfo getMBeanInfo() {
-        return null;
+        return new MBeanInfo(
+                this.getClass().getName(),
+                "Pattern Binding Manager MBean",
+                null,   // attributes
+                null,   // constructors
+                null,   // operations
+                null);  // notifications
+
     }
 }

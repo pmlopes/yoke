@@ -236,7 +236,7 @@ public class Yoke {
 
                 // register on JMX
                 try {
-                    mbs.registerMBean(new MountedMiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:instance=@" + hashCode() + ",type=MountedMiddleware@" + middlewareList.size()));
+                    mbs.registerMBean(new MountedMiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:type=MountedMiddleware@" + hashCode() + ",order=" + middlewareList.size()));
                 } catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
                     throw new RuntimeException(e);
                 }

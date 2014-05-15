@@ -9,6 +9,7 @@ import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.jmx.PatternBindingMBean;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 
@@ -690,7 +691,7 @@ public class Router extends Middleware {
         }
 
         if (!exists) {
-            PatternBinding binding = new PatternBinding(verb, regex, groups, handler);
+            PatternBinding binding = new PatternBinding(verb, input, regex, groups, handler);
             bindings.add(binding);
         }
 
@@ -714,7 +715,7 @@ public class Router extends Middleware {
         }
 
         if (!exists) {
-            PatternBinding binding = new PatternBinding(verb, regex, null, handler);
+            PatternBinding binding = new PatternBinding(verb, regex.pattern(), regex, null, handler);
             bindings.add(binding);
         }
 
@@ -838,7 +839,8 @@ public class Router extends Middleware {
         final List<Middleware> middleware = new ArrayList<>();
         final Set<String> paramNames;
 
-        private PatternBinding(@NotNull String verb, @NotNull Pattern pattern, Set<String> paramNames, @NotNull Middleware[] middleware) {
+        private PatternBinding(@NotNull String verb, @Nullable String route, @NotNull Pattern pattern, Set<String> paramNames, @NotNull Middleware[] middleware) {
+
             this.pattern = pattern;
             this.paramNames = paramNames;
             Collections.addAll(this.middleware, middleware);
@@ -848,13 +850,12 @@ public class Router extends Middleware {
 
             // register on JMX
             try {
-                mbs.registerMBean(new PatternBindingMBean(), new ObjectName("com.jetdrone.yoke.router:type=PatternBinding,method=" + verb + ",pattern" + pattern.pattern()));
+                mbs.registerMBean(new PatternBindingMBean(), new ObjectName("com.jetdrone.yoke.router:type=PatternBinding@" + hashCode() + ",method=" + verb + ",path=" + ObjectName.quote(route)));
             } catch (InstanceAlreadyExistsException e) {
                 // ignore
             } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
                 throw new RuntimeException(e);
             }
-
         }
 
         void addMiddleware(@NotNull Middleware[] middleware) {
