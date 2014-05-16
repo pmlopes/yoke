@@ -9,6 +9,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.*;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,18 +36,44 @@ public final class YokeSecurity {
     private final Map<String, Key> keys;
     private final String UUID = java.util.UUID.randomUUID().toString();
 
-    public YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final Map<String, String> keyPasswords) {
+    public YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final Map<String, Object> keyPasswords) {
         this.keyStore = keyStore;
 
         Map<String, Key> tmp = new HashMap<>();
 
-        for (Map.Entry<String, String> entry : keyPasswords.entrySet()) {
+        for (Map.Entry<String, Object> entry : keyPasswords.entrySet()) {
             try {
-                tmp.put(entry.getKey(), keyStore.getKey(entry.getKey(), entry.getValue().toCharArray()));
+                if (keyStore.containsAlias(entry.getKey())) {
+                    tmp.put(entry.getKey(), keyStore.getKey(entry.getKey(), ((String) entry.getValue()).toCharArray()));
+                }
             } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
                 throw new RuntimeException(e);
             }
+        }
 
+        keys = Collections.unmodifiableMap(tmp);
+    }
+
+    public YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final String keyPassword) {
+        this.keyStore = keyStore;
+
+        Map<String, Key> tmp = new HashMap<>();
+
+        try {
+            Enumeration<String> aliases = keyStore.aliases();
+
+            while(aliases.hasMoreElements()) {
+                String alias = aliases.nextElement();
+
+                try {
+                    tmp.put(alias, keyStore.getKey(alias, keyPassword.toCharArray()));
+                } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
         }
 
         keys = Collections.unmodifiableMap(tmp);

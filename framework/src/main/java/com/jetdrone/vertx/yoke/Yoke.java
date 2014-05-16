@@ -30,7 +30,7 @@ import org.vertx.java.platform.Verticle;
 import org.jetbrains.annotations.*;
 
 import javax.management.*;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
@@ -328,8 +328,7 @@ public class Yoke {
 
     protected YokeSecurity security = new YokeSecurity();
 
-    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final Map<String, String> keyPasswords) {
-
+    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final JsonObject keyPasswords) {
         String storeType;
         int idx = fileName.lastIndexOf('.');
 
@@ -342,15 +341,36 @@ public class Yoke {
         try {
             KeyStore ks = KeyStore.getInstance(storeType);
 
-            try (InputStream in = getClass().getResourceAsStream(fileName)) {
-                if (in == null) {
-                    throw new FileNotFoundException(fileName);
-                }
-
+            try (InputStream in = new FileInputStream(fileName)) {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new YokeSecurity(ks, keyPasswords);
+            this.security = new YokeSecurity(ks, keyPasswords.toMap());
+
+        } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+        return this;
+    }
+
+    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword) {
+        String storeType;
+        int idx = fileName.lastIndexOf('.');
+
+        if (idx == -1) {
+            storeType = KeyStore.getDefaultType();
+        } else {
+            storeType = fileName.substring(idx + 1);
+        }
+
+        try {
+            KeyStore ks = KeyStore.getInstance(storeType);
+
+            try (InputStream in = new FileInputStream(fileName)) {
+                ks.load(in, keyStorePassword.toCharArray());
+            }
+
+            this.security = new YokeSecurity(ks, keyStorePassword);
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);

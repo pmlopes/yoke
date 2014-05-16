@@ -15,6 +15,7 @@ import org.vertx.java.core.Handler;
 
 import org.vertx.groovy.core.Vertx;
 import org.vertx.groovy.core.http.HttpServer;
+import org.vertx.java.core.json.JsonObject;
 
 import java.util.Collections;
 import java.util.List;
@@ -164,8 +165,13 @@ public class GYoke {
     }
 
 
-    public GYoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull Map<String, String> keyPasswords) {
-        jYoke.keyStore(fileName, keyStorePassword, keyPasswords);
+    public GYoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull Map<String, Object> keyPasswords) {
+        jYoke.keyStore(fileName, keyStorePassword, new JsonObject(keyPasswords));
+        return this;
+    }
+
+    public GYoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword) {
+        jYoke.keyStore(fileName, keyStorePassword);
         return this;
     }
 
