@@ -92,7 +92,7 @@ public class BodyParser extends Middleware {
                         if (request.files() == null) {
                             request.setFiles(new HashMap<String, YokeFileUpload>());
                         }
-                        YokeFileUpload upload = new YokeFileUpload(vertx(), fileUpload, uploadDir);
+                        final YokeFileUpload upload = new YokeFileUpload(vertx(), fileUpload, uploadDir);
 
                         // setup callbacks
                         fileUpload.exceptionHandler(new Handler<Throwable>() {
@@ -106,6 +106,15 @@ public class BodyParser extends Middleware {
                         fileUpload.streamToFileSystem(upload.path());
                         // store a reference in the request
                         request.files().put(fileUpload.name(), upload);
+                        // set up a callback to remove the file from the file system when the request completes
+                        request.response().endHandler(new Handler<Void>() {
+                            @Override
+                            public void handle(Void event) {
+                                if (upload.isTransient()) {
+                                    upload.delete();
+                                }
+                            }
+                        });
                     }
                 });
             }

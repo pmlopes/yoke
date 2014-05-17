@@ -10,7 +10,6 @@ import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.core.YokeException;

@@ -3,7 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.core;
 
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
+import com.jetdrone.vertx.yoke.YokeSecurity;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.DefaultCookie;
 import org.jetbrains.annotations.NotNull;

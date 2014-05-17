@@ -29,6 +29,8 @@ public class YokeFileUpload {
     private final long size;
     private final String path;
 
+    private boolean isTransient = true;
+
     public YokeFileUpload(@NotNull final Vertx vertx, @NotNull final HttpServerFileUpload fileUpload, @NotNull String uploadDir) {
         this.fileSystem = vertx.fileSystem();
 
@@ -55,6 +57,14 @@ public class YokeFileUpload {
         this.charset = charset;
         this.size = size;
         this.path = path;
+    }
+
+    public boolean isTransient() {
+        return isTransient;
+    }
+
+    public void setTransient(boolean isTransient) {
+        this.isTransient = isTransient;
     }
 
     /**

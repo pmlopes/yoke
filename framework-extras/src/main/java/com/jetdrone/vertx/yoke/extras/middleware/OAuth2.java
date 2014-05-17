@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.extras.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
+import com.jetdrone.vertx.yoke.YokeSecurity;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
@@ -22,7 +22,7 @@ public abstract class OAuth2 {
     private final String authorize_uri = "/oauth/authorize";
     private final String access_token_uri = "/oauth/access_token";
 
-    private final YokeSecurity security = new YokeSecurity();
+    private final YokeSecurity security = null; //new YokeSecurity();
 
     private final Key cryptoKey = security.getKey("AES");
     private final Cipher encCipher = security.getCipher(cryptoKey, Cipher.ENCRYPT_MODE);

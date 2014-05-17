@@ -5,7 +5,6 @@ package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.core.impl.GroovyRequestWrapper;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.security.YokeSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import groovy.lang.Closure;
 import org.jetbrains.annotations.NotNull;

@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke.security;
+package com.jetdrone.vertx.yoke;
 
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -36,7 +36,7 @@ public final class YokeSecurity {
     private final Map<String, Key> keys;
     private final String UUID = java.util.UUID.randomUUID().toString();
 
-    public YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final Map<String, Object> keyPasswords) {
+    YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final Map<String, Object> keyPasswords) {
         this.keyStore = keyStore;
 
         Map<String, Key> tmp = new HashMap<>();
@@ -54,7 +54,7 @@ public final class YokeSecurity {
         keys = Collections.unmodifiableMap(tmp);
     }
 
-    public YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final String keyPassword) {
+    YokeSecurity(@NotNull final KeyStore keyStore, @NotNull final String keyPassword) {
         this.keyStore = keyStore;
 
         Map<String, Key> tmp = new HashMap<>();
@@ -79,7 +79,7 @@ public final class YokeSecurity {
         keys = Collections.unmodifiableMap(tmp);
     }
 
-    public YokeSecurity() {
+    YokeSecurity() {
         keyStore = null;
         keys = Collections.emptyMap();
     }
