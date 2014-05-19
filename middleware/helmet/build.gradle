@@ -16,7 +16,7 @@ Please edit the details below.
 def configurePom(def pom) {
     pom.project {
         name rootProject.name
-        description 'Swagger for Yoke a middleware framework for Vert.x'
+        description 'Helmet for Yoke a middleware framework for Vert.x'
         inceptionYear '2013'
         packaging 'jar'
         url 'http://pmlopes.github.io/yoke/'
