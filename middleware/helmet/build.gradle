@@ -3,6 +3,7 @@ apply from: "$rootDir/gradle/vertx.gradle"
 dependencies {
   // get yoke jar for parent
   provided project(':framework')
+  provided "org.jetbrains:annotations:13.0"
 }
 
 test {
