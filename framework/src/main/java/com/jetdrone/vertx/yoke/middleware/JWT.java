@@ -109,7 +109,7 @@ public class JWT extends Middleware {
             if (jwtToken.containsField("exp")) {
                 Long exp = jwtToken.getLong("exp");
                 // expires must be after now
-                if (exp >= now) {
+                if (now > exp) {
                     next.handle(new YokeException(401, "Invalid Token!"));
                     return;
                 }
