@@ -47,7 +47,7 @@ public class SwaggerTest extends TestVerticle {
 
         Router.from(router, testSwagger);
 
-        final YokeTester tester = new YokeTester(vertx, yoke);
+        final YokeTester tester = new YokeTester(yoke);
 
         tester.request("GET", "/api-docs", new Handler<Response>() {
             @Override

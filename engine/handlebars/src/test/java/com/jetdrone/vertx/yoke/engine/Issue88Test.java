@@ -40,7 +40,7 @@ public class Issue88Test extends TestVerticle {
                 .listen(8080);
 
 
-        new YokeTester(vertx, yoke).request("GET", "/$", new Handler<Response>() {
+        new YokeTester(yoke).request("GET", "/$", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

@@ -25,7 +25,7 @@ public class ThymeleafEngineTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/", new Handler<Response>() {
+        new YokeTester(yoke).request("GET", "/", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

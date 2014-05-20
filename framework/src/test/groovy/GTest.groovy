@@ -42,7 +42,7 @@ class GTest extends TestVerticle {
         def gYoke = new GYoke(new Vertx(vertx), new Container(container))
         gYoke.use(GRouter.from(new AnnotatedRouter()));
 
-        new GYokeTester(vertx, gYoke).request("GET", "/rest") { Response resp ->
+        new GYokeTester(gYoke).request("GET", "/rest") { Response resp ->
             assertEquals(200, resp.getStatusCode());
             assertEquals("Hello rest!", resp.body.toString());
             testComplete();
@@ -71,7 +71,7 @@ class GTest extends TestVerticle {
         def gYoke = new GYoke(new Vertx(vertx), new Container(container))
         gYoke.use(GRouter.from(new Ann2()));
 
-        new GYokeTester(vertx, gYoke).request("GET", "/users/Paulo") { Response resp ->
+        new GYokeTester(gYoke).request("GET", "/users/Paulo") { Response resp ->
             assertEquals(200, resp.getStatusCode());
             testComplete();
         }

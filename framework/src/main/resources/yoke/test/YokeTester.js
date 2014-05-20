@@ -1,5 +1,5 @@
 function YokeTester(yoke, ssl) {
-    this.jYokeTester = new com.jetdrone.vertx.yoke.test.YokeTester(yoke.vertx, yoke.jYoke, ssl || false);
+    this.jYokeTester = new com.jetdrone.vertx.yoke.test.YokeTester(yoke.jYoke, ssl || false);
 }
 
 YokeTester.prototype.request = function(method, url, headers, body, callback) {
