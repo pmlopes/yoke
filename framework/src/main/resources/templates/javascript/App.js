@@ -13,7 +13,7 @@ var ErrorHandler = require('yoke/middleware/ErrorHandler');
 // Create a new Yoke Application
 var app = new Yoke();
 // define engines
-app.engine('html', new MicroTemplateEngine());
+app.engine(new MicroTemplateEngine());
 // define middleware
 app.use(new Favicon());
 app.use(new Logger());

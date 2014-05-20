@@ -13,7 +13,7 @@ public class App extends Verticle {
       // Create a new Yoke Application
       Yoke app = new Yoke(this);
       // define engines
-      app.engine("html", new StringPlaceholderEngine());
+      app.engine(new StringPlaceholderEngine());
       // define middleware
       app.use(new Favicon());
       app.use(new Logger());
@@ -35,7 +35,7 @@ public class App extends Verticle {
           @Override
           public void handle(YokeRequest request) {
               request.put("title", "My Yoke Application");
-              request.response().render("views/index.html");
+              request.response().render("views/index.shtml");
           }
       });
 

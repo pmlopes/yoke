@@ -10,7 +10,7 @@ public class Tools {
     private static String module;
     private static String version;
 
-    private static final String VERSION = "1.0.12";
+    private static final String VERSION = "1.0.14";
 
     static void write(String path, String value) {
         try {
@@ -84,7 +84,7 @@ public class Tools {
     }
 
     static void printUsage() {
-        System.out.println("Usage: [--help] --[java|groovy|js] group:artifact:version");
+        System.out.println("Usage: [--help] --[java|groovy|groovyscript|js] group:artifact:version");
         System.out.println("  Group:    the owner of the project usually your reverse domain name");
         System.out.println("            e.g.: com.mycompany");
         System.out.println("  Artifact: the module name, usually your app name without special chars");
@@ -97,7 +97,7 @@ public class Tools {
     public static void main(String[] args) throws IOException {
 
         try {
-            language = Args.getArgumentFlag(Arrays.asList(new String[] {"java", "groovy", "js"}), args);
+            language = Args.getArgumentFlag(Arrays.asList(new String[]{"java", "groovy", "groovyscript", "js"}), args);
 
             if (language == null) {
                 throw new RuntimeException("ERROR: Language is required!");
@@ -137,6 +137,11 @@ public class Tools {
                 copyBaseTemplate();
                 createGroovy();
                 break;
+            case "groovyscript":
+                // setup gradle
+                copyBaseTemplate();
+                createGroovyScript();
+                break;
             case "js":
                 // setup gradle
                 copyBaseTemplate();
@@ -164,11 +169,11 @@ public class Tools {
 
         String props =
                 "# E.g. your domain name\n" +
-                "modowner=" + owner + "\n\n" +
-                "# Your module name\n" +
-                "modname=" + module + "\n\n" +
-                "# Your module version\n" +
-                "version=" + version + "\n\n" + readResourceToString("templates/gradle/gradle.properties");
+                        "modowner=" + owner + "\n\n" +
+                        "# Your module name\n" +
+                        "modname=" + module + "\n\n" +
+                        "# Your module version\n" +
+                        "version=" + version + "\n\n" + readResourceToString("templates/gradle/gradle.properties");
 
         write(module + "/gradle.properties", props);
         copy(module + "/conf.json", "templates/gradle/conf.json");
@@ -198,7 +203,8 @@ public class Tools {
 
         write(module + "/src/main/java/" + modulePath + "/App.java",
                 "package " + owner + "." + module + ";\n\n" +
-                        readResourceToString("templates/java/App.java"));
+                        readResourceToString("templates/java/App.java")
+        );
 
         mkdir(module + "/src/main/resources");
         // write resources
@@ -206,40 +212,81 @@ public class Tools {
         mkdir(module + "/src/main/resources/public/stylesheets");
         copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/java/style.css");
         mkdir(module + "/src/main/resources/views");
-        copy(module + "/src/main/resources/views/index.html", "templates/java/index.html");
+        copy(module + "/src/main/resources/views/index.shtml", "templates/java/index.shtml");
         // write mod.json
         write(module + "/src/main/resources/mod.json",
-                "{\n" +
-                "  \"main\": \"" + owner + "." + module + ".App\",\n" +
-                "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
-                "}\n");
+                        "{\n" +
+                        "  \"main\": \"" + owner + "." + module + ".App\",\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
+                        "}\n"
+        );
 
         mkdir(module + "/src/test/java");
         // expand package
         mkdir(module + "/src/test/java/" + modulePath);
         write(module + "/src/test/java/" + modulePath + "/AppTest.java",
                 "package " + owner + "." + module + ";\n\n" +
-                        readResourceToString("templates/java/AppTest.java"));
+                        readResourceToString("templates/java/AppTest.java")
+        );
 
         mkdir(module + "/src/test/resources");
     }
 
     static void createGroovy() {
         // base source code
+        mkdir(module + "/src/main/groovy");
+        String modulePath = owner.replace('.', '/') + "/" + module.replace('.', '/');
+        // expand package
+        mkdir(module + "/src/main/groovy/" + modulePath);
+
+        write(module + "/src/main/groovy/" + modulePath + "/App.groovy",
+                "package " + owner + "." + module + ";\n\n" +
+                        readResourceToString("templates/groovy/App.groovy")
+        );
+
         mkdir(module + "/src/main/resources");
-        write(module + "/src/main/resources/App.groovy", readResourceToString("templates/groovy/App.groovy"));
         // write resources
         mkdir(module + "/src/main/resources/public");
         mkdir(module + "/src/main/resources/public/stylesheets");
-        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/groovy/style.css");
+        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/java/style.css");
         mkdir(module + "/src/main/resources/views");
-        copy(module + "/src/main/resources/views/index.html", "templates/groovy/index.html");
+        copy(module + "/src/main/resources/views/index.gsp", "templates/java/index.gsp");
         // write mod.json
         write(module + "/src/main/resources/mod.json",
                 "{\n" +
+                        "  \"main\": \"" + owner + "." + module + ".App\",\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
+                        "}\n"
+        );
+
+        mkdir(module + "/src/test/groovy");
+        // expand package
+        mkdir(module + "/src/test/groovy/" + modulePath);
+        write(module + "/src/test/groovy/" + modulePath + "/AppTest.groovy",
+                "package " + owner + "." + module + ";\n\n" +
+                        readResourceToString("templates/java/AppTest.groovy")
+        );
+
+        mkdir(module + "/src/test/resources");
+    }
+
+    static void createGroovyScript() {
+        // base source code
+        mkdir(module + "/src/main/resources");
+        write(module + "/src/main/resources/App.groovy", readResourceToString("templates/groovyscript/App.groovy"));
+        // write resources
+        mkdir(module + "/src/main/resources/public");
+        mkdir(module + "/src/main/resources/public/stylesheets");
+        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/groovyscript/style.css");
+        mkdir(module + "/src/main/resources/views");
+        copy(module + "/src/main/resources/views/index.gsp", "templates/groovyscript/index.gsp");
+        // write mod.json
+        write(module + "/src/main/resources/mod.json",
+                        "{\n" +
                         "  \"main\": \"App.groovy\",\n" +
                         "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
-                        "}\n");
+                        "}\n"
+        );
     }
 
     static void createJS() {
@@ -254,10 +301,11 @@ public class Tools {
         copy(module + "/src/main/resources/views/index.html", "templates/javascript/index.html");
         // write mod.json
         write(module + "/src/main/resources/mod.json",
-                "{\n" +
+                        "{\n" +
                         "  \"main\": \"App.js\",\n" +
                         "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
-                        "}\n");
+                        "}\n"
+        );
     }
 
     static void printDone() {

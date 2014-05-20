@@ -17,12 +17,11 @@ public class AppTest extends TestVerticle {
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
-                assertNotNull(this.vertx);
                 request.response().end("OK");
             }
         });
 
-        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+        final YokeTester yokeAssert = new YokeTester(yoke);
 
         yokeAssert.request("GET", "/", new Handler<Response>() {
             @Override

@@ -172,7 +172,7 @@ task runMod(description: 'Run the module', dependsOn: collectDeps) << {
   // We also init here - this means for single module builds the user doesn't have to explicitly init -
   // they can just do runMod
   doInit()
-  args = ['runmod', moduleName]
+  def args = ['runmod', moduleName]
   def args2 = runModArgs.split("\\s+")
   args.addAll(args2)
   Starter.main(args as String[])
