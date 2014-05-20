@@ -114,7 +114,7 @@ public class JWT extends Middleware {
                     return;
                 }
             }
-            request.put("jwt", jwt.decode(token));
+            request.put("jwt", jwtToken);
 
             if (handler == null) {
                 next.handle(null);
