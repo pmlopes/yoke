@@ -1,6 +1,5 @@
 package com.jetdrone.vertx.yoke.annotations.processors;
 
-import com.jetdrone.vertx.yoke.annotations.AnnotationHandler;
 import com.jetdrone.vertx.yoke.annotations.Processor;
 import com.jetdrone.vertx.yoke.annotations.RegExParam;
 import com.jetdrone.vertx.yoke.middleware.Router;
@@ -10,11 +9,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.regex.Pattern;
 
-public class RegExParamProcessorHandler implements AnnotationHandler<Router> {
+public class RegExParamProcessorHandler extends AbstractAnnotationHandler<Router> {
 
-    @Override
-    public boolean isFor(Class<?> clazz) {
-        return Router.class.isAssignableFrom(clazz);
+    public RegExParamProcessorHandler() {
+        super(Router.class);
     }
 
     @Override

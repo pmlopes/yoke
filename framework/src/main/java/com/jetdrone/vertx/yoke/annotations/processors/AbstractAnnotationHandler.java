@@ -12,7 +12,7 @@ public abstract class AbstractAnnotationHandler<T> implements AnnotationHandler<
 
     @Override
     public boolean isFor(Class<?> clazz) {
-        return clazz.isAssignableFrom(clazz);
+        return this.clazz.isAssignableFrom(clazz);
     }
 
 }

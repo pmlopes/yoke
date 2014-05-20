@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.annotations.Processor;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.Map;
@@ -129,5 +130,23 @@ public class GSwagger extends Swagger {
 
     public GSwagger.GResource createResource(final String path) {
         return (GResource) super.createResource(path);
+    }
+
+    public static GSwagger from(final GRouter router, final String version, final Object... objs) {
+        final GSwagger swagger = new GSwagger(router, version);
+        from(swagger, objs);
+
+        return swagger;
+    }
+
+    /**
+     * Builds a Swagger from an annotated Java Object
+     */
+    public static GSwagger from(final GSwagger router, final Object... objs) {
+        for (Object o : objs) {
+            Processor.process(router, o);
+        }
+
+        return router;
     }
 }

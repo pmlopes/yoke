@@ -17,9 +17,11 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.file.impl.PathResolver;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.impl.DefaultContext;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
@@ -30,6 +32,7 @@ import org.jetbrains.annotations.*;
 
 import javax.management.*;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
@@ -340,7 +343,11 @@ public class Yoke {
         try {
             KeyStore ks = KeyStore.getInstance(storeType);
 
-            try (InputStream in = new FileInputStream(fileName)) {
+            try (InputStream in = getClass().getResourceAsStream(fileName)) {
+                if (in == null) {
+                    throw new FileNotFoundException(fileName);
+                }
+
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
@@ -365,7 +372,11 @@ public class Yoke {
         try {
             KeyStore ks = KeyStore.getInstance(storeType);
 
-            try (InputStream in = new FileInputStream(fileName)) {
+            try (InputStream in = getClass().getResourceAsStream(fileName)) {
+                if (in == null) {
+                    throw new FileNotFoundException(fileName);
+                }
+
                 ks.load(in, keyStorePassword.toCharArray());
             }
 

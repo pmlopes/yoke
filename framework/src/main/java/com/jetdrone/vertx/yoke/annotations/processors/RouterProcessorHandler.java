@@ -10,11 +10,10 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class RouterProcessorHandler implements AnnotationHandler<Router> {
+public class RouterProcessorHandler extends AbstractAnnotationHandler<Router> {
 
-    @Override
-    public boolean isFor(Class<?> clazz) {
-        return Router.class.isAssignableFrom(clazz);
+    public RouterProcessorHandler() {
+        super(Router.class);
     }
 
     @Override

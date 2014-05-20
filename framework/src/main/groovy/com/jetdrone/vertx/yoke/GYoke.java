@@ -174,7 +174,7 @@ public class GYoke {
         return this;
     }
 
-    public YokeSecurity security() {
+    public YokeSecurity getSecurity() {
         return jYoke.security();
     }
 
