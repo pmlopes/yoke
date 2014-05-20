@@ -17,12 +17,12 @@ import java.util.Map;
 
 public class GYokeTester extends YokeTester {
 
-    public GYokeTester(Vertx vertx, GYoke yoke, boolean fakeSSL) {
-        super(vertx, yoke.toJavaYoke(), fakeSSL);
+    public GYokeTester(GYoke yoke, boolean fakeSSL) {
+        super(yoke.toJavaYoke(), fakeSSL);
     }
 
-    public GYokeTester(Vertx vertx, GYoke yoke) {
-        this(vertx, yoke, false);
+    public GYokeTester(GYoke yoke) {
+        this(yoke, false);
     }
 
     public void request(final String method, final String url, final Closure<Response> handler) {

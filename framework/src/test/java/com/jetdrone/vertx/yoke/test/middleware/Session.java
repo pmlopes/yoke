@@ -47,7 +47,7 @@ public class Session extends TestVerticle {
             });
         }});
 
-        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+        final YokeTester yokeAssert = new YokeTester(yoke);
 
         yokeAssert.request("GET", "/", new Handler<Response>() {
             @Override

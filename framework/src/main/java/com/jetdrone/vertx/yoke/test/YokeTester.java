@@ -23,14 +23,14 @@ public class YokeTester {
     private final Vertx vertx;
     private final HttpServer fakeServer = new FakeHttpServer();
 
-    public YokeTester(Vertx vertx, Yoke yoke, boolean fakeSSL) {
-        this.vertx = vertx;
+    public YokeTester(Yoke yoke, boolean fakeSSL) {
+        this.vertx = yoke.vertx();
         fakeServer.setSSL(fakeSSL);
         yoke.listen(fakeServer);
     }
 
-    public YokeTester(Vertx vertx, Yoke yoke) {
-        this(vertx, yoke, false);
+    public YokeTester(Yoke yoke) {
+        this(yoke, false);
     }
 
     public void request(final String method, final String url, final Handler<Response> handler) {

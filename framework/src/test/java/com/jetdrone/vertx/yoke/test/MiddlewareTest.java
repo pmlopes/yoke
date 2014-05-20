@@ -28,7 +28,7 @@ public class MiddlewareTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/", null);
+        new YokeTester(yoke).request("GET", "/", null);
     }
 
     @Test

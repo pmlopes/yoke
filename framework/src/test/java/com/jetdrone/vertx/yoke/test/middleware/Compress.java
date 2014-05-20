@@ -31,7 +31,7 @@ public class Compress extends TestVerticle {
     headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
     headers.add("Accept-Encoding", "gzip,deflate,sdch");
 
-      new YokeTester(vertx, yoke).request("GET", "/", headers, new Handler<Response>() {
+      new YokeTester(yoke).request("GET", "/", headers, new Handler<Response>() {
           @Override
           public void handle(Response resp) {
               assertEquals(200, resp.getStatusCode());

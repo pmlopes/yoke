@@ -28,7 +28,7 @@ public class BasicAuth extends TestVerticle {
             }
         });
 
-        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+        final YokeTester yokeAssert = new YokeTester(yoke);
 
         // first time is forbidden
         yokeAssert.request("GET", "/", new Handler<Response>() {
@@ -74,7 +74,7 @@ public class BasicAuth extends TestVerticle {
             }
         });
 
-        final YokeTester yokeAssert = new YokeTester(vertx, yoke);
+        final YokeTester yokeAssert = new YokeTester(yoke);
 
         // first time is forbidden
         yokeAssert.request("GET", "/", new Handler<Response>() {

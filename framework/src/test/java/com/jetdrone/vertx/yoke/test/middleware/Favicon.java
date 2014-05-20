@@ -20,7 +20,7 @@ public class Favicon extends TestVerticle {
 
         final Buffer icon = Utils.readResourceToBuffer(com.jetdrone.vertx.yoke.middleware.Favicon.class, "favicon.ico");
 
-        new YokeTester(vertx, yoke).request("GET", "/favicon.ico", new Handler<Response>() {
+        new YokeTester(yoke).request("GET", "/favicon.ico", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

@@ -42,12 +42,12 @@ public class Validator extends TestVerticle {
             }
         }));
 
-        new YokeTester(vertx, yoke).request("GET", "/search/2012-07-14T00:00:00Z/2013-07-14T00:00:00Z", new Handler<Response>() {
+        new YokeTester(yoke).request("GET", "/search/2012-07-14T00:00:00Z/2013-07-14T00:00:00Z", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
 
-                new YokeTester(vertx, yoke).request("GET", "/search/from/to", new Handler<Response>() {
+                new YokeTester(yoke).request("GET", "/search/from/to", new Handler<Response>() {
                     @Override
                     public void handle(Response resp) {
                         assertEquals(400, resp.getStatusCode());
@@ -92,7 +92,7 @@ public class Validator extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        new YokeTester(vertx, yoke).request("POST", "/search/2012-07-14T00:00:00Z/2013-07-14T00:00:00Z", headers, body, new Handler<Response>() {
+        new YokeTester(yoke).request("POST", "/search/2012-07-14T00:00:00Z/2013-07-14T00:00:00Z", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -131,7 +131,7 @@ public class Validator extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        new YokeTester(vertx, yoke).request("POST", "/", headers, body, new Handler<Response>() {
+        new YokeTester(yoke).request("POST", "/", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -169,7 +169,7 @@ public class Validator extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        new YokeTester(vertx, yoke).request("POST", "/", headers, body, new Handler<Response>() {
+        new YokeTester(yoke).request("POST", "/", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());

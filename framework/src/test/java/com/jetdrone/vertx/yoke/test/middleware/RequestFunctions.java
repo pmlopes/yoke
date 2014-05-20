@@ -35,7 +35,7 @@ public class RequestFunctions extends TestVerticle {
         // text/html
         // text/plain
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, new Handler<Response>() {
+        new YokeTester(yoke).request("GET", "/", headers, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -60,7 +60,7 @@ public class RequestFunctions extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("x-forward-for", "123.456.123.456, 111.111.11.11");
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+        new YokeTester(yoke).request("GET", "/", headers, null);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class RequestFunctions extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("Accept-Language", "en-gb;q=0.8, en;q=0.7, da_DK;q=0.9");
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+        new YokeTester(yoke).request("GET", "/", headers, null);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class RequestFunctions extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("Accept-Language", "da, en-gb;q=0.8, en;q=0.7");
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+        new YokeTester(yoke).request("GET", "/", headers, null);
     }
 
     @Test
@@ -114,6 +114,6 @@ public class RequestFunctions extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("Accept-Language", "en-gb");
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+        new YokeTester(yoke).request("GET", "/", headers, null);
     }
 }

@@ -29,7 +29,7 @@ public class YokeRequestTest extends TestVerticle {
         MultiMap headers = new CaseInsensitiveMultiMap();
         headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, null);
+        new YokeTester(yoke).request("GET", "/", headers, null);
     }
 
     @Test
@@ -43,7 +43,7 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/./me/../pom.xml", null);
+        new YokeTester(yoke).request("GET", "/./me/../pom.xml", null);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/", null);
+        new YokeTester(yoke).request("GET", "/", null);
     }
 
     @Test
@@ -71,7 +71,7 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/%2e%2e%2f", null);
+        new YokeTester(yoke).request("GET", "/%2e%2e%2f", null);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/%2e%2e/", null);
+        new YokeTester(yoke).request("GET", "/%2e%2e/", null);
     }
 
     @Test
@@ -99,6 +99,6 @@ public class YokeRequestTest extends TestVerticle {
             }
         });
 
-        new YokeTester(vertx, yoke).request("GET", "/..%2f", null);
+        new YokeTester(yoke).request("GET", "/..%2f", null);
     }
 }

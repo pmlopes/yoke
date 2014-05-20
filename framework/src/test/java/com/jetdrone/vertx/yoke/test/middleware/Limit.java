@@ -29,7 +29,7 @@ public class Limit extends TestVerticle {
             body.appendByte((byte) 'A');
         }
 
-        new YokeTester(vertx, yoke).request("GET", "/", headers, body, new Handler<Response>() {
+        new YokeTester(yoke).request("GET", "/", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(413, resp.getStatusCode());
