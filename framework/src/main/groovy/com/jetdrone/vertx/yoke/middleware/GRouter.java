@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import groovy.lang.Closure;
 import org.vertx.java.core.Handler;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class GRouter extends Middleware {
@@ -312,4 +313,15 @@ public class GRouter extends Middleware {
         return router;
     }
 
+    public static GRouter from(List<Object> objs) {
+        final GRouter router = new GRouter();
+        from(router, objs.toArray());
+
+        return router;
+    }
+
+    public static GRouter from(final GRouter router, List<Object> objs) {
+        Router.from(router.jRouter, objs.toArray());
+        return router;
+    }
 }
