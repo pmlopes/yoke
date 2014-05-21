@@ -12,6 +12,16 @@ public class GSwagger extends Swagger {
             super(path, description);
         }
 
+        GResource(Resource parent) {
+            super(parent.path, parent.description);
+
+            super.produces = parent.produces;
+            super.consumes = parent.consumes;
+
+            super.models = parent.models;
+            super.apis = parent.models;
+        }
+
         public GResource get(String path, Map<String, Object> operation) {
             super.get(path, new JsonObject(operation));
             return this;
@@ -120,16 +130,31 @@ public class GSwagger extends Swagger {
     }
 
     @Override
-    protected GSwagger.GResource createSwaggerResource(String path, String description) {
-        return new GSwagger.GResource(path, description);
+    protected GResource createSwaggerResource(String path, String description) {
+
+        final Resource res = super.createSwaggerResource(path, description);
+
+        if (res instanceof GResource) {
+            return (GResource) res;
+        } else {
+            return new GResource(res);
+        }
     }
 
-    public GSwagger.GResource createResource(final String path, final String description) {
-        return (GResource) super.createResource(path, description);
+    public GResource createResource(final String path, final String description) {
+        final String normalizedPath;
+
+        if (path.charAt(0) != '/') {
+            normalizedPath = "/" + path;
+        } else {
+            normalizedPath = path;
+        }
+
+        return createSwaggerResource(normalizedPath, description);
     }
 
-    public GSwagger.GResource createResource(final String path) {
-        return (GResource) super.createResource(path);
+    public GResource createResource(final String path) {
+        return createResource(path, "");
     }
 
     public static GSwagger from(final GRouter router, final String version, final Object... objs) {
