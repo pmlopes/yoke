@@ -9,8 +9,8 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD})
 public @interface SwaggerDoc {
     String summary();
-//    String type();
     String[] notes() default {};
+    // TODO: authorizations
 //    Object authorizations();
     Parameter[] parameters() default {};
     ResponseMessage[] responseMessages() default {};
