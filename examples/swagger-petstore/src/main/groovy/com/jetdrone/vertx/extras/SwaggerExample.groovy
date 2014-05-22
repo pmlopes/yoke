@@ -28,7 +28,6 @@ public class SwaggerExample extends Verticle {
 
         yoke.use(new BodyParser());
         yoke.use(new ErrorHandler(true));
-        yoke.use(swagger);
         yoke.use(new Static("swagger-ui-2.0.12"));
         yoke.use(router);
 

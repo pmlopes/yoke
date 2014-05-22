@@ -8,10 +8,6 @@ import java.util.Map;
 public class GSwagger extends Swagger {
 
     public static class GResource extends Resource {
-        GResource(String path, String description) {
-            super(path, description);
-        }
-
         GResource(Resource parent) {
             super(parent.path, parent.description);
 
@@ -19,7 +15,7 @@ public class GSwagger extends Swagger {
             super.consumes = parent.consumes;
 
             super.models = parent.models;
-            super.apis = parent.models;
+            super.apis = parent.apis;
         }
 
         public GResource get(String path, Map<String, Object> operation) {
