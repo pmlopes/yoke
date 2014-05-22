@@ -173,11 +173,14 @@ public class Swagger {
             }
             m.appendTail(sb);
 
-            operation.putString("method", verb);
-            operation.putString("summary", summary);
+            JsonObject op = new JsonObject()
+                    .putString("method", verb)
+                    .putString("summary", summary);
+
+            op.mergeIn(operation);
 
             JsonObject api = getApi(sb.toString());
-            api.getArray("operations").addObject(operation);
+            api.getArray("operations").addObject(op);
         }
     }
 

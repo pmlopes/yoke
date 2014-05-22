@@ -18,6 +18,9 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
     @Override
     public void process(Swagger swagger, Object instance, Class<?> clazz, Method method) {
+
+        StringBuilder sb;
+
         SwaggerResource res = Processor.getAnnotation(clazz, SwaggerResource.class);
 
         if (res == null) {
@@ -32,6 +35,14 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         String[] clazzProduces = clazzProducesAnn != null ? clazzProducesAnn.value() : null;
         String[] clazzConsumes = clazzConsumesAnn != null ? clazzConsumesAnn.value() : null;
+
+        if (clazzProduces != null) {
+            resource.produces(clazzProduces);
+        }
+
+        if (clazzConsumes != null) {
+            resource.consumes(clazzConsumes);
+        }
 
         Produces producesAnn = Processor.getAnnotation(method, Produces.class);
         Consumes consumesAnn = Processor.getAnnotation(method, Consumes.class);
@@ -57,6 +68,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         }
 
         SwaggerDoc doc = Processor.getAnnotation(method, SwaggerDoc.class);
+        Deprecated deprecated = Processor.getAnnotation(method, Deprecated.class);
 
         if (doc == null) {
             return;
@@ -67,7 +79,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         // add all notes
         if (doc.notes().length > 0) {
-            StringBuilder sb = new StringBuilder();
+            sb = new StringBuilder();
             for (String s : doc.notes()) {
                 sb.append(s);
                 sb.append(' ');
@@ -82,6 +94,8 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         // add nickname (deducted from the method name)
         operations.putString("nickname", method.getName());
+
+        // TODO: authorizations
 
         // add parameters
         if (doc.parameters().length > 0) {
@@ -105,6 +119,21 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                                 .putString("message", responseMessage.message())
                 );
             }
+        }
+
+        // produces
+        if (produces != null) {
+            operations.putArray("produces", new JsonArray(produces));
+        }
+
+        // consumes
+        if (consumes != null) {
+            operations.putArray("consumes", new JsonArray(consumes));
+        }
+
+        if (deprecated != null) {
+            // TODO: once SWAGGER API changes this should be boolean
+            operations.putString("deprecated", "true");
         }
 
         // process the methods that have both YokeRequest and Handler
