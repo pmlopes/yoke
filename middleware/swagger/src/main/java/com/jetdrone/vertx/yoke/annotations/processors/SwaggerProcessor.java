@@ -1,5 +1,6 @@
-package com.jetdrone.vertx.yoke.annotations;
+package com.jetdrone.vertx.yoke.annotations.processors;
 
+import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.middleware.Swagger;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
@@ -9,11 +10,10 @@ import org.vertx.java.core.json.JsonObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class SwaggerProcessor implements AnnotationHandler<Swagger> {
+public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
-    @Override
-    public boolean isFor(Class<?> clazz) {
-        return Swagger.class.isAssignableFrom(clazz);
+    public SwaggerProcessor() {
+        super(Swagger.class);
     }
 
     @Override

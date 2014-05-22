@@ -691,7 +691,7 @@ public class Router extends Middleware {
         }
 
         if (!exists) {
-            PatternBinding binding = new PatternBinding(verb, input, regex, groups, handler);
+            PatternBinding binding = new PatternBinding(hashCode(), verb, input, regex, groups, handler);
             bindings.add(binding);
         }
 
@@ -715,7 +715,7 @@ public class Router extends Middleware {
         }
 
         if (!exists) {
-            PatternBinding binding = new PatternBinding(verb, regex.pattern(), regex, null, handler);
+            PatternBinding binding = new PatternBinding(hashCode(), verb, regex.pattern(), regex, null, handler);
             bindings.add(binding);
         }
 
@@ -839,7 +839,7 @@ public class Router extends Middleware {
         final List<Middleware> middleware = new ArrayList<>();
         final Set<String> paramNames;
 
-        private PatternBinding(@NotNull String verb, @Nullable String route, @NotNull Pattern pattern, Set<String> paramNames, @NotNull Middleware[] middleware) {
+        private PatternBinding(int hasCode, @NotNull String verb, @Nullable String route, @NotNull Pattern pattern, Set<String> paramNames, @NotNull Middleware[] middleware) {
 
             this.pattern = pattern;
             this.paramNames = paramNames;
@@ -850,7 +850,7 @@ public class Router extends Middleware {
 
             // register on JMX
             try {
-                mbs.registerMBean(new RouteMBean(), new ObjectName("com.jetdrone.yoke.router:type=Route@" + hashCode() + ",method=" + verb + ",path=" + ObjectName.quote(route)));
+                mbs.registerMBean(new RouteMBean(), new ObjectName("com.jetdrone.yoke.router:type=Route@" + hasCode + ",method=" + verb + ",path=" + ObjectName.quote(route)));
             } catch (InstanceAlreadyExistsException e) {
                 // ignore
             } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
