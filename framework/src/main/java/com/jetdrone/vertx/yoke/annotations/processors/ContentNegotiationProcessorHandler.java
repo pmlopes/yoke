@@ -56,7 +56,7 @@ public class ContentNegotiationProcessorHandler extends AbstractAnnotationHandle
             router.head(Processor.getAnnotation(method, HEAD.class).value(), wrap(consumes, produces));
         }
         if (Processor.isCompatible(method, GET.class, YokeRequest.class, Handler.class)) {
-            router.all(Processor.getAnnotation(method, GET.class).value(), wrap(consumes, produces));
+            router.get(Processor.getAnnotation(method, GET.class).value(), wrap(consumes, produces));
         }
         if (Processor.isCompatible(method, POST.class, YokeRequest.class, Handler.class)) {
             router.post(Processor.getAnnotation(method, POST.class).value(), wrap(consumes, produces));
