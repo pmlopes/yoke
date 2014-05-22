@@ -89,18 +89,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             operations.putArray("parameters", jsonParameters);
 
             for (Parameter parameter : doc.parameters()) {
-                jsonParameters.addObject(
-                        new JsonObject()
-                                .putString("name", parameter.name())
-                                .putString("description", parameter.description())
-                                .putBoolean("required", parameter.required())
-//                                .putString("type", parameter.type())
-//                                .putString("format", parameter.format())
-                                .putString("paramType", parameter.paramType().name())
-                                .putBoolean("allowMultiple", parameter.allowMultiple())
-//                                .putString("minimum", parameter.minimum())
-//                                .putString("maximum", parameter.maximum())
-                );
+                jsonParameters.addObject(parseParameter(parameter));
             }
         }
 
@@ -152,5 +141,45 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
     @Override
     public void process(Swagger swagger, Object instance, Class<?> clazz, Field field) {
         // NOOP
+    }
+
+    private JsonObject parseParameter(Parameter parameter) {
+
+        final JsonObject response = new JsonObject();
+
+        // must be lower case
+        response.putString("paramType", parameter.paramType().name().toLowerCase());
+        response.putString("name", parameter.name());
+        // recommended
+        String description = parameter.description();
+        if (description != null && !description.equals("")) {
+            response.putString("description", parameter.description());
+        }
+        // optional
+        response.putBoolean("required", parameter.required());
+        response.putBoolean("allowMultiple", parameter.allowMultiple());
+
+        // describe the type
+
+        // required
+        response.putString("type", parameter.type() == Parameter.Type.FILE ? parameter.type().name() : parameter.type().name().toLowerCase());
+        // TODO: $ref
+        if (parameter.format() != Parameter.Format.UNDEFINED) {
+            response.putString("type", parameter.format().name().toLowerCase().replace('_', '-'));
+        }
+        // TODO: defaultValue
+        // TODO: enum
+        if (!parameter.minimum().equals("")) {
+            response.putString("type", parameter.minimum());
+        }
+        if (!parameter.maximum().equals("")) {
+            response.putString("type", parameter.maximum());
+        }
+        if (parameter.type() == Parameter.Type.ARRAY) {
+            // TODO: items
+            response.putBoolean("uniqueItems", parameter.uniqueItems());
+        }
+
+        return response;
     }
 }

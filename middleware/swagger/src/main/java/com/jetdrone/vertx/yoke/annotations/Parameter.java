@@ -13,7 +13,10 @@ public @interface Parameter {
         INTEGER,
         NUMBER,
         STRING,
-        BOOLEAN
+        BOOLEAN,
+        ARRAY,
+        VOID,
+        FILE
     }
 
     public static enum Format {
@@ -23,7 +26,8 @@ public @interface Parameter {
         DOUBLE,
         BYTE,
         DATE,
-        DATE_TIME
+        DATE_TIME,
+        UNDEFINED
     }
 
     public static enum ParamType {
@@ -37,10 +41,11 @@ public @interface Parameter {
     String name();
     String description() default "";
     boolean required() default false;
-//    Type type();
-//    Format format();
+    Type type() default Type.VOID;
+    Format format() default Format.UNDEFINED;
     ParamType paramType() default ParamType.PATH;
     boolean allowMultiple() default false;
-//    String minimum();
-//    String maximum();
+    String minimum() default "";
+    String maximum() default "";
+    boolean uniqueItems() default false;
 }

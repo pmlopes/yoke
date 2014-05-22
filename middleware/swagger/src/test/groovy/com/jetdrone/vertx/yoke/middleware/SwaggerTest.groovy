@@ -22,7 +22,7 @@ public class SwaggerTest extends TestVerticle {
                 summary = "say hello to user name",
                 notes = ["note #1", "note #2"],
                 parameters = [
-                        @Parameter(name = "name", description = "User name", required = true)
+                        @Parameter(name = "name", type = Parameter.Type.STRING, description = "User name", required = true)
                 ],
                 responseMessages = [
                         @ResponseMessage(code = 200, message = "No error!")
@@ -146,7 +146,7 @@ public class SwaggerTest extends TestVerticle {
         @SwaggerDoc(
                 summary = "Find purchase order by ID",
                 notes = "For valid response try integer IDs with value <= 5. Anything above 5 or nonintegers will generate API errors",
-                parameters = @Parameter(name = "orderId", description = "ID of pet that needs to be fetched", required = true, paramType = Parameter.ParamType.PATH),
+                parameters = @Parameter(name = "orderId", type = Parameter.Type.STRING, description = "ID of pet that needs to be fetched", required = true, paramType = Parameter.ParamType.PATH),
                 responseMessages = [
                         @ResponseMessage(code = 400, message = "Invalid ID supplied"),
                         @ResponseMessage(code = 404, message = "Order not found")
@@ -160,7 +160,7 @@ public class SwaggerTest extends TestVerticle {
         @SwaggerDoc(
                 summary = "Delete purchase order by ID",
                 notes = "For valid response try integer IDs with value < 1000.  Anything above 1000 or nonintegers will generate API errors",
-                parameters = @Parameter(name = "orderId", description = "ID of pet that needs to be fetched", required = true, paramType = Parameter.ParamType.PATH),
+                parameters = @Parameter(name = "orderId", type = Parameter.Type.STRING, description = "ID of pet that needs to be fetched", required = true, paramType = Parameter.ParamType.PATH),
                 responseMessages = [
                     @ResponseMessage(code = 400, message = "Invalid ID supplied"),
                     @ResponseMessage(code = 404, message = "Order not found")
@@ -174,7 +174,7 @@ public class SwaggerTest extends TestVerticle {
         @SwaggerDoc(
                 summary = "Place an order for a pet",
                 notes = "",
-                parameters = @Parameter(name = "body", description = "order placed for purchasing the pet", required = true, paramType = Parameter.ParamType.BODY),
+                parameters = @Parameter(name = "body", type = Parameter.Type.VOID, description = "order placed for purchasing the pet", required = true, paramType = Parameter.ParamType.BODY),
                 responseMessages = [
                         @ResponseMessage(code = 400, message = "Invalid ID supplied"),
                 ]
