@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Mounted middleware represents a binding of a Middleware instance to a specific url path.
  */
-public class MountedMiddleware {
+public final class MountedMiddleware {
     public final String mount;
     public final Middleware middleware;
     public boolean enabled = true;

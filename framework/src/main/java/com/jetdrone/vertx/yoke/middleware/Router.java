@@ -683,9 +683,9 @@ public class Router extends Middleware {
         boolean exists = false;
         // verify if the binding already exists, if yes add to it
         for (PatternBinding pb : bindings) {
-            if (pb.pattern.equals(regex)) {
-                pb.addMiddleware(handler);
+            if (pb.isFor(input)) {
                 exists = true;
+                pb.addMiddleware(handler);
                 break;
             }
         }
@@ -707,7 +707,7 @@ public class Router extends Middleware {
         boolean exists = false;
         // verify if the binding already exists, if yes add to it
         for (PatternBinding pb : bindings) {
-            if (pb.pattern.equals(regex)) {
+            if (pb.isFor(regex)) {
                 pb.addMiddleware(handler);
                 exists = true;
                 break;
@@ -715,7 +715,7 @@ public class Router extends Middleware {
         }
 
         if (!exists) {
-            PatternBinding binding = new PatternBinding(hashCode(), verb, regex.pattern(), regex, null, handler);
+            PatternBinding binding = new PatternBinding(hashCode(), verb, null, regex, null, handler);
             bindings.add(binding);
         }
 
@@ -835,31 +835,68 @@ public class Router extends Middleware {
     }
 
     private static class PatternBinding {
-        final Pattern pattern;
-        final List<Middleware> middleware = new ArrayList<>();
-        final Set<String> paramNames;
 
-        private PatternBinding(int hasCode, @NotNull String verb, @Nullable String route, @NotNull Pattern pattern, Set<String> paramNames, @NotNull Middleware[] middleware) {
+        //Get the MBean server
+        private static final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
 
+        private final Pattern pattern;
+        private final String route;
+
+        private final List<Middleware> middleware = new ArrayList<>();
+        private final Set<String> paramNames;
+
+        private final ObjectName objectName;
+
+        private PatternBinding(int hasCode, @NotNull String verb, @Nullable String route, @NotNull Pattern pattern, @Nullable Set<String> paramNames, @NotNull Middleware[] middleware) {
+            this.route = route;
             this.pattern = pattern;
             this.paramNames = paramNames;
             Collections.addAll(this.middleware, middleware);
 
-            //Get the MBean server
-            final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
             // register on JMX
             try {
-                mbs.registerMBean(new RouteMBean(), new ObjectName("com.jetdrone.yoke.router:type=Route@" + hasCode + ",method=" + verb + ",path=" + ObjectName.quote(route)));
+                objectName = new ObjectName("com.jetdrone.yoke:type=Route@" + hasCode + ",method=" + verb + ",path=" + ObjectName.quote(route));
+            } catch (MalformedObjectNameException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                mbs.registerMBean(new RouteMBean(this.middleware), objectName);
             } catch (InstanceAlreadyExistsException e) {
                 // ignore
-            } catch (MalformedObjectNameException | MBeanRegistrationException | NotCompliantMBeanException e) {
+            } catch (MBeanRegistrationException | NotCompliantMBeanException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        void addMiddleware(@NotNull Middleware[] middleware) {
+        private void addMiddleware(@NotNull Middleware[] middleware) {
             Collections.addAll(this.middleware, middleware);
+
+            // un register if present
+            try {
+                mbs.unregisterMBean(objectName);
+            } catch (InstanceNotFoundException e) {
+                // ignore
+            } catch (MBeanRegistrationException e) {
+                throw new RuntimeException(e);
+            }
+
+            // re register if present
+            try {
+                mbs.registerMBean(new RouteMBean(this.middleware), objectName);
+            } catch (InstanceAlreadyExistsException e) {
+                // ignore
+            } catch (MBeanRegistrationException | NotCompliantMBeanException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private boolean isFor(@NotNull String route) {
+            return this.route != null && this.route.equals(route);
+        }
+
+        private boolean isFor(@NotNull Pattern regex) {
+            return this.route == null && this.pattern.pattern().equals(regex.pattern());
         }
     }
 

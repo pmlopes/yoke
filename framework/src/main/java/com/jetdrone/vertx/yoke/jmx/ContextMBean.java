@@ -3,7 +3,7 @@ package com.jetdrone.vertx.yoke.jmx;
 import javax.management.*;
 import java.util.*;
 
-public class ContextMBean implements DynamicMBean {
+public final class ContextMBean implements DynamicMBean {
 
     private final Map<String, Object> defaultContext;
 

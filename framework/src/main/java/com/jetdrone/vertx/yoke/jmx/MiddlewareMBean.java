@@ -4,7 +4,7 @@ import com.jetdrone.vertx.yoke.core.MountedMiddleware;
 
 import javax.management.*;
 
-public class MiddlewareMBean implements DynamicMBean {
+public final class MiddlewareMBean implements DynamicMBean {
 
     private final MountedMiddleware middleware;
 
