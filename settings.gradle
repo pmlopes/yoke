@@ -3,6 +3,7 @@ include 'framework'
 // middleware
 include 'middleware:swagger'
 include 'middleware:helmet'
+include 'middleware:pac4j'
 // engines
 include 'engine:handlebars'
 include 'engine:jade'

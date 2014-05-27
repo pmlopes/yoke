@@ -280,6 +280,16 @@ public class YokeTester {
         }
 
         @Override
+        public HttpServer setWebSocketSubProtocols(String... subProtocols) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Set<String> getWebSocketSubProtocols() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public HttpServer setClientAuthRequired(boolean required) {
             throw new UnsupportedOperationException();
         }
