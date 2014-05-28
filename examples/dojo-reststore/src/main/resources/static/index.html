@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Dojo Toolkit REST</title>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojox/grid/resources/claroGrid.css" />
+</head>
+<body>
+<div id="grid"></div>
+<button id="save">Save</button>
+
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js" data-dojo-config="isDebug: true, async: true"></script>
+<script>
+    require([
+    "dojo/store/JsonRest",
+    "dojo/store/Memory",
+    "dojo/store/Cache",
+    "dojox/grid/DataGrid",
+    "dojo/data/ObjectStore",
+    "dojo/domReady!"
+    ], function(JsonRest, Memory, Cache, DataGrid, ObjectStore) {
+        var store = new Cache(new JsonRest({idProperty: '_id', target: '/persons/'}), new Memory());
+
+        var grid = new DataGrid({
+            store: new ObjectStore({objectStore: store}),
+            structure: [
+                {name:"id", field:"_id", width: "20%"},
+                {name:"name", field:"name", width: "80%", editable: true}
+            ]
+        }, "grid");
+        grid.startup();
+
+        dojo.query("#save").onclick(function(){
+            grid.store.save();
+        });
+    });
+</script>
+</body>
+</html>
