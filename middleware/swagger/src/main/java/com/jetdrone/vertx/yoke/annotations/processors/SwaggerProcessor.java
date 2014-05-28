@@ -103,7 +103,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             operations.putArray("parameters", jsonParameters);
 
             for (Parameter parameter : doc.parameters()) {
-                jsonParameters.addObject(parseParameter(parameter));
+                jsonParameters.addObject(parseParameter(parameter, clazzConsumesAnn, consumesAnn));
             }
         }
 
@@ -172,7 +172,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         // NOOP
     }
 
-    private JsonObject parseParameter(Parameter parameter) {
+    private JsonObject parseParameter(Parameter parameter, Consumes classConsumes, Consumes methodConsumes) {
 
         final JsonObject response = new JsonObject();
 
@@ -181,7 +181,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         response.putString("name", parameter.name());
         // recommended
         String description = parameter.description();
-        if (description != null && !description.equals("")) {
+        if (!description.equals("")) {
             response.putString("description", parameter.description());
         }
         // optional
@@ -189,24 +189,80 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         response.putBoolean("allowMultiple", parameter.allowMultiple());
 
         // describe the type
+        final Parameter.DataType type = parameter.type();
 
-        // required
-        response.putString("type", parameter.type() == Parameter.Type.FILE ? parameter.type().name() : parameter.type().name().toLowerCase());
-        // TODO: $ref
-        if (parameter.format() != Parameter.Format.UNDEFINED) {
-            response.putString("type", parameter.format().name().toLowerCase().replace('_', '-'));
-        }
-        // TODO: defaultValue
-        // TODO: enum
-        if (!parameter.minimum().equals("")) {
-            response.putString("type", parameter.minimum());
-        }
-        if (!parameter.maximum().equals("")) {
-            response.putString("type", parameter.maximum());
-        }
-        if (parameter.type() == Parameter.Type.ARRAY) {
-            // TODO: items
-            response.putBoolean("uniqueItems", parameter.uniqueItems());
+        switch (type) {
+            case UNDEFINED:
+                // TODO: this requires a $ref
+                break;
+            // primitives
+            case INTEGER:
+            case LONG:
+            case FLOAT:
+            case DOUBLE:
+                response.putString("type", type.type());
+                response.putString("format", type.type());
+                if (!parameter.minimum().equals("")) {
+                    response.putString("minimum", parameter.minimum());
+                }
+                if (!parameter.maximum().equals("")) {
+                    response.putString("maximum", parameter.maximum());
+                }
+                break;
+            case BYTE:
+            case STRING:
+            case DATE:
+            case DATETIME:
+                response.putString("type", type.type());
+                response.putString("format", type.type());
+                // TODO: default value
+                // TODO: enum
+                break;
+            case BOOLEAN:
+                response.putString("type", type.type());
+                break;
+            // containers
+            case ARRAY:
+                response.putString("type", type.type());
+                // TODO: items
+            case SET:
+                response.putBoolean("uniqueItems", true);
+                break;
+            // void
+            case VOID:
+                response.putString("type", type.type());
+                break;
+            // file
+            case FILE:
+                response.putString("type", type.type());
+                if (parameter.paramType() != Parameter.ParamType.FORM) {
+                    throw new RuntimeException("File requires paramType to be FORM");
+                }
+                // check that method consumes "multipart/form-data"
+                boolean multipart = false;
+
+                if (classConsumes != null) {
+                    for (String c : classConsumes.value()) {
+                        if ("multipart/form-data".equalsIgnoreCase(c)) {
+                            multipart = true;
+                            break;
+                        }
+                    }
+                }
+                if (methodConsumes != null) {
+                    for (String c : methodConsumes.value()) {
+                        if ("multipart/form-data".equalsIgnoreCase(c)) {
+                            multipart = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!multipart) {
+                    throw new RuntimeException("File requires @Consumes(\"multipart/form-data\")");
+                }
+
+                break;
         }
 
         return response;
