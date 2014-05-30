@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 /**
@@ -10,7 +11,7 @@ import org.vertx.java.core.Handler;
 public final class ContentTypeOptions extends Middleware {
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
         request.response().putHeader("X-Content-Type-Options", "nosniff");
         next.handle(null);
     }

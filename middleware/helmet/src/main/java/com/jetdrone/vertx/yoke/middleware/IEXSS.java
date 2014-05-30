@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import java.util.regex.Matcher;
@@ -10,7 +11,7 @@ public final class IEXSS extends Middleware {
 
     private final boolean setOnOldIE;
 
-    private static Pattern UA = Pattern.compile("MSIE (\\d+\\.\\d+)b?;");
+    private static Pattern MSIE_UA = Pattern.compile("MSIE (\\d+\\.\\d+)b?;");
 
     public IEXSS() {
         this(false);
@@ -21,10 +22,10 @@ public final class IEXSS extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
         String userAgentHeader = request.getHeader("user-agent", "");
 
-        Matcher matcher = UA.matcher(userAgentHeader);
+        Matcher matcher = MSIE_UA.matcher(userAgentHeader);
 
         boolean isIE = false;
         float version = 0;
