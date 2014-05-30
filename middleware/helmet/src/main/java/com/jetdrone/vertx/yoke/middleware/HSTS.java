@@ -11,6 +11,10 @@ public final class HSTS extends Middleware {
 
     private final String header;
 
+    public HSTS() {
+        this(false);
+    }
+
     public HSTS(boolean includeSubDomains) {
         // ~6Months
         this(15768000, includeSubDomains);

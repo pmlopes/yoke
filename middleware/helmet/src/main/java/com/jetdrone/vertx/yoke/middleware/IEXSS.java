@@ -6,11 +6,15 @@ import org.vertx.java.core.Handler;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IEXSS extends Middleware {
+public final class IEXSS extends Middleware {
 
     private final boolean setOnOldIE;
 
-    private static Pattern UA = Pattern.compile("([^/\\s]*)(/([^\\s]*))?(\\s*\\[[a-zA-Z][a-zA-Z]\\])?\\s*(\\((([^()]|(\\([^()]*\\)))*)\\))?\\s*");
+    private static Pattern UA = Pattern.compile("MSIE (\\d+\\.\\d+)b?;");
+
+    public IEXSS() {
+        this(false);
+    }
 
     public IEXSS(boolean setOnOldIE) {
         this.setOnOldIE = setOnOldIE;
@@ -22,19 +26,21 @@ public class IEXSS extends Middleware {
 
         Matcher matcher = UA.matcher(userAgentHeader);
 
-        String browserName = matcher.group(1);
-        String browserVersion = matcher.group(3);
+        boolean isIE = false;
         float version = 0;
 
-        if (browserVersion != null) {
-            try {
-                version = Float.parseFloat(browserVersion);
-            } catch (NumberFormatException nfe) {
-                // ignore
+        if (matcher.find()) {
+            isIE = true;
+            String browserVersion = matcher.group(1);
+
+            if (browserVersion != null) {
+                try {
+                    version = Float.parseFloat(browserVersion);
+                } catch (NumberFormatException nfe) {
+                    // ignore
+                }
             }
         }
-
-        boolean isIE = "IE".equals(browserName);
 
         String value;
 

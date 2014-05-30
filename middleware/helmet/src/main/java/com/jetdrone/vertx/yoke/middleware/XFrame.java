@@ -3,7 +3,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import org.vertx.java.core.Handler;
 
-public class XFrame extends Middleware {
+public final class XFrame extends Middleware {
 
     public static enum Action {
         DENY("DENY"),
