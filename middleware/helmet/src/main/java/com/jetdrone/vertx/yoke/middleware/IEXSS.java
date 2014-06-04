@@ -1,17 +1,13 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.middleware.impl.WebClient;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public final class IEXSS extends Middleware {
 
     private final boolean setOnOldIE;
-
-    private static Pattern MSIE_UA = Pattern.compile("MSIE (\\d+\\.\\d+)b?;");
 
     public IEXSS() {
         this(false);
@@ -23,29 +19,14 @@ public final class IEXSS extends Middleware {
 
     @Override
     public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
-        String userAgentHeader = request.getHeader("user-agent", "");
+        final WebClient webClient = WebClient.detect(request.getHeader("user-agent"));
 
-        Matcher matcher = MSIE_UA.matcher(userAgentHeader);
-
-        boolean isIE = false;
-        float version = 0;
-
-        if (matcher.find()) {
-            isIE = true;
-            String browserVersion = matcher.group(1);
-
-            if (browserVersion != null) {
-                try {
-                    version = Float.parseFloat(browserVersion);
-                } catch (NumberFormatException nfe) {
-                    // ignore
-                }
-            }
-        }
+        boolean isIE = webClient.getUserAgent() == WebClient.UserAgent.IE;
+        int majorVersion = webClient.getMajorVersion();
 
         String value;
 
-        if ((!isIE) || (version >= 9) || (setOnOldIE)) {
+        if ((!isIE) || (majorVersion >= 9) || (setOnOldIE)) {
             value = "1; mode=block";
         } else {
             value = "0";
