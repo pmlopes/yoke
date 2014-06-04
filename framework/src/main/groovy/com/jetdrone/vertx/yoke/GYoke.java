@@ -221,6 +221,16 @@ public class GYoke {
      */
     @SuppressWarnings("unchecked")
     public GYoke deploy(final Object config, final Closure handler) {
+
+        if (config == null) {
+            if (handler == null) {
+                return this;
+            } else {
+                handler.call((Object) null);
+                return this;
+            }
+        }
+
         if (config instanceof List) {
 
             if (((List) config).size() == 0) {
