@@ -11,13 +11,13 @@ To get started with Yoke in your project you can use Vert.x module system to dow
 include the maven dependency your self. The moment this module is only compatible with Vert.x 2. It can be backported to
 the 1.x series but there is no work in progress in that direction.
 
-The Vert.x module id is: `com.jetdrone~yoke~1.0.4`. If you prefer to use [maven](http://maven.apache.org), you can get
+The Vert.x module id is: `com.jetdrone~yoke~2.0.0`. If you prefer to use [maven](http://maven.apache.org), you can get
 the artifacts using the following dependency:
 
     <dependency>
       <groupId>com.jetdrone</groupId>
       <artifactId>yoke</artifactId>
-      <version>1.0.4</version>
+      <version>2.0.0</version>
       <scope>provided</scope>
     </dependency>
 
