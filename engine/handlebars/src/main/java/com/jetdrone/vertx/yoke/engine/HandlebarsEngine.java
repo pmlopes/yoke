@@ -21,7 +21,6 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
-import com.jetdrone.vertx.yoke.engine.AbstractEngineSync;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.buffer.Buffer;
@@ -34,10 +33,14 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
 
     private final Handlebars handlebars;
     private final String prefix;
-    private final String extension = ".hbs";
+    private final String extension;
 
     public HandlebarsEngine(final String views) {
-        super(null);
+        this(views, ".hbs");
+    }
+
+    public HandlebarsEngine(final String views, final String extension) {
+        this.extension = extension;
 
         if ("".equals(views)) {
             prefix = views;
@@ -127,10 +130,6 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));
         }
-    }
-
-    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
-        handler.handle(new YokeAsyncResult<Buffer>(new UnsupportedOperationException()));
     }
 
     public void registerHelper(String name, Helper<?> helper) {

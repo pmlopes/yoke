@@ -29,7 +29,7 @@ public class StringPlaceholderEngine extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine(new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
+            yoke.engine(new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine(""));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -68,7 +68,7 @@ public class StringPlaceholderEngine extends TestVerticle {
                     return "Paulo " + args[0];
                 }
             });
-            yoke.engine(new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine());
+            yoke.engine(new com.jetdrone.vertx.yoke.engine.StringPlaceholderEngine(""));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {

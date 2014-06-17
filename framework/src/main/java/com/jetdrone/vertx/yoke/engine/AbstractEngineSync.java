@@ -5,15 +5,12 @@ package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.core.impl.LRUCache;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.file.FileProps;
 import org.vertx.java.core.file.FileSystem;
 
 import java.util.Date;
-import java.util.Map;
 
 /**
  * # AbstractEngineSync
@@ -24,23 +21,9 @@ import java.util.Map;
  */
 public abstract class AbstractEngineSync<T> implements Engine {
 
-    public static final String DEFAULT_TEMPLATEBODY_KEY = "TemplateBody";
-
     protected Vertx vertx;
 
     private final LRUCache<String, T> cache = new LRUCache<>(1024);
-
-    // The main placeholder text. For example, in Groovy engine, the layout template
-    // should have ${TemplateBody} somewhere inside to get replaced with the real template raw content
-    private final String templateBodyKey;
-
-    public AbstractEngineSync() {
-        this(DEFAULT_TEMPLATEBODY_KEY);
-    }
-
-    public AbstractEngineSync(String templateBodyKey) {
-        this.templateBodyKey = templateBodyKey;
-    }
 
     @Override
     public void setVertx(Vertx vertx) {
@@ -169,33 +152,5 @@ public abstract class AbstractEngineSync<T> implements Engine {
      */
     public void removeFromCache(String filename) {
         cache.remove(filename);
-    }
-
-    /**
-     * Default Implementation for render with layout.
-     *
-     * @param filename String representing the file path to the template
-     * @param layoutFilename String representing the file path to the layout template
-     * @param context  Map with key values that might get substituted in the template
-     * @param handler  The future result handler with a Buffer in case of success
-     */
-    @Override
-    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
-        // this implementation just reuses the existing template so it is easier to add more render engines.
-        render(filename, context, new Handler<AsyncResult<Buffer>>() {
-            @Override
-            public void handle(AsyncResult<Buffer> render) {
-                if (render.failed()) {
-                    handler.handle(render);
-                    return;
-                }
-
-                // put the generated body into the context
-                context.put(templateBodyKey, render.result());
-
-                // we now have the body of the template, lets replace that now on the layout template
-                render(layoutFilename, context, handler);
-            }
-        });
     }
 }

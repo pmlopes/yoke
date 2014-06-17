@@ -43,7 +43,14 @@ public class ThymeleafEngine implements Engine {
     private final TemplateEngine engine = new TemplateEngine();
     private final TemplateResolver templateResolver;
 
+    private final String extension;
+
     public ThymeleafEngine(final String views) {
+        this(views, ".html");
+    }
+    public ThymeleafEngine(final String views, final String extension) {
+        this.extension = extension;
+
         String prefix;
         if ("".equals(views)) {
             prefix = views;
@@ -129,12 +136,7 @@ public class ThymeleafEngine implements Engine {
 
     @Override
     public String extension() {
-        return ".html";
-    }
-
-    @Override
-    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
-        handler.handle(new YokeAsyncResult<Buffer>(new UnsupportedOperationException()));
+        return extension;
     }
 
     @Override

@@ -81,10 +81,6 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     public void render(final String template, final Handler<Object> next) {
-    	render(template, null, next);
-    }    
-    
-    public void render(final String template, String layoutTemplate, final Handler<Object> next) {
         int sep = template.lastIndexOf('.');
         if (sep != -1) {
             String extension = template.substring(sep);
@@ -94,32 +90,17 @@ public class YokeResponse implements HttpServerResponse {
             if (renderEngine == null) {
                 next.handle("No engine registered for extension: " + extension);
             } else {
-            	if (layoutTemplate == null) {
-	                renderEngine.render(template, context, new AsyncResultHandler<Buffer>() {
-	                    @Override
-	                    public void handle(AsyncResult<Buffer> asyncResult) {
-	                        if (asyncResult.failed()) {
-	                            next.handle(asyncResult.cause());
-	                        } else {
-	                            setContentType(renderEngine.contentType(), renderEngine.contentEncoding());
-	                            end(asyncResult.result());
-	                        }
-	                    }
-	                });
-            	}
-            	else {
-	                renderEngine.render(template, layoutTemplate, context, new AsyncResultHandler<Buffer>() {
-	                    @Override
-	                    public void handle(AsyncResult<Buffer> asyncResult) {
-	                        if (asyncResult.failed()) {
-	                            next.handle(asyncResult.cause());
-	                        } else {
-	                            setContentType(renderEngine.contentType(), renderEngine.contentEncoding());
-	                            end(asyncResult.result());
-	                        }
-	                    }
-	                });            		
-            	}
+                renderEngine.render(template, context, new AsyncResultHandler<Buffer>() {
+                    @Override
+                    public void handle(AsyncResult<Buffer> asyncResult) {
+                        if (asyncResult.failed()) {
+                            next.handle(asyncResult.cause());
+                        } else {
+                            setContentType(renderEngine.contentType(), renderEngine.contentEncoding());
+                            end(asyncResult.result());
+                        }
+                    }
+                });
             }
         } else {
             next.handle("Cannot determine the extension of the template");
@@ -127,70 +108,32 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     public void render(final String template) {
-    	
-    	// convert to String to avoid ambiguity with 
-    	// public void render(final String template, final Handler<Object> next)
-    	render(template, (String)null);
-    }
-    
-    public void render(final String template, final String layoutTemplate) {
-        
-    	if (layoutTemplate == null) {
-	    	render(template, new Handler<Object>() {
-	            @Override
-	            public void handle(Object error) {
-	                if (error != null) {
-	                    int errorCode;
-	                    // if the error was set on the response use it
-	                    if (getStatusCode() >= 400) {
-	                        errorCode = getStatusCode();
-	                    } else {
-	                        // if it was set as the error object use it
-	                        if (error instanceof Number) {
-	                            errorCode = ((Number) error).intValue();
-	                        } else if (error instanceof YokeException) {
-	                            errorCode = ((YokeException) error).getErrorCode().intValue();
-	                        } else {
-	                            // default error code
-	                            errorCode = 500;
-	                        }
-	                    }
-	
-	                    setStatusCode(errorCode);
-	                    setStatusMessage(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
-	                    end(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
-	                }
-	            }
-	        });
-    	}
-    	else {
-	    	render(template, layoutTemplate, new Handler<Object>() {
-	            @Override
-	            public void handle(Object error) {
-	                if (error != null) {
-	                    int errorCode;
-	                    // if the error was set on the response use it
-	                    if (getStatusCode() >= 400) {
-	                        errorCode = getStatusCode();
-	                    } else {
-	                        // if it was set as the error object use it
-	                        if (error instanceof Number) {
-	                            errorCode = ((Number) error).intValue();
-	                        } else if (error instanceof YokeException) {
-	                            errorCode = ((YokeException) error).getErrorCode().intValue();
-	                        } else {
-	                            // default error code
-	                            errorCode = 500;
-	                        }
-	                    }
-	
-	                    setStatusCode(errorCode);
-	                    setStatusMessage(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
-	                    end(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
-	                }
-	            }
-	        });    		
-    	}
+        render(template, new Handler<Object>() {
+            @Override
+            public void handle(Object error) {
+                if (error != null) {
+                    int errorCode;
+                    // if the error was set on the response use it
+                    if (getStatusCode() >= 400) {
+                        errorCode = getStatusCode();
+                    } else {
+                        // if it was set as the error object use it
+                        if (error instanceof Number) {
+                            errorCode = ((Number) error).intValue();
+                        } else if (error instanceof YokeException) {
+                            errorCode = ((YokeException) error).getErrorCode().intValue();
+                        } else {
+                            // default error code
+                            errorCode = 500;
+                        }
+                    }
+
+                    setStatusCode(errorCode);
+                    setStatusMessage(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
+                    end(HttpResponseStatus.valueOf(errorCode).reasonPhrase());
+                }
+            }
+        });
     }
 
     /**
