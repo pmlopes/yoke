@@ -299,6 +299,7 @@ public class Tools {
     }
 
     static void createJS() {
+        String modulePath = owner.replace('.', '/') + "/" + module.replace('.', '/');
         // base source code
         mkdir(module + "/src/main/resources");
         write(module + "/src/main/resources/App.js", readResourceToString("templates/javascript/App.js"));
@@ -307,7 +308,7 @@ public class Tools {
         mkdir(module + "/src/main/resources/public/stylesheets");
         copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/javascript/style.css");
         mkdir(module + "/src/main/resources/views");
-        copy(module + "/src/main/resources/views/index.html", "templates/javascript/index.html");
+        copy(module + "/src/main/resources/views/index.ejs", "templates/javascript/index.ejs");
         // write mod.json
         write(module + "/src/main/resources/mod.json",
                         "{\n" +
@@ -315,6 +316,18 @@ public class Tools {
                         "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
                         "}\n"
         );
+
+        mkdir(module + "/src/test/java");
+        // expand package
+        mkdir(module + "/src/test/java/" + modulePath);
+        // JUnit helper
+        write(module + "/src/test/java/" + modulePath + "/JSTester.java",
+                "package " + owner + "." + module + ";\n\n" +
+                        readResourceToString("templates/javascript/JSTester.java")
+        );
+
+        mkdir(module + "/src/test/resources");
+        write(module + "/src/test/resources/AppTest.js", readResourceToString("templates/javascript/AppTest.js"));
     }
 
     static void printDone() {
@@ -327,9 +340,9 @@ public class Tools {
         System.out.println();
         System.out.println("Compile your app:");
         if (OS.contains("win")) {
-            System.out.println("  gradlew.bat check");
+            System.out.println("  gradlew.bat build");
         } else {
-            System.out.println("  ./gradlew check");
+            System.out.println("  ./gradlew build");
         }
         System.out.println();
         System.out.println("Run your app:");
