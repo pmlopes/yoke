@@ -1,10 +1,16 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
-import com.jetdrone.vertx.yoke.Engine;
-import com.jetdrone.vertx.yoke.core.Context;
-import com.jetdrone.vertx.yoke.middleware.YokeResponse;
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.EMPTY_OBJECT_ARRAY;
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.is;
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.javaToJS;
 import io.netty.handler.codec.http.Cookie;
+
+import java.util.Map;
+
 import org.mozilla.javascript.Callable;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJSON;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.WrappedException;
@@ -15,9 +21,9 @@ import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.streams.ReadStream;
 
-import java.util.Map;
-
-import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
+import com.jetdrone.vertx.yoke.Engine;
+import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 
 final class JSYokeResponse  extends YokeResponse implements Scriptable {
 
@@ -37,7 +43,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
     private Callable endHandler;
     private Callable exceptionHandler;
     private Callable getHeader;
-    private Scriptable headers;
+    private Object headers;
     private Callable headersHandler;
     private Callable jsonp;
     private Callable putHeader;
@@ -47,7 +53,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
     private Callable sendFile;
     private Callable setContentType;
     private Callable setWriteQueueMaxSize;
-    private Scriptable trailers;
+    private Object trailers;
     private Callable write;
 
     @Override
@@ -95,7 +101,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 if (closeHandler == null) {
                     closeHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -125,7 +131,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 if (drainHandler == null) {
                     drainHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -154,12 +160,22 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
             case "end":
                 if (end == null) {
                     end = new Callable() {
+                        @SuppressWarnings("rawtypes")
                         @Override
                         public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
                             }
 
+                            if (is(args, NativeObject.class) || is(args, NativeArray.class)) {
+                            	Object json = NativeJSON.stringify(cx, scope, args[0], null, null);
+                            	if (json instanceof String) {
+                            		JSYokeResponse.this.end((String) json);
+                                    return Undefined.instance;
+                            	}
+                                throw new UnsupportedOperationException();
+                            }
+                            
                             if (is(args, String.class, String.class)) {
                                 JSYokeResponse.this.end((String) args[0], (String) args[1]);
                                 return Undefined.instance;
@@ -199,7 +215,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 if (endHandler == null) {
                     endHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -229,7 +245,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 if (exceptionHandler == null) {
                     exceptionHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -284,14 +300,14 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 return getStatusMessage();
             case "headers":
                 if (headers == null) {
-                    headers = toScriptable(headers());
+                    headers = javaToJS(headers(), getParentScope());
                 }
                 return headers;
             case "headersHandler":
                 if (headersHandler == null) {
                     headersHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -328,6 +344,24 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
                             }
 
+                            if (is(args, String.class, NativeObject.class) || is(args, String.class, NativeArray.class)) {
+                            	Object json = NativeJSON.stringify(cx, scope, args[1], null, null);
+                            	if (json instanceof String) {
+                            		JSYokeResponse.this.jsonp((String) args[0], (String) json);
+                                    return Undefined.instance;
+                            	}
+                                throw new UnsupportedOperationException();
+                            }
+
+                            if (is(args, NativeObject.class) || is(args, NativeArray.class)) {
+                            	Object json = NativeJSON.stringify(cx, scope, args[0], null, null);
+                            	if (json instanceof String) {
+                            		JSYokeResponse.this.jsonp((String) json);
+                                    return Undefined.instance;
+                            	}
+                                throw new UnsupportedOperationException();
+                            }
+
                             if (is(args, String.class, JsonElement.class)) {
                                 JSYokeResponse.this.jsonp((String) args[0], (JsonElement) args[1]);
                                 return Undefined.instance;
@@ -353,6 +387,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
             case "putHeader":
                 if (putHeader == null) {
                     putHeader = new Callable() {
+                        @SuppressWarnings("unchecked")
                         @Override
                         public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
@@ -387,6 +422,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
             case "putTrailer":
                 if (putTrailer == null) {
                     putTrailer = new Callable() {
+                        @SuppressWarnings("unchecked")
                         @Override
                         public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
@@ -446,7 +482,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 if (render == null) {
                     render = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -482,7 +518,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 if (sendFile == null) {
                     sendFile = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeResponse.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeResponse]");
@@ -578,7 +614,7 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                 return setWriteQueueMaxSize;
             case "trailers":
                 if (trailers == null) {
-                    trailers = toScriptable(trailers());
+                    trailers = javaToJS(trailers(), getParentScope());
                 }
                 return trailers;
             case "write":
