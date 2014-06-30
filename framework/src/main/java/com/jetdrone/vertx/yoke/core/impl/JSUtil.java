@@ -1,13 +1,19 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJSON;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
+import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.impl.Json;
 
 class JSUtil {
 
@@ -16,6 +22,8 @@ class JSUtil {
     static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
     static Object javaToJS(Object value, Scriptable scope) {
+    	if (value == null)
+    		return null;
     	if (value instanceof MultiMap)
     		return toScriptable((MultiMap) value, scope);
     	if (value instanceof Set)
@@ -135,10 +143,14 @@ class JSUtil {
      * @return
      */
     static Scriptable toScriptable(final Set<?> set, final Scriptable scope) {
-    	Object[] elements = set.toArray();
-    	final Scriptable inner = Context.toObject(elements, scope);
+    	final Object[] elements = set.toArray();
+    	final Object[] ids = new Object[elements.length];
+    	for (int i = 0; i < elements.length; ++i)
+    		ids[i] = i;
     	
         return new Scriptable() {
+
+            private Scriptable prototype, parent;
 
             @Override
             public String getClassName() {
@@ -147,22 +159,29 @@ class JSUtil {
 
             @Override
             public Object get(String name, Scriptable start) {
-                return inner.get(name, start);
+            	switch (name) {
+            	case "length":
+            		return elements.length;
+            	default:
+            		return NOT_FOUND;
+            	}
             }
 
             @Override
             public Object get(int index, Scriptable start) {
-            	return inner.get(index, start);
+            	if (index < 0 || index >= elements.length)
+            		return NOT_FOUND;
+            	return javaToJS(elements[index], scope);
             }
 
             @Override
             public boolean has(String name, Scriptable start) {
-                return inner.has(name, start);
+                throw new UnsupportedOperationException();
             }
 
             @Override
             public boolean has(int index, Scriptable start) {
-            	return inner.has(index, start);
+            	return 0 <= index && index < elements.length;
             }
 
             @Override
@@ -180,34 +199,34 @@ class JSUtil {
                 throw new UnsupportedOperationException();
             }
 
-            @Override
+			@Override
             public void delete(int index) {
                 throw new UnsupportedOperationException();
             }
-
+			
             @Override
             public Scriptable getPrototype() {
-                return inner.getPrototype();
+                return prototype;
             }
 
             @Override
             public void setPrototype(Scriptable prototype) {
-                inner.setPrototype(prototype);
+                this.prototype = prototype;
             }
 
             @Override
             public Scriptable getParentScope() {
-                return inner.getParentScope();
+                return parent;
             }
 
             @Override
             public void setParentScope(Scriptable parent) {
-                inner.setParentScope(parent);
+                this.parent = parent;
             }
 
             @Override
             public Object[] getIds() {
-                return inner.getIds();
+                return ids;
             }
 
             @Override
@@ -217,8 +236,16 @@ class JSUtil {
 
             @Override
             public boolean hasInstance(Scriptable instance) {
-                return inner.hasInstance(instance);
+                Scriptable proto = instance.getPrototype();
+                while (proto != null) {
+                    if (proto.equals(this))
+                        return true;
+                    proto = proto.getPrototype();
+                }
+
+                return false;
             }
+
         };
     }
 
@@ -272,7 +299,7 @@ class JSUtil {
             public void put(String name, Scriptable start, Object value) {
             	if (!json.isObject())
                     throw new RuntimeException("Not a JsonObject.");
-                json.asObject().putValue(name, value);
+                json.asObject().putValue(name, fromNative(value, scope));
             }
 
             @Override
@@ -282,7 +309,7 @@ class JSUtil {
             	JsonArray arr = json.asArray();
             	if (index != arr.size() + 1)
             		throw new RuntimeException("JsonArray does not allow put at random index");
-            	arr.add(value);
+            	arr.add(fromNative(value, scope));
             }
 
             @Override
@@ -342,6 +369,33 @@ class JSUtil {
             }
         };
     }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static Object fromNative(Object value, final Scriptable scope) {
+    	boolean isNativeArray = value instanceof NativeArray,
+    			isNativeObject = value instanceof NativeObject;
+    	if (isNativeArray || isNativeObject) {
+    		// Convert JavaScript json to vertx JsonArray or JsonObject
+        	Object json = NativeJSON.stringify(Context.getCurrentContext(), scope, value, null, null);
+        	if (json instanceof String) {
+        		if (isNativeArray) {
+        			value = new JsonArray((List) Json.decodeValue((String) json, List.class));
+        		} else {
+        			value = new JsonObject((Map) Json.decodeValue((String) json, Map.class));
+        		}
+        	}
+    	}
+    	if (value instanceof Double) {
+    		// Because JavaScripe Number will be default to Double, it is better
+    		// to convert it to an integer long value if it could be represented to.
+    		double doubleVal = (Double) value;
+    		long longVal = Math.round(doubleVal);
+    		if (Math.abs(doubleVal - longVal) < Epsilon)
+    			value = longVal;
+    	}
+    	return value;
+    }
+    private static final double Epsilon = 0.00000001;
 
     static boolean is(Object[] args, Class<?>... classes) {
         if (args == null && classes == null) {
