@@ -192,7 +192,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         final Parameter.DataType type = parameter.type();
 
         switch (type) {
-            case UNDEFINED:
+            case REF:
                 // TODO: this requires a $ref
                 break;
             // primitives
