@@ -29,29 +29,38 @@ import java.util.Map;
 
 public class MVELEngine extends AbstractEngine<CompiledTemplate> {
 
-    public MVELEngine() {
-        super();
+    private final String extension;
+    private final String prefix;
+
+    public MVELEngine(final String views) {
+        this(views, ".mvel");
     }
 
-    public MVELEngine(String templateBodyKey) {
-        super(templateBodyKey);
+    public MVELEngine(final String views, final String extension) {
+        this.extension = extension;
+
+        if ("".equals(views)) {
+            prefix = views;
+        } else {
+            prefix = views.endsWith("/") ? views : views + "/";
+        }
     }
 
     @Override
     public String extension() {
-        return ".mvel";
+        return extension;
     }
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
-        read(filename, new AsyncResultHandler<String>() {
+        read(prefix + filename, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
                     next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
                 } else {
                     try {
-                        CompiledTemplate template = compile(filename, asyncResult.result());
+                        CompiledTemplate template = compile(prefix + filename, asyncResult.result());
                         next.handle(new YokeAsyncResult<>(new Buffer((String) TemplateRuntime.execute(template, context))));
                     } catch (IOException ex) {
                         next.handle(new YokeAsyncResult<Buffer>(ex));

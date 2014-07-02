@@ -165,7 +165,6 @@ public final class YokeSecurity {
      * Signs a String value with a given MAC
      */
     public static String sign(@NotNull String val, @NotNull Mac mac) {
-        mac.reset();
         return val + "." + Utils.base64(mac.doFinal(val.getBytes()));
     }
 

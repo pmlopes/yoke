@@ -11,7 +11,7 @@ function wrapAsyncResultHandler(callback) {
 }
 
 function wrapAsyncResult(ex, result) {
-    return new com.jetdrone.vertx.yoke.util.YokeAsyncResult(ex, result);
+    return new com.jetdrone.vertx.yoke.core.YokeAsyncResult(ex, result);
 }
 
 function wrapMap(map) {
@@ -86,7 +86,7 @@ MicroTemplateEngine.prototype.compile = function (filename, templateText) {
 };
 
 MicroTemplateEngine.prototype.render = function (template, context) {
-    return template(wrapMap(context));
+    return new org.vertx.java.core.buffer.Buffer(template(wrapMap(context)));
 };
 
 module.exports = MicroTemplateEngine;

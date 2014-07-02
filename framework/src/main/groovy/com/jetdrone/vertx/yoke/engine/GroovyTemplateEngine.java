@@ -21,31 +21,40 @@ import java.util.Map;
 
 public class GroovyTemplateEngine extends AbstractEngine<Template> {
 
-    public GroovyTemplateEngine() {
-        super();
+    private final String extension;
+    private final String prefix;
+
+    public GroovyTemplateEngine(final String views) {
+        this(views, ".gsp");
     }
 
-    public GroovyTemplateEngine(String templateBodyKey) {
-        super(templateBodyKey);
+    public GroovyTemplateEngine(final String views, final String extension) {
+        this.extension = extension;
+
+        if ("".equals(views)) {
+            prefix = views;
+        } else {
+            prefix = views.endsWith("/") ? views : views + "/";
+        }
     }
 
     private final TemplateEngine engine = new SimpleTemplateEngine();
 
     @Override
     public String extension() {
-        return ".gsp";
+        return extension;
     }
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
-        read(filename, new AsyncResultHandler<String>() {
+        read(prefix + filename, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {
                     next.handle(new YokeAsyncResult<Buffer>(asyncResult.cause()));
                 } else {
                     try {
-                        Buffer result = internalRender(compile(filename, asyncResult.result()), context);
+                        Buffer result = internalRender(compile(prefix + filename, asyncResult.result()), context);
                         next.handle(new YokeAsyncResult<>(result));
                     } catch (CompilationFailedException | ClassNotFoundException | MissingPropertyException | IOException ex) {
                         next.handle(new YokeAsyncResult<Buffer>(ex));

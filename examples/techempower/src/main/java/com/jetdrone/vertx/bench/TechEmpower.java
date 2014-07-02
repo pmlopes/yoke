@@ -75,7 +75,7 @@ public class TechEmpower extends Verticle {
         // create the yoke app
         new Yoke(this)
                 // register the MVEL engine
-                .engine(new MVELEngine())
+                .engine(new MVELEngine("views"))
 
                 // Test 1: JSON serialization
                 .use("/json", new Middleware() {
@@ -179,7 +179,7 @@ public class TechEmpower extends Verticle {
                                         });
                                         // render
                                         request.put("fortunes", results);
-                                        request.response().render("views/fortunes.mvel", next);
+                                        request.response().render("fortunes.mvel", next);
                                         return;
                                     }
                                     if ("more-exist".equalsIgnoreCase(status)) {

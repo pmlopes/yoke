@@ -342,6 +342,29 @@ public class YokeRequest implements HttpServerRequest {
                 if (session != null) {
                     put("session", session);
                 }
+
+                response().headersHandler(new Handler<Void>() {
+                    @Override
+                    public void handle(Void event) {
+                        int responseStatus = response().getStatusCode();
+                        // Only save on success and redirect status codes
+                        if (responseStatus >= 200 && responseStatus < 400) {
+                            JsonObject session = get("session");
+                            if (session != null) {
+                                store.set(sessionId, session, new Handler<Object>() {
+                                    @Override
+                                    public void handle(Object error) {
+                                        if (error != null) {
+                                            // TODO: better handling of errors
+                                            System.err.println(error);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+
                 handler.handle(null);
             }
         });

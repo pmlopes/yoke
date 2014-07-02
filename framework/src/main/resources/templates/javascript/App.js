@@ -29,13 +29,13 @@ app.use(new ErrorHandler(true));
 
 // define routes
 router.get('/', function(request) {
-  request.put('title', 'My Yoke Application');
-  request.response().render('views/index.html');
+  request['title'] = 'My Yoke Application';
+  request.response.render('views/index.ejs');
 });
 
 // define routes
 router.get('/users', function (request) {
-    request.response().end('respond with a resource');
+    request.response.end('respond with a resource');
 });
 
 // start server

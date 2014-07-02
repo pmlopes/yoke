@@ -9,13 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
-import org.vertx.java.core.json.DecodeException;
-import org.vertx.java.core.json.EncodeException;
+import org.vertx.java.core.json.*;
 import org.vertx.java.core.json.impl.Base64;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * # JSON
@@ -29,18 +30,23 @@ public final class JSON {
 
     // create ObjectMapper instance
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final static ObjectMapper PRETTY_MAPPER = new ObjectMapper();
     // extensions
-    private static final SimpleModule ECMA_COMPAT;
+    private static final SimpleModule ECMA404_COMPAT;
 
     static {
+        // indent output
+        PRETTY_MAPPER.configure(SerializationFeature.INDENT_OUTPUT, true);
         // Do not crash if more data than the expected is received (should not happen since we have maps and list)
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        PRETTY_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // Non-standard JSON but we allow C style comments in our JSON (Vert.x default to true, so keep it for compatibility)
         MAPPER.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
+        PRETTY_MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         // custom serializers
-        ECMA_COMPAT = new SimpleModule("ECMA+Custom Compat Layer");
+        ECMA404_COMPAT = new SimpleModule("ECMA404+Custom Compat Layer");
         // serialize Dates as per ECMAScript SPEC
-        ECMA_COMPAT.addSerializer(Date.class, new JsonSerializer<Date>() {
+        ECMA404_COMPAT.addSerializer(Date.class, new JsonSerializer<Date>() {
             @Override
             public void serialize(Date value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 if (value == null) {
@@ -51,7 +57,7 @@ public final class JSON {
             }
         });
 
-        ECMA_COMPAT.addDeserializer(Date.class, new JsonDeserializer<Date>() {
+        ECMA404_COMPAT.addDeserializer(Date.class, new JsonDeserializer<Date>() {
             @Override
             public Date deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
                 String date = jp.getText();
@@ -64,7 +70,7 @@ public final class JSON {
         });
 
         // serialize byte[] as Base64 Strings (same as used to be with Vert.x Json[Object|Array])
-        ECMA_COMPAT.addSerializer(byte[].class, new JsonSerializer<byte[]>() {
+        ECMA404_COMPAT.addSerializer(byte[].class, new JsonSerializer<byte[]>() {
             @Override
             public void serialize(byte[] value, JsonGenerator jgen, SerializerProvider provider) throws IOException {
                 if (value == null) {
@@ -75,22 +81,31 @@ public final class JSON {
             }
         });
 
-        MAPPER.registerModule(ECMA_COMPAT);
+        MAPPER.registerModule(ECMA404_COMPAT);
+        PRETTY_MAPPER.registerModule(ECMA404_COMPAT);
     }
 
     public static <T> void addSerializer(Class<? extends T> clazz, final JsonSerializer<T> serializer) {
         // Serialize Custom Types
-        ECMA_COMPAT.addSerializer(clazz, serializer);
+        ECMA404_COMPAT.addSerializer(clazz, serializer);
     }
 
     public static <T> void addDeserializer(Class<T> clazz, final JsonDeserializer<? extends T> deserializer) {
         // Serialize Custom Types
-        ECMA_COMPAT.addDeserializer(clazz, deserializer);
+        ECMA404_COMPAT.addDeserializer(clazz, deserializer);
     }
 
     public static String encode(Object item) {
         try {
             return MAPPER.writeValueAsString(item);
+        } catch (JsonProcessingException e) {
+            throw new EncodeException(e.getMessage());
+        }
+    }
+
+    public static String encodePretty(Object item) {
+        try {
+            return PRETTY_MAPPER.writeValueAsString(item);
         } catch (JsonProcessingException e) {
             throw new EncodeException(e.getMessage());
         }
@@ -105,6 +120,29 @@ public final class JSON {
         try {
             // Untyped List/Map
             return (R) MAPPER.readValue(source, Object.class);
+        } catch (IOException | RuntimeException e) {
+            throw new DecodeException(e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public static JsonElement decodeElement(String source) {
+        if (source == null) {
+            return null;
+        }
+
+        try {
+            // Untyped List/Map
+            Object json = MAPPER.readValue(source, Object.class);
+
+            if (json instanceof List) {
+                return new JsonArray((List) json);
+            }
+            if (json instanceof Map) {
+                return new JsonObject((Map) json);
+            }
+
+            throw new DecodeException("Cannot cast to JsonElement");
         } catch (IOException | RuntimeException e) {
             throw new DecodeException(e.getMessage());
         }

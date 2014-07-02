@@ -34,7 +34,7 @@ public class KitCMS extends Verticle {
 
         final Yoke yoke = new Yoke(this);
         // register jMustache render engine
-        yoke.engine(new StringPlaceholderEngine());
+        yoke.engine(new StringPlaceholderEngine("com/jetdrone/vertx/kitcms/views"));
         // log the requests
         yoke.use(new Logger());
         // install the pretty error handler middleware
@@ -76,7 +76,7 @@ public class KitCMS extends Verticle {
                                 }
 
                                 request.put("keys", keys);
-                                request.response().render("com/jetdrone/vertx/kitcms/views/admin.shtml", next);
+                                request.response().render("admin.shtml", next);
                             }
                         }
                     });

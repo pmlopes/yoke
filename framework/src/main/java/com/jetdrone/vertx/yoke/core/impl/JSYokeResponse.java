@@ -457,12 +457,6 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                                 return Undefined.instance;
                             }
                             
-                            if (is(args, String.class, String.class, Handler.class)) {
-                            	JSYokeResponse.this.render((String) args[0], (String) args[1], (Handler) args[2]);
-                                return Undefined.instance;
-                            }
-                            
-
                             if (is(args, String.class, Callable.class)) {
                             	
                                 JSYokeResponse.this.render((String) args[0], new Handler<Object>() {
@@ -474,26 +468,11 @@ final class JSYokeResponse  extends YokeResponse implements Scriptable {
                                 return Undefined.instance;
                             }
                             
-                            if (is(args, String.class, String.class, Callable.class)) {
-                                JSYokeResponse.this.render((String) args[0], (String) args[1], new Handler<Object>() {
-                                    @Override
-                                    public void handle(Object error) {
-                                        ((Callable) args[2]).call(cx, scope, thisObj, new Object[]{error});
-                                    }
-                                }); 
-                                return Undefined.instance;
-                            }                            
-
                             if (is(args, String.class)) {
                                 JSYokeResponse.this.render((String) args[0]);
                                 return Undefined.instance;
                             }
                             
-                            if (is(args, String.class, String.class)) {
-                                JSYokeResponse.this.render((String) args[0], (String) args[1]);
-                                return Undefined.instance;
-                            }                            
-
                             throw new UnsupportedOperationException();
                         }
                     };

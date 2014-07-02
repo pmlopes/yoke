@@ -50,13 +50,13 @@ JSYoke.prototype.use = function (route, callback) {
     return this;
 };
 
-JSYoke.prototype.engine = function (extension, engine) {
+JSYoke.prototype.engine = function (engine) {
     // verify if the engine is already a Engine instance
     if (engine.jEngine !== undefined) {
         // in this case pass it directly to the jYoke
-        this.jYoke.engine(extension, engine.jEngine);
+        this.jYoke.engine(engine.jEngine);
     } else {
-        this.jYoke.engine(extension, new com.jetdrone.vertx.yoke.Engine(engine));
+        this.jYoke.engine(new com.jetdrone.vertx.yoke.Engine(engine));
     }
 };
 

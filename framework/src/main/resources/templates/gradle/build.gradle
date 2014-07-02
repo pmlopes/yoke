@@ -55,7 +55,8 @@ dependencies {
   // If you're creating Groovy compiled verticles you may need the following dependencies
   provided "org.codehaus.groovy:groovy-all:$groovyVersion"
   provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
-
+  // If you're creating JavaScript compiled verticles you may need the following dependencies
+  provided "org.mozilla:rhino:$rhinoVersion"
 }
 
 test {

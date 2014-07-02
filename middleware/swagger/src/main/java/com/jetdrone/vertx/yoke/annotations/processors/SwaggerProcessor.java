@@ -192,7 +192,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         final Parameter.DataType type = parameter.type();
 
         switch (type) {
-            case UNDEFINED:
+            case REF:
                 // TODO: this requires a $ref
                 break;
             // primitives
@@ -222,11 +222,11 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                 response.putString("type", type.type());
                 break;
             // containers
+            case SET:
+                response.putBoolean("uniqueItems", true);
             case ARRAY:
                 response.putString("type", type.type());
                 // TODO: items
-            case SET:
-                response.putBoolean("uniqueItems", true);
                 break;
             // void
             case VOID:

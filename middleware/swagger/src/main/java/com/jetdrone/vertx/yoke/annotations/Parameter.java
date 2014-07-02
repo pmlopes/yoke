@@ -27,7 +27,7 @@ public @interface Parameter {
         VOID("void", null, DataType.OUT),
         // file
         FILE("File", null, DataType.IN),
-        UNDEFINED(null, null, 0);
+        REF(null, null, 0);
 
         private static final int IN = 1;
         private static final int OUT = 2;
@@ -70,7 +70,7 @@ public @interface Parameter {
     String name();
     String description() default "";
     boolean required() default false;
-    DataType type() default DataType.UNDEFINED;
+    DataType type();
     ParamType paramType() default ParamType.PATH;
     boolean allowMultiple() default false;
     String minimum() default "";
