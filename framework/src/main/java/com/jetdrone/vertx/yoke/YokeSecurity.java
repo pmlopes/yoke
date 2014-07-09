@@ -73,7 +73,7 @@ public final class YokeSecurity {
             }
 
         } catch (KeyStoreException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         keys = Collections.unmodifiableMap(tmp);
