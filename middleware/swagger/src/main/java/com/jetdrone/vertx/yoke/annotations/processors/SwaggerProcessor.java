@@ -216,7 +216,19 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                 response.putString("type", type.type());
                 response.putString("format", type.type());
                 // TODO: default value
-                // TODO: enum
+                if (!parameter.minimum().equals("")) {
+                    response.putString("minimum", parameter.minimum());
+                }
+                if (!parameter.maximum().equals("")) {
+                    response.putString("maximum", parameter.maximum());
+                }
+                if (parameter.enumeration().length > 0) {
+                    JsonArray enumeration = new JsonArray();
+                    response.putArray("enum", enumeration);
+                    for (String item : parameter.enumeration()) {
+                        enumeration.addString(item);
+                    }
+                }
                 break;
             case BOOLEAN:
                 response.putString("type", type.type());

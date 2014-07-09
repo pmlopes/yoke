@@ -75,4 +75,5 @@ public @interface Parameter {
     boolean allowMultiple() default false;
     String minimum() default "";
     String maximum() default "";
+    String[] enumeration() default {};
 }
