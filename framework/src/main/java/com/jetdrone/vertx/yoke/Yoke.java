@@ -329,7 +329,7 @@ public class Yoke {
         return this;
     }
 
-    protected YokeSecurity security = new SecretSecurity(UUID.randomUUID().toString());
+    protected YokeSecurity security;
 
     public Yoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final JsonObject keyPasswords) {
         String storeType;
@@ -392,6 +392,10 @@ public class Yoke {
     }
 
     public YokeSecurity security() {
+        if (security == null) {
+            throw new RuntimeException("No YokeSecurity implementation is enabled!");
+        }
+
         return security;
     }
 

@@ -19,6 +19,8 @@ public class JWTTest extends TestVerticle {
     @Test
     public void testJWT() {
         final Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         JWT jwt = new JWT(yoke.security());
         testComplete();
     }
@@ -26,6 +28,8 @@ public class JWTTest extends TestVerticle {
     @Test
     public void testJWT2() {
         Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         JWT jwt = new JWT(yoke.security());
 
         long now = System.currentTimeMillis();
@@ -50,22 +54,4 @@ public class JWTTest extends TestVerticle {
 
         testComplete();
     }
-
-//    @Test
-//    public void testJWT3() {
-//        Yoke app = new Yoke(this);
-//        app.keyStore("keystore.jceks", "aysist7", new JsonObject()
-//                .putString("HS256", "go-aysist")
-//                .putString("HS384", "go-aysist")
-//                .putString("HS512", "go-aysist")
-//                .putString("RS256", "go-aysist"));
-//
-//        JWT jwt = new JWT(app.security());
-//
-//        System.out.println(jwt.encode(new JsonObject("{\"name\":\"PullemanG\",\"uid\":88,\"iat\":1404914641483,\"exp\":1405001041483,\"grants\":[\"MANAGER\",\"ROSTER_PORTAL\"]}")));
-//
-//        JsonObject json = jwt.decode("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJuYW1lIjoiUHVsbGVtYW5HIiwidWlkIjo4OCwiaWF0IjoxNDA0OTE0NjQxNDgzLCJleHAiOjE0MDUwMDEwNDE0ODMsImdyYW50cyI6WyJNQU5BR0VSIiwiUk9TVEVSX1BPUlRBTCJdfQ.sQmLG1-ADCcb57gPAvemqTiPNB1j1i0gnS9mugXeVw0");
-//
-//        testComplete();
-//    }
 }

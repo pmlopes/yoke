@@ -21,6 +21,8 @@ public class Session extends TestVerticle {
     @Test
     public void testSession() {
         final Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         final Mac hmac = yoke.security().getMac("HmacSHA256");
         yoke.use(new CookieParser(hmac));
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Session(hmac));

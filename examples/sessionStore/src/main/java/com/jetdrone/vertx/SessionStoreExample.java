@@ -31,6 +31,8 @@ public class SessionStoreExample extends Verticle {
                 }
 
                 final Yoke app = new Yoke(SessionStoreExample.this);
+                app.secretSecurity("keyboard cat");
+
                 app.store(new MongoDBSessionStore(vertx.eventBus(), "vertx.mongopersistor", "sessions"));
 
                 final Mac hmac = app.security().getMac("HmacSHA256");
