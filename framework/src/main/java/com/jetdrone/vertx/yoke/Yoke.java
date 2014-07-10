@@ -10,6 +10,8 @@ import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.security.KeyStoreSecurity;
+import com.jetdrone.vertx.yoke.security.SecretSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.core.YokeException;
@@ -327,9 +329,9 @@ public class Yoke {
         return this;
     }
 
-    protected YokeSecurity security = new YokeSecurity();
+    protected YokeSecurity security = new SecretSecurity(UUID.randomUUID().toString());
 
-    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final JsonObject keyPasswords) {
+    public Yoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final JsonObject keyPasswords) {
         String storeType;
         int idx = fileName.lastIndexOf('.');
 
@@ -346,7 +348,7 @@ public class Yoke {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new YokeSecurity(ks, keyPasswords.toMap());
+            this.security = new KeyStoreSecurity(ks, keyPasswords.toMap());
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -354,7 +356,7 @@ public class Yoke {
         return this;
     }
 
-    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword) {
+    public Yoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword) {
         String storeType;
         int idx = fileName.lastIndexOf('.');
 
@@ -371,11 +373,21 @@ public class Yoke {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new YokeSecurity(ks, keyStorePassword);
+            this.security = new KeyStoreSecurity(ks, keyStorePassword);
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+        return this;
+    }
+
+    public Yoke secretSecurity(@NotNull final String secret) {
+        this.security = new SecretSecurity(secret);
+        return this;
+    }
+
+    public Yoke secretSecurity(@NotNull final byte[] secret) {
+        this.security = new SecretSecurity(secret);
         return this;
     }
 
@@ -480,21 +492,26 @@ public class Yoke {
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;
+                    final Handler<Object> self = this;
 
                     @Override
                     public void handle(Object error) {
                         if (error == null) {
                             currentMiddleware++;
                             if (currentMiddleware < middlewareList.size()) {
-                                MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
+                                final MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
 
                                 if (!mountedMiddleware.enabled) {
                                     // the middleware is disabled
                                     handle(null);
                                 } else {
                                     if (request.path().startsWith(mountedMiddleware.mount)) {
-                                        Middleware middlewareItem = mountedMiddleware.middleware;
-                                        middlewareItem.handle(request, this);
+                                        vertx.runOnContext(new Handler<Void>() {
+                                            @Override
+                                            public void handle(Void event) {
+                                                mountedMiddleware.middleware.handle(request, self);
+                                            }
+                                        });
                                     } else {
                                         // the middleware was not mounted on this uri, skip to the next entry
                                         handle(null);
@@ -506,7 +523,12 @@ public class Yoke {
                                 response.setStatusCode(404);
                                 response.setStatusMessage(HttpResponseStatus.valueOf(404).reasonPhrase());
                                 if (errorHandler != null) {
-                                    errorHandler.handle(request, null);
+                                    vertx.runOnContext(new Handler<Void>() {
+                                        @Override
+                                        public void handle(Void event) {
+                                            errorHandler.handle(request, null);
+                                        }
+                                    });
                                 } else {
                                     response.end(HttpResponseStatus.valueOf(404).reasonPhrase());
                                 }
@@ -514,7 +536,12 @@ public class Yoke {
                         } else {
                             request.put("error", error);
                             if (errorHandler != null) {
-                                errorHandler.handle(request, null);
+                                vertx.runOnContext(new Handler<Void>() {
+                                    @Override
+                                    public void handle(Void event) {
+                                        errorHandler.handle(request, null);
+                                    }
+                                });
                             } else {
                                 HttpServerResponse response = request.response();
 
