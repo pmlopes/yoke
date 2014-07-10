@@ -10,6 +10,9 @@ import java.lang.annotation.Target;
 public @interface SwaggerDoc {
     String summary();
     String[] notes() default {};
+    DataType type() default DataType.VOID;
+    String refId() default "";
+
     // TODO: authorizations
 //    Object authorizations();
     Parameter[] parameters() default {};

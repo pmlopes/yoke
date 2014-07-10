@@ -6,9 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE})
-public @interface SwaggerResource {
-    String path();
-    String description();
-    Model[] models() default {};
+@Target({ElementType.ANNOTATION_TYPE})
+public @interface Item {
+    DataType[] type() default {};
+    String refId() default "";
 }

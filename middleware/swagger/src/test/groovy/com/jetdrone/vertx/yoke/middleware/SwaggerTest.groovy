@@ -22,7 +22,7 @@ public class SwaggerTest extends TestVerticle {
                 summary = "say hello to user name",
                 notes = ["note #1", "note #2"],
                 parameters = [
-                        @Parameter(name = "name", type = Parameter.DataType.STRING, description = "User name", required = true)
+                        @Parameter(name = "name", type = DataType.STRING, description = "User name", required = true)
                 ],
                 responseMessages = [
                         @ResponseMessage(code = 200, message = "No error!")
@@ -139,52 +139,6 @@ public class SwaggerTest extends TestVerticle {
 
     }
 
-    @SwaggerResource(path = "/store", description = "Operations about store")
-    @Produces("application/json")
-    public static class Store {
-
-        @SwaggerDoc(
-                summary = "Find purchase order by ID",
-                notes = "For valid response try integer IDs with value <= 5. Anything above 5 or nonintegers will generate API errors",
-                parameters = @Parameter(name = "orderId", type = Parameter.DataType.STRING, description = "ID of pet that needs to be fetched", required = true, paramType = Parameter.ParamType.PATH),
-                responseMessages = [
-                        @ResponseMessage(code = 400, message = "Invalid ID supplied"),
-                        @ResponseMessage(code = 404, message = "Order not found")
-                ]
-        )
-        @GET("/store/order/:orderId")
-        public void getOrderById(YokeRequest request, Handler<Object> next) {
-
-        }
-
-        @SwaggerDoc(
-                summary = "Delete purchase order by ID",
-                notes = "For valid response try integer IDs with value < 1000.  Anything above 1000 or nonintegers will generate API errors",
-                parameters = @Parameter(name = "orderId", type = Parameter.DataType.STRING, description = "ID of pet that needs to be fetched", required = true, paramType = Parameter.ParamType.PATH),
-                responseMessages = [
-                    @ResponseMessage(code = 400, message = "Invalid ID supplied"),
-                    @ResponseMessage(code = 404, message = "Order not found")
-                ]
-        )
-        @DELETE("/store/order/:orderId")
-        public void deleteOrder(YokeRequest request, Handler<Object> next) {
-
-        }
-
-        @SwaggerDoc(
-                summary = "Place an order for a pet",
-                notes = "",
-                parameters = @Parameter(name = "body", type = Parameter.DataType.VOID, description = "order placed for purchasing the pet", required = true, paramType = Parameter.ParamType.BODY),
-                responseMessages = [
-                        @ResponseMessage(code = 400, message = "Invalid ID supplied"),
-                ]
-        )
-        @POST("/store/order")
-        public void placeOrder(YokeRequest request, Handler<Object> next) {
-
-        }
-    }
-
     @Test
     public void testResourceJson() {
         Yoke yoke = new Yoke(this)
@@ -237,7 +191,7 @@ public class SwaggerTest extends TestVerticle {
                                             "method"          : "GET",
                                             "summary"         : "Find purchase order by ID",
                                             "notes"           : "For valid response try integer IDs with value <= 5. Anything above 5 or nonintegers will generate API errors",
-//                                            "type"            : "Order",
+                                            "type"            : "Order",
                                             "nickname"        : "getOrderById",
 //                                            "authorizations"  : [],
                                             "parameters"      : [
@@ -245,7 +199,7 @@ public class SwaggerTest extends TestVerticle {
                                                             "name"       : "orderId",
                                                             "description": "ID of pet that needs to be fetched",
                                                             "required"   : true,
-//                                                            "type"       : "string",
+                                                            "type"       : "string",
                                                             "paramType"  : "path"
                                                     ]
                                             ],
@@ -264,7 +218,7 @@ public class SwaggerTest extends TestVerticle {
                                             "method"          : "DELETE",
                                             "summary"         : "Delete purchase order by ID",
                                             "notes"           : "For valid response try integer IDs with value < 1000.  Anything above 1000 or nonintegers will generate API errors",
-//                                            "type"            : "void",
+                                            "type"            : "void",
                                             "nickname"        : "deleteOrder",
 //                                            "authorizations"  : [
 //                                                    "oauth2": [
@@ -279,7 +233,7 @@ public class SwaggerTest extends TestVerticle {
                                                             "name"       : "orderId",
                                                             "description": "ID of the order that needs to be deleted",
                                                             "required"   : true,
-//                                                            "type"       : "string",
+                                                            "type"       : "string",
                                                             "paramType"  : "path"
                                                     ]
                                             ],
@@ -303,7 +257,7 @@ public class SwaggerTest extends TestVerticle {
                                             "method"          : "POST",
                                             "summary"         : "Place an order for a pet",
                                             "notes"           : "",
-//                                            "type"            : "void",
+                                            "type"            : "void",
                                             "nickname"        : "placeOrder",
 //                                            "authorizations"  : [
 //                                                    "oauth2": [
@@ -318,7 +272,7 @@ public class SwaggerTest extends TestVerticle {
                                                             "name"       : "body",
                                                             "description": "order placed for purchasing the pet",
                                                             "required"   : true,
-//                                                            "type"       : "Order",
+                                                            "type"       : "Order",
                                                             "paramType"  : "body"
                                                     ]
                                             ],
@@ -332,37 +286,37 @@ public class SwaggerTest extends TestVerticle {
                             ]
                     ]
             ],
-            "models"        : [:
-//                    "Order": [
-//                            "id"        : "Order",
-//                            "properties": [
-//                                    "id"      : [
-//                                            "type"  : "integer",
-//                                            "format": "int64"
-//                                    ],
-//                                    "petId"   : [
-//                                            "type"  : "integer",
-//                                            "format": "int64"
-//                                    ],
-//                                    "quantity": [
-//                                            "type"  : "integer",
-//                                            "format": "int32"
-//                                    ],
-//                                    "status"  : [
-//                                            "type"       : "string",
-//                                            "description": "Order Status",
-//                                            "enum"       : [
-//                                                    "placed",
-//                                                    " approved",
-//                                                    " delivered"
-//                                            ]
-//                                    ],
-//                                    "shipDate": [
-//                                            "type"  : "string",
-//                                            "format": "date-time"
-//                                    ]
-//                            ]
-//                    ]
+            "models"        : [
+                    "Order": [
+                            "id"        : "Order",
+                            "properties": [
+                                    "id"      : [
+                                            "type"  : "integer",
+                                            "format": "int64"
+                                    ],
+                                    "petId"   : [
+                                            "type"  : "integer",
+                                            "format": "int64"
+                                    ],
+                                    "quantity": [
+                                            "type"  : "integer",
+                                            "format": "int32"
+                                    ],
+                                    "status"  : [
+                                            "type"       : "string",
+                                            "description": "Order Status",
+                                            "enum"       : [
+                                                    "placed",
+                                                    " approved",
+                                                    " delivered"
+                                            ]
+                                    ],
+                                    "shipDate": [
+                                            "type"  : "string",
+                                            "format": "date-time"
+                                    ]
+                            ]
+                    ]
             ]
     ]
 
@@ -388,7 +342,9 @@ public class SwaggerTest extends TestVerticle {
                 assertEquals(200, resp.getStatusCode())
 
                 JsonObject generated = new JsonObject(resp.body.toString())
-                System.out.println(api.equals(generated.toMap()))
+                System.out.println(generated.encodePrettily())
+
+                //System.out.println(api.equals(generated.toMap()))
 
 //                assertEquals(api, generated.toMap())
                 testComplete()
