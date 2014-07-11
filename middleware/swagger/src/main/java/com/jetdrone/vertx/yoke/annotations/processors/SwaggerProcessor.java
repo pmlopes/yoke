@@ -3,6 +3,7 @@ package com.jetdrone.vertx.yoke.annotations.processors;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.middleware.Swagger;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -67,6 +68,10 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             resource.consumes(produces);
         }
 
+        for (Model model : res.models()) {
+            resource.addModel(model.value(), new JsonObject(Utils.readResourceToString(clazz, model.value() + ".json")));
+        }
+
         SwaggerDoc doc = Processor.getAnnotation(method, SwaggerDoc.class);
         Deprecated deprecated = Processor.getAnnotation(method, Deprecated.class);
 
@@ -94,6 +99,18 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         // add nickname (deducted from the method name)
         operations.putString("nickname", method.getName());
+
+        DataType returnType = doc.type();
+
+        if (returnType == DataType.REF) {
+            operations.putString("type", doc.refId());
+        } else {
+            operations.putString("type", returnType.type());
+            String format = returnType.format();
+            if (format != null) {
+                operations.putString("format", format);
+            }
+        }
 
         // TODO: authorizations
 
@@ -189,11 +206,11 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         response.putBoolean("allowMultiple", parameter.allowMultiple());
 
         // describe the type
-        final Parameter.DataType type = parameter.type();
+        final DataType type = parameter.type();
 
         switch (type) {
-            case UNDEFINED:
-                // TODO: this requires a $ref
+            case REF:
+                response.putString("$ref", parameter.refId());
                 break;
             // primitives
             case INTEGER:
@@ -201,7 +218,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             case FLOAT:
             case DOUBLE:
                 response.putString("type", type.type());
-                response.putString("format", type.type());
+                response.putString("format", type.format());
                 if (!parameter.minimum().equals("")) {
                     response.putString("minimum", parameter.minimum());
                 }
@@ -214,9 +231,21 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             case DATE:
             case DATETIME:
                 response.putString("type", type.type());
-                response.putString("format", type.type());
+                response.putString("format", type.format());
                 // TODO: default value
-                // TODO: enum
+                if (!parameter.minimum().equals("")) {
+                    response.putString("minimum", parameter.minimum());
+                }
+                if (!parameter.maximum().equals("")) {
+                    response.putString("maximum", parameter.maximum());
+                }
+                if (parameter.enumeration().length > 0) {
+                    JsonArray enumeration = new JsonArray();
+                    response.putArray("enum", enumeration);
+                    for (String item : parameter.enumeration()) {
+                        enumeration.addString(item);
+                    }
+                }
                 break;
             case BOOLEAN:
                 response.putString("type", type.type());
@@ -235,7 +264,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             // file
             case FILE:
                 response.putString("type", type.type());
-                if (parameter.paramType() != Parameter.ParamType.FORM) {
+                if (parameter.paramType() != ParamType.FORM) {
                     throw new RuntimeException("File requires paramType to be FORM");
                 }
                 // check that method consumes "multipart/form-data"

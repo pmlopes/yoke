@@ -7,6 +7,9 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
+import java.util.HashMap;
+import java.util.UUID;
+
 import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.assertTrue;
 import static org.vertx.testtools.VertxAssert.testComplete;
@@ -16,6 +19,8 @@ public class JWTTest extends TestVerticle {
     @Test
     public void testJWT() {
         final Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         JWT jwt = new JWT(yoke.security());
         testComplete();
     }
@@ -23,6 +28,8 @@ public class JWTTest extends TestVerticle {
     @Test
     public void testJWT2() {
         Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         JWT jwt = new JWT(yoke.security());
 
         long now = System.currentTimeMillis();

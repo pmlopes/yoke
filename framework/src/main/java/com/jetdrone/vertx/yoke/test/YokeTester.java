@@ -10,6 +10,7 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.*;
 import org.vertx.java.core.net.NetSocket;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
@@ -437,6 +438,11 @@ public class YokeTester {
 
         @Override
         public boolean isUsePooledBuffers() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setSSLContext(SSLContext sslContext) {
             throw new UnsupportedOperationException();
         }
     }
