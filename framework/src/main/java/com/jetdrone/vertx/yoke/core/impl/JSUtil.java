@@ -15,6 +15,9 @@ import org.vertx.java.core.json.JsonElement;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.impl.Json;
 
+import com.jetdrone.vertx.yoke.store.json.ChangeAwareJsonArray;
+import com.jetdrone.vertx.yoke.store.json.ChangeAwareJsonElement;
+
 class JSUtil {
 
     private JSUtil() {}
@@ -34,6 +37,8 @@ class JSUtil {
             return toScriptable((Map<?, ?>) value, scope);
         if (value instanceof JsonElement)
             return toScriptable((JsonElement) value, scope);
+        if (value instanceof ChangeAwareJsonElement)
+            return toScriptable((ChangeAwareJsonElement) value, scope);
         return Context.javaToJS(value, scope);
     }
 
@@ -588,6 +593,132 @@ class JSUtil {
         };
     }
 
+    private static Scriptable toScriptable(final ChangeAwareJsonElement json, final Scriptable scope) {
+        return new Scriptable() {
+
+            private Scriptable prototype, parent;
+
+            @Override
+            public String getClassName() {
+                return "JSChangeAwareJsonElement";
+            }
+
+            @Override
+            public Object get(String name, Scriptable start) {
+                if (json.isObject()) {
+                    if (json.asObject().containsField(name)) {
+                        return javaToJS(json.asObject().getField(name), scope);
+                    } else {
+                        return NOT_FOUND;
+                    }
+                } else {
+                    switch (name) {
+                    case "length":
+                        return json.asArray().size();
+                    default:
+                        return NOT_FOUND;
+                    }
+                }
+            }
+
+            @Override
+            public Object get(int index, Scriptable start) {
+                if (json.isArray()) {
+                    if (index >= 0 && json.asArray().size() > index) {
+                        return javaToJS(json.asArray().get(index), scope);
+                    } else {
+                        return NOT_FOUND;
+                    }
+                } else {
+                    return NOT_FOUND;
+                }
+            }
+
+            @Override
+            public boolean has(String name, Scriptable start) {
+                return json.isObject() && json.asObject().containsField(name);
+            }
+
+            @Override
+            public boolean has(int index, Scriptable start) {
+                return json.isArray() && index >= 0 && json.asArray().size() > index;
+            }
+
+            @Override
+            public void put(String name, Scriptable start, Object value) {
+                if (!json.isObject())
+                    throw new RuntimeException("Not a ChangeAwareJsonObject.");
+                json.asObject().putValue(name, fromNative(value, scope));
+            }
+
+            @Override
+            public void put(int index, Scriptable start, Object value) {
+                if (!json.isArray())
+                    throw new RuntimeException("Not a ChangeAwareJsonArray.");
+                ChangeAwareJsonArray arr = json.asArray();
+                if (index != arr.size() + 1)
+                    throw new RuntimeException("ChangeAwareJsonArray does not allow put at random index");
+                arr.add(fromNative(value, scope));
+            }
+
+            @Override
+            public void delete(String name) {
+                if (!json.isObject())
+                    throw new RuntimeException("Not a ChangeAwareJsonObject.");
+                json.asObject().removeField(name);
+            }
+
+            @Override
+            public void delete(int index) {
+                throw new RuntimeException("ChangeAwareJsonArray does not allow delete at random index");
+            }
+
+            @Override
+            public Scriptable getPrototype() {
+                return prototype;
+            }
+
+            @Override
+            public void setPrototype(Scriptable prototype) {
+                this.prototype = prototype;
+            }
+
+            @Override
+            public Scriptable getParentScope() {
+                return parent;
+            }
+
+            @Override
+            public void setParentScope(Scriptable parent) {
+                this.parent = parent;
+            }
+
+            @Override
+            public Object[] getIds() {
+                if (json.isObject()) {
+                    return json.asObject().getFieldNames().toArray();
+                }
+                if (json.isArray()) {
+                    int size = json.asArray().size();
+                    Object[] ids = new Object[size];
+                    for (int i = 0; i < size; ++i) ids[i] = Integer.valueOf(i);
+                    return ids;
+                }
+                return EMPTY_OBJECT_ARRAY;
+            }
+
+            @Override
+            public Object getDefaultValue(Class<?> hint) {
+                return "[object JSChangeAwareJsonElement]";
+            }
+
+            @Override
+            public boolean hasInstance(Scriptable instance) {
+                return instance != null && instance instanceof JsonElement;
+            }
+        };
+    }
+
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private static Object fromNative(Object value, final Scriptable scope) {
         if (value == null) return null;
@@ -613,6 +744,11 @@ class JSUtil {
             long longVal = Math.round(doubleVal);
             if (Math.abs(doubleVal - longVal) < Epsilon)
                 value = longVal;
+        }
+
+        if (value instanceof CharSequence) {
+        	// Need to convert CharSequence to String
+        	value = value.toString();
         }
 
         return value;

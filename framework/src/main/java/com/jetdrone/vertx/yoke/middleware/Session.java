@@ -3,13 +3,14 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.core.YokeCookie;
+import javax.crypto.Mac;
+
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
 
-import javax.crypto.Mac;
+import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.core.YokeCookie;
+import com.jetdrone.vertx.yoke.store.json.SessionObject;
 
 /**
  * # Session
@@ -84,7 +85,7 @@ public class Session extends Middleware {
         response.headersHandler(new Handler<Void>() {
             @Override
             public void handle(Void done) {
-                JsonObject session = request.get("session");
+            	SessionObject session = request.get("session");
                 String sessionId = session == null ? null : session.getString("id");
 
                 // removed

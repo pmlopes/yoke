@@ -44,11 +44,12 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
     private Callable getHeader;
     private Callable getParameter;
     private Callable getParameterList;
+    private Object params;
+    private Callable param;
     private Object headers;
     private Callable is;
     private Callable hasBody;
     private Callable loadSession;
-    private Object params;
     private Callable pause;
     private Callable resume;
     private Callable sortedHeader;
@@ -478,6 +479,38 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                     };
                 }
                 return getFormParameterList;
+            case "params":
+                if (params == null) {
+                    params = javaToJS(params(), getParentScope());
+                }
+                return params;
+            case "param":
+            	if (param == null) {
+            		param = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeRequest.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
+                            }
+
+                            if (JSUtil.is(args, String.class)) {
+                            	String name = (String) args[0], value = null;
+                                // first try to get param from params / url --> this differs from expressjs
+                                value = JSYokeRequest.this.params().get(name);
+                                if (value == null) {
+                                	// then try to get param from body
+                                	try {
+	                                    value = JSYokeRequest.this.formAttributes().get(name);
+                                    } catch (Exception ignore) { /* maybe throw IllegalStateExcpetion */ }
+                                }
+                                return value != null ? value : Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+            	}
+            	return param;
             case "hasBody":
                 if (hasBody == null) {
                     hasBody = new Callable() {
@@ -561,11 +594,6 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return normalizedPath();
             case "originalMethod":
                 return originalMethod();
-            case "params":
-                if (params == null) {
-                    params = javaToJS(params(), getParentScope());
-                }
-                return params;
             case "path":
                 return path();
             case "pause":
@@ -594,6 +622,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return query();
             case "remoteAddress":
                 return remoteAddress().toString();
+            case "res":
             case "response":
                 return response();
             case "resume":
