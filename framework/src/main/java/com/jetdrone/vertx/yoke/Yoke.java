@@ -496,7 +496,6 @@ public class Yoke {
 
                 new Handler<Object>() {
                     int currentMiddleware = -1;
-                    final Handler<Object> self = this;
 
                     @Override
                     public void handle(Object error) {
@@ -510,12 +509,7 @@ public class Yoke {
                                     handle(null);
                                 } else {
                                     if (request.path().startsWith(mountedMiddleware.mount)) {
-                                        vertx.runOnContext(new Handler<Void>() {
-                                            @Override
-                                            public void handle(Void event) {
-                                                mountedMiddleware.middleware.handle(request, self);
-                                            }
-                                        });
+                                        mountedMiddleware.middleware.handle(request, this);
                                     } else {
                                         // the middleware was not mounted on this uri, skip to the next entry
                                         handle(null);
@@ -527,12 +521,7 @@ public class Yoke {
                                 response.setStatusCode(404);
                                 response.setStatusMessage(HttpResponseStatus.valueOf(404).reasonPhrase());
                                 if (errorHandler != null) {
-                                    vertx.runOnContext(new Handler<Void>() {
-                                        @Override
-                                        public void handle(Void event) {
-                                            errorHandler.handle(request, null);
-                                        }
-                                    });
+                                    errorHandler.handle(request, null);
                                 } else {
                                     response.end(HttpResponseStatus.valueOf(404).reasonPhrase());
                                 }
@@ -540,12 +529,7 @@ public class Yoke {
                         } else {
                             request.put("error", error);
                             if (errorHandler != null) {
-                                vertx.runOnContext(new Handler<Void>() {
-                                    @Override
-                                    public void handle(Void event) {
-                                        errorHandler.handle(request, null);
-                                    }
-                                });
+                                errorHandler.handle(request, null);
                             } else {
                                 HttpServerResponse response = request.response();
 
