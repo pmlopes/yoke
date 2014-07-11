@@ -3,10 +3,23 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.core.Context;
-import com.jetdrone.vertx.yoke.core.YokeCookie;
-import com.jetdrone.vertx.yoke.core.YokeFileUpload;
-import com.jetdrone.vertx.yoke.store.SessionStore;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.security.cert.X509Certificate;
+
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -14,15 +27,15 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpVersion;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.net.NetSocket;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-import javax.security.cert.X509Certificate;
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.util.*;
+import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.core.YokeCookie;
+import com.jetdrone.vertx.yoke.core.YokeFileUpload;
+import com.jetdrone.vertx.yoke.store.SessionStore;
+import com.jetdrone.vertx.yoke.store.json.SessionObject;
 
 /** YokeRequest is an extension to Vert.x *HttpServerRequest* with some helper methods to make it easier to perform common
  * tasks related to web application development.
@@ -302,7 +315,7 @@ public class YokeRequest implements HttpServerRequest {
     /** Destroys a session from the request context and also from the storage engine.
      */
     public void destroySession() {
-        JsonObject session = get("session");
+    	SessionObject session = get("session");
         if (session == null) {
             return;
         }
@@ -340,7 +353,7 @@ public class YokeRequest implements HttpServerRequest {
             @Override
             public void handle(JsonObject session) {
                 if (session != null) {
-                    put("session", session);
+                    put("session", new SessionObject(session));
                 }
 
                 response().headersHandler(new Handler<Void>() {
@@ -349,9 +362,9 @@ public class YokeRequest implements HttpServerRequest {
                         int responseStatus = response().getStatusCode();
                         // Only save on success and redirect status codes
                         if (responseStatus >= 200 && responseStatus < 400) {
-                            JsonObject session = get("session");
-                            if (session != null) {
-                                store.set(sessionId, session, new Handler<Object>() {
+                        	SessionObject session = get("session");
+                            if (session != null && session.isChanged()) {
+                                store.set(sessionId, session.jsonObject(), new Handler<Object>() {
                                     @Override
                                     public void handle(Object error) {
                                         if (error != null) {
@@ -392,7 +405,7 @@ public class YokeRequest implements HttpServerRequest {
     public JsonObject createSession(@NotNull final String sessionId) {
         final JsonObject session = new JsonObject().putString("id", sessionId);
 
-        put("session", session);
+        put("session", new SessionObject(session, true));
 
         response().headersHandler(new Handler<Void>() {
             @Override
@@ -400,9 +413,9 @@ public class YokeRequest implements HttpServerRequest {
                 int responseStatus = response().getStatusCode();
                 // Only save on success and redirect status codes
                 if (responseStatus >= 200 && responseStatus < 400) {
-                    JsonObject session = get("session");
-                    if (session != null) {
-                        store.set(sessionId, session, new Handler<Object>() {
+                	SessionObject session = get("session");
+                    if (session != null && session.isChanged()) {
+                        store.set(sessionId, session.jsonObject(), new Handler<Object>() {
                             @Override
                             public void handle(Object error) {
                                 if (error != null) {

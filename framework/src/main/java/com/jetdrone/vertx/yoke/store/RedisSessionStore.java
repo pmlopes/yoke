@@ -220,7 +220,7 @@ public class RedisSessionStore implements SessionStore {
         });
     }
 
-
+    @SuppressWarnings("unused")
     private void getKeys(final Handler<JsonArray> next) {
         JsonObject redis = new JsonObject();
         redis.putString("command", "keys");

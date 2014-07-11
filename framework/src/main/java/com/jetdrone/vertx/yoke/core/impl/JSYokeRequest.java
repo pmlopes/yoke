@@ -1,8 +1,11 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
-import com.jetdrone.vertx.yoke.core.Context;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.store.SessionStore;
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.EMPTY_OBJECT_ARRAY;
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.isVararg;
+import static com.jetdrone.vertx.yoke.core.impl.JSUtil.javaToJS;
+
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import org.mozilla.javascript.Callable;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
@@ -12,26 +15,24 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerFileUpload;
 import org.vertx.java.core.http.HttpServerRequest;
 
-import javax.net.ssl.SSLPeerUnverifiedException;
-
-import java.util.List;
-import java.util.Map;
-
-import static com.jetdrone.vertx.yoke.core.impl.JSUtil.*;
+import com.jetdrone.vertx.yoke.core.Context;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.store.SessionStore;
 
 final class JSYokeRequest  extends YokeRequest implements Scriptable {
 
     private final Context context;
 
+    private Callable resolveScope;
     private Callable accepts;
     private Callable bodyHandler;
-    private Scriptable cookies;
+    private Object cookies;
     private Callable dataHandler;
     private Callable endHandler;
     private Callable exceptionHandler;
     private Callable expectMultipart;
-    private Scriptable files;
-    private Scriptable formAttributes;
+    private Object files;
+    private Object formAttributes;
 
     private Scriptable prototype, parent;
     private Callable getAllCookies;
@@ -43,15 +44,18 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
     private Callable getHeader;
     private Callable getParameter;
     private Callable getParameterList;
-    private Scriptable headers;
+    private Object params;
+    private Callable param;
+    private Object headers;
     private Callable is;
     private Callable hasBody;
     private Callable loadSession;
-    private Scriptable params;
     private Callable pause;
     private Callable resume;
     private Callable sortedHeader;
     private Callable uploadHandler;
+    private Callable createSession;
+    private Callable destroySession;
 
     public JSYokeRequest(HttpServerRequest request, JSYokeResponse response, boolean secure, Context context, SessionStore store) {
         super(request, response, secure, context, store);
@@ -67,10 +71,22 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
     public Object get(String name, Scriptable start) {
         // first context
         if (context.containsKey(name)) {
-            return context.get(name);
+            return javaToJS(context.get(name), getParentScope());
         }
         // cacheable scriptable objects
         switch (name) {
+        	case "resolveScope":
+        		if (resolveScope == null) {
+        			resolveScope = new Callable() {
+						@Override
+						public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+							setParentScope(scope);
+							((JSYokeResponse) response()).setParentScope(scope);
+							return Undefined.instance;
+						}
+					};
+        		}
+        		return resolveScope;
             case "absoluteURI":
                 return absoluteURI();
             case "accepts":
@@ -93,23 +109,17 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return accepts;
             case "body":
                 if (body != null) {
-                    if (body instanceof Map) {
-                        return toScriptable((Map) body);
-                    }
-                    if (body instanceof List) {
-                        return toScriptable((List) body);
-                    }
                     if (body instanceof Buffer) {
                         return body.toString();
                     }
+                    return javaToJS(body, getParentScope());
                 }
-
-                return body;
+                return null;
             case "bodyHandler":
                 if (bodyHandler == null) {
                     bodyHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
@@ -143,16 +153,27 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return contentLength();
             case "cookies":
                 if (cookies == null) {
-                    cookies = toScriptable(cookies());
+                	cookies = javaToJS(cookies(), parent);
                 }
                 return cookies;
             case "createSession":
-                return createSession();
+            	if (createSession == null) {
+            		createSession = new Callable() {
+                        @Override
+                        public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
+                            if (JSYokeRequest.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
+                            }
+                            return javaToJS(createSession(), scope);
+                        }
+                    };
+            	}
+                return createSession;
             case "dataHandler":
                 if (dataHandler == null) {
                     dataHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
@@ -181,13 +202,24 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 }
                 return dataHandler;
             case "destroySession":
-                destroySession();
-                return Undefined.instance;
+            	if (destroySession == null) {
+            		destroySession = new Callable() {
+                        @Override
+                        public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
+                            if (JSYokeRequest.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
+                            }
+                            destroySession();
+                            return Undefined.instance;
+                        }
+                    };
+            	}
+                return destroySession;
             case "endHandler":
                 if (endHandler == null) {
                     endHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
@@ -217,7 +249,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 if (exceptionHandler == null) {
                     exceptionHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
@@ -265,12 +297,12 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return expectMultipart;
             case "files":
                 if (files == null) {
-                    files = toScriptable(files());
+                	files = javaToJS(files(), getParentScope());
                 }
                 return files;
             case "formAttributes":
                 if (formAttributes == null) {
-                    formAttributes = toScriptable(formAttributes());
+                    formAttributes = javaToJS(formAttributes(), getParentScope());
                 }
                 return formAttributes;
             case "getAllCookies":
@@ -283,7 +315,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.getAllCookies((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.getAllCookies((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -301,7 +333,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.getAllHeaders((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.getAllHeaders((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -319,7 +351,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.getCookie((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.getCookie((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -337,7 +369,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.getFile((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.getFile((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -377,7 +409,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.getFormParameterList((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.getFormParameterList((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -439,7 +471,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.getParameterList((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.getParameterList((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -447,6 +479,38 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                     };
                 }
                 return getFormParameterList;
+            case "params":
+                if (params == null) {
+                    params = javaToJS(params(), getParentScope());
+                }
+                return params;
+            case "param":
+            	if (param == null) {
+            		param = new Callable() {
+                        @Override
+                        public Object call(org.mozilla.javascript.Context cx, Scriptable scope, Scriptable thisObj, Object[] args) {
+                            if (JSYokeRequest.this != thisObj) {
+                                throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
+                            }
+
+                            if (JSUtil.is(args, String.class)) {
+                            	String name = (String) args[0], value = null;
+                                // first try to get param from params / url --> this differs from expressjs
+                                value = JSYokeRequest.this.params().get(name);
+                                if (value == null) {
+                                	// then try to get param from body
+                                	try {
+	                                    value = JSYokeRequest.this.formAttributes().get(name);
+                                    } catch (Exception ignore) { /* maybe throw IllegalStateExcpetion */ }
+                                }
+                                return value != null ? value : Undefined.instance;
+                            }
+
+                            throw new UnsupportedOperationException();
+                        }
+                    };
+            	}
+            	return param;
             case "hasBody":
                 if (hasBody == null) {
                     hasBody = new Callable() {
@@ -455,7 +519,6 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
                             }
-
                             return JSYokeRequest.this.hasBody();
                         }
                     };
@@ -463,7 +526,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 return hasBody;
             case "headers":
                 if (headers == null) {
-                    headers = toScriptable(headers());
+                    headers = javaToJS(headers(), getParentScope());
                 }
                 return headers;
             case "ip":
@@ -492,7 +555,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 if (loadSession == null) {
                     loadSession = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
@@ -513,29 +576,24 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                                 return Undefined.instance;
                             }
 
-
                             throw new UnsupportedOperationException();
                         }
                     };
                 }
                 return loadSession;
             case "localAddress":
-                return localAddress();
+                return localAddress().toString();
             case "locale":
-                return locale();
+                return locale().toString();
             case "method":
                 return method();
             case "netSocket":
+            	// TODO
                 return netSocket();
             case "normalizedPath":
                 return normalizedPath();
             case "originalMethod":
                 return originalMethod();
-            case "params":
-                if (params == null) {
-                    params = toScriptable(params());
-                }
-                return params;
             case "path":
                 return path();
             case "pause":
@@ -554,6 +612,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 }
                 return pause;
             case "peerCertificateChain":
+            	// TODO
                 try {
                     return peerCertificateChain();
                 } catch (SSLPeerUnverifiedException e) {
@@ -562,7 +621,8 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
             case "query":
                 return query();
             case "remoteAddress":
-                return remoteAddress();
+                return remoteAddress().toString();
+            case "res":
             case "response":
                 return response();
             case "resume":
@@ -590,7 +650,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                             }
 
                             if (JSUtil.is(args, String.class)) {
-                                return toScriptable(JSYokeRequest.this.sortedHeader((String) args[0]));
+                                return javaToJS(JSYokeRequest.this.sortedHeader((String) args[0]), scope);
                             }
 
                             throw new UnsupportedOperationException();
@@ -602,7 +662,7 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
                 if (uploadHandler == null) {
                     uploadHandler = new Callable() {
                         @Override
-                        @SuppressWarnings("unchecked")
+                        @SuppressWarnings({ "unchecked", "rawtypes" })
                         public Object call(final org.mozilla.javascript.Context cx, final Scriptable scope, final Scriptable thisObj, final Object[] args) {
                             if (JSYokeRequest.this != thisObj) {
                                 throw new RuntimeException("[native JSYokeFunction not bind to JSYokeRequest]");
@@ -633,8 +693,16 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
             case "uri":
                 return uri();
             case "version":
-                return version();
+            	switch (version()) {
+            	case HTTP_1_0:
+            		return "1.0";
+            	case HTTP_1_1:
+            		return "1.1";
+            	default:
+            		return "unknown";
+            	}
             case "vertxHttpServerRequest":
+            	// TODO
                 return vertxHttpServerRequest();
 
             default:
