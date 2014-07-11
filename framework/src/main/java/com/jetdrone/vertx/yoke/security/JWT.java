@@ -27,12 +27,12 @@ public final class JWT {
         }
 
         @Override
-        public synchronized byte[] sign(byte[] payload) {
+        public byte[] sign(byte[] payload) {
             return mac.doFinal(payload);
         }
 
         @Override
-        public synchronized boolean verify(byte[] signature, byte[] payload) {
+        public boolean verify(byte[] signature, byte[] payload) {
             return Arrays.equals(signature, mac.doFinal(payload));
         }
     }
@@ -45,7 +45,7 @@ public final class JWT {
         }
 
         @Override
-        public synchronized byte[] sign(byte[] payload) {
+        public byte[] sign(byte[] payload) {
             try {
                 sig.update(payload);
                 return sig.sign();
@@ -55,7 +55,7 @@ public final class JWT {
         }
 
         @Override
-        public synchronized boolean verify(byte[] signature, byte[] payload) {
+        public boolean verify(byte[] signature, byte[] payload) {
             try {
                 sig.update(payload);
                 return sig.verify(signature);
