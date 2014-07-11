@@ -4,7 +4,9 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
 import groovy.lang.Closure;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import java.util.List;
@@ -13,6 +15,12 @@ import java.util.regex.Pattern;
 public class GRouter extends Middleware {
 
     private final Router jRouter = new Router();
+
+    @Override
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+        jRouter.init(yoke, mount);
+        return this;
+    }
 
     @Override
     public void handle(YokeRequest request, Handler<Object> next) {
