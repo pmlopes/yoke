@@ -160,7 +160,6 @@ public class Static extends Middleware {
             request.response().end();
         } else {
             request.response().sendFile(file);
-            request.response().end();
         }
     }
 
