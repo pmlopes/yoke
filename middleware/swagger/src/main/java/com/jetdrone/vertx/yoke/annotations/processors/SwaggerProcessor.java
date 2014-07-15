@@ -255,7 +255,21 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                 response.putBoolean("uniqueItems", true);
             case ARRAY:
                 response.putString("type", type.type());
-                // TODO: items
+                if (parameter.items() == DataType.UNDEFINED) {
+                    if (!"".equals(parameter.itemsRefId())) {
+                        response.putObject("items", new JsonObject().putString("$ref", parameter.itemsRefId()));
+                    } else {
+                        throw new RuntimeException("ARRAY/SET must specify items type or items refId");
+                    }
+                } else {
+                    if (parameter.items() == DataType.ARRAY || parameter.items() == DataType.SET) {
+                        throw new RuntimeException("ARRAY/SET cannot contain ARRAYS/SETs");
+                    } else {
+                        response.putObject("items", new JsonObject()
+                                .putString("type", parameter.items().type())
+                                .putString("format", parameter.items().format()));
+                    }
+                }
                 break;
             // void
             case VOID:

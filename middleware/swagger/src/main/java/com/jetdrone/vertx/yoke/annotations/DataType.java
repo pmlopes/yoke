@@ -18,7 +18,8 @@ public enum DataType {
     VOID("void", null, DataType.OUT),
     // file
     FILE("File", null, DataType.IN),
-    REF(null, null, 0);
+    REF(null, null, 0),
+    UNDEFINED(null, null, 0);
 
     private static final int IN = 1;
     private static final int OUT = 2;
@@ -34,18 +35,30 @@ public enum DataType {
     }
 
     public String type() {
+        if (type == null) {
+            throw new RuntimeException("UNDEFINED cannot be used as a type");
+        }
         return type;
     }
 
     public String format() {
+        if (type == null) {
+            throw new RuntimeException("UNDEFINED cannot be used as a type");
+        }
         return format;
     }
 
     public boolean isIN() {
+        if (type == null) {
+            throw new RuntimeException("UNDEFINED cannot be used as a type");
+        }
         return (inOut & IN) == IN;
     }
 
     public boolean isOUT() {
+        if (type == null) {
+            throw new RuntimeException("UNDEFINED cannot be used as a type");
+        }
         return (inOut & OUT) == OUT;
     }
 }

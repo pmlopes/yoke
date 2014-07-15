@@ -14,9 +14,13 @@ public @interface Parameter {
     DataType type();
     ParamType paramType() default ParamType.PATH;
     boolean allowMultiple() default false;
+    String defaultValue() default "";
     String minimum() default "";
     String maximum() default "";
     String[] enumeration() default {};
     // specify the $ref name when type is REF
     String refId() default "";
+
+    String itemsRefId() default "";
+    DataType items() default DataType.UNDEFINED;
 }
