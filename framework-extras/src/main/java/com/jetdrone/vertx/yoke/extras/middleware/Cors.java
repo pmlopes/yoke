@@ -10,10 +10,8 @@ import static io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_REQUE
 import static io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_REQUEST_METHOD;
 import static io.netty.handler.codec.http.HttpHeaders.Names.ORIGIN;
 import static io.netty.handler.codec.http.HttpMethod.OPTIONS;
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
-import static org.apache.commons.lang.StringUtils.isNotBlank;
-import static org.apache.commons.lang.StringUtils.join;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -134,5 +132,36 @@ public class Cors extends Middleware
     private String getAllowedOrigin(final String origin)
     {
         return allowedOriginPattern == null ? "*" : origin;
+    }
+
+    private static boolean isEmpty(final Collection<?> c)
+    {
+        return c == null ? true : c.isEmpty();
+    }
+
+    private static boolean isNotBlank(final String s)
+    {
+        return s == null ? false : !s.trim().isEmpty();
+    }
+
+    private static String join(final Collection<String> ss, final String j)
+    {
+        if (ss == null || ss.isEmpty())
+        {
+            return "";
+        }
+
+        final StringBuffer sb = new StringBuffer();
+        boolean first = true;
+        for (final String s : ss)
+        {
+            if (!first)
+            {
+                sb.append(j);
+            }
+            sb.append(s);
+            first = false;
+        }
+        return sb.toString();
     }
 }
