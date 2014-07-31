@@ -6,7 +6,6 @@ public class JsonSchema {
 
     public static boolean conformsSchema(Object instance, String schemaRef) {
         return schemaRef == null || conformsSchema(instance, resolve(schemaRef));
-
     }
 
     public static boolean conformsSchema(Object instance, Schema schema) {
