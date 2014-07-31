@@ -15,7 +15,7 @@ class Attributes {
 
     @Test
     void it_should_not_validate_an_invalid_number() {
-        assertTrue(JsonSchema.conformsSchema('0', new JsonSchemaResolver.Schema(['type': 'number'])));
+        assertFalse(JsonSchema.conformsSchema('0', new JsonSchemaResolver.Schema(['type': 'number'])));
     }
 
     @Test
@@ -70,52 +70,52 @@ class Attributes {
 
     @Test
     void it_should_validate_if_number_meets_minimum() {
-        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': '1'])));
+        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': 1])));
     }
 
     @Test
     void it_should_not_validate_if_number_is_below_minimum() {
-        assertFalse(JsonSchema.conformsSchema(0, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': '1'])));
+        assertFalse(JsonSchema.conformsSchema(0, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': 1])));
     }
 
     @Test
     void it_should_validate_if_number_is_above_minimum_using_exclusiveMinimum() {
-        assertTrue(JsonSchema.conformsSchema(2, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': '1', 'exclusiveMinimum': true])));
+        assertTrue(JsonSchema.conformsSchema(2, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': 1, 'exclusiveMinimum': true])));
     }
 
     @Test
     void it_should_not_validate_if_number_is_the_minimum_using_exclusiveMinimum() {
-        assertFalse(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': '1', 'exclusiveMinimum': true])));
+        assertFalse(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': 1, 'exclusiveMinimum': true])));
     }
 
     @Test
     void it_should_validate_if_number_is_below_the_maximum() {
-        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': '2'])));
+        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': 2])));
     }
 
     @Test
     void it_should_not_validate_if_number_is_above_maximum() {
-        assertFalse(JsonSchema.conformsSchema(3, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': '2'])));
+        assertFalse(JsonSchema.conformsSchema(3, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': 2])));
     }
 
     @Test
     void it_should_validate_if_number_is_below_maximum_using_exclusiveMinimum() {
-        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': '2', 'exclusiveMaximum': true])));
+        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': 2, 'exclusiveMaximum': true])));
     }
 
     @Test
     void it_should_not_validate_if_number_is_the_maximum_using_exclusiveMinimum() {
-        assertFalse(JsonSchema.conformsSchema(2, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': '2', 'exclusiveMaximum': true])));
+        assertFalse(JsonSchema.conformsSchema(2, new JsonSchemaResolver.Schema(['type': 'number', 'maximum': 2, 'exclusiveMaximum': true])));
     }
 
     @Test
     void it_should_validate_if_number_is_between_minmax() {
-        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': '1', 'maximum': '2'])));
+        assertTrue(JsonSchema.conformsSchema(1, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': 1, 'maximum': 2])));
     }
 
     @Test
     void it_should_not_validate_if_number_is_above_minumum() {
-        assertFalse(JsonSchema.conformsSchema(3, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': '1', 'maximum': '2'])));
+        assertFalse(JsonSchema.conformsSchema(3, new JsonSchemaResolver.Schema(['type': 'number', 'minimum': 1, 'maximum': 2])));
     }
 
     @Test
@@ -210,16 +210,16 @@ class Attributes {
 
     @Test
     void it_should_validate_with_missing_non_depended_properties() {
-        assertTrue(JsonSchema.conformsSchema([foo: 1], new JsonSchemaResolver.Schema(['dependencies': ['quux': ['foo', 'bar']]])));
+        assertTrue(JsonSchema.conformsSchema([foo: 1], new JsonSchemaResolver.Schema(['type': 'object', 'dependencies': ['quux': ['foo', 'bar']]])));
     }
 
     @Test
     void it_should_not_validate_with_missing_dependencies() {
-        assertFalse(JsonSchema.conformsSchema([quux: 1, foo: 1], new JsonSchemaResolver.Schema(['dependencies': ['quux': ['foo', 'bar']]])));
+        assertFalse(JsonSchema.conformsSchema([quux: 1, foo: 1], new JsonSchemaResolver.Schema(['type': 'object', 'dependencies': ['quux': ['foo', 'bar']]])));
     }
 
     @Test
     void it_should_validate_with_satisfied_dependencies() {
-        assertTrue(JsonSchema.conformsSchema([quux: 1, foo: 1, bar: 1], new JsonSchemaResolver.Schema(['dependencies': ['quux': ['foo', 'bar']]])));
+        assertTrue(JsonSchema.conformsSchema([quux: 1, foo: 1, bar: 1], new JsonSchemaResolver.Schema(['type': 'object', 'dependencies': ['quux': ['foo', 'bar']]])));
     }
 }
