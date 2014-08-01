@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.json;
 
 import com.jetdrone.vertx.yoke.json.JsonSchemaResolver.Schema;
 
-public class JsonSchema {
+public final class JsonSchema {
 
     public static boolean conformsSchema(Object instance, String schemaRef) {
         return schemaRef == null || conformsSchema(instance, resolve(schemaRef));

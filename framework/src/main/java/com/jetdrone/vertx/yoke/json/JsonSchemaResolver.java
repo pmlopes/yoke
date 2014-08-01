@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public final class JsonSchemaResolver {
 
-    public static class Schema extends HashMap<String, Object> {
+    public static final class Schema extends HashMap<String, Object> {
 
         private static final long serialVersionUID = 1l;
 
