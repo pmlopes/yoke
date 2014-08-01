@@ -42,6 +42,14 @@ public final class JsonSchemaResolver {
         public <T> T get(String key) {
             return (T) super.get(key);
         }
+
+        public String getLocation() {
+            if (parent != null) {
+                return parent.getLocation() + "@" + resolvedId;
+            }
+
+            return resolvedId;
+        }
     }
 
     private static final Pattern ABSOLUTE = Pattern.compile("^.*://.*");
