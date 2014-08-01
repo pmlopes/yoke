@@ -1,8 +1,10 @@
-package com.jetdrone.vertx.yoke.json;
+package com.jetdrone.vertx.json;
 
-import com.jetdrone.vertx.yoke.util.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.json.JsonObject;
 
+import java.io.*;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -87,11 +89,11 @@ public final class JsonSchemaResolver {
         JsonObject json;
 
         if (CLASSPATH.matcher(uri).matches()) {
-            json = new JsonObject(Utils.readResourceToString(JsonSchemaResolver.class, uri.substring(12)));
+            json = new JsonObject(readResourceToString(JsonSchemaResolver.class, uri.substring(12)));
         } else if (FILE.matcher(uri).matches()) {
-            json = new JsonObject(Utils.readFileToString(uri.substring(7)));
+            json = new JsonObject(readFileToString(uri.substring(7)));
         } else if (HTTP.matcher(uri).matches()) {
-            json = new JsonObject(Utils.readURLToString(uri));
+            json = new JsonObject(readURLToString(uri));
         } else {
             throw new RuntimeException("Unknown Protocol: " + uri);
         }
@@ -111,5 +113,71 @@ public final class JsonSchemaResolver {
 
     private static boolean isAbsolute(String uri) {
         return ABSOLUTE.matcher(uri).matches();
+    }
+
+    /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    private static String readResourceToString(@NotNull Class<?> clazz, @NotNull String resource) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                return writer.toString();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    private static String readFileToString(@NotNull String resource) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(resource), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                return writer.toString();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    private static String readURLToString(@NotNull String resource) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(new URL(resource).openStream(), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                return writer.toString();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 }

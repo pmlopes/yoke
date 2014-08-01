@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.yoke.json;
+package com.jetdrone.vertx.json;
 
 import java.util.HashSet;
 import java.util.List;

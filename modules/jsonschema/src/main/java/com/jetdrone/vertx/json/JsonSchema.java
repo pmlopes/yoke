@@ -1,6 +1,6 @@
-package com.jetdrone.vertx.yoke.json;
+package com.jetdrone.vertx.json;
 
-import com.jetdrone.vertx.yoke.json.JsonSchemaResolver.Schema;
+import com.jetdrone.vertx.json.JsonSchemaResolver.Schema;
 
 public final class JsonSchema {
 

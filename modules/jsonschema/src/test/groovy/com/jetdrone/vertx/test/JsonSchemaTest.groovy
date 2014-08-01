@@ -1,7 +1,7 @@
-package com.jetdrone.vertx.yoke.test
+package com.jetdrone.vertx.test
 
-import com.jetdrone.vertx.yoke.json.JsonSchema
-import com.jetdrone.vertx.yoke.json.StringValidator
+import com.jetdrone.vertx.json.JsonSchema
+import com.jetdrone.vertx.json.StringValidator
 import org.junit.Test
 import org.vertx.java.core.json.JsonObject
 

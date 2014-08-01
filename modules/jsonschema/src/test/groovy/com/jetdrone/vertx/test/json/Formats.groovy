@@ -1,7 +1,7 @@
-package com.jetdrone.vertx.yoke.test.json
+package com.jetdrone.vertx.test.json
 
-import com.jetdrone.vertx.yoke.json.JsonSchema
-import com.jetdrone.vertx.yoke.json.JsonSchemaResolver
+import com.jetdrone.vertx.json.JsonSchema
+import com.jetdrone.vertx.json.JsonSchemaResolver
 import org.junit.Test
 
 import static org.junit.Assert.*
