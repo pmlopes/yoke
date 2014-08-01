@@ -1,56 +1,43 @@
 package com.jetdrone.vertx.yoke.json;
 
-final class IntegerValidator {
+public final class IntegerValidator {
 
     public static boolean isValid(Object instance, JsonSchemaResolver.Schema schema) {
         if (!isInteger(instance)) {
             return false;
         }
 
-        Integer number = (Integer) instance;
-
-        // validate divisibleBy
-        Integer divisibleBy = schema.get("divisibleBy");
-
-        if (divisibleBy != null) {
-            if (number == null || number % divisibleBy != 0) {
-                return false;
-            }
+        // apply default value
+        if (instance == null) {
+            instance = schema.get("default");
         }
 
-        // validate minimum
-        Integer minimum = schema.get("minimum");
-        Boolean exclusiveMinimum = schema.get("exclusiveMinimum");
+        final Integer number = (Integer) instance;
 
-        if (minimum != null) {
-            if (exclusiveMinimum == null) {
-                exclusiveMinimum = false;
-            }
+        if (number != null) {
+            // validate divisibleBy
+            final Integer divisibleBy = schema.get("divisibleBy");
 
-            if (number == null) {
+            if (divisibleBy != null && number % divisibleBy != 0) {
                 return false;
             }
 
-            if (exclusiveMinimum ? (number <= minimum) : (number < minimum)) {
-                return false;
-            }
-        }
+            // validate minimum
+            final Integer minimum = schema.get("minimum");
 
-        // validate maximum
-        Integer maximum = schema.get("maximum");
-        Boolean exclusiveMaximum = schema.get("exclusiveMaximum");
-
-        if (maximum != null) {
-            if (exclusiveMaximum == null) {
-                exclusiveMaximum = false;
+            if (minimum != null) {
+                if (Boolean.TRUE.equals(schema.get("exclusiveMinimum")) ? (number <= minimum) : (number < minimum)) {
+                    return false;
+                }
             }
 
-            if (number == null) {
-                return false;
-            }
+            // validate maximum
+            final Integer maximum = schema.get("maximum");
 
-            if (exclusiveMaximum ? (maximum <= number) : (maximum < number)) {
-                return false;
+            if (maximum != null) {
+                if (Boolean.TRUE.equals(schema.get("exclusiveMaximum")) ? (maximum <= number) : (maximum < number)) {
+                    return false;
+                }
             }
         }
 

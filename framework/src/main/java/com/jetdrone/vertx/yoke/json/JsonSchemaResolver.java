@@ -11,6 +11,8 @@ public final class JsonSchemaResolver {
 
     public static class Schema extends HashMap<String, Object> {
 
+        private static final long serialVersionUID = 1l;
+
         private Schema parent;
         private final String resolvedId;
 

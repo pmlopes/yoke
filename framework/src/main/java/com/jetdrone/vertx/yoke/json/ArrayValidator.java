@@ -5,63 +5,64 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-final class ArrayValidator {
+public final class ArrayValidator {
 
     public static boolean isValid(Object instance, JsonSchemaResolver.Schema schema) {
         if (!isArray(instance)) {
             return false;
         }
 
-        List<Object> array = (List<Object>) instance;
-
-        // validate additionalItems
-        Boolean additionalItems = schema.get("additionalItems");
-
-        if (additionalItems != null && !additionalItems) {
-            List<Object> items = schema.get("items");
-            if (array.size() > items.size()) {
-                return false;
-            }
+        // apply default value
+        if (instance == null) {
+            instance = schema.get("default");
         }
 
-        // validate maxItems
-        Integer maxItems = schema.get("maxItems");
+        final List array = (List) instance;
 
-        if (maxItems != null) {
-            if (array == null || array.size() > maxItems) {
-                return false;
-            }
-        }
+        if (array != null) {
+            // validate additionalItems
+            Boolean additionalItems = schema.get("additionalItems");
 
-        // validate minItems
-        Integer minItems = schema.get("minItems");
-
-        if (minItems != null) {
-            if (array == null || array.size() < minItems) {
-                return false;
-            }
-        }
-
-        // validate uniqueItems
-        Boolean uniqueItems = schema.get("uniqueItems");
-
-        if (uniqueItems != null && uniqueItems) {
-            if (array == null) {
-                return false;
-            }
-
-            Set<Object> set = new HashSet<>();
-
-            for (Object o : array) {
-                if (!set.add(o)) {
+            if (additionalItems != null && !additionalItems) {
+                List<Object> items = schema.get("items");
+                if (array.size() > items.size()) {
                     return false;
                 }
             }
 
-            set.clear();
-        }
+            // validate maxItems
+            Integer maxItems = schema.get("maxItems");
 
-        if (array != null) {
+            if (maxItems != null) {
+                if (array.size() > maxItems) {
+                    return false;
+                }
+            }
+
+            // validate minItems
+            Integer minItems = schema.get("minItems");
+
+            if (minItems != null) {
+                if (array.size() < minItems) {
+                    return false;
+                }
+            }
+
+            // validate uniqueItems
+            Boolean uniqueItems = schema.get("uniqueItems");
+
+            if (uniqueItems != null && uniqueItems) {
+                Set<Object> set = new HashSet<>();
+
+                for (Object o : array) {
+                    if (!set.add(o)) {
+                        return false;
+                    }
+                }
+
+                set.clear();
+            }
+
             Object items = schema.get("items");
             JsonSchemaResolver.Schema itemsSchema = null;
 

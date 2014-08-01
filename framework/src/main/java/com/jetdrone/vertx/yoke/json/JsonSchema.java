@@ -19,18 +19,6 @@ public class JsonSchema {
 
         final String type = schema.get("type");
 
-        if (isNull(instance)) {
-            Object required = schema.get("required");
-
-            if (!(required instanceof Boolean) || Boolean.FALSE.equals(required)) {
-                required = null;
-            }
-
-            if (required != null) {
-                return false;
-            }
-        }
-
         if (!AnyValidator.isValid(instance, schema)) {
             return false;
         }
@@ -48,7 +36,7 @@ public class JsonSchema {
                 case "integer":
                     return IntegerValidator.isValid(instance, schema);
                 case "boolean":
-                    return isBoolean(instance);
+                    return BooleanValidator.isValid(instance, schema);
                 case "object":
                     return ObjectValidator.isValid(instance, schema);
                 default:
@@ -57,10 +45,6 @@ public class JsonSchema {
         }
 
         return true;
-    }
-
-    private static boolean isBoolean(Object value) {
-        return value == null || value instanceof Boolean;
     }
 
     private static boolean isNull(Object value) {
