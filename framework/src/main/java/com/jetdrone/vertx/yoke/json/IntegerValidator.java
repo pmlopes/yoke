@@ -47,5 +47,4 @@ public final class IntegerValidator {
     private static boolean isInteger(Object value) {
         return value == null || value instanceof Integer;
     }
-
 }

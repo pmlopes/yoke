@@ -85,5 +85,4 @@ public final class StringValidator {
     private static boolean isString(Object value) {
         return value == null || value instanceof String;
     }
-
 }

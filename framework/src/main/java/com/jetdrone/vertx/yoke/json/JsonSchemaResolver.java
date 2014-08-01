@@ -83,7 +83,6 @@ public final class JsonSchemaResolver {
         return resolveRelativeUri(uri, baseUri);
     }
 
-
     private static void tryToLoad(String uri) {
         JsonObject json;
 
