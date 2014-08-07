@@ -1,10 +1,11 @@
-package com.jetdrone.vertx.test.json
+package test.json
 
-import com.jetdrone.vertx.json.JsonSchema
-import com.jetdrone.vertx.json.JsonSchemaResolver
+import com.jetdrone.vertx.yoke.json.JsonSchema
+import com.jetdrone.vertx.yoke.json.JsonSchemaResolver
 import org.junit.Test
 
-import static org.junit.Assert.*
+import static org.junit.Assert.assertFalse
+import static org.junit.Assert.assertTrue
 
 class Attributes {
 

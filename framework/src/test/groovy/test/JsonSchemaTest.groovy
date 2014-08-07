@@ -1,7 +1,7 @@
-package com.jetdrone.vertx.test
+package test
 
-import com.jetdrone.vertx.json.JsonSchema
-import com.jetdrone.vertx.json.StringValidator
+import com.jetdrone.vertx.yoke.json.JsonSchema
+import com.jetdrone.vertx.yoke.json.StringValidator
 import org.junit.Test
 import org.vertx.java.core.json.JsonObject
 
@@ -22,7 +22,7 @@ public class JsonSchemaTest {
                 .putString("givenName", "Paulo")
                 .putString("familyName", "Lopes");
 
-        assertTrue(JsonSchema.conformsSchema(json.toMap(), "classpath:///card.json"));
+        assertTrue(JsonSchema.conformsSchema(json.toMap(), "classpath://card.json"));
     }
 
     @Test
@@ -73,6 +73,6 @@ public class JsonSchemaTest {
                 ]
         ];
 
-        assertTrue(JsonSchema.conformsSchema(json, "classpath:///card.json"));
+        assertTrue(JsonSchema.conformsSchema(json, "classpath://card.json"));
     }
 }

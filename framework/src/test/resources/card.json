@@ -28,7 +28,7 @@
                 "value": { "type": "string", "format": "phone" }
             }
         },
-        "adr": { "$ref": "classpath:///address.json" },
+        "adr": { "$ref": "classpath://address.json" },
         "geo": { "$ref": "http://json-schema.org/geo" },
         "tz": { "type": "string" },
         "photo": { "type": "string" },

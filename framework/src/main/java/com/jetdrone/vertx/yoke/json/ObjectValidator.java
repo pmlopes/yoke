@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.json;
+package com.jetdrone.vertx.yoke.json;
 
 import java.util.List;
 import java.util.Map;

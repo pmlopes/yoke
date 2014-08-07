@@ -1,9 +1,9 @@
 package com.jetdrone.vertx.yoke.annotations.processors;
 
+import com.jetdrone.vertx.yoke.json.JsonSchemaResolver;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.middleware.Swagger;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.util.Utils;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -68,8 +68,15 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             resource.consumes(produces);
         }
 
-        for (Model model : res.models()) {
-            resource.addModel(model.value(), new JsonObject(Utils.readResourceToString(clazz, model.value() + ".json")));
+        for (JsonSchema model : res.models()) {
+            String id = model.id();
+            JsonObject json = new JsonObject(JsonSchemaResolver.resolveSchema(model.value()));
+
+            if ("".equals(id)) {
+                // try to extract from the schema itself
+                id = json.getString("id");
+            }
+            resource.addModel(id, json);
         }
 
         SwaggerDoc doc = Processor.getAnnotation(method, SwaggerDoc.class);

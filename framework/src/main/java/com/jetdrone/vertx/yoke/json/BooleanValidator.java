@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.json;
+package com.jetdrone.vertx.yoke.json;
 
 public final class BooleanValidator {
 

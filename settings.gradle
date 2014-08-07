@@ -11,8 +11,6 @@ include 'engine:handlebars'
 include 'engine:jade'
 include 'engine:mvel'
 include 'engine:thymeleaf'
-// modules
-include 'modules:jsonschema'
 // extras
 include 'framework-extras'
 // examples

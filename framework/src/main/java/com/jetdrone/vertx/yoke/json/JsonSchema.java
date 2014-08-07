@@ -1,6 +1,4 @@
-package com.jetdrone.vertx.json;
-
-import com.jetdrone.vertx.json.JsonSchemaResolver.Schema;
+package com.jetdrone.vertx.yoke.json;
 
 public final class JsonSchema {
 
@@ -8,7 +6,7 @@ public final class JsonSchema {
         return schemaRef == null || conformsSchema(instance, resolve(schemaRef));
     }
 
-    public static boolean conformsSchema(Object instance, Schema schema) {
+    public static boolean conformsSchema(Object instance, JsonSchemaResolver.Schema schema) {
         if (schema == null) {
             return true;
         }
@@ -51,7 +49,7 @@ public final class JsonSchema {
         return value == null;
     }
 
-    private static Schema resolve(String id) {
+    private static JsonSchemaResolver.Schema resolve(String id) {
         return JsonSchemaResolver.resolveSchema(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.jetdrone.vertx.json;
+package com.jetdrone.vertx.yoke.json;
 
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.json.JsonObject;
@@ -89,7 +89,7 @@ public final class JsonSchemaResolver {
         JsonObject json;
 
         if (CLASSPATH.matcher(uri).matches()) {
-            json = new JsonObject(readResourceToString(JsonSchemaResolver.class, uri.substring(12)));
+            json = new JsonObject(readResourceToString(JsonSchemaResolver.class, uri.substring(11)));
         } else if (FILE.matcher(uri).matches()) {
             json = new JsonObject(readFileToString(uri.substring(7)));
         } else if (HTTP.matcher(uri).matches()) {
