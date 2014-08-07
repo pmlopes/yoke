@@ -7,9 +7,6 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
-import java.util.HashMap;
-import java.util.UUID;
-
 import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.assertTrue;
 import static org.vertx.testtools.VertxAssert.testComplete;
