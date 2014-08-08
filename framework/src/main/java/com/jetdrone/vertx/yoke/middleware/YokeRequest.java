@@ -20,6 +20,7 @@ import java.util.UUID;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 
+import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -721,7 +722,7 @@ public class YokeRequest implements HttpServerRequest {
             return cachedNormalizedPath;
         }
 
-        String path = request.path();
+        String path = Utils.decodeURIComponent(request.path());
 
         // path should start with / so we should ignore it
         if (path.charAt(0) == '/') {

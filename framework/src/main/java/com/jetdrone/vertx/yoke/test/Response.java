@@ -185,6 +185,7 @@ public class Response implements HttpServerResponse {
     @Override
     public HttpServerResponse sendFile(String filename) {
         body.appendBuffer(vertx.fileSystem().readFileSync(filename));
+        done();
         return this;
     }
 
