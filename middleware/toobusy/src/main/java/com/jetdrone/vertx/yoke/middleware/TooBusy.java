@@ -9,6 +9,7 @@ import org.vertx.java.core.Vertx;
 public final class TooBusy extends Middleware {
 
     private final long highWaterMark;
+    private final String message;
 
     private long timerID;
     private long t0;
@@ -19,7 +20,12 @@ public final class TooBusy extends Middleware {
     }
 
     public TooBusy(long highWaterMark) {
+        this(highWaterMark, "Server is too busy. Please, try again later.");
+    }
+
+    public TooBusy(long highWaterMark, String message) {
         this.highWaterMark = highWaterMark;
+        this.message = message;
     }
 
     @Override
@@ -55,7 +61,7 @@ public final class TooBusy extends Middleware {
             final YokeResponse response = request.response();
 
             response.setStatusCode(503);
-            response.setStatusMessage("Server is too busy. Please, try again later.");
+            response.setStatusMessage(message);
             response.end();
         } else {
             next.handle(null);
