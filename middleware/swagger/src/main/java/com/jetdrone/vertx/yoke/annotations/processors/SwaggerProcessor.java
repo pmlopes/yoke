@@ -217,7 +217,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         switch (type) {
             case REF:
-                response.putString("$ref", parameter.refId());
+                response.putString("type", parameter.model());
                 break;
             // primitives
             case INTEGER:
@@ -225,12 +225,22 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             case FLOAT:
             case DOUBLE:
                 response.putString("type", type.type());
-                response.putString("format", type.format());
+                if (type.format() != null) {
+                    response.putString("format", type.format());
+                }
                 if (!parameter.minimum().equals("")) {
                     response.putString("minimum", parameter.minimum());
                 }
                 if (!parameter.maximum().equals("")) {
                     response.putString("maximum", parameter.maximum());
+                }
+                if (!parameter.defaultValue().equals("")) {
+                    String val = parameter.defaultValue();
+                    if (val.indexOf('.') != -1) {
+                        response.putNumber("defaultValue", Double.parseDouble(parameter.defaultValue()));
+                    } else {
+                        response.putNumber("defaultValue", Integer.parseInt(parameter.defaultValue()));
+                    }
                 }
                 break;
             case BYTE:
@@ -238,8 +248,12 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             case DATE:
             case DATETIME:
                 response.putString("type", type.type());
-                response.putString("format", type.format());
-                // TODO: default value
+                if (type.format() != null) {
+                    response.putString("format", type.format());
+                }
+                if (!parameter.defaultValue().equals("")) {
+                    response.putString("defaultValue", parameter.defaultValue());
+                }
                 if (!parameter.minimum().equals("")) {
                     response.putString("minimum", parameter.minimum());
                 }
@@ -256,6 +270,9 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                 break;
             case BOOLEAN:
                 response.putString("type", type.type());
+                if (!parameter.defaultValue().equals("")) {
+                    response.putBoolean("defaultValue", Boolean.parseBoolean(parameter.defaultValue()));
+                }
                 break;
             // containers
             case SET:
