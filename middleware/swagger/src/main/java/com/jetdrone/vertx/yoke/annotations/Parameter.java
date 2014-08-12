@@ -18,9 +18,8 @@ public @interface Parameter {
     String minimum() default "";
     String maximum() default "";
     String[] enumeration() default {};
-    // specify the $ref name when type is REF
-    String refId() default "";
+    String model() default "";
 
-    String itemsRefId() default "";
     DataType items() default DataType.UNDEFINED;
+    String itemsRefId() default "";
 }
