@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 public final class CrossDomain extends Middleware {
@@ -13,7 +14,7 @@ public final class CrossDomain extends Middleware {
             "</cross-domain-policy>";
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
         if ("/crossdomain.xml".equals(request.path())) {
             request.response().putHeader("Content-Type", "text/x-cross-domain-policy");
             request.response().end(DATA);

@@ -10,6 +10,7 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.*;
 import org.vertx.java.core.net.NetSocket;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 import java.net.InetSocketAddress;
@@ -17,7 +18,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 
-/** # YokeTester */
+/**
+ * # YokeTester
+ */
 public class YokeTester {
 
     private final Vertx vertx;
@@ -97,7 +100,7 @@ public class YokeTester {
                         params = new CaseInsensitiveMultiMap();
 
                         if (!prms.isEmpty()) {
-                            for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
+                            for (Map.Entry<String, List<String>> entry : prms.entrySet()) {
                                 params.add(entry.getKey(), entry.getValue());
                             }
                         }
@@ -126,17 +129,27 @@ public class YokeTester {
                 }
 
                 @Override
-                public HttpServerRequest bodyHandler(Handler<Buffer> bodyHandler) {
-                    if(bodyHandler != null){
-                        bodyHandler.handle(body);
+                public HttpServerRequest bodyHandler(final Handler<Buffer> bodyHandler) {
+                    if (bodyHandler != null) {
+                        vertx.runOnContext(new Handler<Void>() {
+                            @Override
+                            public void handle(Void event) {
+                                bodyHandler.handle(body);
+                            }
+                        });
                     }
                     return this;
                 }
 
                 @Override
-                public HttpServerRequest dataHandler(Handler<Buffer> handler) {
-                    if(handler != null){
-                        handler.handle(body);
+                public HttpServerRequest dataHandler(final Handler<Buffer> handler) {
+                    if (handler != null) {
+                        vertx.runOnContext(new Handler<Void>() {
+                            @Override
+                            public void handle(Void event) {
+                                handler.handle(body);
+                            }
+                        });
                     }
                     return this;
                 }
@@ -152,12 +165,18 @@ public class YokeTester {
                 }
 
                 @Override
-                public HttpServerRequest endHandler(Handler<Void> endHandler) {
-                    if(endHandler != null){
-                        endHandler.handle(null);
+                public HttpServerRequest endHandler(final Handler<Void> endHandler) {
+                    if (endHandler != null) {
+                        vertx.runOnContext(new Handler<Void>() {
+                            @Override
+                            public void handle(Void event) {
+                                endHandler.handle(null);
+                            }
+                        });
                     }
                     return this;
                 }
+
                 @Override
                 public NetSocket netSocket() {
                     throw new UnsupportedOperationException("This mock does not support netSocket");
@@ -184,7 +203,7 @@ public class YokeTester {
                             Map<String, List<String>> prms = queryStringDecoder.parameters();
 
                             if (!prms.isEmpty()) {
-                                for (Map.Entry<String, List<String>> entry: prms.entrySet()) {
+                                for (Map.Entry<String, List<String>> entry : prms.entrySet()) {
                                     attributes.add(entry.getKey(), entry.getValue());
                                 }
                             }
@@ -437,6 +456,11 @@ public class YokeTester {
 
         @Override
         public boolean isUsePooledBuffers() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public HttpServer setSSLContext(SSLContext sslContext) {
             throw new UnsupportedOperationException();
         }
     }

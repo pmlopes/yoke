@@ -31,7 +31,7 @@ public class MVELEngineTest extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine(new MVELEngine());
+            yoke.engine(new MVELEngine(""));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -64,7 +64,7 @@ public class MVELEngineTest extends TestVerticle {
             final String location = temp.getAbsolutePath();
 
             Yoke yoke = new Yoke(this);
-            yoke.engine(new MVELEngine());
+            yoke.engine(new MVELEngine(""));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {

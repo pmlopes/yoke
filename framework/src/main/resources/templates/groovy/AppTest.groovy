@@ -1,41 +1,26 @@
-package templates.groovy
-
-import com.jetdrone.vertx.yoke.middleware.*
 import com.jetdrone.vertx.yoke.GYoke
-import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
+import com.jetdrone.vertx.yoke.test.GYokeTester
+import org.junit.Test
+import org.vertx.groovy.core.Vertx
+import org.vertx.groovy.platform.Container
+import org.vertx.testtools.TestVerticle
 
+import static org.vertx.testtools.VertxAssert.*
 
+public class AppTest extends TestVerticle {
 
-// Create a new Yoke Application
-GYoke app = new GYoke(vertx, container)
-// define engines
-app.engine(new GroovyTemplateEngine())
-// define middleware
-app.use(new Favicon())
-app.use(new Logger())
-app.use(new BodyParser())
-app.use(new MethodOverride())
-// Create a new Router
-GRouter router = new GRouter()
-app.use(router)
-// static file server
-app.use(new Static('public'))
+    @Test
+    public void testApp() {
+        final GYoke yoke = new GYoke(new Vertx(vertx), new Container(container))
+        yoke.use() { request, next ->
+            request.response.end("OK")
+        }
 
-// development only
-if (System.getenv('DEV') != null) {
-    app.use(new ErrorHandler(true))
+        final GYokeTester yokeAssert = new GYokeTester(yoke)
+
+        yokeAssert.request("GET", "/") { response ->
+            assertEquals("OK", response.body.toString())
+            testComplete()
+        }
+    }
 }
-
-// define routes
-router.get('/') { request ->
-    request.put('title', 'My Yoke Application')
-    request.response.render('views/index.gsp')
-}
-
-// define routes
-router.get('/users') { request ->
-    request.response.end('respond with a resource')
-}
-
-app.listen(8080)
-container.logger.info('Yoke server listening on port 8080')

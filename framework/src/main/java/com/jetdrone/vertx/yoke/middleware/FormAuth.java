@@ -3,12 +3,14 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
+
+import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.Yoke;
+import com.jetdrone.vertx.yoke.store.json.SessionObject;
+import com.jetdrone.vertx.yoke.util.Utils;
 
 public class FormAuth extends Middleware {
 
@@ -128,7 +130,7 @@ public class FormAuth extends Middleware {
     public final Middleware RequiredAuth = new Middleware() {
         @Override
         public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
-            JsonObject session = request.get("session");
+        	SessionObject session = request.get("session");
 
             if (session != null) {
                 if (session.getString("id") != null) {

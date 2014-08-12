@@ -31,17 +31,26 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
     private static final String sep = "(,\\s*)?";
     private static final Pattern ARG = Pattern.compile(quote + argument + quote + sep);
 
-    public StringPlaceholderEngine() {
-        super();
+    private final String extension;
+    private final String prefix;
+
+    public StringPlaceholderEngine(final String views) {
+        this(views, ".shtml");
     }
 
-    public StringPlaceholderEngine(String templateBodyKey) {
-        super(templateBodyKey);
+    public StringPlaceholderEngine(final String views, final String extension) {
+        this.extension = extension;
+
+        if ("".equals(views)) {
+            prefix = views;
+        } else {
+            prefix = views.endsWith("/") ? views : views + "/";
+        }
     }
 
     @Override
     public String extension() {
-        return ".shtml";
+        return extension;
     }
 
     /**
@@ -63,7 +72,7 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
     @Override
     public void render(final String file, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
         // verify if the file is still fresh in the cache
-        read(file, new AsyncResultHandler<String>() {
+        read(prefix + file, new AsyncResultHandler<String>() {
             @Override
             public void handle(AsyncResult<String> asyncResult) {
                 if (asyncResult.failed()) {

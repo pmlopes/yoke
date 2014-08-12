@@ -158,9 +158,9 @@ public class Swagger {
             return this;
         }
 
-        public Resource addModel(String name, JsonObject model) {
-            model.putString("id", name);
-            models.putObject(name, model);
+        public Resource addModel(String id, JsonObject model) {
+            model.putString("id", id);
+            models.putObject(id, model);
             return this;
         }
 

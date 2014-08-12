@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Set;
@@ -104,6 +105,50 @@ public final class Utils {
     public static String readResourceToString(@NotNull Class<?> clazz, @NotNull String resource) {
         try {
             try (Reader r = new BufferedReader(new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                return writer.toString();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    public static String readFileToString(@NotNull String resource) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(resource), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                return writer.toString();
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    /**
+     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
+     */
+    public static String readURLToString(@NotNull String resource) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(new URL(resource).openStream(), "UTF-8"))) {
 
                 Writer writer = new StringWriter();
 

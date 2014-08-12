@@ -10,6 +10,8 @@ import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import com.jetdrone.vertx.yoke.security.KeyStoreSecurity;
+import com.jetdrone.vertx.yoke.security.SecretSecurity;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.core.YokeException;
@@ -236,7 +238,7 @@ public class Yoke {
 
                 // register on JMX
                 try {
-                    mbs.registerMBean(new MiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:type=Middleware@" + hashCode() + ",name=" + m.getClass().getSimpleName()));
+                    mbs.registerMBean(new MiddlewareMBean(mm), new ObjectName("com.jetdrone.yoke:type=Middleware@" + hashCode() + ",route=" + ObjectName.quote(route) + ",name=" + m.getClass().getSimpleName() + "@" + m.hashCode()));
                 } catch (MalformedObjectNameException | InstanceAlreadyExistsException | MBeanRegistrationException | NotCompliantMBeanException e) {
                     throw new RuntimeException(e);
                 }
@@ -327,9 +329,9 @@ public class Yoke {
         return this;
     }
 
-    protected YokeSecurity security = new YokeSecurity();
+    protected YokeSecurity security;
 
-    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final JsonObject keyPasswords) {
+    public Yoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull final JsonObject keyPasswords) {
         String storeType;
         int idx = fileName.lastIndexOf('.');
 
@@ -346,7 +348,7 @@ public class Yoke {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new YokeSecurity(ks, keyPasswords.toMap());
+            this.security = new KeyStoreSecurity(ks, keyPasswords.toMap());
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -354,7 +356,7 @@ public class Yoke {
         return this;
     }
 
-    public Yoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword) {
+    public Yoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword) {
         String storeType;
         int idx = fileName.lastIndexOf('.');
 
@@ -371,15 +373,29 @@ public class Yoke {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new YokeSecurity(ks, keyStorePassword);
+            this.security = new KeyStoreSecurity(ks, keyStorePassword);
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+        return this;
+    }
+
+    public Yoke secretSecurity(@NotNull final String secret) {
+        this.security = new SecretSecurity(secret);
+        return this;
+    }
+
+    public Yoke secretSecurity(@NotNull final byte[] secret) {
+        this.security = new SecretSecurity(secret);
         return this;
     }
 
     public YokeSecurity security() {
+        if (security == null) {
+            throw new RuntimeException("No YokeSecurity implementation is enabled!");
+        }
+
         return security;
     }
 
@@ -486,15 +502,14 @@ public class Yoke {
                         if (error == null) {
                             currentMiddleware++;
                             if (currentMiddleware < middlewareList.size()) {
-                                MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
+                                final MountedMiddleware mountedMiddleware = middlewareList.get(currentMiddleware);
 
                                 if (!mountedMiddleware.enabled) {
                                     // the middleware is disabled
                                     handle(null);
                                 } else {
                                     if (request.path().startsWith(mountedMiddleware.mount)) {
-                                        Middleware middlewareItem = mountedMiddleware.middleware;
-                                        middlewareItem.handle(request, this);
+                                        mountedMiddleware.middleware.handle(request, this);
                                     } else {
                                         // the middleware was not mounted on this uri, skip to the next entry
                                         handle(null);
@@ -528,6 +543,11 @@ public class Yoke {
                                         errorCode = ((Number) error).intValue();
                                     } else if (error instanceof YokeException) {
                                         errorCode = ((YokeException) error).getErrorCode().intValue();
+                                    } else if (error instanceof JsonObject) {
+                                        errorCode = ((JsonObject) error).getInteger("errorCode", 500);
+                                    } else if (error instanceof Map) {
+                                        Integer tmp = (Integer) ((Map) error).get("errorCode");
+                                        errorCode = tmp != null ? tmp : 500;
                                     } else {
                                         // default error code
                                         errorCode = 500;

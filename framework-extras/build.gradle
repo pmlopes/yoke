@@ -51,6 +51,7 @@ install - install any jars produced to the local Maven repository (.m2)
 dependencies {
   // get yoke jar for parent
   provided project(':framework')
+  provided "org.jetbrains:annotations:13.0"
 }
 
 test {

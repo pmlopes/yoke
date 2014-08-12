@@ -36,7 +36,12 @@ public class Response implements HttpServerResponse {
             closeHandler.handle(null);
         }
         // complete
-        handler.handle(this);
+        vertx.runOnContext(new Handler<Void>() {
+            @Override
+            public void handle(Void event) {
+                handler.handle(Response.this);
+            }
+        });
     }
 
     @Override
@@ -180,6 +185,7 @@ public class Response implements HttpServerResponse {
     @Override
     public HttpServerResponse sendFile(String filename) {
         body.appendBuffer(vertx.fileSystem().readFileSync(filename));
+        done();
         return this;
     }
 

@@ -10,7 +10,7 @@ public class Tools {
     private static String module;
     private static String version;
 
-    private static final String VERSION = "1.0.18";
+    private static final String VERSION = "2.0.1";
 
     static void write(String path, String value) {
         try {
@@ -43,7 +43,12 @@ public class Tools {
     }
 
     static void abort(String message) {
-        System.err.println(message);
+        System.err.println("   \033[31merror\033[0m : " + message);
+        System.exit(1);
+    }
+
+    static void warn(String message) {
+        System.err.println("   \033[33mwarning\033[0m : " + message);
         System.exit(1);
     }
 
@@ -84,7 +89,7 @@ public class Tools {
     }
 
     static void printUsage() {
-        System.out.println("Usage: [--help] --[java|groovy|groovyscript|js] group:artifact:version");
+        System.out.println("Usage: [--help] --[java|groovy|groovyscript|javascript] group:artifact:version");
         System.out.println("  Group:    the owner of the project usually your reverse domain name");
         System.out.println("            e.g.: com.mycompany");
         System.out.println("  Artifact: the module name, usually your app name without special chars");
@@ -97,7 +102,7 @@ public class Tools {
     public static void main(String[] args) throws IOException {
 
         try {
-            language = Args.getArgumentFlag(Arrays.asList(new String[]{"java", "groovy", "groovyscript", "js"}), args);
+            language = Args.getArgumentFlag(Arrays.asList(new String[]{"java", "groovy", "groovyscript", "javascript"}), args);
 
             if (language == null) {
                 throw new RuntimeException("ERROR: Language is required!");
@@ -142,7 +147,7 @@ public class Tools {
                 copyBaseTemplate();
                 createGroovyScript();
                 break;
-            case "js":
+            case "javascript":
                 // setup gradle
                 copyBaseTemplate();
                 createJS();
@@ -180,8 +185,12 @@ public class Tools {
         copy(module + "/LICENSE.txt", "templates/gradle/LICENSE.txt");
         copy(module + "/gradlew.bat", "templates/gradle/gradlew.bat");
         copy(module + "/gradlew", "templates/gradle/gradlew");
+
         // need to set the *nix to executable
-        new File(module + "/gradlew").setExecutable(true);
+        if (!new File(module + "/gradlew").setExecutable(true)) {
+            warn("Could not set " + module + "/gradlew to executable!");
+        }
+
         copy(module + "/build.gradle", "templates/gradle/build.gradle");
 
         mkdir(module + "/gradle");
@@ -248,13 +257,13 @@ public class Tools {
         // write resources
         mkdir(module + "/src/main/resources/public");
         mkdir(module + "/src/main/resources/public/stylesheets");
-        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/java/style.css");
+        copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/groovy/style.css");
         mkdir(module + "/src/main/resources/views");
-        copy(module + "/src/main/resources/views/index.gsp", "templates/java/index.gsp");
+        copy(module + "/src/main/resources/views/index.gsp", "templates/groovy/index.gsp");
         // write mod.json
         write(module + "/src/main/resources/mod.json",
                 "{\n" +
-                        "  \"main\": \"" + owner + "." + module + ".App\",\n" +
+                        "  \"main\": \"groovy:" + owner + "." + module + ".App\",\n" +
                         "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
                         "}\n"
         );
@@ -264,7 +273,7 @@ public class Tools {
         mkdir(module + "/src/test/groovy/" + modulePath);
         write(module + "/src/test/groovy/" + modulePath + "/AppTest.groovy",
                 "package " + owner + "." + module + ";\n\n" +
-                        readResourceToString("templates/java/AppTest.groovy")
+                        readResourceToString("templates/groovy/AppTest.groovy")
         );
 
         mkdir(module + "/src/test/resources");
@@ -290,6 +299,7 @@ public class Tools {
     }
 
     static void createJS() {
+        String modulePath = owner.replace('.', '/') + "/" + module.replace('.', '/');
         // base source code
         mkdir(module + "/src/main/resources");
         write(module + "/src/main/resources/App.js", readResourceToString("templates/javascript/App.js"));
@@ -298,7 +308,7 @@ public class Tools {
         mkdir(module + "/src/main/resources/public/stylesheets");
         copy(module + "/src/main/resources/public/stylesheets/style.css", "templates/javascript/style.css");
         mkdir(module + "/src/main/resources/views");
-        copy(module + "/src/main/resources/views/index.html", "templates/javascript/index.html");
+        copy(module + "/src/main/resources/views/index.ejs", "templates/javascript/index.ejs");
         // write mod.json
         write(module + "/src/main/resources/mod.json",
                         "{\n" +
@@ -306,6 +316,18 @@ public class Tools {
                         "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
                         "}\n"
         );
+
+        mkdir(module + "/src/test/java");
+        // expand package
+        mkdir(module + "/src/test/java/" + modulePath);
+        // JUnit helper
+        write(module + "/src/test/java/" + modulePath + "/JSTester.java",
+                "package " + owner + "." + module + ";\n\n" +
+                        readResourceToString("templates/javascript/JSTester.java")
+        );
+
+        mkdir(module + "/src/test/resources");
+        write(module + "/src/test/resources/AppTest.js", readResourceToString("templates/javascript/AppTest.js"));
     }
 
     static void printDone() {
@@ -318,9 +340,9 @@ public class Tools {
         System.out.println();
         System.out.println("Compile your app:");
         if (OS.contains("win")) {
-            System.out.println("  gradlew.bat check");
+            System.out.println("  gradlew.bat build");
         } else {
-            System.out.println("  ./gradlew check");
+            System.out.println("  ./gradlew build");
         }
         System.out.println();
         System.out.println("Run your app:");

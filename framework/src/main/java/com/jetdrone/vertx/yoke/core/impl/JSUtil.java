@@ -1,14 +1,22 @@
 package com.jetdrone.vertx.yoke.core.impl;
 
-import com.jetdrone.vertx.yoke.core.YokeCookie;
-import com.jetdrone.vertx.yoke.core.YokeFileUpload;
-import org.mozilla.javascript.Scriptable;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.json.JsonElement;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJSON;
+import org.mozilla.javascript.NativeObject;
+import org.mozilla.javascript.Scriptable;
+import org.vertx.java.core.MultiMap;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonElement;
+import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.json.impl.Json;
+
+import com.jetdrone.vertx.yoke.store.json.ChangeAwareJsonArray;
+import com.jetdrone.vertx.yoke.store.json.ChangeAwareJsonElement;
 
 class JSUtil {
 
@@ -16,7 +24,25 @@ class JSUtil {
 
     static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    static Scriptable toScriptable(final MultiMap multiMap) {
+    static Object javaToJS(Object value, Scriptable scope) {
+        if (value == null)
+            return null;
+        if (value instanceof MultiMap)
+            return toScriptable((MultiMap) value, scope);
+        if (value instanceof Set)
+            return toScriptable((Set<?>) value, scope);
+        if (value instanceof List)
+            return toScriptable((List<?>) value, scope);
+        if (value instanceof Map)
+            return toScriptable((Map<?, ?>) value, scope);
+        if (value instanceof JsonElement)
+            return toScriptable((JsonElement) value, scope);
+        if (value instanceof ChangeAwareJsonElement)
+            return toScriptable((ChangeAwareJsonElement) value, scope);
+        return Context.javaToJS(value, scope);
+    }
+
+    private static Scriptable toScriptable(final MultiMap multiMap, final Scriptable scope) {
         return new Scriptable() {
 
             private Scriptable prototype, parent;
@@ -33,10 +59,10 @@ class JSUtil {
                     return NOT_FOUND;
                 }
                 if (items.size() == 1) {
-                    return items.get(0);
+                    return javaToJS(items.get(0), start);
                 }
 
-                return toScriptable(items);
+                return javaToJS(items, start);
             }
 
             @Override
@@ -118,43 +144,246 @@ class JSUtil {
         };
     }
 
-    static Scriptable toScriptable(final Set<?> set) {
-        // TODO: implement me!!!
-        return null;
-    }
-
-    static Scriptable toScriptable(final List<?> list) {
-        // TODO: implement me!!!
-        return null;
-    }
-
-    static Scriptable toScriptable(final YokeCookie cookie) {
-        // TODO: implement me!!!
-        return null;
-    }
-
-    static Scriptable toScriptable(final YokeFileUpload fileUpload) {
-        // TODO: implement me!!!
-        return null;
-    }
-
-    static Scriptable toScriptable(final Map<?, ?> map) {
+    /**
+     * Return a read-only {@link Scriptable} representing the given {@code set}.
+     * 
+     * @param set
+     * @param scope
+     * @return
+     */
+    static Scriptable toScriptable(final Set<?> set, final Scriptable scope) {
+        final Object[] elements = set.toArray();
+        final Object[] ids = new Object[elements.length];
+        for (int i = 0; i < elements.length; ++i)
+            ids[i] = i;
+        
         return new Scriptable() {
 
             private Scriptable prototype, parent;
 
             @Override
             public String getClassName() {
-                return "JSMultiMap";
+                return "JSSet";
+            }
+
+            @Override
+            public Object get(String name, Scriptable start) {
+                switch (name) {
+                case "length":
+                    return elements.length;
+                default:
+                    return NOT_FOUND;
+                }
+            }
+
+            @Override
+            public Object get(int index, Scriptable start) {
+                if (index < 0 || index >= elements.length)
+                    return NOT_FOUND;
+                return javaToJS(elements[index], scope);
+            }
+
+            @Override
+            public boolean has(String name, Scriptable start) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean has(int index, Scriptable start) {
+                return 0 <= index && index < elements.length;
+            }
+
+            @Override
+            public void put(String name, Scriptable start, Object value) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void put(int index, Scriptable start, Object value) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void delete(String name) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void delete(int index) {
+                throw new UnsupportedOperationException();
+            }
+            
+            @Override
+            public Scriptable getPrototype() {
+                return prototype;
+            }
+
+            @Override
+            public void setPrototype(Scriptable prototype) {
+                this.prototype = prototype;
+            }
+
+            @Override
+            public Scriptable getParentScope() {
+                return parent;
+            }
+
+            @Override
+            public void setParentScope(Scriptable parent) {
+                this.parent = parent;
+            }
+
+            @Override
+            public Object[] getIds() {
+                return ids;
+            }
+
+            @Override
+            public Object getDefaultValue(Class<?> hint) {
+                return "[object JSSet]";
+            }
+
+            @Override
+            public boolean hasInstance(Scriptable instance) {
+                Scriptable proto = instance.getPrototype();
+                while (proto != null) {
+                    if (proto.equals(this))
+                        return true;
+                    proto = proto.getPrototype();
+                }
+
+                return false;
+            }
+
+        };
+    }
+
+    static Scriptable toScriptable(final List<?> list, final Scriptable scope) {
+        return new Scriptable() {
+
+            private Scriptable prototype, parent;
+
+            @Override
+            public String getClassName() {
+                return "JSList";
+            }
+
+            @Override
+            public Object get(String name, Scriptable start) {
+                switch (name) {
+                case "length":
+                    return list.size();
+                default:
+                    return NOT_FOUND;
+                }
+            }
+
+            @Override
+            public Object get(int index, Scriptable start) {
+                if (index < 0 || index >= list.size())
+                    return NOT_FOUND;
+                return javaToJS(list.get(index), scope);
+            }
+
+            @Override
+            public boolean has(String name, Scriptable start) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean has(int index, Scriptable start) {
+                return 0 <= index && index < list.size();
+            }
+
+            @Override
+            public void put(String name, Scriptable start, Object value) {
+                throw new UnsupportedOperationException();
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void put(int index, Scriptable start, Object value) {
+                int size = list.size();
+                if (0 <= index && index < size)
+                    ((List<Object>) list).set(index, fromNative(value, scope));
+                else if (index == size + 1)
+                    ((List<Object>) list).add(fromNative(value, scope));
+                else
+                    throw new RuntimeException("JSList does not allow put at random index");
+            }
+
+            @Override
+            public void delete(String name) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void delete(int index) {
+                list.remove(index);
+            }
+
+            @Override
+            public Scriptable getPrototype() {
+                return prototype;
+            }
+
+            @Override
+            public void setPrototype(Scriptable prototype) {
+                this.prototype = prototype;
+            }
+
+            @Override
+            public Scriptable getParentScope() {
+                return parent;
+            }
+
+            @Override
+            public void setParentScope(Scriptable parent) {
+                this.parent = parent;
+            }
+
+            @Override
+            public Object[] getIds() {
+                Object[] ids = new Object[list.size()];
+                for (int i = 0; i < list.size(); ++i)
+                    ids[i] = i;
+                return ids;
+            }
+
+            @Override
+            public Object getDefaultValue(Class<?> hint) {
+                return "[object JSList]";
+            }
+
+            @Override
+            public boolean hasInstance(Scriptable instance) {
+                Scriptable proto = instance.getPrototype();
+                while (proto != null) {
+                    if (proto.equals(this))
+                        return true;
+                    proto = proto.getPrototype();
+                }
+
+                return false;
+            }
+        };
+    }
+    
+    static Scriptable toScriptable(final Map<?, ?> map, final Scriptable scope) {
+        return new Scriptable() {
+
+            private Scriptable prototype, parent;
+
+            @Override
+            public String getClassName() {
+                return "JSMap";
             }
 
             @Override
             public Object get(String name, Scriptable start) {
                 if (map.containsKey(name)) {
-                    // TODO: cast return type to js friendly type
-                    return map.get(name);
+                    return javaToJS(map.get(name), scope);
                 }
-
                 return NOT_FOUND;
             }
 
@@ -176,7 +405,7 @@ class JSUtil {
             @Override
             @SuppressWarnings("unchecked")
             public void put(String name, Scriptable start, Object value) {
-                ((Map) map).put(name, value);
+                ((Map<String, Object>) map).put(name, fromNative(value, scope));
             }
 
             @Override
@@ -221,7 +450,7 @@ class JSUtil {
 
             @Override
             public Object getDefaultValue(Class<?> hint) {
-                return "[object JSMultiMap]";
+                return "[object JSMap]";
             }
 
             @Override
@@ -238,7 +467,7 @@ class JSUtil {
         };
     }
 
-    static Scriptable toScriptable(final JsonElement json) {
+    private static Scriptable toScriptable(final JsonElement json, final Scriptable scope) {
         return new Scriptable() {
 
             private Scriptable prototype, parent;
@@ -252,13 +481,17 @@ class JSUtil {
             public Object get(String name, Scriptable start) {
                 if (json.isObject()) {
                     if (json.asObject().containsField(name)) {
-                        // TODO: convert jsonelement/map/jsonarray/list
-                        return json.asObject().getField(name);
+                        return javaToJS(json.asObject().getField(name), scope);
                     } else {
                         return NOT_FOUND;
                     }
                 } else {
-                    return NOT_FOUND;
+                    switch (name) {
+                    case "length":
+                        return json.asArray().size();
+                    default:
+                        return NOT_FOUND;
+                    }
                 }
             }
 
@@ -266,8 +499,7 @@ class JSUtil {
             public Object get(int index, Scriptable start) {
                 if (json.isArray()) {
                     if (index >= 0 && json.asArray().size() > index) {
-                        // TODO: convert jsonelement/map/jsonarray/list
-                        return json.asArray().get(index);
+                        return javaToJS(json.asArray().get(index), scope);
                     } else {
                         return NOT_FOUND;
                     }
@@ -288,16 +520,25 @@ class JSUtil {
 
             @Override
             public void put(String name, Scriptable start, Object value) {
-                json.asObject().putValue(name, value);
+                if (!json.isObject())
+                    throw new RuntimeException("Not a JsonObject.");
+                json.asObject().putValue(name, fromNative(value, scope));
             }
 
             @Override
             public void put(int index, Scriptable start, Object value) {
-                throw new RuntimeException("JsonArray does not allow put at random index");
+                if (!json.isArray())
+                    throw new RuntimeException("Not a JsonArray.");
+                JsonArray arr = json.asArray();
+                if (index != arr.size() + 1)
+                    throw new RuntimeException("JsonArray does not allow put at random index");
+                arr.add(fromNative(value, scope));
             }
 
             @Override
             public void delete(String name) {
+                if (!json.isObject())
+                    throw new RuntimeException("Not a JsonObject.");
                 json.asObject().removeField(name);
             }
 
@@ -331,6 +572,12 @@ class JSUtil {
                 if (json.isObject()) {
                     return json.asObject().getFieldNames().toArray();
                 }
+                if (json.isArray()) {
+                    int size = json.asArray().size();
+                    Object[] ids = new Object[size];
+                    for (int i = 0; i < size; ++i) ids[i] = Integer.valueOf(i);
+                    return ids;
+                }
                 return EMPTY_OBJECT_ARRAY;
             }
 
@@ -345,6 +592,168 @@ class JSUtil {
             }
         };
     }
+
+    private static Scriptable toScriptable(final ChangeAwareJsonElement json, final Scriptable scope) {
+        return new Scriptable() {
+
+            private Scriptable prototype, parent;
+
+            @Override
+            public String getClassName() {
+                return "JSChangeAwareJsonElement";
+            }
+
+            @Override
+            public Object get(String name, Scriptable start) {
+                if (json.isObject()) {
+                    if (json.asObject().containsField(name)) {
+                        return javaToJS(json.asObject().getField(name), scope);
+                    } else {
+                        return NOT_FOUND;
+                    }
+                } else {
+                    switch (name) {
+                    case "length":
+                        return json.asArray().size();
+                    default:
+                        return NOT_FOUND;
+                    }
+                }
+            }
+
+            @Override
+            public Object get(int index, Scriptable start) {
+                if (json.isArray()) {
+                    if (index >= 0 && json.asArray().size() > index) {
+                        return javaToJS(json.asArray().get(index), scope);
+                    } else {
+                        return NOT_FOUND;
+                    }
+                } else {
+                    return NOT_FOUND;
+                }
+            }
+
+            @Override
+            public boolean has(String name, Scriptable start) {
+                return json.isObject() && json.asObject().containsField(name);
+            }
+
+            @Override
+            public boolean has(int index, Scriptable start) {
+                return json.isArray() && index >= 0 && json.asArray().size() > index;
+            }
+
+            @Override
+            public void put(String name, Scriptable start, Object value) {
+                if (!json.isObject())
+                    throw new RuntimeException("Not a ChangeAwareJsonObject.");
+                json.asObject().putValue(name, fromNative(value, scope));
+            }
+
+            @Override
+            public void put(int index, Scriptable start, Object value) {
+                if (!json.isArray())
+                    throw new RuntimeException("Not a ChangeAwareJsonArray.");
+                ChangeAwareJsonArray arr = json.asArray();
+                if (index != arr.size() + 1)
+                    throw new RuntimeException("ChangeAwareJsonArray does not allow put at random index");
+                arr.add(fromNative(value, scope));
+            }
+
+            @Override
+            public void delete(String name) {
+                if (!json.isObject())
+                    throw new RuntimeException("Not a ChangeAwareJsonObject.");
+                json.asObject().removeField(name);
+            }
+
+            @Override
+            public void delete(int index) {
+                throw new RuntimeException("ChangeAwareJsonArray does not allow delete at random index");
+            }
+
+            @Override
+            public Scriptable getPrototype() {
+                return prototype;
+            }
+
+            @Override
+            public void setPrototype(Scriptable prototype) {
+                this.prototype = prototype;
+            }
+
+            @Override
+            public Scriptable getParentScope() {
+                return parent;
+            }
+
+            @Override
+            public void setParentScope(Scriptable parent) {
+                this.parent = parent;
+            }
+
+            @Override
+            public Object[] getIds() {
+                if (json.isObject()) {
+                    return json.asObject().getFieldNames().toArray();
+                }
+                if (json.isArray()) {
+                    int size = json.asArray().size();
+                    Object[] ids = new Object[size];
+                    for (int i = 0; i < size; ++i) ids[i] = Integer.valueOf(i);
+                    return ids;
+                }
+                return EMPTY_OBJECT_ARRAY;
+            }
+
+            @Override
+            public Object getDefaultValue(Class<?> hint) {
+                return "[object JSChangeAwareJsonElement]";
+            }
+
+            @Override
+            public boolean hasInstance(Scriptable instance) {
+                return instance != null && instance instanceof JsonElement;
+            }
+        };
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static Object fromNative(Object value, final Scriptable scope) {
+        if (value == null) return null;
+
+        boolean isNativeArray = value instanceof NativeArray,
+                isNativeObject = value instanceof NativeObject;
+        if (isNativeArray || isNativeObject) {
+            // Convert JavaScript json to vertx JsonArray or JsonObject
+            Object json = NativeJSON.stringify(Context.getCurrentContext(), scope, value, null, null);
+            if (json instanceof String) {
+                if (isNativeArray) {
+                    value = new JsonArray((List) Json.decodeValue((String) json, List.class));
+                } else {
+                    value = new JsonObject((Map) Json.decodeValue((String) json, Map.class));
+                }
+            }
+        }
+
+        if (value instanceof Double) {
+            // Because JavaScripe Number will be default to Double, it is better
+            // to convert it to an integer long value if it could be represented to.
+            double doubleVal = (Double) value;
+            long longVal = Math.round(doubleVal);
+            if (Math.abs(doubleVal - longVal) < Epsilon)
+                value = longVal;
+        }
+
+        if (value instanceof CharSequence) {
+        	// Need to convert CharSequence to String
+        	value = value.toString();
+        }
+
+        return value;
+    }
+    private static final double Epsilon = 0.0000001;
 
     static boolean is(Object[] args, Class<?>... classes) {
         if (args == null && classes == null) {

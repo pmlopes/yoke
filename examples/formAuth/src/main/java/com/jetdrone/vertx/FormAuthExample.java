@@ -17,6 +17,7 @@ public class FormAuthExample extends Verticle {
     public void start() {
 
         final Yoke app = new Yoke(this);
+        app.secretSecurity("keyboard cat");
 
         final Mac hmac = app.security().getMac("HmacSHA256");
 

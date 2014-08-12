@@ -1,6 +1,7 @@
 package com.jetdrone.vertx.yoke.annotations;
 
 import com.jetdrone.vertx.yoke.annotations.processors.ContentNegotiationProcessorHandler;
+import com.jetdrone.vertx.yoke.annotations.processors.JsonSchemaProcessorHandler;
 import com.jetdrone.vertx.yoke.annotations.processors.RegExParamProcessorHandler;
 import com.jetdrone.vertx.yoke.annotations.processors.RouterProcessorHandler;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +29,7 @@ public final class Processor {
     static {
         handlers.add(new ContentNegotiationProcessorHandler());
         handlers.add(new RegExParamProcessorHandler());
+        handlers.add(new JsonSchemaProcessorHandler());
         handlers.add(new RouterProcessorHandler());
     }
 

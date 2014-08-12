@@ -16,7 +16,6 @@
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
-import com.jetdrone.vertx.yoke.engine.AbstractEngineSync;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
@@ -34,10 +33,13 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
     private final JadeConfiguration config = new JadeConfiguration();
 
     private final String prefix;
-    private final String extension = ".jade";
+    private final String extension;
 
     public Jade4JEngine(final String views) {
-        super(null);
+        this(views, ".jade");
+    }
+    public Jade4JEngine(final String views, final String extension) {
+        this.extension = extension;
 
         if ("".equals(views)) {
             prefix = views;
@@ -76,11 +78,6 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
     @Override
     public String extension() {
         return extension;
-    }
-
-    @Override
-    public void render(final String filename, final String layoutFilename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> handler) {
-        handler.handle(new YokeAsyncResult<Buffer>(new UnsupportedOperationException()));
     }
 
     @Override

@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface SwaggerResource {
     String path();
     String description();
+    JsonSchema[] models() default {};
 }

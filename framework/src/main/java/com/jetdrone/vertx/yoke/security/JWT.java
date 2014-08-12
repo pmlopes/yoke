@@ -8,18 +8,19 @@ import javax.crypto.Mac;
 import java.security.Signature;
 import java.security.SignatureException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public final class JWT {
 
-    private interface Crypto {
+    private static interface Crypto {
         byte[] sign(byte[] payload);
         boolean verify(byte[] signature, byte[] payload);
     }
 
-    private final class CryptoMac implements Crypto {
-        final Mac mac;
+    private static final class CryptoMac implements Crypto {
+        private final Mac mac;
 
         private CryptoMac(final Mac mac) {
             this.mac = mac;
@@ -36,8 +37,8 @@ public final class JWT {
         }
     }
 
-    private final class CryptoSignature implements Crypto {
-        final Signature sig;
+    private static final class CryptoSignature implements Crypto {
+        private final Signature sig;
 
         private CryptoSignature(final Signature signature) {
             this.sig = signature;
@@ -64,29 +65,33 @@ public final class JWT {
         }
     }
 
-    private final Map<String, Crypto> CRYPTO_MAP = new HashMap<>();
+    private final Map<String, Crypto> CRYPTO_MAP;
 
     public JWT(final YokeSecurity security) {
+
+        Map<String, Crypto> tmp = new HashMap<>();
         try {
-            CRYPTO_MAP.put("HS256", new CryptoMac(security.getMac("HS256")));
+            tmp.put("HS256", new CryptoMac(security.getMac("HS256")));
         } catch (RuntimeException e) {
             // Algorithm not supported
         }
         try {
-            CRYPTO_MAP.put("HS384", new CryptoMac(security.getMac("HS384")));
+            tmp.put("HS384", new CryptoMac(security.getMac("HS384")));
         } catch (RuntimeException e) {
             // Algorithm not supported
         }
         try {
-            CRYPTO_MAP.put("HS512", new CryptoMac(security.getMac("HS512")));
+            tmp.put("HS512", new CryptoMac(security.getMac("HS512")));
         } catch (RuntimeException e) {
             // Algorithm not supported
         }
         try {
-            CRYPTO_MAP.put("RS256", new CryptoSignature(security.getSignature("RS256")));
+            tmp.put("RS256", new CryptoSignature(security.getSignature("RS256")));
         } catch (RuntimeException e) {
             // Algorithm not supported
         }
+
+        CRYPTO_MAP = Collections.unmodifiableMap(tmp);
     }
 
     public JsonObject decode(final String token) {

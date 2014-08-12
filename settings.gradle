@@ -5,13 +5,15 @@ include 'middleware:swagger'
 include 'middleware:helmet'
 include 'middleware:pac4j'
 include 'middleware:reststore'
+include 'middleware:toobusy'
 // engines
 include 'engine:handlebars'
 include 'engine:jade'
 include 'engine:mvel'
 include 'engine:thymeleaf'
-
+// extras
 include 'framework-extras'
+// examples
 include 'examples:dojo-reststore'
 include 'examples:groovy'
 include 'examples:javascript'
@@ -23,3 +25,4 @@ include 'examples:swagger-petstore'
 include 'examples:benchmark'
 include 'examples:cluster-benchmark'
 include 'examples:techempower'
+include 'examples:sessionStore'

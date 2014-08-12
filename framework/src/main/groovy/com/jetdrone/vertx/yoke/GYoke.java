@@ -164,13 +164,23 @@ public class GYoke {
     }
 
 
-    public GYoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull Map<String, Object> keyPasswords) {
-        jYoke.keyStore(fileName, keyStorePassword, new JsonObject(keyPasswords));
+    public GYoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword, @NotNull Map<String, Object> keyPasswords) {
+        jYoke.keyStoreSecurity(fileName, keyStorePassword, new JsonObject(keyPasswords));
         return this;
     }
 
-    public GYoke keyStore(@NotNull final String fileName, @NotNull final String keyStorePassword) {
-        jYoke.keyStore(fileName, keyStorePassword);
+    public GYoke keyStoreSecurity(@NotNull final String fileName, @NotNull final String keyStorePassword) {
+        jYoke.keyStoreSecurity(fileName, keyStorePassword);
+        return this;
+    }
+
+    public GYoke secretSecurity(@NotNull final String secret) {
+        jYoke.secretSecurity(secret);
+        return this;
+    }
+
+    public GYoke secretSecurity(@NotNull final byte[] secret) {
+        jYoke.secretSecurity(secret);
         return this;
     }
 
@@ -221,6 +231,16 @@ public class GYoke {
      */
     @SuppressWarnings("unchecked")
     public GYoke deploy(final Object config, final Closure handler) {
+
+        if (config == null) {
+            if (handler == null) {
+                return this;
+            } else {
+                handler.call((Object) null);
+                return this;
+            }
+        }
+
         if (config instanceof List) {
 
             if (((List) config).size() == 0) {

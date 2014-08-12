@@ -1,17 +1,15 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.middleware.impl.WebClient;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class CSP extends Middleware {
-
-    private static Pattern UA = Pattern.compile("([^/\\s]*)(/([^\\s]*))?(\\s*\\[[a-zA-Z][a-zA-Z]\\])?\\s*(\\((([^()]|(\\([^()]*\\)))*)\\))?\\s*");
 
     private final List<String> ALL_HEADERS = Arrays.asList(
             "X-Content-Security-Policy",
@@ -80,27 +78,17 @@ public class CSP extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    @SuppressWarnings("unchecked")
+    public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
 
         List<String> headers = new ArrayList<>();
         Map<String, Object> policy = new HashMap<>();
         boolean setAllHeaders = this.setAllHeaders;
 
-        String userAgentHeader = request.getHeader("user-agent", "");
+        final WebClient webClient = WebClient.detect(request.getHeader("user-agent"));
 
-        Matcher matcher = UA.matcher(userAgentHeader);
-
-        String browserName = matcher.group(1);
-        String browserVersion = matcher.group(3);
-        float version = 0;
-
-        if (browserVersion != null) {
-            try {
-                version = Float.parseFloat(browserVersion);
-            } catch (NumberFormatException nfe) {
-                // ignore
-            }
-        }
+        WebClient.UserAgent userAgent = webClient.getUserAgent();
+        int version = webClient.getMajorVersion();
 
         for (String directive : DIRECTIVES) {
             Object value = options.getField(directive);
@@ -118,9 +106,9 @@ public class CSP extends Middleware {
 
         }
 
-        switch (browserName) {
+        switch (userAgent) {
 
-            case "IE":
+            case IE:
                 if (version >= 10) {
                     headers.add("X-Content-Security-Policy");
                     if (policy.get("sandbox") == null) {
@@ -129,7 +117,7 @@ public class CSP extends Middleware {
                 }
                 break;
 
-            case "Firefox":
+            case FIREFOX:
 
                 if (version >= 23) {
 
@@ -186,7 +174,7 @@ public class CSP extends Middleware {
 
                 break;
 
-            case "Chrome":
+            case CHROME:
                 if ((version >= 14) && (version < 25)) {
                     headers.add("X-WebKit-CSP");
                 } else if (version >= 25) {
@@ -194,7 +182,7 @@ public class CSP extends Middleware {
                 }
                 break;
 
-            case "Safari":
+            case SAFARI:
                 if (version >= 7) {
                     headers.add("Content-Security-Policy");
                 } else if ((version >= 6) || ((version >= 5.1) && safari5)) {
@@ -202,13 +190,13 @@ public class CSP extends Middleware {
                 }
                 break;
 
-            case "Opera":
+            case OPERA:
                 if (version >= 15) {
                     headers.add("Content-Security-Policy");
                 }
                 break;
 
-            case "Chrome Mobile":
+            case CHROME_MOBILE:
                 if (version >= 14) {
                     headers.add("Content-Security-Policy");
                 }

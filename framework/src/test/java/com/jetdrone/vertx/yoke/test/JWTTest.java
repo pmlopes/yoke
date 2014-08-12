@@ -16,6 +16,8 @@ public class JWTTest extends TestVerticle {
     @Test
     public void testJWT() {
         final Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         JWT jwt = new JWT(yoke.security());
         testComplete();
     }
@@ -23,6 +25,8 @@ public class JWTTest extends TestVerticle {
     @Test
     public void testJWT2() {
         Yoke yoke = new Yoke(this);
+        yoke.secretSecurity("keyboard cat");
+
         JWT jwt = new JWT(yoke.security());
 
         long now = System.currentTimeMillis();

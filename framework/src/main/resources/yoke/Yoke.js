@@ -5,8 +5,12 @@
 function JSYoke() {
     this.vertx = __jvertx;
     this.container = __jcontainer;
-//    this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container);
     this.jYoke = new com.jetdrone.vertx.yoke.Yoke(this.vertx, this.container, new com.jetdrone.vertx.yoke.core.impl.JSRequestWrapper());
+    // Resolve execution scope for JSYokeRequest and JSYokeResponse
+    this.use(function(request, next) {
+        request.resolveScope();
+        next(null);
+    });
 }
 
 JSYoke.prototype.store = function (sessionStore) {
@@ -50,13 +54,13 @@ JSYoke.prototype.use = function (route, callback) {
     return this;
 };
 
-JSYoke.prototype.engine = function (extension, engine) {
+JSYoke.prototype.engine = function (engine) {
     // verify if the engine is already a Engine instance
     if (engine.jEngine !== undefined) {
         // in this case pass it directly to the jYoke
-        this.jYoke.engine(extension, engine.jEngine);
+        this.jYoke.engine(engine.jEngine);
     } else {
-        this.jYoke.engine(extension, new com.jetdrone.vertx.yoke.Engine(engine));
+        this.jYoke.engine(new com.jetdrone.vertx.yoke.Engine(engine));
     }
 };
 
