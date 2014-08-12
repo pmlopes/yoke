@@ -1,5 +1,7 @@
 package com.jetdrone.vertx.yoke.json;
 
+import org.vertx.java.core.json.JsonObject;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +17,19 @@ public final class ObjectValidator {
             instance = schema.get("default");
         }
 
+        // from now on work with maps
+        if (instance instanceof JsonObject) {
+            instance = ((JsonObject) instance).toMap();
+        }
+
         final Map object = (Map) instance;
+
+        // required takes precedence if instance is null
+        final List<String> required = schema.get("required");
+
+        if (object == null && required != null && required.size() > 0) {
+            return false;
+        }
 
         if (object != null) {
             // validate maxProperties
@@ -37,8 +51,6 @@ public final class ObjectValidator {
             }
 
             // validate required
-            final List<String> required = schema.get("required");
-
             if (required != null) {
                 for (String field : required) {
                     if (!object.containsKey(field)) {
@@ -107,7 +119,7 @@ public final class ObjectValidator {
     }
 
     private static boolean isObject(Object value) {
-        return value == null || value instanceof Map;
+        return value == null || value instanceof Map || value instanceof JsonObject;
     }
 
     private static void setParentIfNotNull(JsonSchemaResolver.Schema schema, JsonSchemaResolver.Schema parent) {

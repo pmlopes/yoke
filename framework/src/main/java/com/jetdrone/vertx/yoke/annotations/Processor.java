@@ -28,8 +28,8 @@ public final class Processor {
 
     static {
         handlers.add(new ContentNegotiationProcessorHandler());
-        handlers.add(new RegExParamProcessorHandler());
         handlers.add(new JsonSchemaProcessorHandler());
+        handlers.add(new RegExParamProcessorHandler());
         handlers.add(new RouterProcessorHandler());
     }
 

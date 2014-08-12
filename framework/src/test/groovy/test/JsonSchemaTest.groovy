@@ -18,11 +18,16 @@ public class JsonSchemaTest {
         StringValidator.addPattern("phone", Pattern.compile(".*"));
         StringValidator.addPattern("date", Pattern.compile(".*"));
 
-        JsonObject json = new JsonObject()
-                .putString("givenName", "Paulo")
-                .putString("familyName", "Lopes");
-
-        assertTrue(JsonSchema.conformsSchema(json.toMap(), "classpath://card.json"));
+        def json = [
+                familyName     : 'Paulo',
+                givenName      : 'Lopes',
+                adr            : [
+                        locality: 'Amsterdam',
+                        region: 'North Holland',
+                        'country-name': 'The Netherlands'
+                ]
+        ];
+        assertTrue(JsonSchema.conformsSchema(json, "classpath://card.json"));
     }
 
     @Test
