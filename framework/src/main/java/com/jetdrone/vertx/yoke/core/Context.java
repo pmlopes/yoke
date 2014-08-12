@@ -121,10 +121,9 @@ public final class Context implements Map<String, Object> {
     @Override
     public @NotNull Collection<Object> values() {
         if (rw != null) {
-            Collection<Object> values = new HashSet<>(ro.values());
-            for (Object entry : rw.values()) {
-                // if already present replace
-                values.add(entry);
+            Collection<Object> values = new LinkedList<>();
+            for (String key : keySet()) {
+                values.add(get(key));
             }
             return values;
         }
@@ -135,10 +134,24 @@ public final class Context implements Map<String, Object> {
     @Override
     public @NotNull Set<Entry<String, Object>> entrySet() {
         if (rw != null) {
-            Set<Entry<String, Object>> entries = new HashSet<>(ro.entrySet());
-            for (Entry<String, Object> entry : rw.entrySet()) {
-                // if already present replace
-                entries.add(entry);
+            Set<Entry<String, Object>> entries = new HashSet<>();
+            for (final String key : keySet()) {
+                entries.add(new Entry<String, Object>() {
+                    @Override
+                    public String getKey() {
+                        return key;
+                    }
+
+                    @Override
+                    public Object getValue() {
+                        return get(key);
+                    }
+
+                    @Override
+                    public Object setValue(Object o) {
+                        return put(key, o);
+                    }
+                });
             }
             return entries;
         }
