@@ -1,5 +1,7 @@
 package com.jetdrone.vertx.yoke.json;
 
+import org.vertx.java.core.json.JsonArray;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,11 @@ public final class ArrayValidator {
         // apply default value
         if (instance == null) {
             instance = schema.get("default");
+        }
+
+        // from now on work with lists
+        if (instance instanceof JsonArray) {
+            instance = ((JsonArray) instance).toList();
         }
 
         final List array = (List) instance;
@@ -89,7 +96,7 @@ public final class ArrayValidator {
     }
 
     private static boolean isArray(Object value) {
-        return value == null || value instanceof List;
+        return value == null || value instanceof List || value instanceof JsonArray;
     }
 
     private static void setParentIfNotNull(JsonSchemaResolver.Schema schema, JsonSchemaResolver.Schema parent) {
