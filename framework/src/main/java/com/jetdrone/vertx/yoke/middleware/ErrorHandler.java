@@ -15,6 +15,7 @@ import org.vertx.java.core.json.JsonObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * # ErrorHandler
@@ -83,6 +84,10 @@ public class ErrorHandler extends Middleware {
             return (String) error;
         } else if (error instanceof Integer) {
             return HttpResponseStatus.valueOf((Integer) error).reasonPhrase();
+        } else if (error instanceof JsonObject) {
+            return ((JsonObject) error).getString("message");
+        } else if (error instanceof Map) {
+            return (String) ((Map) error).get("message");
         } else {
             return error.toString();
         }
@@ -99,6 +104,11 @@ public class ErrorHandler extends Middleware {
             return ((Number) error).intValue();
         } else if (error instanceof YokeException) {
             return ((YokeException) error).getErrorCode().intValue();
+        } else if (error instanceof JsonObject) {
+            return ((JsonObject) error).getInteger("errorCode", 500);
+        } else if (error instanceof Map) {
+            Integer tmp = (Integer) ((Map) error).get("errorCode");
+            return tmp != null ? tmp : 500;
         } else {
             return 500;
         }

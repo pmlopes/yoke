@@ -543,6 +543,11 @@ public class Yoke {
                                         errorCode = ((Number) error).intValue();
                                     } else if (error instanceof YokeException) {
                                         errorCode = ((YokeException) error).getErrorCode().intValue();
+                                    } else if (error instanceof JsonObject) {
+                                        errorCode = ((JsonObject) error).getInteger("errorCode", 500);
+                                    } else if (error instanceof Map) {
+                                        Integer tmp = (Integer) ((Map) error).get("errorCode");
+                                        errorCode = tmp != null ? tmp : 500;
                                     } else {
                                         // default error code
                                         errorCode = 500;
