@@ -41,28 +41,36 @@ public class TooBusyTest extends TestVerticle {
 
         vertx.setPeriodic(100, new Handler<Long>() {
             int i = 0;
-            boolean some200 = false;
-            boolean some503 = false;
+            int some200 = 0;
+            int some503 = 0;
+
             @Override
             public void handle(Long event) {
                 tester.request("GET", "/", new Handler<Response>() {
                     @Override
                     public void handle(Response response) {
                         if (response.getStatusCode() == 200) {
-                            some200 = true;
+                            some200++;
                         }
                         if (response.getStatusCode() == 503) {
-                            some503 = true;
+                            some503++;
                         }
                     }
                 });
 
                 if (++i == 100) {
-                    assertTrue(some200);
-                    assertTrue(some503);
+                    System.out.println("[200]: " + some200 + " [503]: " + some503);
+                    assertTrue(some200 > 0);
+                    assertTrue(some503 > 0);
                     testComplete();
                 }
             }
         });
+    }
+
+    @Test
+    public void test2() {
+        System.out.println(System.currentTimeMillis());
+        System.out.println(System.nanoTime());
     }
 }

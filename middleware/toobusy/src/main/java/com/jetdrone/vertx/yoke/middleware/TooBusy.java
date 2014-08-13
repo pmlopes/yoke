@@ -24,7 +24,7 @@ public final class TooBusy extends Middleware {
     }
 
     public TooBusy(long highWaterMark, String message) {
-        this.highWaterMark = highWaterMark;
+        this.highWaterMark = highWaterMark * 1000000;
         this.message = message;
     }
 
@@ -32,13 +32,13 @@ public final class TooBusy extends Middleware {
     public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
         super.init(yoke, mount);
 
-        t0 = System.currentTimeMillis();
-        dt = 500;
+        t0 = System.nanoTime();
+        dt = 500 * 1000000; // nano time
 
         timerID = yoke.vertx().setPeriodic(500, new Handler<Long>() {
             @Override
             public void handle(Long timerID) {
-                final long t1 = System.currentTimeMillis();
+                final long t1 = System.nanoTime();
                 dt = t1 - t0;
                 t0 = t1;
             }
@@ -48,7 +48,7 @@ public final class TooBusy extends Middleware {
     }
 
     public long getLag() {
-        return dt - 500;
+        return dt - 500 * 1000000;
     }
 
     public void shutdown() {
@@ -57,7 +57,7 @@ public final class TooBusy extends Middleware {
 
     @Override
     public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
-        if (dt - 500 > highWaterMark) {
+        if (dt - 500 * 1000000 > highWaterMark) {
             final YokeResponse response = request.response();
 
             response.setStatusCode(503);
