@@ -67,10 +67,4 @@ public class TooBusyTest extends TestVerticle {
             }
         });
     }
-
-    @Test
-    public void test2() {
-        System.out.println(System.currentTimeMillis());
-        System.out.println(System.nanoTime());
-    }
 }
