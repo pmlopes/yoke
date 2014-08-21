@@ -876,7 +876,13 @@ public class Router extends Middleware {
 
             // register on JMX
             try {
-                objectName = new ObjectName("com.jetdrone.yoke:type=Route@" + hasCode + ",method=" + verb + ",path=" + ObjectName.quote(route));
+                String jmxName = route;
+
+                // fallback to decode from the pattern
+                if (jmxName == null) {
+                    jmxName = pattern.pattern();
+                }
+                objectName = new ObjectName("com.jetdrone.yoke:type=Route@" + hasCode + ",method=" + verb + ",path=" + ObjectName.quote(jmxName));
             } catch (MalformedObjectNameException e) {
                 throw new RuntimeException(e);
             }
