@@ -18,7 +18,7 @@ public @interface Parameter {
     String minimum() default "";
     String maximum() default "";
     String[] enumeration() default {};
-    String model() default "";
+    String modelRef() default "";
 
     DataType items() default DataType.UNDEFINED;
     String itemsRefId() default "";

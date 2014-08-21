@@ -217,7 +217,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         switch (type) {
             case REF:
-                response.putString("type", parameter.model());
+                response.putString("type", parameter.modelRef());
                 break;
             // primitives
             case INTEGER:
@@ -289,9 +289,14 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                     if (parameter.items() == DataType.ARRAY || parameter.items() == DataType.SET) {
                         throw new RuntimeException("ARRAY/SET cannot contain ARRAYS/SETs");
                     } else {
-                        response.putObject("items", new JsonObject()
-                                .putString("type", parameter.items().type())
-                                .putString("format", parameter.items().format()));
+                        if (parameter.items() == DataType.REF) {
+                            response.putObject("items", new JsonObject()
+                                    .putString("$ref", parameter.modelRef()));
+                        } else {
+                            response.putObject("items", new JsonObject()
+                                    .putString("type", parameter.items().type())
+                                    .putString("format", parameter.items().format()));
+                        }
                     }
                 }
                 break;
