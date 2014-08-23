@@ -54,7 +54,21 @@ import com.jetdrone.vertx.yoke.middleware.YokeResponse;
  * <b>Use it as the last middleware and do not use it with a body consuming middleware!</b>
  * </p>
  * <p>
- * Example:
+ * <b>Don't forget to add Jersey to your project's classpath!</b> For Maven, this would be done with
+ * this addition to the POM:
+ * </p>
+ *
+ * <pre>
+ * {@code
+ * <dependency>
+ *   <groupId>org.glassfish.jersey.core</groupId>
+ *   <artifactId>jersey-server</artifactId>
+ *   <version>2.11</version>
+ * </dependency>
+ * }
+ * </pre>
+ * <p>
+ * Example usage:
  * </p>
  *
  * <pre>
