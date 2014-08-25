@@ -377,13 +377,19 @@ public class Jersey extends Middleware implements Container
         }
     }
 
-    private static final class Writer implements ContainerResponseWriter
+    private static final class YokeResponseWriter implements ContainerResponseWriter
     {
         private final YokeResponse response;
+        private final Vertx vertx;
 
-        public Writer(final YokeResponse response)
+        private TimeoutHandler timeoutHandler;
+        private long suspendTimerId;
+
+        public YokeResponseWriter(final YokeResponse response, final Vertx vertx)
         {
             this.response = response;
+            this.vertx = vertx;
+            this.suspendTimerId = 0;
         }
 
         @Override
@@ -438,14 +444,58 @@ public class Jersey extends Middleware implements Container
                                final TimeUnit timeUnit,
                                final TimeoutHandler timeoutHandler)
         {
-            return false;
+            if (timeoutHandler == null)
+            {
+                throw new IllegalArgumentException("TimeoutHandler can't be null");
+            }
+
+            // if already suspended should return false according to documentation
+            if (this.timeoutHandler != null)
+            {
+                return false;
+            }
+
+            this.timeoutHandler = timeoutHandler;
+
+            doSuspend(timeOut, timeUnit);
+
+            return true;
         }
 
         @Override
         public void setSuspendTimeout(final long timeOut, final TimeUnit timeUnit)
             throws IllegalStateException
         {
-            // NOOP
+            if (timeoutHandler == null)
+            {
+                throw new IllegalStateException("Request not currently suspended");
+            }
+
+            if (suspendTimerId != 0)
+            {
+                vertx.cancelTimer(suspendTimerId);
+            }
+
+            doSuspend(timeOut, timeUnit);
+        }
+
+        private void doSuspend(final long timeOut, final TimeUnit timeUnit)
+        {
+            // if timeout <= 0, then it suspends indefinitely
+            if (timeOut <= 0)
+            {
+                return;
+            }
+
+            final long ms = timeUnit.toMillis(timeOut);
+            suspendTimerId = vertx.setTimer(ms, new Handler<Long>()
+            {
+                @Override
+                public void handle(final Long $)
+                {
+                    YokeResponseWriter.this.timeoutHandler.onTimeout(YokeResponseWriter.this);
+                }
+            });
         }
 
         @Override
@@ -575,7 +625,7 @@ public class Jersey extends Middleware implements Container
     public void handle(final YokeRequest request, final Handler<Object> next)
     {
         final YokeResponse response = request.response();
-        final Writer responseWriter = new Writer(response);
+        final YokeResponseWriter responseWriter = new YokeResponseWriter(response, vertx());
         final URI baseUri = getBaseUri(request);
 
         try
