@@ -98,6 +98,20 @@ public final class JsonSchemaResolver {
             throw new RuntimeException("Unknown Protocol: " + uri);
         }
 
+        final Schema schema = new Schema(json, uri);
+        final String schemaId = schema.get("id");
+
+        if (schemaId != null) {
+            if (loadedSchemas.containsKey(schemaId)) {
+                throw new RuntimeException("Schema ID [" + schemaId + "] already in use!");
+            }
+            // register the schema into the registry using its Id
+            loadedSchemas.put(schemaId, schema);
+        }
+
+        if (loadedSchemas.containsKey(uri)) {
+            throw new RuntimeException("Schema URI [" + uri + "] already in use!");
+        }
         loadedSchemas.put(uri, new Schema(json, uri));
     }
 
