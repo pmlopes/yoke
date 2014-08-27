@@ -228,7 +228,7 @@ public class Router extends TestVerticle {
 
     public static class R3 {
         @POST("/api")
-        @JsonSchema("classpath://Person.json")
+        @JsonSchema("classpath:///Person.json")
         public void handle(YokeRequest request, Handler<Object> next) {
             request.response().end("OK");
         }

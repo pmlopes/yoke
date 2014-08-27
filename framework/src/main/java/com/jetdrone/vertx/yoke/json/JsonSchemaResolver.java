@@ -109,7 +109,7 @@ public final class JsonSchemaResolver {
                 // fallback to class loader when no scheme is present
                 final String path = uri.getPath();
 
-                if (path != null) {
+                if (path != null && !"".equals(path)) {
                     json = loadFromClasspath(uri);
                 } else {
                     throw new RuntimeException("Unknown URI: " + ref);
@@ -169,7 +169,11 @@ public final class JsonSchemaResolver {
 
     private static JsonObject loadFromClasspath(final URI uri) {
         try {
-            try (Reader r = new BufferedReader(new InputStreamReader(JsonSchemaResolver.class.getResourceAsStream(uri.getPath()), "UTF-8"))) {
+            final String path = uri.getPath();
+            if (path == null || "".equals(path)) {
+                throw new RuntimeException("Invalid path [" + uri.toString() + "]");
+            }
+            try (Reader r = new BufferedReader(new InputStreamReader(JsonSchemaResolver.class.getResourceAsStream(path), "UTF-8"))) {
 
                 Writer writer = new StringWriter();
 
@@ -198,7 +202,11 @@ public final class JsonSchemaResolver {
 
     private static JsonObject loadFromFile(final URI uri) {
         try {
-            try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath()), "UTF-8"))) {
+            final String path = uri.getPath();
+            if (path == null || "".equals(path)) {
+                throw new RuntimeException("Invalid path [" + uri.toString() + "]");
+            }
+            try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF-8"))) {
 
                 Writer writer = new StringWriter();
 
