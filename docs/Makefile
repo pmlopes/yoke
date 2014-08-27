@@ -21,7 +21,7 @@ EXTRAS =	Rest.html
 	@sed -i 's/<title><\/title>/<title>Yoke a middleware framework for Vert.x: $(patsubst %.html,%,$@)<\/title>/g' $@
 
 all: $(BASE) $(TUTORIALS) $(EXTRAS)
-    @mkdir -p html
+	@mkdir -p html
 	@mv *.html html
 
 clean:
