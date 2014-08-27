@@ -24,7 +24,7 @@ all: $(BASE) $(TUTORIALS) $(EXTRAS)
 	@mkdir -p html
 	@mv *.html html
 	@git fetch
-	@git checkout -b gh-pages origin/gh-pages
+	@git checkout gh-pages
 	@pwd
 
 clean:
