@@ -23,6 +23,9 @@ EXTRAS =	Rest.html
 all: $(BASE) $(TUTORIALS) $(EXTRAS)
 	@mkdir -p html
 	@mv *.html html
+	@git fetch
+	@git checkout -b gh-pages origin/gh-pages
+	@pwd
 
 clean:
 	@rm *.html || true
