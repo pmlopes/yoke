@@ -1,10 +1,10 @@
 package com.jetdrone.vertx.yoke.json;
 
-import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.json.JsonObject;
 
 import java.io.*;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -56,10 +56,6 @@ public final class JsonSchemaResolver {
 
     private static final Pattern ABSOLUTE = Pattern.compile("^.*://.*");
 
-    private static final Pattern CLASSPATH = Pattern.compile("^classpath://.*");
-    private static final Pattern FILE = Pattern.compile("^file://.*");
-    private static final Pattern HTTP = Pattern.compile("^http(?:s)?://.*");
-
     private static Map<String, Schema> loadedSchemas = new HashMap<>();
 
     public static Schema resolveSchema(String uri) {
@@ -85,34 +81,148 @@ public final class JsonSchemaResolver {
         return resolveRelativeUri(uri, baseUri);
     }
 
-    private static void tryToLoad(String uri) {
-        JsonObject json;
+    private static void tryToLoad(String ref) {
+        try {
+            JsonObject json;
 
-        if (CLASSPATH.matcher(uri).matches()) {
-            json = new JsonObject(readResourceToString(JsonSchemaResolver.class, uri.substring(11)));
-        } else if (FILE.matcher(uri).matches()) {
-            json = new JsonObject(readFileToString(uri.substring(7)));
-        } else if (HTTP.matcher(uri).matches()) {
-            json = new JsonObject(readURLToString(uri));
-        } else {
-            throw new RuntimeException("Unknown Protocol: " + uri);
-        }
+            final URI uri = new URI(ref);
 
-        final Schema schema = new Schema(json, uri);
-        final String schemaId = schema.get("id");
+            final String scheme = uri.getScheme();
 
-        if (schemaId != null) {
-            if (loadedSchemas.containsKey(schemaId)) {
-                throw new RuntimeException("Schema ID [" + schemaId + "] already in use!");
+            if (scheme != null) {
+                // there is a scheme so we can load from http, classpath, or file
+                switch (scheme) {
+                    case "classpath":
+                        json = loadFromClasspath(uri);
+                        break;
+                    case "http":
+                    case "https":
+                        json = loadFromURL(uri);
+                        break;
+                    case "file":
+                        json = loadFromFile(uri);
+                        break;
+                    default:
+                        throw new RuntimeException("Unknown Protocol: " + scheme);
+                }
+            } else {
+                // fallback to class loader when no scheme is present
+                final String path = uri.getPath();
+
+                if (path != null) {
+                    json = loadFromClasspath(uri);
+                } else {
+                    throw new RuntimeException("Unknown URI: " + ref);
+                }
             }
-            // register the schema into the registry using its Id
-            loadedSchemas.put(schemaId, schema);
-        }
 
-        if (loadedSchemas.containsKey(uri)) {
-            throw new RuntimeException("Schema URI [" + uri + "] already in use!");
+            final Schema schema = new Schema(json, ref);
+            final String schemaId = schema.get("id");
+
+            if (schemaId != null) {
+                if (loadedSchemas.containsKey(schemaId)) {
+                    throw new RuntimeException("Schema ID [" + schemaId + "] already in use!");
+                }
+                // register the schema into the registry using its Id
+                loadedSchemas.put(schemaId, schema);
+            }
+
+            if (loadedSchemas.containsKey(ref)) {
+                throw new RuntimeException("Schema URI [" + uri + "] already in use!");
+            }
+
+            // register the schema into the registry using its URI
+            loadedSchemas.put(ref, schema);
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
         }
-        loadedSchemas.put(uri, new Schema(json, uri));
+    }
+
+    private static JsonObject loadFromURL(final URI uri) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(uri.toURL().openStream(), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                final JsonObject json = new JsonObject(writer.toString());
+                final String fragment = uri.getFragment();
+                if (fragment != null) {
+                    if (json.containsField(fragment)) {
+                        return json.getObject(fragment);
+                    } else {
+                        throw new RuntimeException("Fragment #" + fragment + " not found!");
+                    }
+                }
+
+                return json;
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    private static JsonObject loadFromClasspath(final URI uri) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(JsonSchemaResolver.class.getResourceAsStream(uri.getPath()), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                final JsonObject json = new JsonObject(writer.toString());
+                final String fragment = uri.getFragment();
+                if (fragment != null) {
+                    if (json.containsField(fragment)) {
+                        return json.getObject(fragment);
+                    } else {
+                        throw new RuntimeException("Fragment #" + fragment + " not found!");
+                    }
+                }
+
+                return json;
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+    private static JsonObject loadFromFile(final URI uri) {
+        try {
+            try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(uri.getPath()), "UTF-8"))) {
+
+                Writer writer = new StringWriter();
+
+                char[] buffer = new char[1024];
+                int n;
+                while ((n = r.read(buffer)) != -1) {
+                    writer.write(buffer, 0, n);
+                }
+
+                final JsonObject json = new JsonObject(writer.toString());
+                final String fragment = uri.getFragment();
+                if (fragment != null) {
+                    if (json.containsField(fragment)) {
+                        return json.getObject(fragment);
+                    } else {
+                        throw new RuntimeException("Fragment #" + fragment + " not found!");
+                    }
+                }
+
+                return json;
+            }
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
     }
 
     private static String resolveRelativeUri(String uri, String base) {
@@ -127,71 +237,5 @@ public final class JsonSchemaResolver {
 
     private static boolean isAbsolute(String uri) {
         return ABSOLUTE.matcher(uri).matches();
-    }
-
-    /**
-     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
-     */
-    private static String readResourceToString(@NotNull Class<?> clazz, @NotNull String resource) {
-        try {
-            try (Reader r = new BufferedReader(new InputStreamReader(clazz.getResourceAsStream(resource), "UTF-8"))) {
-
-                Writer writer = new StringWriter();
-
-                char[] buffer = new char[1024];
-                int n;
-                while ((n = r.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-
-                return writer.toString();
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
-    }
-
-    /**
-     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
-     */
-    private static String readFileToString(@NotNull String resource) {
-        try {
-            try (Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(resource), "UTF-8"))) {
-
-                Writer writer = new StringWriter();
-
-                char[] buffer = new char[1024];
-                int n;
-                while ((n = r.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-
-                return writer.toString();
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
-    }
-
-    /**
-     * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
-     */
-    private static String readURLToString(@NotNull String resource) {
-        try {
-            try (Reader r = new BufferedReader(new InputStreamReader(new URL(resource).openStream(), "UTF-8"))) {
-
-                Writer writer = new StringWriter();
-
-                char[] buffer = new char[1024];
-                int n;
-                while ((n = r.read(buffer)) != -1) {
-                    writer.write(buffer, 0, n);
-                }
-
-                return writer.toString();
-            }
-        } catch (IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
     }
 }
