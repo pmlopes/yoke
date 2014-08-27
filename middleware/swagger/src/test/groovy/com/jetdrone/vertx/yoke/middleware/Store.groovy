@@ -7,7 +7,7 @@ import org.vertx.java.core.Handler;
         path = "/store",
         description = "Operations about store",
         models = [
-                @JsonSchema("classpath://com/jetdrone/vertx/yoke/middleware/Order.json")
+                @JsonSchema("classpath:///com/jetdrone/vertx/yoke/middleware/Order.json")
         ]
 )
 @Produces("application/json")
