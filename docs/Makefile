@@ -25,7 +25,7 @@ all: $(BASE) $(TUTORIALS) $(EXTRAS)
 	@mv *.html html
 	@git fetch
 	@git checkout gh-pages
-	@pwd
+	@mv html/* ..
 
 clean:
-	@rm *.html || true
+	@rm -Rf html || true
