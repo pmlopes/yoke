@@ -52,6 +52,7 @@ dependencies {
   // get yoke jar for parent
   provided project(':framework')
   provided "org.jetbrains:annotations:13.0"
+  provided "org.glassfish.jersey.core:jersey-server:2.11"
 }
 
 test {
