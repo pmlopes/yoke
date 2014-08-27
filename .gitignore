@@ -1,6 +1,4 @@
-# Apple crap
 .DS_Store
-# Build tools crap
 .gradle
 .idea
 .classpath
@@ -14,10 +12,8 @@ out
 *.ipr
 *.iws
 mods
-docs
-# Ruby crap
+docs/html
 .yardoc
 .yardopts
-# Benchmark crap
 node_modules
 vertx_classpath.txt
