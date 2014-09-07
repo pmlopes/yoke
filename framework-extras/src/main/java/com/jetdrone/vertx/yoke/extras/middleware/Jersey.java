@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -403,6 +405,14 @@ public class Jersey extends Middleware implements Container
             if (contentLength != -1)
             {
                 response.putHeader(CONTENT_LENGTH, Long.toString(contentLength));
+            }
+
+            for (final Entry<String, List<String>> header : responseContext.getStringHeaders().entrySet())
+            {
+                for (final String value : header.getValue())
+                {
+                    response.putHeader(header.getKey(), value);
+                }
             }
 
             if (responseContext.isChunked())
