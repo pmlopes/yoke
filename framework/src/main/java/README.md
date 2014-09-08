@@ -61,7 +61,7 @@ You register middleware onto it using the ```use``` method, you might call the m
     use(Handler<YokeRequest> request);
     use(String route, Handler<YokeRequest> request);
 
-You can registeras many middleware as you want, but keep in mind that the order you used to register is the order that
+You can register as many middleware as you want, but keep in mind that the order you used to register is the order that
 is used to process a request. In other words If you need to consume the request body of a request you need to use the
 [BodyParser](BodyParser.html) middleware before the middleware you are implementing.
 

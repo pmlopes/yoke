@@ -1,0 +1,8 @@
+site_name: Yoke Micro-Framework
+pages:
+- [index.md, Home]
+- [java.md, Java]
+- [groovy.md, Groovy]
+- [javascript.md, JavaScript]
+- [3rd-party.md, 3rd Party]
+theme: slate

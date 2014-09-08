@@ -1,8 +1,22 @@
-# Yoke
+# Yoke Micro-Framework
 
-Yoke ```com.jetdrone~yoke~1.0.9``` is a minimal and flexible polyglot middleware framework for
-[Vert.x](http://www.vertx.io), providing a robust set of features for building single and multi-page, and hybrid web
-applications.
+Yoke is a minimal and flexible polyglot middleware micro framework for [Vert.x](http://www.vertx.io), providing a robust
+set of features for building single and multi-page, and hybrid web applications.
+
+## Instalation
+
+To get started with Yoke in your project you can use Vert.x module system to download it from the maven repository or
+include the maven dependency your self. The moment this module is only compatible with Vert.x 2. It can be backported to
+the 1.x series but there is no work in progress in that direction.
+
+The Vert.x module id is: `com.jetdrone~yoke~2.0.4`. If you prefer to use [maven](http://maven.apache.org), you can get
+the artifacts using the following dependency:
+
+    <dependency>
+      <groupId>com.jetdrone</groupId>
+      <artifactId>yoke</artifactId>
+      <version>2.0.4</version>
+    </dependency>
 
 
 ## Middleware
@@ -16,80 +30,20 @@ Yoke provides a thin layer of features fundamental to any web application, witho
 love in Vert.x.
 
 
-## Java
+## Polyglot
 
-``` java
-Yoke yoke = new Yoke(vertx)
-  .use(new Favicon())
-  .use(new Static("webroot"))
-  .use(new Router()
-    .all("/hello", new Handler<HttpServerRequest>() {
-      @Override
-      public void handle(HttpServerRequest request) {
-        request.response().end("Hello World!");
-      }
-    })).listen(3000);
-```
+Choose one of the supported languages from the menu above for language specific docs and tutorials.
 
-[Java API reference](framework-java/index.html)
+Yoke is a polyglot framework so you should choose a trail to follow with your favourite language:
+
+* [Java](java.md)
+* [Groovy](groovy.md)
+* [JavaScript](javascript.md)
 
 
-## Groovy
+## Inspiration
 
-``` groovy
-def yoke = new GYoke(vertx)
-  .use(new Favicon())
-  .use(new Static("webroot"))
-  .use(new GRouter()
-    .all("/hello") { request ->
-      request.response().end("Hello World!");
-    }).listen(3000)
-```
-
-[Groovy API reference](framework-groovy/index.html)
-
-
-## JavaScript
-
-``` js
-var yoke = new Yoke()
-  .use(new Favicon())
-  .use(new Static('webroot'))
-  .use(new Router()
-    .all("/hello", function (request) {
-      request.response().end('Hello World!');
-    })).listen(3000);
-```
-
-[JavaScript API reference](framework-javascript/index.html)
-
-
-## Tutorials
-
-* [Java](Java-Tutorial.html) Java Tutorials
-* [Groovy](Groovy-Tutorial.html) Groovy Tutorials
-* [JavaScript](JavaScript-Tutorial.html) JavaScript Tutorials
-
-
-## Example Apps
-
-* [KitCMS](https://github.com/pmlopes/yoke/tree/master/example/kitcms) - Remake of KitCMS from NodeJS with Yoke
-* [Persona](Persona.html) - Implementation of Mozilla Persona Authentication with Yoke
-
-
-## Benchmarks
-
-* [Benchmark](Benchmark.html) Simple Benchmarks Yoke vs [ExpressJS](http://expressjs.com)
-
-
-## Extras
-
-* [Rest](Rest.html) Json REST Router
-
-
-## 3rd-party
-
-* [Google Closure templates](https://github.com/core9/vertx-yoke-engine-closure) Yoke templating engine for Google Closure templates
+This project was inspired by [Connect](http://www.senchalabs.org/connect/).
 
 
 ## Links
@@ -97,4 +51,7 @@ var yoke = new Yoke()
 * GitHub [repository](https://github.com/pmlopes/yoke)
 * [Vert.x](http://vertx.io)
 * [Google Group](https://groups.google.com/forum/?fromgroups#!forum/yoke-framework)
-* [Me](http://www.jetdrone.com)
+
+## License
+
+This project is released under the Apache License 2.0 as included in the root of the project.

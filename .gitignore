@@ -12,8 +12,8 @@ out
 *.ipr
 *.iws
 mods
-docs/html
 .yardoc
 .yardopts
 node_modules
 vertx_classpath.txt
+site
