@@ -248,3 +248,28 @@ error ```400``` (Bad Request) is returned.
 The generated code also created a simple JUnit test. Yoke includes a ```YokeTester``` class that helps you write tests
 without having to fully bootstrap a server, this makes testing your APIs simple as calling a method and inspect the
 generated result.
+
+
+    public class AppTest extends TestVerticle {
+     
+      @Test
+      public void testApp() {
+        final Yoke yoke = new Yoke(this);
+        yoke.use(new Middleware() {
+          @Override
+          public void handle(YokeRequest request, Handler<Object> next) {
+            request.response().end("OK");
+          }
+        });
+     
+        final YokeTester yokeAssert = new YokeTester(yoke);
+     
+        yokeAssert.request("GET", "/", new Handler<Response>() {
+          @Override
+          public void handle(Response response) {
+            assertEquals("OK", response.body.toString());
+            testComplete();
+          }
+        });
+      }
+    }
