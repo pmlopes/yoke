@@ -161,7 +161,7 @@ public class BodyParser extends Middleware {
                             if (!request.get("canceled", false)) {
                                 next.handle(null);
                             }
-                        } else if (buffer.length() == 0) {
+                        } else if (buffer != null && buffer.length() == 0) {
                             String contentLength = request.getHeader("Content-Length");
 
                             if (contentLength != null && contentLength.equals("0")) {
