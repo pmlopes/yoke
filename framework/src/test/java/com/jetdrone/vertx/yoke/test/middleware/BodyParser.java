@@ -212,4 +212,29 @@ public class BodyParser extends TestVerticle {
         });
     }
 
+    @Test
+    public void testDeleteContentLengthZeroWithNoBody() {
+
+        Yoke yoke = new Yoke(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
+        yoke.use(new Handler<YokeRequest>() {
+            @Override
+            public void handle(YokeRequest request) {
+                request.response().setStatusCode(204);
+                request.response().end("");
+            }
+        });
+
+        MultiMap headers = new CaseInsensitiveMultiMap();
+        headers.add("Content-Type", "application/json");
+        headers.add("Content-Length", "0");
+
+        new YokeTester(yoke).request("DELETE", "/delete", headers, new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(204, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
 }
