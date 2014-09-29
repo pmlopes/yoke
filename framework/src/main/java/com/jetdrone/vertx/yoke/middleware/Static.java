@@ -317,7 +317,6 @@ public class Static extends Middleware {
                 Date lastModifiedDate = ISODATE.parse(lastModified);
                 notModified = lastModifiedDate.getTime() <= modifiedSinceDate.getTime();
             } catch (ParseException e) {
-                e.printStackTrace();
                 notModified = false;
             }
         }

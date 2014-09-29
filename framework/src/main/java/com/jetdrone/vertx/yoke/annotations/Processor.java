@@ -41,7 +41,7 @@ public final class Processor {
         }
     }
 
-    public static void registerProcessor(Class<?> processor) {
+    public static synchronized void registerProcessor(Class<?> processor) {
         try {
             // if already registered skip
             for (AnnotationHandler<?> annotationHandler : handlers) {

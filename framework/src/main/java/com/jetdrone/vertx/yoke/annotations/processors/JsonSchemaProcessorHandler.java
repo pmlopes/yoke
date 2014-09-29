@@ -42,7 +42,6 @@ public class JsonSchemaProcessorHandler extends AbstractAnnotationHandler<Router
         return new Middleware() {
             @Override
             public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
-                Object body = request.body();
                 if (!com.jetdrone.vertx.yoke.json.JsonSchema.conformsSchema(request.body(), schema)) {
                     next.handle(400);
                     return;

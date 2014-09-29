@@ -10,6 +10,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpVersion;
 import org.vertx.java.core.logging.impl.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.util.Date;
 
 /** # Logger
@@ -74,17 +75,25 @@ public class Logger extends Middleware {
         return null;
     }
 
-    private void log(YokeRequest request, long start) {
-        int contentLength = 0;
+    private String getClientAddress(InetSocketAddress inetSocketAddress) {
+        if (inetSocketAddress == null) {
+            return null;
+        }
+
+        return inetSocketAddress.getHostString();
+    }
+
+    private void log(YokeRequest request, long timestamp, final String remoteClient, final String version, final String method, final String uri) {
+        long contentLength = 0;
         if (immediate) {
             Object obj = request.getHeader("content-length");
             if (obj != null) {
-                contentLength = Integer.parseInt(obj.toString());
+                contentLength = Long.parseLong(obj.toString());
             }
         } else {
             Object obj = request.response().getHeader("content-length");
             if (obj != null) {
-                contentLength = Integer.parseInt(obj.toString());
+                contentLength = Long.parseLong(obj.toString());
             }
         }
 
@@ -97,11 +106,11 @@ public class Logger extends Middleware {
                 Object userAgent = request.getHeader("user-agent", "");
 
                 message = String.format("%s - - [%s] \"%s %s %s\" %d %d \"%s\" \"%s\"",
-                        request.remoteAddress().getHostString(),
-                        ISODATE.format(new Date(start)),
-                        request.method(),
-                        request.uri(),
-                        getVersionString(request.version()),
+                        remoteClient,
+                        ISODATE.format(new Date(timestamp)),
+                        method,
+                        uri,
+                        version,
                         status,
                         contentLength,
                         referrer,
@@ -109,21 +118,21 @@ public class Logger extends Middleware {
                 break;
             case SHORT:
                 message = String.format("%s - %s %s %s %d %d - %d ms",
-                        request.remoteAddress().getHostString(),
-                        request.method(),
-                        request.uri(),
-                        getVersionString(request.version()),
+                        remoteClient,
+                        method,
+                        uri,
+                        version,
                         status,
                         contentLength,
-                        (System.currentTimeMillis() - start));
+                        (System.currentTimeMillis() - timestamp));
                 break;
             case TINY:
                 message = String.format("%s %s %d %d - %d ms",
-                        request.method(),
-                        request.uri(),
-                        request.response().getStatusCode(),
+                        method,
+                        uri,
+                        status,
                         contentLength,
-                        (System.currentTimeMillis() - start));
+                        (System.currentTimeMillis() - timestamp));
                 break;
         }
 
@@ -140,15 +149,21 @@ public class Logger extends Middleware {
 
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
-        final long start = System.currentTimeMillis();
+
+        // common logging data
+        final long timestamp = System.currentTimeMillis();
+        final String remoteClient = getClientAddress(request.remoteAddress());
+        final String method = request.method();
+        final String uri = request.uri();
+        final String version = getVersionString(request.version());
 
         if (immediate) {
-            log(request, start);
+            log(request, timestamp, remoteClient, version, method, uri);
         } else {
             request.response().endHandler(new Handler<Void>() {
                 @Override
                 public void handle(Void event) {
-                    log(request, start);
+                    log(request, timestamp, remoteClient, version, method, uri);
                 }
             });
         }
