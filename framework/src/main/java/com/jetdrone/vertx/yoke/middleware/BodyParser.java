@@ -162,9 +162,8 @@ public class BodyParser extends Middleware {
                                 next.handle(null);
                             }
                         } else if (buffer != null && buffer.length() == 0) {
-                            String contentLength = request.getHeader("Content-Length");
-
-                            if (contentLength != null && contentLength.equals("0")) {
+                            // special case for IE and Safari than even for 0 content length, send content type header
+                            if (request.contentLength() == 0) {
                                 request.setBody(null);
 
                                 if (!request.get("canceled", false)) {
