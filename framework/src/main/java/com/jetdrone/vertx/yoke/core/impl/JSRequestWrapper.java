@@ -12,7 +12,7 @@ import java.util.Map;
 public class JSRequestWrapper implements RequestWrapper {
 
     @Override
-    public YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store) {
-        return new JSYokeRequest(request, new JSYokeResponse(request.response(), context, engines), secure, context, store);
+    public YokeRequest wrap(HttpServerRequest request, Context context, Map<String, Engine> engines, SessionStore store) {
+        return new JSYokeRequest(request, new JSYokeResponse(request.response(), context, engines), context, store);
     }
 }

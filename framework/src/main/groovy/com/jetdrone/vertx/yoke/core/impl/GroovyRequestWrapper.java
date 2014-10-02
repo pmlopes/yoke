@@ -14,7 +14,7 @@ import java.util.Map;
 public class GroovyRequestWrapper implements RequestWrapper {
 
         @Override
-        public YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store) {
-            return new GYokeRequest(request, new GYokeResponse(request.response(), context, engines), secure, context, store);
+        public YokeRequest wrap(HttpServerRequest request, Context context, Map<String, Engine> engines, SessionStore store) {
+            return new GYokeRequest(request, new GYokeResponse(request.response(), context, engines), context, store);
         }
 }

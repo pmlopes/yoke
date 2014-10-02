@@ -67,8 +67,8 @@ public class GYokeRequest extends YokeRequest implements org.vertx.groovy.core.h
 
     private final GYokeResponse response;
 
-    public GYokeRequest(HttpServerRequest request, GYokeResponse response, boolean secure, Context context, SessionStore store) {
-        super(request, response, secure, context, store);
+    public GYokeRequest(HttpServerRequest request, GYokeResponse response, Context context, SessionStore store) {
+        super(request, response, context, store);
         this.response = response;
     }
 

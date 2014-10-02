@@ -16,7 +16,7 @@ public class DefaultRequestWrapper implements RequestWrapper {
      * Default implementation of the request wrapper
      */
     @Override
-    public YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store) {
-        return new YokeRequest(request, new YokeResponse(request.response(), context, engines), secure, context, store);
+    public YokeRequest wrap(HttpServerRequest request, Context context, Map<String, Engine> engines, SessionStore store) {
+        return new YokeRequest(request, new YokeResponse(request.response(), context, engines), context, store);
     }
 }

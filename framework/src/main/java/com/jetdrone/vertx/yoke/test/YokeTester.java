@@ -23,6 +23,8 @@ import java.util.*;
  */
 public class YokeTester {
 
+    private static final Random random = new Random();
+
     private final Vertx vertx;
     private final HttpServer fakeServer = new FakeHttpServer();
 
@@ -56,6 +58,107 @@ public class YokeTester {
 
                 MultiMap params = null;
                 MultiMap attributes = null;
+                final NetSocket netSocket = new NetSocket() {
+                    @Override
+                    public String writeHandlerID() {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::writeHandlerID");
+                    }
+
+                    @Override
+                    public NetSocket write(Buffer data) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::write");
+                    }
+
+                    @Override
+                    public NetSocket write(String str) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::write");
+                    }
+
+                    @Override
+                    public NetSocket write(String str, String enc) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::write");
+                    }
+
+                    @Override
+                    public NetSocket sendFile(String filename) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::sendFile");
+                    }
+
+                    @Override
+                    public NetSocket sendFile(String filename, Handler<AsyncResult<Void>> resultHandler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::sendFile");
+                    }
+
+                    @Override
+                    public InetSocketAddress remoteAddress() {
+                        return new InetSocketAddress("localhost", random.nextInt(Short.MAX_VALUE));
+                    }
+
+                    @Override
+                    public InetSocketAddress localAddress() {
+                        return new InetSocketAddress("localhost", random.nextInt(Short.MAX_VALUE));
+                    }
+
+                    @Override
+                    public void close() {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::close");
+                    }
+
+                    @Override
+                    public NetSocket closeHandler(Handler<Void> handler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::closeHandler");
+                    }
+
+                    @Override
+                    public NetSocket ssl(Handler<Void> handler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::ssl");
+                    }
+
+                    @Override
+                    public boolean isSsl() {
+                        return fakeServer.isSSL();
+                    }
+
+                    @Override
+                    public NetSocket setWriteQueueMaxSize(int maxSize) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::setWriteQueueMaxSize");
+                    }
+
+                    @Override
+                    public boolean writeQueueFull() {
+                        return false;
+                    }
+
+                    @Override
+                    public NetSocket drainHandler(Handler<Void> handler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::drainHandler");
+                    }
+
+                    @Override
+                    public NetSocket endHandler(Handler<Void> endHandler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::endHandler");
+                    }
+
+                    @Override
+                    public NetSocket dataHandler(Handler<Buffer> handler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::dataHandler");
+                    }
+
+                    @Override
+                    public NetSocket pause() {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::pause");
+                    }
+
+                    @Override
+                    public NetSocket resume() {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::resume");
+                    }
+
+                    @Override
+                    public NetSocket exceptionHandler(Handler<Throwable> handler) {
+                        throw new UnsupportedOperationException("This mock does not support netSocket::exceptionHandler");
+                    }
+                };
 
                 @Override
                 public HttpVersion version() {
@@ -179,7 +282,7 @@ public class YokeTester {
 
                 @Override
                 public NetSocket netSocket() {
-                    throw new UnsupportedOperationException("This mock does not support netSocket");
+                    return netSocket;
                 }
 
                 @Override

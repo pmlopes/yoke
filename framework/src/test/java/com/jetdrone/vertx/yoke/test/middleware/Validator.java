@@ -7,6 +7,7 @@ import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import com.jetdrone.vertx.yoke.util.validation.Type;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -27,7 +28,7 @@ public class Validator extends TestVerticle {
 
         yoke.use(new Router().get("/search/:from/:to", new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
                     that("param:from").is(Type.DateTime),
                     that("param:to").is(Type.DateTime)
@@ -67,7 +68,7 @@ public class Validator extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new Router().post("/search/:from/:to", new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
                     that("param:from").is(Type.DateTime),
                     that("param:to").is(Type.DateTime),
@@ -110,7 +111,7 @@ public class Validator extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
 
                 com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
                     that("body:user.?login").is(Type.String)
@@ -149,7 +150,7 @@ public class Validator extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
                     that("body:user.?login").is(Type.String)
                 );

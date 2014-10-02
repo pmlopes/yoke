@@ -4,6 +4,8 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.YokeSecurity;
 import com.jetdrone.vertx.yoke.core.YokeException;
+import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
@@ -109,7 +111,7 @@ public abstract class OAuth2 {
 
     public final Middleware login = new Middleware() {
         @Override
-        public void handle(YokeRequest request, Handler<Object> next) {
+        public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
             String atok, user_id, client_id, extra_data;
             Date grant_date;
 
@@ -144,7 +146,7 @@ public abstract class OAuth2 {
 
     public final Middleware oauth = new Middleware() {
         @Override
-        public void handle(final YokeRequest request, final Handler<Object> next) {
+        public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
             // TODO: remove prefix
             String uri = request.path();
 

@@ -93,7 +93,7 @@ public class GYoke {
         final int params = closure.getMaximumNumberOfParameters();
         jYoke.use(route, new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 if (params == 1) {
                     closure.call(request);
                 } else if (params == 2) {
