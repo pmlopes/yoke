@@ -3,8 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.AbstractMiddleware;
-import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpClient;

@@ -3,8 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.AbstractMiddleware;
-import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.util.Utils;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;

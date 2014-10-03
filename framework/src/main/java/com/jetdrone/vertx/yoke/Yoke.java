@@ -9,6 +9,7 @@ import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
+import com.jetdrone.vertx.yoke.middleware.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.security.KeyStoreSecurity;
 import com.jetdrone.vertx.yoke.security.SecretSecurity;

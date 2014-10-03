@@ -1,7 +1,6 @@
 package com.jetdrone.vertx.yoke.test;
 
-import com.jetdrone.vertx.yoke.AbstractMiddleware;
-import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.middleware.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;

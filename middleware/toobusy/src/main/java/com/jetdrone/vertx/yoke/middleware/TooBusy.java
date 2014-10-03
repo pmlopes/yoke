@@ -1,11 +1,9 @@
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 
 public final class TooBusy extends AbstractMiddleware {
 

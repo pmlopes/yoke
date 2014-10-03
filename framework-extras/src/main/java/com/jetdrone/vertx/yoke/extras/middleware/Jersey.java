@@ -19,7 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.core.SecurityContext;
 
-import com.jetdrone.vertx.yoke.AbstractMiddleware;
+import com.jetdrone.vertx.yoke.middleware.AbstractMiddleware;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
