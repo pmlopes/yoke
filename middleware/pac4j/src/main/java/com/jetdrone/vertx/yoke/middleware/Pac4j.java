@@ -13,7 +13,7 @@ import org.pac4j.vertx.VertxWebContext;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
-public class Pac4j extends Middleware {
+public class Pac4j implements Middleware {
 
     private final BaseClient<? extends Credentials, ? extends CommonProfile> client;
     private final Boolean isAjax;

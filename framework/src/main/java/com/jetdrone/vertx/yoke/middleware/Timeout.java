@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
@@ -13,7 +14,7 @@ import org.vertx.java.core.Handler;
  *
  * The timeout error is passed to ```next.handle(408)``` so that you may customize the response behaviour.
  */
-public class Timeout extends Middleware {
+public class Timeout extends AbstractMiddleware {
 
     private final long timeout;
 

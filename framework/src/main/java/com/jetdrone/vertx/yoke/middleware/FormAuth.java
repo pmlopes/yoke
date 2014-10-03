@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -12,7 +13,7 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.store.json.SessionObject;
 import com.jetdrone.vertx.yoke.util.Utils;
 
-public class FormAuth extends Middleware {
+public class FormAuth extends AbstractMiddleware {
 
     private final AuthHandler authHandler;
 

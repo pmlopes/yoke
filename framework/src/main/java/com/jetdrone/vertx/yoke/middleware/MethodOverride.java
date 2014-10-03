@@ -17,7 +17,7 @@ import org.vertx.java.core.json.JsonObject;
  * *note:* If the method override is sent in a *POST* then the [BodyParser](BodyParser.html) middleware must be used and
  * installed prior this one.
  */
-public class MethodOverride extends Middleware {
+public class MethodOverride implements Middleware {
 
     private final String key;
 

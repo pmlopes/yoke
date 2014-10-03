@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.util.Utils;
 import com.jetdrone.vertx.yoke.core.YokeException;
@@ -22,7 +23,7 @@ import java.util.Map;
  *
  * Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
  */
-public class ErrorHandler extends Middleware {
+public class ErrorHandler extends AbstractMiddleware {
 
     /**
      * Flag to enable/disable printing the full stack trace of exceptions.

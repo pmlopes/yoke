@@ -230,7 +230,7 @@ public class Yoke {
             // when the type of middleware is error handler then the route is ignored and
             // the middleware is extracted from the execution chain into a special placeholder
             // for error handling
-            if (m.isErrorHandler()) {
+            if (m instanceof AbstractMiddleware && ((AbstractMiddleware) m).isErrorHandler()) {
                 errorHandler = m;
             } else {
                 MountedMiddleware mm = new MountedMiddleware(route, m);
@@ -244,8 +244,10 @@ public class Yoke {
                 }
             }
 
-            // initialize the middleware with the current Vert.x and Logger
-            m.init(this, route);
+            // initialize the middleware with the current Yoke
+            if (m instanceof AbstractMiddleware) {
+                ((AbstractMiddleware) m).init(this, route);
+            }
         }
         return this;
     }
@@ -282,7 +284,7 @@ public class Yoke {
     public Yoke use(@NotNull String route, final @NotNull Handler<YokeRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 handler.handle(request);
             }
         }));

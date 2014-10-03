@@ -4,6 +4,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
 import java.lang.reflect.Field;
@@ -80,7 +81,7 @@ public class ContentNegotiationProcessorHandler extends AbstractAnnotationHandle
     private static Middleware wrap(final String[] consumes, final String[] produces) {
         return new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 // we only know how to process certain media types
                 if (consumes != null) {
                     boolean canConsume = false;

@@ -8,7 +8,7 @@ import org.vertx.java.core.Handler;
  * HTTP Strict Transport Security (HSTS)
  * http://tools.ietf.org/html/rfc6797
  */
-public final class HSTS extends Middleware {
+public final class HSTS implements Middleware {
 
     private final String header;
 

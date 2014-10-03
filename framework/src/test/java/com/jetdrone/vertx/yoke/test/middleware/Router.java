@@ -73,7 +73,7 @@ public class Router extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api/:userId", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
 
                     assertNotNull(request.get("user"));
                     assertTrue(request.get("user") instanceof JsonObject);
@@ -82,7 +82,7 @@ public class Router extends TestVerticle {
             });
             param("userId", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                     assertEquals("1", request.params().get("userId"));
                     // pretend that we went on some DB and got a json object representing the user
                     request.put("user", new JsonObject("{\"id\":" + request.params().get("userId") + "}"));
@@ -107,7 +107,7 @@ public class Router extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api/:userId", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                     request.response().end("OK");
                 }
             });
@@ -130,7 +130,7 @@ public class Router extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api/:userId", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                     request.response().end("OK");
                 }
             });
@@ -153,7 +153,7 @@ public class Router extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.Router() {{
             get("/api", new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                     request.response().end("OK");
                 }
             });

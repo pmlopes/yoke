@@ -4,6 +4,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
@@ -19,7 +20,7 @@ public class YokeRequestTest extends TestVerticle {
         final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertNotNull(request.accepts("application/json"));
                 testComplete();
             }
@@ -37,7 +38,7 @@ public class YokeRequestTest extends TestVerticle {
         final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertEquals("/pom.xml", request.normalizedPath());
                 testComplete();
             }
@@ -51,7 +52,7 @@ public class YokeRequestTest extends TestVerticle {
         final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertEquals("/", request.normalizedPath());
                 testComplete();
             }
@@ -65,7 +66,7 @@ public class YokeRequestTest extends TestVerticle {
         final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertNull(request.normalizedPath());
                 testComplete();
             }
@@ -79,7 +80,7 @@ public class YokeRequestTest extends TestVerticle {
         final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertNull(request.normalizedPath());
                 testComplete();
             }
@@ -93,7 +94,7 @@ public class YokeRequestTest extends TestVerticle {
         final Yoke yoke = new Yoke(this);
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertNull(request.normalizedPath());
                 testComplete();
             }

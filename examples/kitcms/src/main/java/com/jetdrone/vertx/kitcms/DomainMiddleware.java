@@ -4,7 +4,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.Handler;
 
-public class DomainMiddleware extends Middleware {
+public class DomainMiddleware implements Middleware {
 
     private final Config config;
 

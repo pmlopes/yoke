@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.core.YokeException;
@@ -10,7 +11,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.util.regex.Pattern;
 
-public class JWT extends Middleware {
+public class JWT extends AbstractMiddleware {
 
     private static final Pattern BEARER = Pattern.compile("^Bearer$", Pattern.CASE_INSENSITIVE);
 

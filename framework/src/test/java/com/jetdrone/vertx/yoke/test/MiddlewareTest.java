@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.test;
 
+import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
@@ -21,7 +22,7 @@ public class MiddlewareTest extends TestVerticle {
     public void testMiddleware() {
         final Yoke yoke = new Yoke(this);
 
-        yoke.use(new Middleware() {
+        yoke.use(new AbstractMiddleware() {
             @Override
             public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertNotNull(this.yoke);

@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.util.Utils;
@@ -20,7 +21,7 @@ import java.util.Map;
  *
  * By default serves the Yoke favicon, or the favicon located by the given ```path```.
  */
-public class Favicon extends Middleware {
+public class Favicon extends AbstractMiddleware {
 
     /**
      * ## Icon

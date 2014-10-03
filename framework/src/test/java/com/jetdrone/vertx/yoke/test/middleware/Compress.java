@@ -5,6 +5,7 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
@@ -22,7 +23,7 @@ public class Compress extends TestVerticle {
     yoke.use(new com.jetdrone.vertx.yoke.middleware.Compress());
     yoke.use(new Middleware() {
       @Override
-      public void handle(YokeRequest request, Handler<Object> next) {
+      public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
         request.response().end(new JsonObject().putString("hello", "world"));
       }
     });

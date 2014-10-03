@@ -20,7 +20,6 @@ import com.jetdrone.vertx.yoke.middleware.YokeResponse;
  * <p>
  * Example:
  * </p>
- *
  * <pre>
  * {@code
  * yoke.use(new ResponseHeaders()
@@ -29,26 +28,22 @@ import com.jetdrone.vertx.yoke.middleware.YokeResponse;
  * }
  * </pre>
  */
-public class ResponseHeaders extends Middleware
-{
+public class ResponseHeaders implements Middleware {
+
     private final Map<CharSequence, CharSequence[]> headers;
 
-    public ResponseHeaders()
-    {
+    public ResponseHeaders() {
         headers = new HashMap<>();
     }
 
-    public ResponseHeaders with(final CharSequence name, final CharSequence... values)
-    {
+    public ResponseHeaders with(final CharSequence name, final CharSequence... values) {
         headers.put(name, values);
         return this;
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next)
-    {
-        for (final Entry<CharSequence, CharSequence[]> header : headers.entrySet())
-        {
+    public void handle(final YokeRequest request, final Handler<Object> next) {
+        for (final Entry<CharSequence, CharSequence[]> header : headers.entrySet()) {
             request.response().headers().add(header.getKey(), Arrays.asList(header.getValue()));
         }
 
