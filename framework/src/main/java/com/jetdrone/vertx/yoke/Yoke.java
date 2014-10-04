@@ -66,11 +66,6 @@ public class Yoke {
     private final Vertx vertx;
 
     /**
-     * Vert.x container
-     */
-    private final Container container;
-
-    /**
      * request wrapper in use
      */
     private final RequestWrapper requestWrapper;
@@ -112,7 +107,7 @@ public class Yoke {
      * @param verticle the main verticle
      */
     public Yoke(@NotNull Verticle verticle) {
-        this(verticle.getVertx(), verticle.getContainer(), new DefaultRequestWrapper());
+        this(verticle.getVertx(), new DefaultRequestWrapper());
     }
 
     /**
@@ -134,29 +129,7 @@ public class Yoke {
      * @param vertx
      */
     public Yoke(@NotNull Vertx vertx) {
-        this(vertx, null, new DefaultRequestWrapper());
-    }
-
-    /**
-     * Creates a Yoke instance.
-     *
-     * This constructor should be called from a verticle and pass a valid Vertx instance and a Container. This instance
-     * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
-     * features such as file system and timers.
-     *
-     * <pre>
-     * public class MyVerticle extends Verticle {
-     *   public void start() {
-     *     final Yoke yoke = new Yoke(getVertx());
-     *     ...
-     *   }
-     * }
-     * </pre>
-     *
-     * @param vertx
-     */
-    public Yoke(@NotNull Vertx vertx, Container container) {
-        this(vertx, container, new DefaultRequestWrapper());
+        this(vertx, new DefaultRequestWrapper());
     }
 
     /**
@@ -176,12 +149,10 @@ public class Yoke {
      * </pre>
      *
      * @param vertx
-     * @param container
      * @param requestWrapper
      */
-    public Yoke(@NotNull Vertx vertx, @Nullable Container container, @NotNull RequestWrapper requestWrapper) {
+    public Yoke(@NotNull Vertx vertx, @NotNull RequestWrapper requestWrapper) {
         this.vertx = vertx;
-        this.container = container;
         this.requestWrapper = requestWrapper;
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
@@ -583,8 +554,8 @@ public class Yoke {
      *
      * @param config either a json object or a json array.
      */
-    public Yoke deploy(@NotNull JsonElement config) {
-        return deploy(config, null);
+    public Yoke deploy(@NotNull final Container container, @NotNull JsonElement config) {
+        return deploy(container, config, null);
     }
 
     /**
@@ -604,10 +575,11 @@ public class Yoke {
      * }
      * </pre>
      *
+     * @param container Vert.x2 container
      * @param config either a json object or a json array.
      * @param handler A handler that is called once all middleware is deployed or on error.
      */
-    public Yoke deploy(final @NotNull JsonElement config, final Handler<Object> handler) {
+    public Yoke deploy(final @NotNull Container container, final @NotNull JsonElement config, final Handler<Object> handler) {
 
         if (config.isArray() && config.asArray().size() == 0) {
             if (handler == null) {
@@ -619,7 +591,7 @@ public class Yoke {
         }
 
         if (config.isObject()) {
-            return deploy(new JsonArray().addObject(config.asObject()), handler);
+            return deploy(container, new JsonArray().addObject(config.asObject()), handler);
         }
 
         // wait for all deployments before calling the real handler
@@ -643,16 +615,16 @@ public class Yoke {
         for (Object o : config.asArray()) {
             JsonObject mod = (JsonObject) o;
             if (mod.getString("module") != null) {
-                deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
+                deploy(container, mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
             } else {
-                deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
+                deploy(container, mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
             }
         }
 
         return this;
     }
 
-    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, JsonObject config, Handler<AsyncResult<String>> handler) {
+    private void deploy(@NotNull Container container, String name, boolean module, boolean worker, boolean multiThreaded, int instances, JsonObject config, Handler<AsyncResult<String>> handler) {
         if (module) {
             if (handler != null) {
                 container.deployModule(name, config, instances, handler);

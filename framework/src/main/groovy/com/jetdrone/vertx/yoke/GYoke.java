@@ -35,7 +35,6 @@ public class GYoke {
 
     private final Yoke jYoke;
     private final org.vertx.java.core.Vertx vertx;
-    private final Container container;
 
     /**
      * Creates a Yoke instance.
@@ -55,7 +54,7 @@ public class GYoke {
      * @param verticle the main verticle
      */
     public GYoke(Verticle verticle) {
-        this(verticle.getVertx(), verticle.getContainer());
+        this(verticle.getVertx());
     }
 
     /**
@@ -67,11 +66,9 @@ public class GYoke {
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(Vertx vertx, Container container) {
+    public GYoke(Vertx vertx) {
         this.vertx = vertx.toJavaVertx();
-        this.container = container;
-
-        jYoke = new Yoke(this.vertx, null, new GroovyRequestWrapper());
+        jYoke = new Yoke(this.vertx, new GroovyRequestWrapper());
     }
 
     public GYoke store(SessionStore store) {
@@ -230,7 +227,7 @@ public class GYoke {
      * @param handler Closure tho allow asynchronous result handling
      */
     @SuppressWarnings("unchecked")
-    public GYoke deploy(final Object config, final Closure handler) {
+    public GYoke deploy(final Container container, final Object config, final Closure handler) {
 
         if (config == null) {
             if (handler == null) {
@@ -305,9 +302,9 @@ public class GYoke {
                 multiThreaded = multiThreaded == null ? false : multiThreaded;
 
                 if (module != null) {
-                    deploy(module, true, false, false, instances, modConfig, waitFor);
+                    deploy(container, module, true, false, false, instances, modConfig, waitFor);
                 } else {
-                    deploy(verticle, false, worker, multiThreaded, instances, modConfig, waitFor);
+                    deploy(container, verticle, false, worker, multiThreaded, instances, modConfig, waitFor);
                 }
             }
         } else {
@@ -326,16 +323,16 @@ public class GYoke {
             multiThreaded = multiThreaded == null ? false : multiThreaded;
 
             if (module != null) {
-                deploy(module, true, false, false, instances, modConfig, handler);
+                deploy(container, module, true, false, false, instances, modConfig, handler);
             } else {
-                deploy(verticle, false, worker, multiThreaded, instances, modConfig, handler);
+                deploy(container, verticle, false, worker, multiThreaded, instances, modConfig, handler);
             }
         }
 
         return this;
     }
 
-    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, Map<String, Object> config, Closure handler) {
+    private void deploy(Container container, String name, boolean module, boolean worker, boolean multiThreaded, int instances, Map<String, Object> config, Closure handler) {
         if (module) {
             if (handler != null) {
                 container.deployModule(name, config, instances, handler);
