@@ -202,7 +202,7 @@ public class Yoke {
             // when the type of middleware is error handler then the route is ignored and
             // the middleware is extracted from the execution chain into a special placeholder
             // for error handling
-            if (m instanceof AbstractMiddleware && ((AbstractMiddleware) m).isErrorHandler()) {
+            if (m instanceof ErrorMiddleware) {
                 errorHandler = m;
             } else {
                 MountedMiddleware mm = new MountedMiddleware(route, m);

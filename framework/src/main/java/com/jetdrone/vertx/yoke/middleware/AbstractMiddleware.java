@@ -121,13 +121,4 @@ public abstract class AbstractMiddleware implements Middleware {
     public Vertx vertx() {
         return yoke.vertx();
     }
-
-    /**
-     * When there is a need to identify a middleware to handle errors (error handler) this method should return true.
-     *
-     * @return true is this middleware will handle errors.
-     */
-    public boolean isErrorHandler() {
-        return false;
-    }
 }

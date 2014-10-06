@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.ErrorMiddleware;
 import com.jetdrone.vertx.yoke.util.Utils;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -21,7 +22,7 @@ import java.util.Map;
  *
  * Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
  */
-public class ErrorHandler extends AbstractMiddleware {
+public class ErrorHandler extends AbstractMiddleware implements ErrorMiddleware {
 
     /**
      * Flag to enable/disable printing the full stack trace of exceptions.
@@ -47,16 +48,6 @@ public class ErrorHandler extends AbstractMiddleware {
     public ErrorHandler(boolean fullStack) {
         this.fullStack = fullStack;
         errorTemplate = Utils.readResourceToBuffer(getClass(), "error.html").toString();
-    }
-
-    /**
-     * Override the Middleware isErrorHandler getter.
-     *
-     * @return always true
-     */
-    @Override
-    public boolean isErrorHandler() {
-        return true;
     }
 
     /**
