@@ -285,11 +285,16 @@ public class Yoke {
      * registered you can use the method render in the YokeResponse to
      * render a template.
      *
+     * @param extension The template file extension
      * @param engine    The implementation of the engine
      */
-    public Yoke engine(@NotNull Engine engine) {
+    public Yoke engine(@NotNull String extension, @NotNull Engine engine) {
         engine.setVertx(vertx);
-        engineMap.put(engine.extension(), engine);
+        // prefix "." to the file extension
+        if (extension.charAt(0) != '.') {
+            extension = "." + extension;
+        }
+        engineMap.put(extension, engine);
         return this;
     }
 

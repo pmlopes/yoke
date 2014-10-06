@@ -94,11 +94,6 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
         });
     }
 
-    @Override
-    public String extension() {
-        return extension;
-    }
-
     public HandlebarsEngine startDelimiter(String delimiter) {
         handlebars.startDelimiter(delimiter);
         return this;

@@ -27,7 +27,7 @@ public class HandlebarsEngineTest extends TestVerticle {
     public void testEngine() {
         try {
             Yoke yoke = new Yoke(this);
-            yoke.engine(new HandlebarsEngine("views"));
+            yoke.engine("hbs", new HandlebarsEngine("views"));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -53,7 +53,7 @@ public class HandlebarsEngineTest extends TestVerticle {
     public void testEngine2() {
         try {
             Yoke yoke = new Yoke(this);
-            yoke.engine(new HandlebarsEngine("views"));
+            yoke.engine("hbs", new HandlebarsEngine("views"));
             yoke.use(new Middleware() {
                 @Override
                 public void handle(YokeRequest request, Handler<Object> next) {
@@ -91,7 +91,7 @@ public class HandlebarsEngineTest extends TestVerticle {
     @Test
     public void testReuse() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new HandlebarsEngine(""));
+        yoke.engine("hbs", new HandlebarsEngine(""));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -114,7 +114,7 @@ public class HandlebarsEngineTest extends TestVerticle {
     @Test
     public void testPartials() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new HandlebarsEngine(""));
+        yoke.engine("hbs", new HandlebarsEngine(""));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

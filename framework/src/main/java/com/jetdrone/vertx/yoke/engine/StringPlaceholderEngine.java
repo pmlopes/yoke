@@ -31,26 +31,14 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
     private static final String sep = "(,\\s*)?";
     private static final Pattern ARG = Pattern.compile(quote + argument + quote + sep);
 
-    private final String extension;
     private final String prefix;
 
     public StringPlaceholderEngine(final String views) {
-        this(views, ".shtml");
-    }
-
-    public StringPlaceholderEngine(final String views, final String extension) {
-        this.extension = extension;
-
         if ("".equals(views)) {
             prefix = views;
         } else {
             prefix = views.endsWith("/") ? views : views + "/";
         }
-    }
-
-    @Override
-    public String extension() {
-        return extension;
     }
 
     /**

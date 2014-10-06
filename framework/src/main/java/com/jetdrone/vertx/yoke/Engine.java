@@ -41,13 +41,6 @@ public interface Engine {
     String contentEncoding();
 
     /**
-     * Return the file extension for this template, e.g.: jsp
-     *
-     * @return file extension
-     */
-    String extension();
-
-    /**
      * The implementation of the render engine. The implementation should render the given file with the context in an
      * asynchronous way.
      *

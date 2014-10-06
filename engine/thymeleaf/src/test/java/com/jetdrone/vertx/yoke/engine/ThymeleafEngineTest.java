@@ -16,7 +16,7 @@ public class ThymeleafEngineTest extends TestVerticle {
     @Test
     public void testEngine() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new ThymeleafEngine("views"));
+        yoke.engine("html", new ThymeleafEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

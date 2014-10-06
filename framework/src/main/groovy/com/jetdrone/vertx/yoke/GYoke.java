@@ -144,8 +144,8 @@ public class GYoke {
      *
      * @param engine The implementation of the engine
      */
-    public GYoke engine(Engine engine) {
-        jYoke.engine(engine);
+    public GYoke engine(String extension, Engine engine) {
+        jYoke.engine(extension, engine);
         return this;
     }
 
