@@ -61,7 +61,7 @@ public abstract class AbstractWriterFilter implements WriterFilter {
     @Override
     public Buffer end(@NotNull final Buffer buffer) {
         end(buffer.getBytes());
-        return buffer;
+        return this.buffer;
     }
 
     @Override
