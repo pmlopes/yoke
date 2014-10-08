@@ -62,14 +62,12 @@ public class ErrorHandler extends AbstractMiddleware implements ErrorMiddleware 
             String message = ((Throwable) error).getMessage();
 
             if (message == null) {
-                message = "";
+                if (fullStack) {
+                    message = error.getClass().getName();
+                }
             }
 
-            if (fullStack) {
-                return error.getClass().getName() + ": " + message;
-            } else {
-                return message;
-            }
+            return message;
         } else if (error instanceof String) {
             return (String) error;
         } else if (error instanceof Integer) {
@@ -138,7 +136,7 @@ public class ErrorHandler extends AbstractMiddleware implements ErrorMiddleware 
             response.end(
                     errorTemplate.replace("{title}", (String) request.get("title"))
                             .replace("{errorCode}", Integer.toString(errorCode))
-                            .replace("{errorMessage}", errorMessage)
+                            .replace("{errorMessage}", errorMessage == null ? "" : errorMessage)
                             .replace("{stackTrace}", stack.toString())
             );
             return true;
@@ -146,7 +144,14 @@ public class ErrorHandler extends AbstractMiddleware implements ErrorMiddleware 
 
         if (mime.startsWith("application/json")) {
             JsonObject jsonError = new JsonObject();
-            jsonError.putObject("error", new JsonObject().putNumber("code", errorCode).putString("message", errorMessage));
+            JsonObject jsonErrorMessage = new JsonObject().putNumber("code", errorCode);
+
+            jsonError.putObject("error", jsonErrorMessage);
+
+            if (errorMessage != null) {
+                jsonError.putString("message", errorMessage);
+            }
+
             if (!stackTrace.isEmpty()) {
                 JsonArray stack = new JsonArray();
                 for (String t : stackTrace) {
@@ -165,8 +170,11 @@ public class ErrorHandler extends AbstractMiddleware implements ErrorMiddleware 
             StringBuilder sb = new StringBuilder();
             sb.append("Error ");
             sb.append(errorCode);
-            sb.append(": ");
-            sb.append(errorMessage);
+
+            if (errorMessage != null) {
+                sb.append(": ");
+                sb.append(errorMessage);
+            }
 
             for (String t : stackTrace) {
                 sb.append("\tat ");
