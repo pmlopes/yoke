@@ -136,6 +136,11 @@ public class Logger implements Middleware {
                 break;
         }
 
+        logMessage(status, message);
+    }
+
+    protected void logMessage(int status, String message)
+    {
         if (status >= 500) {
             logger.fatal(message);
         } else if (status >= 400) {
