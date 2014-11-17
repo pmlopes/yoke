@@ -137,7 +137,7 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
         }
     }
 
-    public void registerHelper(String name, Helper<?> helper) {
-        handlebars.registerHelper(name, helper);
+    public final Handlebars getHandlebars() {
+        return handlebars;
     }
 }
