@@ -11,12 +11,21 @@ public class GJWT extends JWT {
         super();
     }
 
-    public GJWT(final @Nullable String skip) {
+    public GJWT(final @NotNull String skip) {
         super(skip);
     }
 
-    public GJWT(final @Nullable String skip, final Closure closure) {
+    public GJWT(final @NotNull String skip, final @NotNull Closure closure) {
         super(skip, new JWTHandler() {
+            @Override
+            public void handle(JsonObject token, Handler<Object> result) {
+                closure.call(token.toMap(), result);
+            }
+        });
+    }
+
+    public GJWT(final @NotNull Closure closure) {
+        super(new JWTHandler() {
             @Override
             public void handle(JsonObject token, Handler<Object> result) {
                 closure.call(token.toMap(), result);

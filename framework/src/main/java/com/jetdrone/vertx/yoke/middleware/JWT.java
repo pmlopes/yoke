@@ -4,7 +4,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
@@ -25,15 +24,22 @@ public class JWT extends AbstractMiddleware {
     private final JWTHandler handler;
 
     public JWT() {
-        this(null);
+        this.skip = null;
+        this.handler = null;
     }
 
-    public JWT(final @Nullable String skip) {
-        this(skip, null);
-    }
-
-    public JWT(final @Nullable String skip, final @Nullable JWTHandler handler) {
+    public JWT(final @NotNull String skip) {
         this.skip = skip;
+        this.handler = null;
+    }
+
+    public JWT(final @NotNull String skip, final @NotNull JWTHandler handler) {
+        this.skip = skip;
+        this.handler = handler;
+    }
+
+    public JWT(final @NotNull JWTHandler handler) {
+        this.skip = null;
         this.handler = handler;
     }
 
