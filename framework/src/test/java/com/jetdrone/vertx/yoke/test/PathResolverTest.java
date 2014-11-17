@@ -1,6 +1,5 @@
 package com.jetdrone.vertx.yoke.test;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.vertx.java.core.file.impl.PathAdjuster;
 import org.vertx.java.core.impl.VertxInternal;
@@ -14,7 +13,6 @@ import static org.vertx.testtools.VertxAssert.*;
 public class PathResolverTest extends TestVerticle {
 
     @Test
-    @Ignore
     public void testEscape() throws IOException {
 
         String base = PathAdjuster.adjust((VertxInternal) vertx, ".");
