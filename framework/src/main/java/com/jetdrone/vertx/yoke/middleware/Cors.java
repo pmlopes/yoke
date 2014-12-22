@@ -1,5 +1,5 @@
 
-package com.jetdrone.vertx.yoke.extras.middleware;
+package com.jetdrone.vertx.yoke.middleware;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS;
 import static io.netty.handler.codec.http.HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS;

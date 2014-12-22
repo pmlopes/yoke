@@ -1,5 +1,5 @@
 
-package com.jetdrone.vertx.yoke.extras.middleware;
+package com.jetdrone.vertx.yoke.middleware;
 
 import static org.vertx.java.core.http.HttpHeaders.CONTENT_LENGTH;
 
@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.core.SecurityContext;
 
-import com.jetdrone.vertx.yoke.middleware.AbstractMiddleware;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -37,6 +36,7 @@ import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -46,8 +46,6 @@ import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 
 /**
  * <p>
@@ -238,7 +236,7 @@ public class Jersey extends AbstractMiddleware implements Container {
 
         @Override
         public int hashCode() {
-            return 31 + ((user == null) ? 0 : user.hashCode());
+            return 31 + (user.hashCode());
         }
 
         @Override
@@ -247,9 +245,7 @@ public class Jersey extends AbstractMiddleware implements Container {
             if (obj == null) return false;
             if (getClass() != obj.getClass()) return false;
             final YokePrincipal other = (YokePrincipal) obj;
-            if (user == null) {
-                if (other.user != null) return false;
-            } else if (!user.equals(other.user)) return false;
+            if (!user.equals(other.user)) return false;
             return true;
         }
     }
@@ -502,7 +498,7 @@ public class Jersey extends AbstractMiddleware implements Container {
     }
 
     @Override
-    public Middleware init(final Yoke yoke, final String mount) {
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
         super.init(yoke, mount);
         initJersey();
         containerListener.onStartup(this);
@@ -538,7 +534,7 @@ public class Jersey extends AbstractMiddleware implements Container {
     }
 
     @Override
-    public void handle(final YokeRequest request, final Handler<Object> next) {
+    public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         final YokeResponse response = request.response();
         final YokeResponseWriter responseWriter = new YokeResponseWriter(response, vertx());
         final URI baseUri = getBaseUri(request);
