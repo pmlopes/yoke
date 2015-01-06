@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface ResponseMessage {
     int code();
     String message();
+    String responseModel() default "";
 }

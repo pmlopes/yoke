@@ -137,11 +137,15 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             operations.putArray("responseMessages", jsonResponseMessages);
 
             for (ResponseMessage responseMessage : doc.responseMessages()) {
-                jsonResponseMessages.addObject(
-                        new JsonObject()
-                                .putNumber("code", responseMessage.code())
-                                .putString("message", responseMessage.message())
-                );
+                JsonObject json = new JsonObject()
+                        .putNumber("code", responseMessage.code())
+                        .putString("message", responseMessage.message());
+
+                if (!responseMessage.responseModel().equals("")) {
+                    json.putString("responseModel", responseMessage.responseModel());
+                }
+
+                jsonResponseMessages.addObject(json);
             }
         }
 
