@@ -16,7 +16,6 @@
 package com.jetdrone.vertx.yoke.engine;
 
 import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Helper;
 import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
@@ -97,16 +96,6 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
     @Override
     public String extension() {
         return extension;
-    }
-
-    public HandlebarsEngine startDelimiter(String delimiter) {
-        handlebars.startDelimiter(delimiter);
-        return this;
-    }
-
-    public HandlebarsEngine endDelimiter(String delimiter) {
-        handlebars.endDelimiter(delimiter);
-        return this;
     }
 
     private String resolve(String location) {
