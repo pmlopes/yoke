@@ -25,7 +25,7 @@ import java.util.Date;
  * equal to 500 the fatal severity is used, for status greater or equal to 400 the error severity is used, for status
  * greater or equal to 300 warn is used and for status above 100 info is used.
  */
-public class Logger extends Middleware {
+public class Logger implements Middleware {
 
     private final org.vertx.java.core.logging.Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -136,6 +136,11 @@ public class Logger extends Middleware {
                 break;
         }
 
+        logMessage(status, message);
+    }
+
+    protected void logMessage(int status, String message)
+    {
         if (status >= 500) {
             logger.fatal(message);
         } else if (status >= 400) {

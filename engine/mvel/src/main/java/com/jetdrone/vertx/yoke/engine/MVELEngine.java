@@ -29,26 +29,14 @@ import java.util.Map;
 
 public class MVELEngine extends AbstractEngine<CompiledTemplate> {
 
-    private final String extension;
     private final String prefix;
 
     public MVELEngine(final String views) {
-        this(views, ".mvel");
-    }
-
-    public MVELEngine(final String views, final String extension) {
-        this.extension = extension;
-
         if ("".equals(views)) {
             prefix = views;
         } else {
             prefix = views.endsWith("/") ? views : views + "/";
         }
-    }
-
-    @Override
-    public String extension() {
-        return extension;
     }
 
     @Override

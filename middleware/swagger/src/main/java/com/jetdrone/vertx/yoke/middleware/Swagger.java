@@ -3,6 +3,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.Processor;
 import com.jetdrone.vertx.yoke.annotations.processors.SwaggerProcessor;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -209,7 +210,7 @@ public class Swagger {
 
         this.router.get(this.prefix, new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 JsonObject result = new JsonObject()
                         .putString("apiVersion", apiVersion)
                         .putString("swaggerVersion", "1.2");
@@ -257,7 +258,7 @@ public class Swagger {
 
         router.get(prefix + path, new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 JsonObject result = new JsonObject()
                         .putString("apiVersion", apiVersion)
                         .putString("swaggerVersion", "1.2")

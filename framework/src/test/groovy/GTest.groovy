@@ -9,7 +9,6 @@ import com.jetdrone.vertx.yoke.test.GYokeTester
 import com.jetdrone.vertx.yoke.test.Response
 import org.junit.Test
 import org.vertx.groovy.core.Vertx
-import org.vertx.groovy.platform.Container
 import org.vertx.java.core.Handler
 import org.vertx.testtools.TestVerticle
 
@@ -21,7 +20,7 @@ class GTest extends TestVerticle {
 
     @Test
     public void testInstantiation() {
-        def gYoke = new GYoke(new Vertx(vertx), new Container(container))
+        def gYoke = new GYoke(new Vertx(vertx))
         gYoke.use {req ->
             req.response.end()
         }
@@ -39,7 +38,7 @@ class GTest extends TestVerticle {
 
     @Test
     public void testAnnotatedRouter() {
-        def gYoke = new GYoke(new Vertx(vertx), new Container(container))
+        def gYoke = new GYoke(new Vertx(vertx))
         gYoke.use(GRouter.from(new AnnotatedRouter()));
 
         new GYokeTester(gYoke).request("GET", "/rest") { Response resp ->
@@ -68,7 +67,7 @@ class GTest extends TestVerticle {
 
     @Test
     public void testAnnotatedRouter2() {
-        def gYoke = new GYoke(new Vertx(vertx), new Container(container))
+        def gYoke = new GYoke(new Vertx(vertx))
         gYoke.use(GRouter.from(new Ann2()));
 
         new GYokeTester(gYoke).request("GET", "/users/Paulo") { Response resp ->

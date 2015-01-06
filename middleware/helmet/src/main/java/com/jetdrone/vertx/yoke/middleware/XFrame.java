@@ -4,7 +4,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
-public final class XFrame extends Middleware {
+public final class XFrame implements Middleware {
 
     public static enum Action {
         DENY("DENY"),

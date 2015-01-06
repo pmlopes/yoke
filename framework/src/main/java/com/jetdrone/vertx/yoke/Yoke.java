@@ -9,6 +9,7 @@ import com.jetdrone.vertx.yoke.core.RequestWrapper;
 import com.jetdrone.vertx.yoke.core.impl.DefaultRequestWrapper;
 import com.jetdrone.vertx.yoke.jmx.ContextMBean;
 import com.jetdrone.vertx.yoke.jmx.MiddlewareMBean;
+import com.jetdrone.vertx.yoke.middleware.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.security.KeyStoreSecurity;
 import com.jetdrone.vertx.yoke.security.SecretSecurity;
@@ -65,11 +66,6 @@ public class Yoke {
     private final Vertx vertx;
 
     /**
-     * Vert.x container
-     */
-    private final Container container;
-
-    /**
      * request wrapper in use
      */
     private final RequestWrapper requestWrapper;
@@ -111,7 +107,7 @@ public class Yoke {
      * @param verticle the main verticle
      */
     public Yoke(@NotNull Verticle verticle) {
-        this(verticle.getVertx(), verticle.getContainer(), new DefaultRequestWrapper());
+        this(verticle.getVertx(), new DefaultRequestWrapper());
     }
 
     /**
@@ -133,29 +129,7 @@ public class Yoke {
      * @param vertx
      */
     public Yoke(@NotNull Vertx vertx) {
-        this(vertx, null, new DefaultRequestWrapper());
-    }
-
-    /**
-     * Creates a Yoke instance.
-     *
-     * This constructor should be called from a verticle and pass a valid Vertx instance and a Container. This instance
-     * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
-     * features such as file system and timers.
-     *
-     * <pre>
-     * public class MyVerticle extends Verticle {
-     *   public void start() {
-     *     final Yoke yoke = new Yoke(getVertx());
-     *     ...
-     *   }
-     * }
-     * </pre>
-     *
-     * @param vertx
-     */
-    public Yoke(@NotNull Vertx vertx, Container container) {
-        this(vertx, container, new DefaultRequestWrapper());
+        this(vertx, new DefaultRequestWrapper());
     }
 
     /**
@@ -175,12 +149,10 @@ public class Yoke {
      * </pre>
      *
      * @param vertx
-     * @param container
      * @param requestWrapper
      */
-    public Yoke(@NotNull Vertx vertx, @Nullable Container container, @NotNull RequestWrapper requestWrapper) {
+    public Yoke(@NotNull Vertx vertx, @NotNull RequestWrapper requestWrapper) {
         this.vertx = vertx;
-        this.container = container;
         this.requestWrapper = requestWrapper;
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
@@ -230,7 +202,7 @@ public class Yoke {
             // when the type of middleware is error handler then the route is ignored and
             // the middleware is extracted from the execution chain into a special placeholder
             // for error handling
-            if (m.isErrorHandler()) {
+            if (m instanceof ErrorMiddleware) {
                 errorHandler = m;
             } else {
                 MountedMiddleware mm = new MountedMiddleware(route, m);
@@ -244,8 +216,10 @@ public class Yoke {
                 }
             }
 
-            // initialize the middleware with the current Vert.x and Logger
-            m.init(this, route);
+            // initialize the middleware with the current Yoke
+            if (m instanceof AbstractMiddleware) {
+                ((AbstractMiddleware) m).init(this, route);
+            }
         }
         return this;
     }
@@ -282,7 +256,7 @@ public class Yoke {
     public Yoke use(@NotNull String route, final @NotNull Handler<YokeRequest> handler) {
         middlewareList.add(new MountedMiddleware(route, new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 handler.handle(request);
             }
         }));
@@ -311,11 +285,16 @@ public class Yoke {
      * registered you can use the method render in the YokeResponse to
      * render a template.
      *
+     * @param extension The template file extension
      * @param engine    The implementation of the engine
      */
-    public Yoke engine(@NotNull Engine engine) {
+    public Yoke engine(@NotNull String extension, @NotNull Engine engine) {
         engine.setVertx(vertx);
-        engineMap.put(engine.extension(), engine);
+        // prefix "." to the file extension
+        if (extension.charAt(0) != '.') {
+            extension = "." + extension;
+        }
+        engineMap.put(extension, engine);
         return this;
     }
 
@@ -479,14 +458,11 @@ public class Yoke {
      * @return {Yoke}
      */
     public Yoke listen(final @NotNull HttpServer server) {
-        // is this server HTTPS?
-        final boolean secure = server.isSSL();
-
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest req) {
                 // the context map is shared with all middlewares
-                final YokeRequest request = requestWrapper.wrap(req, secure, new Context(defaultContext), engineMap, store);
+                final YokeRequest request = requestWrapper.wrap(req, new Context(defaultContext), engineMap, store);
 
                 // add x-powered-by header is enabled
                 Boolean poweredBy = request.get("x-powered-by");
@@ -583,8 +559,8 @@ public class Yoke {
      *
      * @param config either a json object or a json array.
      */
-    public Yoke deploy(@NotNull JsonElement config) {
-        return deploy(config, null);
+    public Yoke deploy(@NotNull final Container container, @NotNull JsonElement config) {
+        return deploy(container, config, null);
     }
 
     /**
@@ -604,10 +580,11 @@ public class Yoke {
      * }
      * </pre>
      *
+     * @param container Vert.x2 container
      * @param config either a json object or a json array.
      * @param handler A handler that is called once all middleware is deployed or on error.
      */
-    public Yoke deploy(final @NotNull JsonElement config, final Handler<Object> handler) {
+    public Yoke deploy(final @NotNull Container container, final @NotNull JsonElement config, final Handler<Object> handler) {
 
         if (config.isArray() && config.asArray().size() == 0) {
             if (handler == null) {
@@ -619,7 +596,7 @@ public class Yoke {
         }
 
         if (config.isObject()) {
-            return deploy(new JsonArray().addObject(config.asObject()), handler);
+            return deploy(container, new JsonArray().addObject(config.asObject()), handler);
         }
 
         // wait for all deployments before calling the real handler
@@ -643,16 +620,16 @@ public class Yoke {
         for (Object o : config.asArray()) {
             JsonObject mod = (JsonObject) o;
             if (mod.getString("module") != null) {
-                deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
+                deploy(container, mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
             } else {
-                deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
+                deploy(container, mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
             }
         }
 
         return this;
     }
 
-    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, JsonObject config, Handler<AsyncResult<String>> handler) {
+    private void deploy(@NotNull Container container, String name, boolean module, boolean worker, boolean multiThreaded, int instances, JsonObject config, Handler<AsyncResult<String>> handler) {
         if (module) {
             if (handler != null) {
                 container.deployModule(name, config, instances, handler);

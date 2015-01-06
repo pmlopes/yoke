@@ -22,7 +22,7 @@ public class Issue88Test extends TestVerticle {
     public void testIssue88() {
         Yoke yoke = new Yoke(this)
                 .set("title", "Yoke 1.0.7: Issue #88")
-                .engine(new HandlebarsEngine("issue88/"))
+                .engine("hbs", new HandlebarsEngine("issue88/"))
                 .use(new ErrorHandler(true))
                 .use("/$", new Middleware() {
                             @Override

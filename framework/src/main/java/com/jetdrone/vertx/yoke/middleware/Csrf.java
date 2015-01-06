@@ -19,7 +19,7 @@ import java.util.UUID;
  *
  * This middleware requires session support, thus should be added somewhere below Session.
  */
-public class Csrf extends Middleware {
+public class Csrf implements Middleware {
 
     /**
      * Handler that validates the CRSF token

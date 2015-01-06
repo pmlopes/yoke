@@ -12,7 +12,7 @@ import org.vertx.java.core.Handler;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class GRouter extends Middleware {
+public class GRouter extends AbstractMiddleware {
 
     private final Router jRouter = new Router();
 
@@ -23,7 +23,7 @@ public class GRouter extends Middleware {
     }
 
     @Override
-    public void handle(YokeRequest request, Handler<Object> next) {
+    public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
         jRouter.handle(request, next);
     }
 
@@ -31,7 +31,7 @@ public class GRouter extends Middleware {
         final int params = closure.getMaximumNumberOfParameters();
         return new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 if (params == 1) {
                     closure.call(request);
                 } else if (params == 2) {

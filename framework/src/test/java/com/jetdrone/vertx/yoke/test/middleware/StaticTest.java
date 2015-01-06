@@ -49,8 +49,6 @@ public class StaticTest extends TestVerticle {
     }
 
     @Test
-    @Ignore
-    // TODO: wait for bugfix from Vert.x 2.1.2
     public void testStaticEscape() {
         Yoke yoke = new Yoke(this);
         yoke.use(new Static("static"));

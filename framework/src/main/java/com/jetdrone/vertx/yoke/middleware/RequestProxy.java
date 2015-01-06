@@ -3,7 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpClient;
@@ -20,7 +19,7 @@ import org.vertx.java.core.http.HttpClientResponse;
  * In order to handler the proxy request properly, Bodyparser should be disabled for the
  * path matched by RequestProxy.
  */
-public class RequestProxy extends Middleware {
+public class RequestProxy extends AbstractMiddleware {
 
     private final String prefix;
     private final String host;

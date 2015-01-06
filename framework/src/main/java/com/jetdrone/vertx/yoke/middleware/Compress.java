@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  * You can specify which content types are compressable and by default json/text/javascript
  * are enabled.
  */
-public class Compress extends Middleware {
+public class Compress implements Middleware {
 
     /**
      * Regular expression to identify resources that are subject to compression

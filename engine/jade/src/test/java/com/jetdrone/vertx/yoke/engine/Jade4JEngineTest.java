@@ -16,7 +16,7 @@ public class Jade4JEngineTest extends TestVerticle {
     @Test
     public void testEngine() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new Jade4JEngine("views"));
+        yoke.engine("jade", new Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {
@@ -37,7 +37,7 @@ public class Jade4JEngineTest extends TestVerticle {
     @Test
     public void testEngine2() {
         Yoke yoke = new Yoke(this);
-        yoke.engine(new Jade4JEngine("views"));
+        yoke.engine("jade", new Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
             public void handle(YokeRequest request, Handler<Object> next) {

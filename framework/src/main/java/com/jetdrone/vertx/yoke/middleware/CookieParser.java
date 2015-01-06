@@ -24,7 +24,7 @@ import java.util.TreeSet;
  *
  * When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.
  */
-public class CookieParser extends Middleware {
+public class CookieParser implements Middleware {
 
     /**
      * Message Signer

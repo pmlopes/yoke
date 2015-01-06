@@ -3,7 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.JSON;
 import com.jetdrone.vertx.yoke.core.YokeFileUpload;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,7 @@ import java.util.HashMap;
  * Currently when parsing *multipart/form-data* if there are several files uploaded under the same name, only the last
  * is preserved.
  */
-public class BodyParser extends Middleware {
+public class BodyParser extends AbstractMiddleware {
 
     /**
      * Location on the file system to store the uploaded files.

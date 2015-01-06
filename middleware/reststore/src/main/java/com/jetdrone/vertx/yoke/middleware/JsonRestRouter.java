@@ -18,6 +18,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 
 import com.jetdrone.vertx.yoke.middleware.rest.Store;
+import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -50,7 +51,7 @@ public class JsonRestRouter extends Router {
 
     private static final Middleware NOT_ALLOWED = new Middleware() {
         @Override
-        public void handle(YokeRequest request, Handler<Object> next) {
+        public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
             next.handle(405);
         }
     };
@@ -119,7 +120,7 @@ public class JsonRestRouter extends Router {
     private Middleware delete(final String idName) {
         return new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 // get the real id from the params multimap
                 final String id = request.params().get(idName);
 
@@ -147,7 +148,7 @@ public class JsonRestRouter extends Router {
     private Middleware create(final String idName) {
         return new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 JsonObject item = request.body();
 
                 if (item == null) {
@@ -174,7 +175,7 @@ public class JsonRestRouter extends Router {
     private Middleware append(final String idName) {
         return new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 // get the real id from the params multimap
                 final String id = request.params().get(idName);
 
@@ -235,7 +236,7 @@ public class JsonRestRouter extends Router {
     private Middleware update(final String idName) {
         return new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 JsonObject item = request.body();
 
                 if (item == null) {
@@ -282,7 +283,7 @@ public class JsonRestRouter extends Router {
 
         return new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 // content negotiation
                 if (request.accepts("application/json") == null) {
                     // Not Acceptable (we only talk json)
@@ -384,7 +385,7 @@ public class JsonRestRouter extends Router {
     private Middleware read(final String idName) {
         return new Middleware() {
             @Override
-            public void handle(final YokeRequest request, final Handler<Object> next) {
+            public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 // content negotiation
                 if (request.accepts("application/json") == null) {
                     // Not Acceptable (we only talk json)

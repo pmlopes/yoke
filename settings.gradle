@@ -6,6 +6,7 @@ include 'middleware:helmet'
 include 'middleware:pac4j'
 include 'middleware:reststore'
 include 'middleware:toobusy'
+include 'middleware:jersey'
 // engines
 include 'engine:handlebars'
 include 'engine:jade'

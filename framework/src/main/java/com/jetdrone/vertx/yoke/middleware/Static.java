@@ -3,7 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +21,7 @@ import java.util.TimeZone;
  *
  * Static file server with the given ```root``` path. Optionaly will also generate index pages for directory listings.
  */
-public class Static extends Middleware {
+public class Static extends AbstractMiddleware {
 
     /**
      * SimpleDateFormat to format date objects into ISO format.

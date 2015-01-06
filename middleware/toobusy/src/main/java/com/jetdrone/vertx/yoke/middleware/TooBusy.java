@@ -4,9 +4,8 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 
-public final class TooBusy extends Middleware {
+public final class TooBusy extends AbstractMiddleware {
 
     private final long highWaterMark;
     private final String message;

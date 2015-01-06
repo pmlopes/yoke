@@ -6,6 +6,7 @@ import com.jetdrone.vertx.yoke.middleware.AuthHandler;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.http.CaseInsensitiveMultiMap;
 import org.vertx.java.core.Handler;
@@ -23,7 +24,7 @@ public class BasicAuth extends TestVerticle {
         yoke.use(new com.jetdrone.vertx.yoke.middleware.BasicAuth("Aladdin", "open sesame"));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.response().end();
             }
         });
@@ -69,7 +70,7 @@ public class BasicAuth extends TestVerticle {
 
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.response().end();
             }
         });

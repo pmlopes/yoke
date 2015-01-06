@@ -75,7 +75,7 @@ public class TechEmpower extends Verticle {
         // create the yoke app
         new Yoke(this)
                 // register the MVEL engine
-                .engine(new MVELEngine("views"))
+                .engine("mvel", new MVELEngine("views"))
 
                 // Test 1: JSON serialization
                 .use("/json", new Middleware() {

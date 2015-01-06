@@ -3,7 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.ErrorMiddleware;
 import com.jetdrone.vertx.yoke.util.Utils;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -22,7 +22,7 @@ import java.util.Map;
  *
  * Creates pretty print error pages in *html*, *text* or *json* depending on the *accept* header from the client.
  */
-public class ErrorHandler extends Middleware {
+public class ErrorHandler extends AbstractMiddleware implements ErrorMiddleware {
 
     /**
      * Flag to enable/disable printing the full stack trace of exceptions.
@@ -51,16 +51,6 @@ public class ErrorHandler extends Middleware {
     }
 
     /**
-     * Override the Middleware isErrorHandler getter.
-     *
-     * @return always true
-     */
-    @Override
-    public boolean isErrorHandler() {
-        return true;
-    }
-
-    /**
      * Extracts a single message from a error Object. This will handle Throwables, Strings and Numbers. In case of
      * numbers these are handled as Http error codes.
      *
@@ -72,14 +62,12 @@ public class ErrorHandler extends Middleware {
             String message = ((Throwable) error).getMessage();
 
             if (message == null) {
-                message = "";
+                if (fullStack) {
+                    message = error.getClass().getName();
+                }
             }
 
-            if (fullStack) {
-                return error.getClass().getName() + ": " + message;
-            } else {
-                return message;
-            }
+            return message;
         } else if (error instanceof String) {
             return (String) error;
         } else if (error instanceof Integer) {
@@ -148,7 +136,7 @@ public class ErrorHandler extends Middleware {
             response.end(
                     errorTemplate.replace("{title}", (String) request.get("title"))
                             .replace("{errorCode}", Integer.toString(errorCode))
-                            .replace("{errorMessage}", errorMessage)
+                            .replace("{errorMessage}", errorMessage == null ? "" : errorMessage)
                             .replace("{stackTrace}", stack.toString())
             );
             return true;
@@ -156,7 +144,14 @@ public class ErrorHandler extends Middleware {
 
         if (mime.startsWith("application/json")) {
             JsonObject jsonError = new JsonObject();
-            jsonError.putObject("error", new JsonObject().putNumber("code", errorCode).putString("message", errorMessage));
+            JsonObject jsonErrorMessage = new JsonObject().putNumber("code", errorCode);
+
+            jsonError.putObject("error", jsonErrorMessage);
+
+            if (errorMessage != null) {
+                jsonError.putString("message", errorMessage);
+            }
+
             if (!stackTrace.isEmpty()) {
                 JsonArray stack = new JsonArray();
                 for (String t : stackTrace) {
@@ -175,8 +170,11 @@ public class ErrorHandler extends Middleware {
             StringBuilder sb = new StringBuilder();
             sb.append("Error ");
             sb.append(errorCode);
-            sb.append(": ");
-            sb.append(errorMessage);
+
+            if (errorMessage != null) {
+                sb.append(": ");
+                sb.append(errorMessage);
+            }
 
             for (String t : stackTrace) {
                 sb.append("\tat ");

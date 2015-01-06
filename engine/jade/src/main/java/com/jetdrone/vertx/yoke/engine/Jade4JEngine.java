@@ -76,11 +76,6 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
     }
 
     @Override
-    public String extension() {
-        return extension;
-    }
-
-    @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
         try {
             JadeTemplate template = getTemplateFromCache(resolve(filename));

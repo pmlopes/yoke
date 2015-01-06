@@ -1,9 +1,10 @@
 package com.jetdrone.vertx.yoke.test;
 
-import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.middleware.AbstractMiddleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -20,9 +21,9 @@ public class MiddlewareTest extends TestVerticle {
     public void testMiddleware() {
         final Yoke yoke = new Yoke(this);
 
-        yoke.use(new Middleware() {
+        yoke.use(new AbstractMiddleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 assertNotNull(this.yoke);
                 testComplete();
             }

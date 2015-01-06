@@ -9,7 +9,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.util.*;
 
-public class CSP extends Middleware {
+public class CSP implements Middleware {
 
     private final List<String> ALL_HEADERS = Arrays.asList(
             "X-Content-Security-Policy",
