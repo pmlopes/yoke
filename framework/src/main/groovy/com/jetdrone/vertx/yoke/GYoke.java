@@ -35,6 +35,7 @@ public class GYoke {
 
     private final Yoke jYoke;
     private final org.vertx.java.core.Vertx vertx;
+    private final Vertx gVertx;
 
     /**
      * Creates a Yoke instance.
@@ -67,6 +68,7 @@ public class GYoke {
      * @param vertx The Vertx instance
      */
     public GYoke(Vertx vertx) {
+        this.gVertx = vertx;
         this.vertx = vertx.toJavaVertx();
         jYoke = new Yoke(this.vertx, new GroovyRequestWrapper());
     }
@@ -358,5 +360,9 @@ public class GYoke {
 
     public Yoke toJavaYoke() {
         return jYoke;
+    }
+
+    public Vertx getVertx() {
+        return gVertx;
     }
 }
