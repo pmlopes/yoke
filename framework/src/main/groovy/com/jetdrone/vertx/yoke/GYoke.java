@@ -35,6 +35,7 @@ public class GYoke {
 
     private final Yoke jYoke;
     private final org.vertx.java.core.Vertx vertx;
+    private final Vertx gVertx;
     private final Container container;
 
     /**
@@ -67,7 +68,7 @@ public class GYoke {
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(Vertx vertx, Container container) {
+    public GYoke(Vertx vertx) {
         this.vertx = vertx.toJavaVertx();
         this.container = container;
 
@@ -361,5 +362,9 @@ public class GYoke {
 
     public Yoke toJavaYoke() {
         return jYoke;
+    }
+
+    public Vertx getVertx() {
+        return gVertx;
     }
 }
