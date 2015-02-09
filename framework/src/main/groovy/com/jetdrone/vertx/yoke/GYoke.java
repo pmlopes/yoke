@@ -68,7 +68,8 @@ public class GYoke {
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(Vertx vertx) {
+    public GYoke(Vertx vertx, Container container) {
+        this.gVertx = vertx;
         this.vertx = vertx.toJavaVertx();
         this.container = container;
 

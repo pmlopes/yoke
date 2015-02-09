@@ -59,6 +59,8 @@ public class YokeTester {
 
                         MultiMap params = null;
                         MultiMap attributes = null;
+                        final Random random = new Random();
+
                         final NetSocket netSocket = new NetSocket() {
                             @Override
                             public String writeHandlerID() {
