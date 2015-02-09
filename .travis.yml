@@ -2,11 +2,6 @@ language: java
 jdk:
   - openjdk7
 
-install: true
-
-script:
-  - TERM=dumb ./gradlew check uploadArchives
-
 env:
   global:
     - secure: "dDxDBHqsT0dlJ3HzCTo/SCyiwNtvnW2YkclfUOrHDawluwdvmt8M9sv0y5+ACoA7gGz0mw1oFZRoT0ct34SUokk+W7EmGHy2NUxSL1yZGdwroPb+9l1rB8cIzqGjtgvUv9hIwS5qQ4ZLMFBk7xiMAextZrjJwBo5j7s00C4tEnM="
