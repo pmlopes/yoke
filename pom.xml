@@ -99,9 +99,9 @@
         <module>store/redis</module>
         <module>store/mongodb</module>
 
-        <!--<module>examples/benchmark</module>-->
-        <!--<module>examples/cluster-benchmark</module>-->
-        <!--&lt;!&ndash;<module>examples/dojo-reststore</module>&ndash;&gt;-->
+        <module>examples/benchmark</module>
+        <module>examples/cluster-benchmark</module>
+        <module>examples/dojo-reststore</module>
         <!--<module>examples/form-auth</module>-->
         <!--&lt;!&ndash;<module>examples/groovy</module>&ndash;&gt;-->
         <!--&lt;!&ndash;<module>examples/kitcms</module>&ndash;&gt;-->
