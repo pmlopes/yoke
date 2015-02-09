@@ -27,6 +27,7 @@
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>13.0</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>

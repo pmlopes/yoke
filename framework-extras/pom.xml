@@ -24,6 +24,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>13.0</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>com.jetdrone</groupId>
             <artifactId>yoke</artifactId>
             <version>${project.version}</version>

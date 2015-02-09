@@ -10,9 +10,9 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>yoke.middleware.toobusy</artifactId>
+    <artifactId>yoke.examples.session-store</artifactId>
     <packaging>jar</packaging>
-    <name>middleware-toobusy</name>
+    <name>example-session-store</name>
 
     <properties>
         <!--Vertx module name-->
@@ -24,20 +24,25 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>13.0</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>com.jetdrone</groupId>
             <artifactId>yoke</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.jetdrone</groupId>
+            <artifactId>yoke.store.mongodb</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-platform</artifactId>
             <version>${vertx.version}</version>
             <scope>provided</scope>
         </dependency>

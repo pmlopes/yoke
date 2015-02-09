@@ -102,13 +102,14 @@
         <module>examples/benchmark</module>
         <module>examples/cluster-benchmark</module>
         <module>examples/dojo-reststore</module>
-        <!--<module>examples/form-auth</module>-->
-        <!--&lt;!&ndash;<module>examples/groovy</module>&ndash;&gt;-->
-        <!--&lt;!&ndash;<module>examples/kitcms</module>&ndash;&gt;-->
-        <!--<module>examples/mozilla-persona</module>-->
-        <!--<module>examples/session-store</module>-->
-        <!--&lt;!&ndash;<module>examples/swagger-petstore</module>&ndash;&gt;-->
-        <!--&lt;!&ndash;<module>examples/techempower</module>&ndash;&gt;-->
+        <module>examples/form-auth</module>
+        <module>examples/groovy</module>
+        <module>examples/javascript</module>
+        <module>examples/kitcms</module>
+        <module>examples/mozilla-persona</module>
+        <module>examples/session-store</module>
+        <module>examples/swagger-petstore</module>
+        <module>examples/techempower</module>
     </modules>
 
     <build>

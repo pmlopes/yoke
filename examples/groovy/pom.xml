@@ -10,9 +10,9 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>yoke.middleware.toobusy</artifactId>
+    <artifactId>yoke.examples.groovy</artifactId>
     <packaging>jar</packaging>
-    <name>middleware-toobusy</name>
+    <name>example-groovy</name>
 
     <properties>
         <!--Vertx module name-->
@@ -24,21 +24,48 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>13.0</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>com.jetdrone</groupId>
             <artifactId>yoke</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>com.jetdrone</groupId>
+            <artifactId>yoke.engine.handlebars</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jetdrone</groupId>
+            <artifactId>yoke.engine.jade</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jetdrone</groupId>
+            <artifactId>yoke-extras</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>${groovy.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
             <version>${vertx.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-platform</artifactId>
+            <version>${vertx.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>lang-groovy</artifactId>
+            <version>2.1.1-final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
