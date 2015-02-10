@@ -16,4 +16,3 @@ mods
 .yardopts
 node_modules
 vertx_classpath.txt
-site
