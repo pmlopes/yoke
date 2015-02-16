@@ -12,7 +12,7 @@ import org.vertx.java.core.Handler;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class GRouter extends AbstractMiddleware {
+public class GRouter extends Middleware {
 
     private final Router jRouter = new Router();
 

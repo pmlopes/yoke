@@ -20,7 +20,7 @@ public class ExtrasExample extends Verticle {
     @Override
     public void start() {
         final Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new HandlebarsEngine("views"));
+        yoke.engine(new HandlebarsEngine("views"));
 
         yoke.use(new BodyParser());
         yoke.use(new ErrorHandler(true));

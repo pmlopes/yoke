@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.testtools.TestVerticle;
@@ -27,10 +28,10 @@ public class HandlebarsEngineTest extends TestVerticle {
     public void testEngine() {
         try {
             Yoke yoke = new Yoke(this);
-            yoke.engine("hbs", new HandlebarsEngine("views"));
+            yoke.engine(new HandlebarsEngine("views"));
             yoke.use(new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                     request.put("name", "Paulo");
                     request.response().render("template.hbs", next);
                 }
@@ -53,10 +54,10 @@ public class HandlebarsEngineTest extends TestVerticle {
     public void testEngine2() {
         try {
             Yoke yoke = new Yoke(this);
-            yoke.engine("hbs", new HandlebarsEngine("views"));
+            yoke.engine(new HandlebarsEngine("views"));
             yoke.use(new Middleware() {
                 @Override
-                public void handle(YokeRequest request, Handler<Object> next) {
+                public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                     List<Map> blogs = new ArrayList<>();
                     Map<String, String> blog1 = new HashMap<>();
                     blog1.put("name", "Handlebars.java");
@@ -91,10 +92,10 @@ public class HandlebarsEngineTest extends TestVerticle {
     @Test
     public void testReuse() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new HandlebarsEngine(""));
+        yoke.engine(new HandlebarsEngine(""));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.response().render("views/home.hbs");
             }
         });
@@ -114,10 +115,10 @@ public class HandlebarsEngineTest extends TestVerticle {
     @Test
     public void testPartials() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("hbs", new HandlebarsEngine(""));
+        yoke.engine(new HandlebarsEngine(""));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.response().render("views/home2.hbs");
             }
         });

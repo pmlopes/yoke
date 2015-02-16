@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  * * `CONNECT`
  * * `PATCH`
  */
-public class Router extends AbstractMiddleware {
+public class Router extends Middleware {
 
     private final List<PatternBinding> getBindings = new ArrayList<>();
     private final List<PatternBinding> putBindings = new ArrayList<>();
@@ -68,8 +68,8 @@ public class Router extends AbstractMiddleware {
     private void init(Yoke yoke, String mount, List<PatternBinding> bindings) {
         for (PatternBinding binding : bindings) {
             for (Middleware m : binding.middleware) {
-                if (m instanceof AbstractMiddleware && !((AbstractMiddleware) m).isInitialized()) {
-                    ((AbstractMiddleware) m).init(yoke, mount);
+                if (!m.isInitialized()) {
+                    m.init(yoke, mount);
                 }
             }
         }
@@ -91,8 +91,8 @@ public class Router extends AbstractMiddleware {
 
         for (String key : paramProcessors.keySet()) {
             final Middleware m = paramProcessors.get(key);
-            if (m instanceof AbstractMiddleware && !((AbstractMiddleware) m).isInitialized()) {
-                ((AbstractMiddleware) paramProcessors.get(key)).init(yoke, mount);
+            if (!m.isInitialized()) {
+                paramProcessors.get(key).init(yoke, mount);
             }
         }
 
@@ -639,8 +639,8 @@ public class Router extends AbstractMiddleware {
 
     public Router param(@NotNull final String paramName, @NotNull final Middleware handler) {
         // also pass the vertx object to the routes
-        if (handler instanceof AbstractMiddleware && !((AbstractMiddleware) handler).isInitialized() && isInitialized()) {
-            ((AbstractMiddleware) handler).init(yoke, mount);
+        if (!handler.isInitialized() && isInitialized()) {
+            handler.init(yoke, mount);
         }
         paramProcessors.put(paramName, handler);
         return this;
@@ -698,8 +698,8 @@ public class Router extends AbstractMiddleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (h instanceof AbstractMiddleware && !((AbstractMiddleware) h).isInitialized() && isInitialized()) {
-                ((AbstractMiddleware) h).init(yoke, mount);
+            if (!h.isInitialized() && isInitialized()) {
+                h.init(yoke, mount);
             }
         }
     }
@@ -722,8 +722,8 @@ public class Router extends AbstractMiddleware {
 
         // also pass the vertx object to the routes
         for (Middleware h : handler) {
-            if (h instanceof AbstractMiddleware && !((AbstractMiddleware) h).isInitialized() && isInitialized()) {
-                ((AbstractMiddleware) h).init(yoke, mount);
+            if (!h.isInitialized() && isInitialized()) {
+                h.init(yoke, mount);
             }
         }
     }

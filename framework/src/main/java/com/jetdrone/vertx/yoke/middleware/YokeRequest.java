@@ -78,6 +78,8 @@ public class YokeRequest implements HttpServerRequest {
     final private YokeResponse response;
     // the request context
     final protected Context context;
+    // is this request secure (if extensions need to access it, use the accessor)
+    final private boolean secure;
     // session data store
     final protected SessionStore store;
 
@@ -91,12 +93,13 @@ public class YokeRequest implements HttpServerRequest {
     // control flags
     private boolean expectMultiPartCalled = false;
 
-    public YokeRequest(@NotNull final HttpServerRequest request, @NotNull final YokeResponse response, @NotNull final Context context, @NotNull final SessionStore store) {
+    public YokeRequest(@NotNull final HttpServerRequest request, @NotNull final YokeResponse response, final boolean secure, @NotNull final Context context, @NotNull final SessionStore store) {
         this.context = context;
         this.request = request;
         this.method = request.method();
         response.setMethod(this.method);
         this.response = response;
+        this.secure = secure;
         this.store = store;
     }
 
@@ -431,7 +434,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     public boolean isSecure() {
-        return request.netSocket().isSsl();
+        return secure;
     }
 
     private static String[] splitMime(@NotNull String mime) {

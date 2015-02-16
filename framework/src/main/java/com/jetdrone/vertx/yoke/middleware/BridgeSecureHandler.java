@@ -19,7 +19,7 @@ import org.vertx.java.core.eventbus.Message;
  *
  * Please see vert.x doc on how to use secured EventBus Bridge.
  */
-public class BridgeSecureHandler extends AbstractMiddleware {
+public class BridgeSecureHandler extends Middleware {
 
     /** Default Address if none specified
      */

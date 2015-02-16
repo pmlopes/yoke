@@ -8,7 +8,7 @@ import org.vertx.java.core.Handler;
  *  X-Content-Type-Options
  * The only defined value, "nosniff", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type
  */
-public final class ContentTypeOptions implements Middleware {
+public final class ContentTypeOptions extends Middleware {
 
     @Override
     public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {

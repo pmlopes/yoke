@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.core;
 
-import com.jetdrone.vertx.yoke.Middleware;
+import com.jetdrone.vertx.yoke.IMiddleware;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class MountedMiddleware {
     public final String mount;
-    public final Middleware middleware;
+    public final IMiddleware middleware;
     public boolean enabled = true;
 
     /**
@@ -17,7 +17,7 @@ public final class MountedMiddleware {
      * @param mount      Mount path
      * @param middleware Middleware to use on the path.
      */
-    public MountedMiddleware(@NotNull String mount, @NotNull Middleware middleware) {
+    public MountedMiddleware(@NotNull String mount, @NotNull IMiddleware middleware) {
         this.mount = mount;
         this.middleware = middleware;
     }

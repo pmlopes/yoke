@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * By default serves the Yoke favicon, or the favicon located by the given ```path```.
  */
-public class Favicon extends AbstractMiddleware {
+public class Favicon extends Middleware {
 
     /**
      * ## Icon

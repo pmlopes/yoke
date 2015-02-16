@@ -24,7 +24,7 @@ public class Persona extends Verticle {
         final Yoke yoke = new Yoke(this);
         yoke.secretSecurity("keyboard cat");
 
-        yoke.engine("shtml", new StringPlaceholderEngine("views"));
+        yoke.engine(new StringPlaceholderEngine("views"));
 
         final Mac secret = yoke.security().getMac("HmacSHA256");
 

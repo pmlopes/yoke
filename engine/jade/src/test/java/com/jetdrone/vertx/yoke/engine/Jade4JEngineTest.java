@@ -5,6 +5,7 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.testtools.TestVerticle;
@@ -16,10 +17,10 @@ public class Jade4JEngineTest extends TestVerticle {
     @Test
     public void testEngine() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("jade", new Jade4JEngine("views"));
+        yoke.engine(new Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.response().render("template.jade");
             }
         });
@@ -37,10 +38,10 @@ public class Jade4JEngineTest extends TestVerticle {
     @Test
     public void testEngine2() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("jade", new Jade4JEngine("views"));
+        yoke.engine(new Jade4JEngine("views"));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.put("pageName", "Vert.X Test");
                 request.response().render("template2.jade");
             }

@@ -35,6 +35,8 @@ public class GYoke {
 
     private final Yoke jYoke;
     private final org.vertx.java.core.Vertx vertx;
+    private final Vertx gVertx;
+    private final Container container;
 
     /**
      * Creates a Yoke instance.
@@ -54,7 +56,7 @@ public class GYoke {
      * @param verticle the main verticle
      */
     public GYoke(Verticle verticle) {
-        this(verticle.getVertx());
+        this(verticle.getVertx(), verticle.getContainer());
     }
 
     /**
@@ -66,9 +68,12 @@ public class GYoke {
      *
      * @param vertx The Vertx instance
      */
-    public GYoke(Vertx vertx) {
+    public GYoke(Vertx vertx, Container container) {
+        this.gVertx = vertx;
         this.vertx = vertx.toJavaVertx();
-        jYoke = new Yoke(this.vertx, new GroovyRequestWrapper());
+        this.container = container;
+
+        jYoke = new Yoke(this.vertx, null, new GroovyRequestWrapper());
     }
 
     public GYoke store(SessionStore store) {
@@ -105,7 +110,7 @@ public class GYoke {
 
     /**
      * Adds a middleware to the chain with the prefix "/".
-     * @see Yoke#use(String, Middleware...)
+     * @see Yoke#use(String, IMiddleware...)
      * @param closure The closure add to the chain
      */
     public GYoke use(Closure closure) {
@@ -129,7 +134,7 @@ public class GYoke {
 
     /**
      * Adds a middleware to the chain with the prefix "/".
-     * @see Yoke#use(String, Middleware...)
+     * @see Yoke#use(String, IMiddleware...)
      * @param middleware The middleware add to the chain
      */
     public GYoke use(Middleware... middleware) {
@@ -144,8 +149,8 @@ public class GYoke {
      *
      * @param engine The implementation of the engine
      */
-    public GYoke engine(String extension, Engine engine) {
-        jYoke.engine(extension, engine);
+    public GYoke engine(Engine engine) {
+        jYoke.engine(engine);
         return this;
     }
 
@@ -227,7 +232,7 @@ public class GYoke {
      * @param handler Closure tho allow asynchronous result handling
      */
     @SuppressWarnings("unchecked")
-    public GYoke deploy(final Container container, final Object config, final Closure handler) {
+    public GYoke deploy(final Object config, final Closure handler) {
 
         if (config == null) {
             if (handler == null) {
@@ -302,9 +307,9 @@ public class GYoke {
                 multiThreaded = multiThreaded == null ? false : multiThreaded;
 
                 if (module != null) {
-                    deploy(container, module, true, false, false, instances, modConfig, waitFor);
+                    deploy(module, true, false, false, instances, modConfig, waitFor);
                 } else {
-                    deploy(container, verticle, false, worker, multiThreaded, instances, modConfig, waitFor);
+                    deploy(verticle, false, worker, multiThreaded, instances, modConfig, waitFor);
                 }
             }
         } else {
@@ -323,16 +328,16 @@ public class GYoke {
             multiThreaded = multiThreaded == null ? false : multiThreaded;
 
             if (module != null) {
-                deploy(container, module, true, false, false, instances, modConfig, handler);
+                deploy(module, true, false, false, instances, modConfig, handler);
             } else {
-                deploy(container, verticle, false, worker, multiThreaded, instances, modConfig, handler);
+                deploy(verticle, false, worker, multiThreaded, instances, modConfig, handler);
             }
         }
 
         return this;
     }
 
-    private void deploy(Container container, String name, boolean module, boolean worker, boolean multiThreaded, int instances, Map<String, Object> config, Closure handler) {
+    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, Map<String, Object> config, Closure handler) {
         if (module) {
             if (handler != null) {
                 container.deployModule(name, config, instances, handler);
@@ -358,5 +363,9 @@ public class GYoke {
 
     public Yoke toJavaYoke() {
         return jYoke;
+    }
+
+    public Vertx getVertx() {
+        return gVertx;
     }
 }

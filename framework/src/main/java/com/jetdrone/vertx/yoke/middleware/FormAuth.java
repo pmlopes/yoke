@@ -12,7 +12,7 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.store.json.SessionObject;
 import com.jetdrone.vertx.yoke.util.Utils;
 
-public class FormAuth extends AbstractMiddleware {
+public class FormAuth extends Middleware {
 
     private final AuthHandler authHandler;
 

@@ -6,6 +6,7 @@ import com.jetdrone.vertx.yoke.middleware.ErrorHandler;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.testtools.TestVerticle;
@@ -22,13 +23,13 @@ public class Issue88Test extends TestVerticle {
     public void testIssue88() {
         Yoke yoke = new Yoke(this)
                 .set("title", "Yoke 1.0.7: Issue #88")
-                .engine("hbs", new HandlebarsEngine("issue88/"))
+                .engine(new HandlebarsEngine("issue88/"))
                 .use(new ErrorHandler(true))
                 .use("/$", new Middleware() {
                             @Override
                             public void handle(
-                                    YokeRequest request,
-                                    Handler<Object> next) {
+                                    @NotNull YokeRequest request,
+                                    @NotNull Handler<Object> next) {
                                 try {
                                     request.response().render("index.hbs", next);
                                 } catch (Exception e) {

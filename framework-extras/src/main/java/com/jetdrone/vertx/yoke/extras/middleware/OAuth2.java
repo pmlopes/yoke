@@ -4,7 +4,6 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.YokeSecurity;
 import com.jetdrone.vertx.yoke.core.YokeException;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;

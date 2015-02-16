@@ -29,7 +29,7 @@ public class TooBusyTest extends TestVerticle {
 
             @Override
             public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
-                for (int i = 0; i < 100000; i++) {
+                for (int i = 0; i < 200000; i++) {
                     cnt += rand.nextDouble();
                 }
 

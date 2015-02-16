@@ -5,6 +5,7 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
 import org.vertx.testtools.TestVerticle;
@@ -16,10 +17,10 @@ public class ThymeleafEngineTest extends TestVerticle {
     @Test
     public void testEngine() {
         Yoke yoke = new Yoke(this);
-        yoke.engine("html", new ThymeleafEngine("views"));
+        yoke.engine(new ThymeleafEngine("views"));
         yoke.use(new Middleware() {
             @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 request.put("home.welcome", "Hi there!");
                 request.response().render("template.html");
             }

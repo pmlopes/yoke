@@ -7,9 +7,10 @@ import com.jetdrone.vertx.yoke.GYoke;
 import groovy.lang.Closure;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
+import org.vertx.groovy.core.buffer.Buffer;
 import org.vertx.java.core.http.CaseInsensitiveMultiMap;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +45,34 @@ public class GYokeTester extends YokeTester {
     }
 
     public void request(final String method, final String url, final Map<String, Object> headers, final Buffer body, final Closure<Response> handler) {
-        request(method, url, toMultiMap(headers), body, new Handler<Response>() {
+        request(method, url, toMultiMap(headers), body.toJavaBuffer(), new Handler<Response>() {
+            @Override
+            public void handle(Response event) {
+                handler.call(event);
+            }
+        });
+    }
+
+    public void request(final String method, final String url, final Map<String, Object> headers, final String body, final Closure<Response> handler) {
+        request(method, url, toMultiMap(headers), new org.vertx.java.core.buffer.Buffer(body), new Handler<Response>() {
+            @Override
+            public void handle(Response event) {
+                handler.call(event);
+            }
+        });
+    }
+
+    public void request(final String method, final String url, final Map<String, Object> headers, final Map<String, Object> json, final Closure<Response> handler) {
+        request(method, url, toMultiMap(headers), new org.vertx.java.core.buffer.Buffer(new JsonObject(json).encode()), new Handler<Response>() {
+            @Override
+            public void handle(Response event) {
+                handler.call(event);
+            }
+        });
+    }
+
+    public void request(final String method, final String url, final Map<String, Object> headers, final List<Object> json, final Closure<Response> handler) {
+        request(method, url, toMultiMap(headers), new org.vertx.java.core.buffer.Buffer(new JsonArray(json).encode()), new Handler<Response>() {
             @Override
             public void handle(Response event) {
                 handler.call(event);
@@ -66,6 +94,10 @@ public class GYokeTester extends YokeTester {
                     List<String> entries = new ArrayList<>();
                     for (Object v : (List) o) {
                         if (v != null) {
+                            if (v instanceof String) {
+                                entries.add((String) v);
+                                continue;
+                            }
                             entries.add(v.toString());
                         }
                     }
@@ -74,7 +106,10 @@ public class GYokeTester extends YokeTester {
                 }
                 if (o instanceof String) {
                     multiMap.add(entry.getKey(), (String) o);
+                    continue;
                 }
+
+                multiMap.add(entry.getKey(), o.toString());
             }
         }
 

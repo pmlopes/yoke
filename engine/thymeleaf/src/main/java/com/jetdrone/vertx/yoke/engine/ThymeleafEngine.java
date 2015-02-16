@@ -43,7 +43,14 @@ public class ThymeleafEngine implements Engine {
     private final TemplateEngine engine = new TemplateEngine();
     private final TemplateResolver templateResolver;
 
+    private final String extension;
+
     public ThymeleafEngine(final String views) {
+        this(views, ".html");
+    }
+    public ThymeleafEngine(final String views, final String extension) {
+        this.extension = extension;
+
         String prefix;
         if ("".equals(views)) {
             prefix = views;
@@ -125,6 +132,11 @@ public class ThymeleafEngine implements Engine {
     @Override
     public String contentEncoding() {
         return "UTF-8";
+    }
+
+    @Override
+    public String extension() {
+        return extension;
     }
 
     @Override

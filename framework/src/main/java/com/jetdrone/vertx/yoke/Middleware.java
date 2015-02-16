@@ -42,45 +42,89 @@ import org.vertx.java.core.file.FileSystem;
  * Using the extras project you get the following extra Middleware:
  * * [JsonRestRouter].
  */
-public interface Middleware {
+public abstract class Middleware implements IMiddleware {
 
     /**
-     * Handles a request that is inside the chain.
-     *
-     * Example that always returns Hello:
-     * <pre>
-     * class HelloMiddleware implements Middleware {
-     *   public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
-     *     request.response.end("Hello");
-     *   }
-     * }
-     * </pre>
-     *
-     * Example that always raises an internal server error:
-     * <pre>
-     * class HelloMiddleware implements Middleware {
-     *   public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
-     *     next.handle("Something went wrong!");
-     *   }
-     * }
-     * </pre>
-     *
-     * Example that passes the control to the next middleware:
-     * <pre>
-     * class HelloMiddleware implements Middleware {
-     *   public void handle(YokeRequest request, Handler&lt;Object&gt; next) {
-     *     // when the error is null, then the chain will execute
-     *     // the next Middleware until the chain is complete,
-     *     // when that happens a 404 error is returned since no
-     *     // middleware was found that could handle the request.
-     *     next.handle(null);
-     *   }
-     * }
-     * </pre>
-     *
-     * @param request A YokeRequest which in practice is a extended HttpServerRequest
-     * @param next    The callback to inform that the next middleware in the chain should be used. A value different from
-     *                null represents an error and in that case the error handler middleware will be executed.
+     * Local Yoke instance for usage within the middleware. This is useful to use all asynchronous features of it.
      */
-    void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next);
+    protected Yoke yoke;
+
+    /**
+     * The configured mount point for this middleware.
+     */
+    protected String mount;
+
+    /**
+     * Internal flag to ensure that middleware is initialized only once
+     */
+    private boolean initialized = false;
+
+    /**
+     * Initializes the middleware. This methos is called from Yoke once a middleware is added to the chain.
+     *
+     * @param yoke the local Yoke instance.
+     * @param mount the configured mount path.
+     * @return self
+     */
+    public Middleware init(@NotNull final Yoke yoke, @NotNull final String mount) {
+
+        if (initialized) {
+            throw new RuntimeException("Already Initialized!");
+        }
+
+        this.yoke = yoke;
+        this.mount = mount;
+        this.initialized = true;
+
+        return this;
+    }
+
+    /**
+     * Read only check if this middleware instance has been initialized.
+     * @return true if the init method has been called
+     */
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    /**
+     * Get access to the event bus
+     * @return eventBus
+     */
+    public EventBus eventBus() {
+        return vertx().eventBus();
+    }
+
+    /**
+     * Get access to the FileSystem object from Vert.x
+     * @return fileSystem
+     */
+    public FileSystem fileSystem() {
+        return vertx().fileSystem();
+    }
+
+    /**
+     * Get access to the security object from Yoke
+     * @return security
+     */
+    public YokeSecurity security() {
+        return yoke.security();
+    }
+
+    /**
+     * Get access to Vert.x object
+     * @return vertx
+     */
+    public Vertx vertx() {
+        return yoke.vertx();
+    }
+
+    /**
+     * When there is a need to identify a middleware to handle errors (error handler) this method should return true.
+     *
+     * @return true is this middleware will handle errors.
+     */
+    public boolean isErrorHandler() {
+        return false;
+    }
 }
