@@ -9,7 +9,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.util.regex.Pattern;
 
-public class JWT extends AbstractMiddleware {
+public class JWT extends Middleware {
 
     private static final Pattern BEARER = Pattern.compile("^Bearer$", Pattern.CASE_INSENSITIVE);
 

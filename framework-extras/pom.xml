@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.jetdrone</groupId>
         <artifactId>yoke-project</artifactId>
-        <version>2.1.0-SNAPSHOT</version>
+        <version>2.0.12-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -56,6 +56,17 @@
     </dependencies>
 
     <build>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/mod.json</include>
+                </includes>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
@@ -208,41 +219,15 @@
     <reporting>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-project-info-reports-plugin</artifactId>
-                <configuration>
-                    <dependencyDetailsEnabled>true</dependencyDetailsEnabled>
-                    <dependencyLocationsEnabled>true</dependencyLocationsEnabled>
-                </configuration>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>dependencies</report>
-                            <report>project-team</report>
-                            <report>cim</report>
-                            <report>issue-tracking</report>
-                            <report>license</report>
-                            <report>scm</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <configuration>
                     <check>true</check>
                     <formats>
-                        <format>html</format>
                         <format>xml</format>
                     </formats>
                 </configuration>
             </plugin>
         </plugins>
     </reporting>
-
 </project>

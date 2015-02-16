@@ -57,8 +57,8 @@ final class JSYokeRequest  extends YokeRequest implements Scriptable {
     private Callable createSession;
     private Callable destroySession;
 
-    public JSYokeRequest(HttpServerRequest request, JSYokeResponse response, Context context, SessionStore store) {
-        super(request, response, context, store);
+    public JSYokeRequest(HttpServerRequest request, JSYokeResponse response, boolean secure, Context context, SessionStore store) {
+        super(request, response, secure, context, store);
         this.context = context;
     }
 

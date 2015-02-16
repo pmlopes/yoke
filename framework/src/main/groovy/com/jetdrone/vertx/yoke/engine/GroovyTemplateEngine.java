@@ -21,9 +21,16 @@ import java.util.Map;
 
 public class GroovyTemplateEngine extends AbstractEngine<Template> {
 
+    private final String extension;
     private final String prefix;
 
     public GroovyTemplateEngine(final String views) {
+        this(views, ".gsp");
+    }
+
+    public GroovyTemplateEngine(final String views, final String extension) {
+        this.extension = extension;
+
         if ("".equals(views)) {
             prefix = views;
         } else {
@@ -32,6 +39,11 @@ public class GroovyTemplateEngine extends AbstractEngine<Template> {
     }
 
     private final TemplateEngine engine = new SimpleTemplateEngine();
+
+    @Override
+    public String extension() {
+        return extension;
+    }
 
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {

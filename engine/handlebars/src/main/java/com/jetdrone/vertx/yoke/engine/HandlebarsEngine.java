@@ -93,14 +93,9 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
         });
     }
 
-    public HandlebarsEngine startDelimiter(String delimiter) {
-        handlebars.startDelimiter(delimiter);
-        return this;
-    }
-
-    public HandlebarsEngine endDelimiter(String delimiter) {
-        handlebars.endDelimiter(delimiter);
-        return this;
+    @Override
+    public String extension() {
+        return extension;
     }
 
     private String resolve(String location) {

@@ -5,7 +5,7 @@ import com.jetdrone.vertx.yoke.middleware.impl.WebClient;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
-public final class IEXSS implements Middleware {
+public final class IEXSS extends Middleware {
 
     private final boolean setOnOldIE;
 

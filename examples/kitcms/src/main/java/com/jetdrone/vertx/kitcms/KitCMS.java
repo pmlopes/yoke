@@ -34,7 +34,7 @@ public class KitCMS extends Verticle {
 
         final Yoke yoke = new Yoke(this);
         // register jMustache render engine
-        yoke.engine("shtml", new StringPlaceholderEngine("com/jetdrone/vertx/kitcms/views"));
+        yoke.engine(new StringPlaceholderEngine("com/jetdrone/vertx/kitcms/views"));
         // log the requests
         yoke.use(new Logger());
         // install the pretty error handler middleware

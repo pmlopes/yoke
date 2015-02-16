@@ -23,8 +23,6 @@ import java.util.*;
  */
 public class YokeTester {
 
-    private static final Random random = new Random();
-
     private final Vertx vertx;
     private final HttpServer fakeServer = new FakeHttpServer();
 
@@ -61,6 +59,8 @@ public class YokeTester {
 
                         MultiMap params = null;
                         MultiMap attributes = null;
+                        final Random random = new Random();
+
                         final NetSocket netSocket = new NetSocket() {
                             @Override
                             public String writeHandlerID() {

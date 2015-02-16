@@ -13,7 +13,7 @@ import org.vertx.java.core.Handler;
  * For more, see this MSDN blog post:
  * http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-v-comprehensive-protection.aspx
  */
-public final class IENoOpen implements Middleware {
+public final class IENoOpen extends Middleware {
 
     @Override
     public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {

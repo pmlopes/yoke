@@ -15,7 +15,7 @@ import com.jetdrone.vertx.yoke.store.json.SessionObject;
 /**
  * # Session
  */
-public class Session implements Middleware {
+public class Session extends Middleware {
 
     private final Mac hmacSHA256;
 

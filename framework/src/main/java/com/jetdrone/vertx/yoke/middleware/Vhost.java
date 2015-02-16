@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  *
  * Setup vhost for the given *hostname* and *server*.
  */
-public class Vhost implements Middleware {
+public class Vhost extends Middleware {
 
     private final Handler<HttpServerRequest> handler;
     private final Pattern regex;

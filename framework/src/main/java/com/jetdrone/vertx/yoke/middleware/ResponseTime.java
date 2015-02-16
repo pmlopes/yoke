@@ -11,7 +11,7 @@ import org.vertx.java.core.Handler;
  *
  * Adds the ```x-response-time``` header displaying the response duration in milliseconds.
  */
-public class ResponseTime implements Middleware {
+public class ResponseTime extends Middleware {
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
 

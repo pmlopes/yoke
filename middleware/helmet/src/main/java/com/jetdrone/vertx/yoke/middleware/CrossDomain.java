@@ -4,7 +4,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 
-public final class CrossDomain implements Middleware {
+public final class CrossDomain extends Middleware {
 
     private static final String DATA =
             "<?xml version=\"1.0\"?>" +
