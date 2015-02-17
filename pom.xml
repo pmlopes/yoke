@@ -79,6 +79,27 @@
         </site>
     </distributionManagement>
 
+    <profiles>
+        <profile>
+            <id>examples</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>examples/benchmark</module>
+                <module>examples/cluster-benchmark</module>
+                <module>examples/dojo-reststore</module>
+                <module>examples/form-auth</module>
+                <module>examples/groovy</module>
+                <module>examples/javascript</module>
+                <module>examples/kitcms</module>
+                <module>examples/mozilla-persona</module>
+                <module>examples/session-store</module>
+                <module>examples/swagger-petstore</module>
+                <module>examples/techempower</module>
+        </modules>
+        </profile>
+    </profiles>
 
     <modules>
         <module>framework</module>
@@ -98,18 +119,6 @@
 
         <module>store/redis</module>
         <module>store/mongodb</module>
-
-        <module>examples/benchmark</module>
-        <module>examples/cluster-benchmark</module>
-        <module>examples/dojo-reststore</module>
-        <module>examples/form-auth</module>
-        <module>examples/groovy</module>
-        <module>examples/javascript</module>
-        <module>examples/kitcms</module>
-        <module>examples/mozilla-persona</module>
-        <module>examples/session-store</module>
-        <module>examples/swagger-petstore</module>
-        <module>examples/techempower</module>
     </modules>
 
     <build>
