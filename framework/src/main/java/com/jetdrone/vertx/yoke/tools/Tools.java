@@ -2,6 +2,7 @@ package com.jetdrone.vertx.yoke.tools;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Properties;
 
 public class Tools {
 
@@ -10,7 +11,7 @@ public class Tools {
     private static String module;
     private static String version;
 
-    private static final String VERSION = "2.0.12";
+    private static String yokeVersion;
 
     static void write(String path, String value) {
         try {
@@ -102,6 +103,11 @@ public class Tools {
     public static void main(String[] args) throws IOException {
 
         try {
+            Properties properties = new Properties();
+            properties.load(Tools.class.getClassLoader().getResourceAsStream("build.properties"));
+
+            yokeVersion = properties.getProperty("version");
+
             language = Args.getArgumentFlag(Arrays.asList(new String[]{"java", "groovy", "groovyscript", "javascript"}), args);
 
             if (language == null) {
@@ -170,37 +176,26 @@ public class Tools {
 
     static void copyBaseTemplate() throws IOException {
 
-        copy(module + "/README.md", "templates/gradle/README.md");
+        copy(module + "/README.md", "templates/maven/README.md");
 
-        String props =
-                "# E.g. your domain name\n" +
-                        "modowner=" + owner + "\n\n" +
-                        "# Your module name\n" +
-                        "modname=" + module + "\n\n" +
-                        "# Your module version\n" +
-                        "version=" + version + "\n\n" + readResourceToString("templates/gradle/gradle.properties");
+        String pom = readResourceToString("templates/maven/pom.xml");
 
-        write(module + "/gradle.properties", props);
-        copy(module + "/conf.json", "templates/gradle/conf.json");
-        copy(module + "/LICENSE.txt", "templates/gradle/LICENSE.txt");
-        copy(module + "/gradlew.bat", "templates/gradle/gradlew.bat");
-        copy(module + "/gradlew", "templates/gradle/gradlew");
+        pom = pom.replace("<groupId>mygroup</groupId>", "<groupId>" + owner + "</groupId>");
+        pom = pom.replace("<artifactId>myartifact</artifactId>", "<artifactId>" + module + "</artifactId>");
+        pom = pom.replace("<version>1.0-SNAPSHOT</version>", "<version>" + version + "</version>");
 
-        // need to set the *nix to executable
-        if (!new File(module + "/gradlew").setExecutable(true)) {
-            warn("Could not set " + module + "/gradlew to executable!");
-        }
+        pom = pom.replace("<!-- YOKE -->",
+                "<dependency>\n" +
+                "            <groupId>com.jetdrone</groupId>\n" +
+                "            <artifactId>yoke</artifactId>\n" +
+                "            <version>2.0.12-SNAPSHOT</version>\n" +
+                "        </dependency>");
 
-        copy(module + "/build.gradle", "templates/gradle/build.gradle");
+        write(module + "/pom.xml", pom);
 
-        mkdir(module + "/gradle");
-        copy(module + "/gradle/vertx.gradle", "templates/gradle/gradle/vertx.gradle");
-        copy(module + "/gradle/setup.gradle", "templates/gradle/gradle/setup.gradle");
-        copy(module + "/gradle/maven.gradle", "templates/gradle/gradle/maven.gradle");
+        mkdir(module + "/src/main/assembly");
 
-        mkdir(module + "/gradle/wrapper");
-        copy(module + "/gradle/wrapper/gradle-wrapper.properties", "templates/gradle/gradle/wrapper/gradle-wrapper.properties");
-        copy(module + "/gradle/wrapper/gradle-wrapper.jar", "templates/gradle/gradle/wrapper/gradle-wrapper.jar");
+        copy(module + "/src/main/assembly/mod.xml", "templates/maven/src/main/assembly/mod.xml");
     }
 
     static void createJava() {
@@ -226,7 +221,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                         "{\n" +
                         "  \"main\": \"" + owner + "." + module + ".App\",\n" +
-                        "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~" + yokeVersion + "\"\n" +
                         "}\n"
         );
 
@@ -264,7 +259,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                 "{\n" +
                         "  \"main\": \"groovy:" + owner + "." + module + ".App\",\n" +
-                        "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~" + yokeVersion + "\"\n" +
                         "}\n"
         );
 
@@ -293,7 +288,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                         "{\n" +
                         "  \"main\": \"App.groovy\",\n" +
-                        "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~" + yokeVersion + "\"\n" +
                         "}\n"
         );
     }
@@ -313,7 +308,7 @@ public class Tools {
         write(module + "/src/main/resources/mod.json",
                         "{\n" +
                         "  \"main\": \"App.js\",\n" +
-                        "  \"includes\": \"com.jetdrone~yoke~" + VERSION + "\"\n" +
+                        "  \"includes\": \"com.jetdrone~yoke~" + yokeVersion + "\"\n" +
                         "}\n"
         );
 
@@ -331,26 +326,15 @@ public class Tools {
     }
 
     static void printDone() {
-
-        String OS = System.getProperty("os.name").toLowerCase();
-
         System.out.println();
         System.out.println("Go to your new app:");
         System.out.println("  cd " + module);
         System.out.println();
         System.out.println("Compile your app:");
-        if (OS.contains("win")) {
-            System.out.println("  gradlew.bat build");
-        } else {
-            System.out.println("  ./gradlew build");
-        }
+        System.out.println("  mvn clean install");
         System.out.println();
         System.out.println("Run your app:");
-        if (OS.contains("win")) {
-            System.out.println("  gradlew.bat runMod");
-        } else {
-            System.out.println("  ./gradlew runMod");
-        }
+        System.out.println("  mvn vertx:runMod");
         System.out.println();
     }
 }

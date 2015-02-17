@@ -3,53 +3,68 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.jetdrone</groupId>
-        <artifactId>yoke-project</artifactId>
-        <version>2.0.13-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
-    </parent>
+    <groupId>mygroup</groupId>
+    <artifactId>myartifact</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-    <artifactId>yoke.examples.groovy</artifactId>
     <packaging>jar</packaging>
-    <name>example-groovy</name>
 
     <properties>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.testTarget>1.7</maven.compiler.testTarget>
+        <maven.compiler.testSource>1.7</maven.compiler.testSource>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!--Vertx module name-->
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
-        <sonar.sources>src/main</sonar.sources>
-        <sonar.tests>src/test,target/generated-sources</sonar.tests>
-        <sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>
+        <!-- Set pullInDeps to true if you want any modules specified in the 'includes' and 'deploys' fields
+               in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
+               module won't download and install those dependencies at run-time when they're first requested. -->
+        <vertx.pullInDeps>false</vertx.pullInDeps>
+        <!-- Set createFatJar to true if you want to create a fat executable jar which contains the Vert.x binaries
+        along with the module so it can be run with java -jar <jarname> -->
+        <vertx.createFatJar>false</vertx.createFatJar>
+        <!-- The directory where the module will be assembled - you can override this on the command line
+        with -Dmods.directory=mydir -->
+        <mods.directory>target/mods</mods.directory>
+        <!-- Dependency versions -->
+        <vertx.version>2.1.5</vertx.version>
+        <groovy.version>2.3.3</groovy.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.jetdrone</groupId>
-            <artifactId>yoke</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>13.0</version>
+            <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>com.jetdrone</groupId>
-            <artifactId>yoke.engine.handlebars</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jetdrone</groupId>
-            <artifactId>yoke.engine.jade</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jetdrone</groupId>
-            <artifactId>yoke-extras</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
+        <!-- YOKE -->
+
+        <!-- GROOVY Support -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>lang-groovy</artifactId>
+            <version>2.1.1-final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- JavaScript Support -->
+        <dependency>
+            <groupId>org.mozilla</groupId>
+            <artifactId>rhino</artifactId>
+            <version>1.7R4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Core -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
@@ -62,12 +77,8 @@
             <version>${vertx.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>lang-groovy</artifactId>
-            <version>2.1.1-final</version>
-            <scope>provided</scope>
-        </dependency>
+
+        <!-- Testing -->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>testtools</artifactId>
@@ -83,28 +94,11 @@
     </dependencies>
 
     <build>
-
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>mod.json</include>
-                </includes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>mod.json</exclude>
-                </excludes>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
+                <version>1.5</version>
                 <configuration>
                     <source>2.0</source>
                     <providerSelection>2.0</providerSelection>
@@ -132,6 +126,7 @@
             <plugin>
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-maven-plugin</artifactId>
+                <version>2.0.11-final</version>
                 <configuration>
                     <configFile>${project.basedir}/conf.json</configFile>
                 </configuration>
@@ -166,6 +161,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
                 <executions>
                     <execution>
                         <id>copy-mod-to-target</id>
@@ -188,6 +184,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.10</version>
                 <executions>
                     <execution>
                         <id>copy-mod-dependencies-to-target</id>
@@ -216,6 +213,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.5.3</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/main/assembly/mod.xml</descriptor>
@@ -231,25 +229,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>cobertura-maven-plugin</artifactId>
-                <configuration>
-                    <check>true</check>
-                    <formats>
-                        <format>xml</format>
-                    </formats>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
-
 </project>
