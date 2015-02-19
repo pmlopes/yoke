@@ -1,5 +1,3 @@
-package com.jetdrone.vertx.yoke.test;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.vertx.testtools.ScriptClassRunner;
@@ -16,7 +14,7 @@ import org.vertx.testtools.TestVerticleInfo;
  */
 @TestVerticleInfo(filenameFilter=".+\\.js", funcRegex="function[\\s]+(test[^\\s(]+)")
 @RunWith(ScriptClassRunner.class)
-public class JSTester {
+public class JSTest {
     @Test
     public void __vertxDummy() {
     }

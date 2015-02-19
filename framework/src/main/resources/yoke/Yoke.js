@@ -26,13 +26,17 @@ JSYoke.prototype.use = function (route, callback) {
         route = '/';
     }
 
+    var cbArray = java.lang.reflect.Array.newInstance(com.jetdrone.vertx.yoke.IMiddleware, 1);
+
     // verify if the callback is already a middleware instance
     if (callback instanceof com.jetdrone.vertx.yoke.IMiddleware) {
         // in this case pass it directly to the jYoke
-        this.jYoke.use(route, callback);
+        cbArray[0] = callback;
+        this.jYoke.use(route, cbArray);
     } else if (typeof callback === 'object' && callback.jMiddleware !== undefined) {
         // this is a special case when base middleware (Java) is extended to be more fluent with JavaScript
-        this.jYoke.use(route, callback.jMiddleware);
+        cbArray[0] = callback.jMiddleware;
+        this.jYoke.use(route, cbArray);
     } else if (typeof callback === 'function') {
         // wrap the function into a Middleware Java class
         var middleware = {
@@ -46,7 +50,8 @@ JSYoke.prototype.use = function (route, callback) {
                 });
             }
         };
-        this.jYoke.use(route, new com.jetdrone.vertx.yoke.IMiddleware(middleware));
+        cbArray[0] = new com.jetdrone.vertx.yoke.IMiddleware(middleware);
+        this.jYoke.use(route, cbArray);
     } else {
         throw new Error('callback should be a javascript function or Middleware java class');
     }

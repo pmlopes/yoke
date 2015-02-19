@@ -188,7 +188,7 @@ public class Tools {
                 "<dependency>\n" +
                 "            <groupId>com.jetdrone</groupId>\n" +
                 "            <artifactId>yoke</artifactId>\n" +
-                "            <version>2.0.12-SNAPSHOT</version>\n" +
+                "            <version>" + yokeVersion + "</version>\n" +
                 "        </dependency>");
 
         write(module + "/pom.xml", pom);
@@ -316,9 +316,9 @@ public class Tools {
         // expand package
         mkdir(module + "/src/test/java/" + modulePath);
         // JUnit helper
-        write(module + "/src/test/java/" + modulePath + "/JSTester.java",
+        write(module + "/src/test/java/" + modulePath + "/JSTest.java",
                 "package " + owner + "." + module + ";\n\n" +
-                        readResourceToString("templates/javascript/JSTester.java")
+                        readResourceToString("templates/javascript/JSTest.java")
         );
 
         mkdir(module + "/src/test/resources");
