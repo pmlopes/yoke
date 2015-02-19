@@ -11,7 +11,7 @@
             <topBarEnabled>true</topBarEnabled>
             <topBarContainerStyle>width: 90%;</topBarContainerStyle>
             <topBarIcon>
-                <name>Maven Fluido Skin</name>
+                <name>Yoke</name>
                 <href>/index.html</href>
             </topBarIcon>
             <sideBarEnabled>false</sideBarEnabled>
@@ -24,11 +24,33 @@
         </fluidoSkin>
     </custom>
     <body>
-        <menu name="Regular Web Site">
-            <item name="Blah" href="index.html"/>
-            <item name="APT Format2" href="format.html"/>
-            <item name="Xdoc Example" href="xdoc.html"/>
-            <item name="FAQ" href="faq.html"/>
+        <menu name="Middleware">
+            <item name="Basic Auth" href="middleware/basic-auth.html"/>
+            <item name="Body Parser" href="middleware/body-parser.html"/>
+            <item name="Bridge Secure Handler" href="middleware/bridge-secure-handler.html"/>
+            <item name="Compress" href="middleware/compress.html"/>
+            <item name="Cookie Parser" href="middleware/cookie-parser.html"/>
+            <item name="CORS" href="middleware/cors.html"/>
+            <item name="CSRF" href="middleware/csrf.html"/>
+            <item name="Error Handler" href="middleware/error-handler.html"/>
+            <item name="Favicon" href="middleware/favicon.html"/>
+            <item name="Form Auth" href="middleware/form-auth.html"/>
+            <item name="JWT" href="middleware/jwt.html"/>
+            <item name="Limit" href="middleware/limit.html"/>
+            <item name="Logger" href="middleware/logger.html"/>
+            <item name="Method Override" href="middleware/method-override.html"/>
+            <item name="Request Proxy" href="middleware/request-proxy.html"/>
+            <item name="Response Headers" href="middleware/response-headers.html"/>
+            <item name="Router" href="middleware/router.html"/>
+            <item name="Session" href="middleware/session.html"/>
+            <item name="Static" href="middleware/static.html"/>
+            <item name="Timeout" href="middleware/timeout.html"/>
+            <item name="VHost" href="middleware/vhost.html"/>
+        </menu>
+        <menu name="Tutorial">
+            <item name="Java" href="tutorial/java.html"/>
+            <item name="Groovy" href="tutorial/groovy.html"/>
+            <item name="JavaScript" href="tutorial/javascript.html"/>
         </menu>
         <menu ref="reports"/>
     </body>
