@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Issue130 extends TestVerticle {
+public class Issue130Test extends TestVerticle {
 
     @Test
     public void testRegEx() {

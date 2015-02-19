@@ -16,7 +16,7 @@ import org.vertx.testtools.TestVerticle;
 import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.testComplete;
 
-public class Compress extends TestVerticle {
+public class CompressTest extends TestVerticle {
   @Test
   public void testGzipCompress() {
     Yoke yoke = new Yoke(this);

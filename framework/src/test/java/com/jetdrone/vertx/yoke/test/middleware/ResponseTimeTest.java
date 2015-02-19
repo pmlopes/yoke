@@ -10,7 +10,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class ResponseTime extends TestVerticle {
+public class ResponseTimeTest extends TestVerticle {
 
     @Test
     public void testResponseTime() {

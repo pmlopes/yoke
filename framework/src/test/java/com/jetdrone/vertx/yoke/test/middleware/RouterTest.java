@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Router extends TestVerticle {
+public class RouterTest extends TestVerticle {
 
     public static class TestRouter {
         @GET("/ws")

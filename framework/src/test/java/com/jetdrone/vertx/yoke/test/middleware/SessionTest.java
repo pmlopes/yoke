@@ -16,7 +16,7 @@ import javax.crypto.Mac;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Session extends TestVerticle {
+public class SessionTest extends TestVerticle {
 
     @Test
     public void testSession() {

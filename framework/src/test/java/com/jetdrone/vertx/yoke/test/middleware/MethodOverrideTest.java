@@ -15,7 +15,7 @@ import org.vertx.testtools.TestVerticle;
 import static org.vertx.testtools.VertxAssert.*;
 import static org.vertx.testtools.VertxAssert.assertEquals;
 
-public class MethodOverride extends TestVerticle {
+public class MethodOverrideTest extends TestVerticle {
 
     @Test
     public void testOverride() {

@@ -14,7 +14,7 @@ import java.util.Locale;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class RequestFunctions extends TestVerticle {
+public class RequestFunctionsTest extends TestVerticle {
 
     @Test
     public void testAccepts() {

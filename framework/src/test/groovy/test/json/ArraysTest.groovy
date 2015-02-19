@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class Arrays {
+class ArraysTest {
 
     @Test
     void it_should_validate_an_empty_array() {

@@ -11,7 +11,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Favicon extends TestVerticle {
+public class FaviconTest extends TestVerticle {
 
     @Test
     public void testFavicon() {

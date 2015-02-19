@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class ArraysMinItems {
+class ArraysMinItemsTest {
 
     @Test
     void it_should_validate_if_array_has_a_length_greater_than_minItems() {

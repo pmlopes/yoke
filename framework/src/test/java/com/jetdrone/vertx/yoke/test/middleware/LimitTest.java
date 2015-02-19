@@ -12,7 +12,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Limit extends TestVerticle {
+public class LimitTest extends TestVerticle {
 
     @Test
     public void testLimit() {

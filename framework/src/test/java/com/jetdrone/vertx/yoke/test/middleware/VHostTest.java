@@ -14,7 +14,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class VHost extends TestVerticle {
+public class VHostTest extends TestVerticle {
 
     @Test
     public void testLimit() {

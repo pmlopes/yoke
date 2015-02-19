@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class ArraysUniqueItems {
+class ArraysUniqueItemsTest {
 
     @Test
     void it_should_validate_if_array_has_no_duplicate_items() {

@@ -5,7 +5,7 @@ import org.junit.Test
 
 import static org.junit.Assert.*
 
-class Resolver {
+class ResolverTest {
 
     @Test
     void testResolveMultipleSchemasInOneFile() {

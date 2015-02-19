@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class Formats {
+class FormatsTest {
 
     @Test void it_should_validate_a_valid_date_time() {
         assertTrue(JsonSchema.conformsSchema("2012-07-08T16:41:41.532Z", new JsonSchemaResolver.Schema(['type': 'string', 'format': 'date-time'])));

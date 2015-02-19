@@ -10,7 +10,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class Timeout extends TestVerticle {
+public class TimeoutTest extends TestVerticle {
 
     @Test
     public void testTimeout() {

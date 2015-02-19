@@ -16,7 +16,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class BasicAuth extends TestVerticle {
+public class BasicAuthTest extends TestVerticle {
 
     @Test
     public void testBasicAuth() {

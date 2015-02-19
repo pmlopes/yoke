@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class Attributes {
+class AttributesTest {
 
     @Test
     void it_should_validate_a_valid_number() {

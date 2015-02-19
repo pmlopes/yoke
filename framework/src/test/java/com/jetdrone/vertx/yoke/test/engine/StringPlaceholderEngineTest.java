@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class StringPlaceholderEngine extends TestVerticle {
+public class StringPlaceholderEngineTest extends TestVerticle {
 
     @Test
     public void testEngine() {

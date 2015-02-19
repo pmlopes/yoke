@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
 
-class ArraysMaxItems {
+class ArraysMaxItemsTest {
 
     @Test
     void it_should_validate_if_array_has_a_less_than_maxItems() {

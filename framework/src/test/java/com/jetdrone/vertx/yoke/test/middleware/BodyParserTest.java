@@ -16,7 +16,7 @@ import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;
 
-public class BodyParser extends TestVerticle {
+public class BodyParserTest extends TestVerticle {
 
     @Test
     public void testJsonBodyParser() {

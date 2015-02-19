@@ -20,7 +20,7 @@ import static com.jetdrone.vertx.yoke.util.Validator.that;
 import static org.vertx.testtools.VertxAssert.assertEquals;
 import static org.vertx.testtools.VertxAssert.testComplete;
 
-public class Validator extends TestVerticle {
+public class ValidatorTest extends TestVerticle {
 
     @Test
     public void testParam() {
