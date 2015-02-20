@@ -12,7 +12,8 @@
 
     <artifactId>yoke</artifactId>
     <packaging>jar</packaging>
-    <name>framework</name>
+    <name>Yoke micro-framework</name>
+    <url>http://pmlopes.github.io/yoke</url>
 
     <properties>
         <!--Vertx module name-->
@@ -88,6 +89,9 @@
                 <excludes>
                     <exclude>build.properties</exclude>
                 </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/js</directory>
             </resource>
         </resources>
 
