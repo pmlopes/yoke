@@ -1,9 +1,9 @@
-# Response Headers
+## Response Headers
 
 A simple Middleware that allows adding custom response headers to all YokeResponse.
 
 
-## Examples
+### Examples
 
 ```
 yoke.use(new ResponseHeaders()

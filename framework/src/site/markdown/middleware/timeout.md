@@ -1,4 +1,4 @@
-# Timeout
+## Timeout
 
 Times out the request in ```ms```, defaulting to ```5000```.
 

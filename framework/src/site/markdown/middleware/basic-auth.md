@@ -1,9 +1,9 @@
-# BasicAuth
+## BasicAuth
 
 Enfore basic authentication by providing a AuthHandler.handler(user, pass), which must return true in order to gain
 access. Populates request.user. The final alternative is simply passing username / password strings.
 
-## Examples
+### Examples
 
 Creates a new BasicAuth middleware with a master username / password and a given realm.
 

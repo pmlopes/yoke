@@ -1,4 +1,4 @@
-# CookieParser
+## CookieParser
 
  Parse request cookies both signed or plain.
 
@@ -7,7 +7,7 @@ If a cooke value starts with *s:* it means that it is a signed cookie. In this c
 
 When the Cookie parser is initialized with a secret then that value is used to verify if a cookie is valid.
 
-## Examples
+### Examples
 
 Instantiates a CookieParser with a given Mac.
 

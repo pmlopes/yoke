@@ -1,4 +1,4 @@
-# RequestProxy
+## RequestProxy
 
 RequestProxy provides web client a simple way to interact with other REST service
 providers via Yoke, meanwhile Yoke could pre-handle authentication, logging and etc.

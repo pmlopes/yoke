@@ -1,7 +1,3 @@
-# [Yoke](/)
-
-## Benchmarks
-
 Yoke has a simple benchmark to compare to ExpressJS, these benchmarks are too simple and do not represent real world
 scenarios. Proper benchmarking should be done comparing what you need and not just serving static text or json
 resources.

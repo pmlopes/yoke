@@ -1,4 +1,4 @@
-# CSRF
+## CSRF
 
 This middleware adds a CSRF token to requests which mutate state. You should put the result within a hidden form
 field, query-string etc. This token should be validated against the visitor's session.

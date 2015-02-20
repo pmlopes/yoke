@@ -1,4 +1,4 @@
-# Compress
+## Compress
 
 Middleware to compress responses and set the appropriate response headers.
 Not all responses are compressed, the middleware first inspects if the

@@ -1,9 +1,9 @@
-# Logger
+## Logger
 
 Logger for request. There are 3 formats included:
-1. DEFAULT
-2. SHORT
-3. TINY
+* DEFAULT
+* SHORT
+* TINY
 
 Default tries to log in a format similar to Apache log format, while the other 2 are more suited to development mode.
 The logging depends on Vert.x logger settings and the severity of the error, so for errors with status greater or
