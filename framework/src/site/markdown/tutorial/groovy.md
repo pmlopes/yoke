@@ -1,9 +1,3 @@
-# [Yoke](/)
-
-## Groovy Tutorial
-
-## Boostraping a Project
-
 There are several options on creating projects for Java. In this tutorial the chosen method is using
 [Gradle](http://www.gradle.org/). The choice was made because there is no required installation of software (as long as
 you have *JDK >= 1.7* installed in your system.

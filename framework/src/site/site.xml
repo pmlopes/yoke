@@ -1,6 +1,6 @@
-<project name="Maven" xmlns="http://maven.apache.org/DECORATION/1.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.0 http://maven.apache.org/xsd/decoration-1.0.0.xsd">
+<project xmlns="http://maven.apache.org/DECORATION/1.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd">
+
     <skin>
         <groupId>org.apache.maven.skins</groupId>
         <artifactId>maven-fluido-skin</artifactId>
@@ -47,10 +47,20 @@
             <item name="Timeout" href="middleware/timeout.html"/>
             <item name="VHost" href="middleware/vhost.html"/>
         </menu>
+        <!--<menu name="Engines">-->
+            <!--<item name="Handlebars" href="engine/handlebars.html"/>-->
+            <!--<item name="JADE" href="engine/jade.html"/>-->
+            <!--<item name="MVEL" href="engine/mvel.html"/>-->
+            <!--<item name="Thymeleaf" href="engine/thymeleaf.html"/>-->
+        <!--</menu>-->
+        <!--<menu name="Stores">-->
+            <!--<item name="MongoDB" href="store/mongodb.html"/>-->
+            <!--<item name="REDIS" href="store/redis.html"/>-->
+        <!--</menu>-->
         <menu name="Tutorial">
             <item name="Java" href="tutorial/java.html"/>
-            <item name="Groovy" href="tutorial/groovy.html"/>
-            <item name="JavaScript" href="tutorial/javascript.html"/>
+            <!--<item name="Groovy" href="tutorial/groovy.html"/>-->
+            <!--<item name="JavaScript" href="tutorial/javascript.html"/>-->
         </menu>
         <menu ref="reports"/>
     </body>

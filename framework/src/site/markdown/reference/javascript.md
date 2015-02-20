@@ -1,5 +1,3 @@
-# Java API
-
 Yoke is a minimal and flexible Vert.x web application framework, providing a robust set of features for building single
 and multi-page, and hybrid web applications. Yoke provides a thin layer of features fundamental to any web application,
 without obscuring features that you know and love in Vert.x.
