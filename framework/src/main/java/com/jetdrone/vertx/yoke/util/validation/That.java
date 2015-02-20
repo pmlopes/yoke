@@ -2,6 +2,8 @@ package com.jetdrone.vertx.yoke.util.validation;
 
 import com.jetdrone.vertx.yoke.core.YokeException;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
+import com.jetdrone.vertx.yoke.json.JsonSchema;
+import com.jetdrone.vertx.yoke.json.JsonSchemaResolver;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -81,7 +83,7 @@ public final class That {
             case "param":
                 this.type = 0;
                 break;
-            case "formParam":
+            case "form":
                 this.type = 1;
                 break;
             case "body":
@@ -774,6 +776,46 @@ public final class That {
                     }
                     throw new YokeException(errorCode, "'" + path + "' does not equal [" + value + "] be NULL");
                 }
+            }
+        };
+    }
+
+    public Assertion conformsTo(final JsonSchemaResolver.Schema schema) {
+        return new Assertion() {
+            @Override
+            public void ok(final YokeRequest request) throws YokeException {
+                final Object field = get(request);
+                final boolean optional = isOptional();
+
+                // null is handled as a special case
+                if (field == null) {
+                    throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                }
+
+                if (JsonSchema.conformsSchema(field, schema)) {
+                    return;
+                }
+                throw new YokeException(errorCode, "'" + path + "' does not conforms to schema");
+            }
+        };
+    }
+
+    public Assertion conformsTo(final String schemaRef) {
+        return new Assertion() {
+            @Override
+            public void ok(final YokeRequest request) throws YokeException {
+                final Object field = get(request);
+                final boolean optional = isOptional();
+
+                // null is handled as a special case
+                if (field == null) {
+                    throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                }
+
+                if (JsonSchema.conformsSchema(field, schemaRef)) {
+                    return;
+                }
+                throw new YokeException(errorCode, "'" + path + "' does not conforms to schema");
             }
         };
     }
