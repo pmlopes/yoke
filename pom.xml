@@ -23,6 +23,52 @@
             <name>Paulo Lopes</name>
             <email>pmlopes@gmail.com</email>
         </developer>
+        <developer>
+            <id>silviucm</id>
+        </developer>
+        <developer>
+            <id>ddossot</id>
+            <name>David Dossot</name>
+            <email>david@dossot.net</email>
+        </developer>
+        <developer>
+            <id>panzhangwang</id>
+        </developer>
+        <developer>
+            <id>XiaochunLU</id>
+            <name>Xiaochun Lu</name>
+            <email>luxiaochun_1111@hotmail.com</email>
+        </developer>
+        <developer>
+            <id>valerinistor</id>
+            <name>Valeri Nistor</name>
+            <email>nistor.valeri@gmail.com</email>
+        </developer>
+        <developer>
+            <id>ndarilek</id>
+            <name>Nolan Darilek</name>
+        </developer>
+        <developer>
+            <id>danthegoodman</id>
+            <name>Danny Kirchmeier</name>
+            <email>danny@kirchmeier.us</email>
+        </developer>
+        <developer>
+            <id>hellobigbean</id>
+            <name>Bean</name>
+        </developer>
+        <developer>
+            <id>4z3</id>
+            <name>tv</name>
+            <email>tv@shackspace.de</email>
+        </developer>
+        <developer>
+            <id>sorin-costea</id>
+            <name>Sorin Costea</name>
+        </developer>
+        <developer>
+            <id>ixasuhan</id>
+        </developer>
     </developers>
 
     <issueManagement>
