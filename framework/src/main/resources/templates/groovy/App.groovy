@@ -11,7 +11,7 @@ class App extends Verticle {
         // Create a new Yoke Application
         GYoke app = new GYoke(this)
         // define engines
-        app.engine(new GroovyTemplateEngine())
+        app.engine(new GroovyTemplateEngine("views"))
         // define middleware
         app.use(new Favicon())
         app.use(new Logger())

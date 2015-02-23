@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.jetdrone</groupId>
         <artifactId>yoke-project</artifactId>
-        <version>2.0.12</version>
+        <version>2.0.13</version>
         <relativePath>..</relativePath>
     </parent>
 
@@ -62,8 +62,15 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>**/mod.json</include>
+                    <include>mod.json</include>
                 </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>mod.json</exclude>
+                </excludes>
             </resource>
         </resources>
 

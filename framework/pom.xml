@@ -6,13 +6,14 @@
     <parent>
         <groupId>com.jetdrone</groupId>
         <artifactId>yoke-project</artifactId>
-        <version>2.0.12</version>
+        <version>2.0.13</version>
         <relativePath>..</relativePath>
     </parent>
 
     <artifactId>yoke</artifactId>
     <packaging>jar</packaging>
-    <name>framework</name>
+    <name>Yoke micro-framework</name>
+    <url>http://pmlopes.github.io/yoke</url>
 
     <properties>
         <!--Vertx module name-->
@@ -74,6 +75,26 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>build.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>build.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <directory>src/main/js</directory>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
@@ -220,6 +241,17 @@
             </plugin>
             <plugin>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.jetdrone.vertx.yoke.tools.Tools</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
             </plugin>
         </plugins>
     </build>

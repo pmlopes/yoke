@@ -9,7 +9,7 @@ import com.jetdrone.vertx.yoke.engine.GroovyTemplateEngine
 // Create a new Yoke Application
 GYoke app = new GYoke(vertx, container)
 // define engines
-app.engine(new GroovyTemplateEngine())
+app.engine(new GroovyTemplateEngine("views"))
 // define middleware
 app.use(new Favicon())
 app.use(new Logger())

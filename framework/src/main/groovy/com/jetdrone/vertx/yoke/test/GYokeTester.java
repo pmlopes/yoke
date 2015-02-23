@@ -45,7 +45,7 @@ public class GYokeTester extends YokeTester {
     }
 
     public void request(final String method, final String url, final Map<String, Object> headers, final Buffer body, final Closure<Response> handler) {
-        request(method, url, toMultiMap(headers), body.toJavaBuffer(), new Handler<Response>() {
+        request(method, url, toMultiMap(headers), body == null ? null : body.toJavaBuffer(), new Handler<Response>() {
             @Override
             public void handle(Response event) {
                 handler.call(event);
@@ -54,7 +54,7 @@ public class GYokeTester extends YokeTester {
     }
 
     public void request(final String method, final String url, final Map<String, Object> headers, final String body, final Closure<Response> handler) {
-        request(method, url, toMultiMap(headers), new org.vertx.java.core.buffer.Buffer(body), new Handler<Response>() {
+        request(method, url, toMultiMap(headers), body == null ? null : new org.vertx.java.core.buffer.Buffer(body), new Handler<Response>() {
             @Override
             public void handle(Response event) {
                 handler.call(event);
@@ -72,7 +72,7 @@ public class GYokeTester extends YokeTester {
     }
 
     public void request(final String method, final String url, final Map<String, Object> headers, final List<Object> json, final Closure<Response> handler) {
-        request(method, url, toMultiMap(headers), new org.vertx.java.core.buffer.Buffer(new JsonArray(json).encode()), new Handler<Response>() {
+        request(method, url, toMultiMap(headers), json == null ? null : new org.vertx.java.core.buffer.Buffer(new JsonArray(json).encode()), new Handler<Response>() {
             @Override
             public void handle(Response event) {
                 handler.call(event);

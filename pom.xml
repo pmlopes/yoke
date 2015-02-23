@@ -10,7 +10,7 @@
 
     <groupId>com.jetdrone</groupId>
     <artifactId>yoke-project</artifactId>
-    <version>2.0.12</version>
+    <version>2.0.13</version>
     <packaging>pom</packaging>
 
     <name>Yoke</name>
@@ -22,6 +22,52 @@
             <id>pmlopes</id>
             <name>Paulo Lopes</name>
             <email>pmlopes@gmail.com</email>
+        </developer>
+        <developer>
+            <id>silviucm</id>
+        </developer>
+        <developer>
+            <id>ddossot</id>
+            <name>David Dossot</name>
+            <email>david@dossot.net</email>
+        </developer>
+        <developer>
+            <id>panzhangwang</id>
+        </developer>
+        <developer>
+            <id>XiaochunLU</id>
+            <name>Xiaochun Lu</name>
+            <email>luxiaochun_1111@hotmail.com</email>
+        </developer>
+        <developer>
+            <id>valerinistor</id>
+            <name>Valeri Nistor</name>
+            <email>nistor.valeri@gmail.com</email>
+        </developer>
+        <developer>
+            <id>ndarilek</id>
+            <name>Nolan Darilek</name>
+        </developer>
+        <developer>
+            <id>danthegoodman</id>
+            <name>Danny Kirchmeier</name>
+            <email>danny@kirchmeier.us</email>
+        </developer>
+        <developer>
+            <id>hellobigbean</id>
+            <name>Bean</name>
+        </developer>
+        <developer>
+            <id>4z3</id>
+            <name>tv</name>
+            <email>tv@shackspace.de</email>
+        </developer>
+        <developer>
+            <id>sorin-costea</id>
+            <name>Sorin Costea</name>
+        </developer>
+        <developer>
+            <id>ixasuhan</id>
         </developer>
     </developers>
 
@@ -79,6 +125,27 @@
         </site>
     </distributionManagement>
 
+    <profiles>
+        <profile>
+            <id>examples</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>examples/benchmark</module>
+                <module>examples/cluster-benchmark</module>
+                <module>examples/dojo-reststore</module>
+                <module>examples/form-auth</module>
+                <module>examples/groovy</module>
+                <module>examples/javascript</module>
+                <module>examples/kitcms</module>
+                <module>examples/mozilla-persona</module>
+                <module>examples/session-store</module>
+                <module>examples/swagger-petstore</module>
+                <module>examples/techempower</module>
+        </modules>
+        </profile>
+    </profiles>
 
     <modules>
         <module>framework</module>
@@ -98,18 +165,6 @@
 
         <module>store/redis</module>
         <module>store/mongodb</module>
-
-        <module>examples/benchmark</module>
-        <module>examples/cluster-benchmark</module>
-        <module>examples/dojo-reststore</module>
-        <module>examples/form-auth</module>
-        <module>examples/groovy</module>
-        <module>examples/javascript</module>
-        <module>examples/kitcms</module>
-        <module>examples/mozilla-persona</module>
-        <module>examples/session-store</module>
-        <module>examples/swagger-petstore</module>
-        <module>examples/techempower</module>
     </modules>
 
     <build>
