@@ -65,7 +65,7 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
         // register the consumes
         if (consumes != null) {
-            resource.consumes(produces);
+            resource.consumes(consumes);
         }
 
         for (JsonSchema model : res.models()) {
