@@ -30,11 +30,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.jetdrone</groupId>
-            <artifactId>yoke-extras</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
             <version>${groovy.version}</version>
