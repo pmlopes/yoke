@@ -789,13 +789,13 @@ public final class That {
 
                 // null is handled as a special case
                 if (field == null) {
-                    throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    throw new YokeException(errorCode, "'" + field + "' cannot be NULL");
                 }
 
                 if (JsonSchema.conformsSchema(field, schema)) {
                     return;
                 }
-                throw new YokeException(errorCode, "'" + path + "' does not conforms to schema");
+                throw new YokeException(errorCode, "'" + field + "' does not conforms to schema");
             }
         };
     }
@@ -809,13 +809,13 @@ public final class That {
 
                 // null is handled as a special case
                 if (field == null) {
-                    throw new YokeException(errorCode, "'" + path + "' cannot be NULL");
+                    throw new YokeException(errorCode, "'" + field + "' cannot be NULL");
                 }
 
                 if (JsonSchema.conformsSchema(field, schemaRef)) {
                     return;
                 }
-                throw new YokeException(errorCode, "'" + path + "' does not conforms to schema");
+                throw new YokeException(errorCode, "'" + field + "' does not conforms to schema");
             }
         };
     }

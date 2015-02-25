@@ -10,7 +10,7 @@
 
     <groupId>com.jetdrone</groupId>
     <artifactId>yoke-project</artifactId>
-    <version>2.0.13</version>
+    <version>2.0.14</version>
     <packaging>pom</packaging>
 
     <name>Yoke</name>
@@ -23,53 +23,48 @@
             <name>Paulo Lopes</name>
             <email>pmlopes@gmail.com</email>
         </developer>
-        <developer>
-            <id>silviucm</id>
-        </developer>
-        <developer>
-            <id>ddossot</id>
+    </developers>
+
+    <contributors>
+        <contributor>
+            <name>silviucm</name>
+        </contributor>
+        <contributor>
             <name>David Dossot</name>
             <email>david@dossot.net</email>
-        </developer>
-        <developer>
-            <id>panzhangwang</id>
-        </developer>
-        <developer>
-            <id>XiaochunLU</id>
+        </contributor>
+        <contributor>
+            <name>panzhangwang</name>
+        </contributor>
+        <contributor>
             <name>Xiaochun Lu</name>
             <email>luxiaochun_1111@hotmail.com</email>
-        </developer>
-        <developer>
-            <id>valerinistor</id>
+        </contributor>
+        <contributor>
             <name>Valeri Nistor</name>
             <email>nistor.valeri@gmail.com</email>
-        </developer>
-        <developer>
-            <id>ndarilek</id>
+        </contributor>
+        <contributor>
             <name>Nolan Darilek</name>
-        </developer>
-        <developer>
-            <id>danthegoodman</id>
+        </contributor>
+        <contributor>
             <name>Danny Kirchmeier</name>
             <email>danny@kirchmeier.us</email>
-        </developer>
-        <developer>
-            <id>hellobigbean</id>
+        </contributor>
+        <contributor>
             <name>Bean</name>
-        </developer>
-        <developer>
-            <id>4z3</id>
+        </contributor>
+        <contributor>
             <name>tv</name>
             <email>tv@shackspace.de</email>
-        </developer>
-        <developer>
-            <id>sorin-costea</id>
+        </contributor>
+        <contributor>
             <name>Sorin Costea</name>
-        </developer>
-        <developer>
-            <id>ixasuhan</id>
-        </developer>
-    </developers>
+        </contributor>
+        <contributor>
+            <name>ixasuhan</name>
+        </contributor>
+    </contributors>
 
     <issueManagement>
         <url>https://github.com/pmlopes/yoke/issues</url>
@@ -149,7 +144,6 @@
 
     <modules>
         <module>framework</module>
-        <module>framework-extras</module>
 
         <module>middleware/helmet</module>
         <module>middleware/jersey</module>

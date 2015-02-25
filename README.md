@@ -8,16 +8,15 @@ Yoke is a polyglot middleware framework for Vert.x, shipping with over 12 bundle
 ## Instalation
 
 To get started with Yoke in your project you can use Vert.x module system to download it from the maven repository or
-include the maven dependency your self. The moment this module is only compatible with Vert.x 2. It can be backported to
-the 1.x series but there is no work in progress in that direction.
+include the maven dependency your self. The moment this module is only compatible with Vert.x 2.
 
-The Vert.x module id is: `com.jetdrone~yoke~2.0.5`. If you prefer to use [maven](http://maven.apache.org), you can get
+The Vert.x module id is: `com.jetdrone~yoke~2.0.13`. If you prefer to use [maven](http://maven.apache.org), you can get
 the artifacts using the following dependency:
 
     <dependency>
       <groupId>com.jetdrone</groupId>
       <artifactId>yoke</artifactId>
-      <version>2.0.3</version>
+      <version>2.0.13</version>
       <scope>provided</scope>
     </dependency>
 
@@ -29,20 +28,9 @@ in the server classpath.
 
 Yoke is a polyglot framework so you should choose a trail to follow with your favourite language:
 
-* [Java](java/Readme.html)
-* [Groovy](groovy/Readme.html)
-* [JavaScript](resources/Readme.html)
-
-You can also get tutorials:
-
-* [Java-Tutorial](http://pmlopes.github.io/yoke/Java-Tutorial.html)
-* [Groovy-Tutorial](http://pmlopes.github.io/yoke/Groovy-Tutorial.html)
-* [JavaScript-Tutorial](http://pmlopes.github.io/yoke/JavaScript-Tutorial.html)
-* [Mozilla Persona](http://pmlopes.github.io/yoke/Persona.html)
-
-And also Benchmarks:
-
-* [Benchmark](http://pmlopes.github.io/yoke/Benchmark.html)
+* Java
+* Groovy
+* JavaScript
 
 If you need help with Yoke. just ask your questions on [yoke framework group](https://groups.google.com/forum/#!forum/yoke-framework).
 

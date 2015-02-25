@@ -78,12 +78,12 @@ public final class ArrayValidator {
             } else {
                 if (items instanceof Map) {
                     // convert to schema
-                    itemsSchema = new JsonSchemaResolver.Schema((Map<String, Object>) items);
+                    itemsSchema = JsonSchemaResolver.resolveSchema((Map<String, Object>) items, schema.getParent());
                     schema.put("items", itemsSchema);
                 }
             }
 
-            setParentIfNotNull(itemsSchema, schema);
+//            setParentIfNotNull(itemsSchema, schema);
 
             for (Object item : array) {
                 if (!JsonSchema.conformsSchema(item, itemsSchema)) {

@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.jetdrone</groupId>
         <artifactId>yoke-project</artifactId>
-        <version>2.0.13</version>
+        <version>2.0.14</version>
         <relativePath>../..</relativePath>
     </parent>
 
@@ -28,11 +28,6 @@
             <artifactId>yoke</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jetdrone</groupId>
-            <artifactId>yoke-extras</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
