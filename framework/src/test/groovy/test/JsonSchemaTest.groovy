@@ -27,7 +27,7 @@ public class JsonSchemaTest {
                         'country-name': 'The Netherlands'
                 ]
         ];
-        assertTrue(JsonSchema.conformsSchema(json, "/card.json"));
+        assertTrue(JsonSchema.conformsSchema(json, "classpath:///card.json"));
     }
 
     @Test
@@ -78,6 +78,6 @@ public class JsonSchemaTest {
                 ]
         ];
 
-        assertTrue(JsonSchema.conformsSchema(json, "/card.json"));
+        assertTrue(JsonSchema.conformsSchema(json, "classpath:///card.json"));
     }
 }

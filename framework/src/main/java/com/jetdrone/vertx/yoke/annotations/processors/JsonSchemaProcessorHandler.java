@@ -3,6 +3,7 @@ package com.jetdrone.vertx.yoke.annotations.processors;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.annotations.JsonSchema;
+import com.jetdrone.vertx.yoke.core.YokeException;
 import com.jetdrone.vertx.yoke.json.*;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
@@ -43,7 +44,7 @@ public class JsonSchemaProcessorHandler extends AbstractAnnotationHandler<Router
             @Override
             public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
                 if (!com.jetdrone.vertx.yoke.json.JsonSchema.conformsSchema(request.body(), schema)) {
-                    next.handle(400);
+                    next.handle(new YokeException(400, "'" + request.body() + "' does not conforms to schema"));
                     return;
                 }
 

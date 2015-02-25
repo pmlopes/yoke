@@ -4,6 +4,7 @@ import org.vertx.java.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public final class ObjectValidator {
 
@@ -59,7 +60,7 @@ public final class ObjectValidator {
                 }
             }
 
-            // TODO: validate additionalProperties, properties and patternProperties
+            // TODO: validate additionalProperties
 
             // validate dependencies
             Map<String, Object> dependencies = schema.get("dependencies");
@@ -77,7 +78,7 @@ public final class ObjectValidator {
                         }
 
                         if (entry.getValue() instanceof Map) {
-                            JsonSchemaResolver.Schema schemaDependency = new JsonSchemaResolver.Schema((Map<String, Object>) entry.getValue());
+                            JsonSchemaResolver.Schema schemaDependency = JsonSchemaResolver.resolveSchema((Map<String, Object>) entry.getValue(), schema.getParent());
                             if (!JsonSchema.conformsSchema(object.get(entry.getKey()), schemaDependency)) {
                                 return false;
                             }
@@ -100,16 +101,49 @@ public final class ObjectValidator {
                     } else {
                         if (property instanceof Map) {
                             // convert to schema
-                            propertySchema = new JsonSchemaResolver.Schema((Map<String, Object>) property);
+                            propertySchema = JsonSchemaResolver.resolveSchema((Map<String, Object>) property, schema);
                             entry.setValue(propertySchema);
                         }
                     }
 
                     Object item = object.get(name);
-                    setParentIfNotNull(propertySchema, schema);
+//                    setParentIfNotNull(propertySchema, schema);
 
                     if (!JsonSchema.conformsSchema(item, propertySchema)) {
                         return false;
+                    }
+                }
+            }
+
+            // validate patternProperties
+            final Map<String, Object> patternProperties = schema.get("patternProperties");
+
+            if (patternProperties != null) {
+                for (Map.Entry<String, Object> entry : patternProperties.entrySet()) {
+                    String name = entry.getKey();
+                    Pattern pattern = Pattern.compile(name);
+                    Object property = entry.getValue();
+                    JsonSchemaResolver.Schema propertySchema = null;
+
+                    if (property instanceof JsonSchemaResolver.Schema) {
+                        propertySchema = (JsonSchemaResolver.Schema) property;
+                    } else {
+                        if (property instanceof Map) {
+                            // convert to schema
+                            propertySchema = JsonSchemaResolver.resolveSchema((Map<String, Object>) property);
+                            entry.setValue(propertySchema);
+                        }
+                    }
+
+                    for (Object key : object.keySet()) {
+                        if(pattern.matcher((String) key).matches()) {
+                            Object item = object.get(key);
+//                            setParentIfNotNull(propertySchema, schema);
+
+                            if (!JsonSchema.conformsSchema(item, propertySchema)) {
+                                return false;
+                            }
+                        }
                     }
                 }
             }
@@ -120,11 +154,5 @@ public final class ObjectValidator {
 
     private static boolean isObject(Object value) {
         return value == null || value instanceof Map || value instanceof JsonObject;
-    }
-
-    private static void setParentIfNotNull(JsonSchemaResolver.Schema schema, JsonSchemaResolver.Schema parent) {
-        if (schema != null) {
-            schema.setParent(parent);
-        }
     }
 }

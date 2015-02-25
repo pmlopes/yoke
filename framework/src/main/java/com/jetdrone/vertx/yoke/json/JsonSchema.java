@@ -1,5 +1,8 @@
 package com.jetdrone.vertx.yoke.json;
 
+/**
+ * JsonSchema validator according to draft-v4
+ */
 public final class JsonSchema {
 
     public static boolean conformsSchema(Object instance, String schemaRef) {
@@ -7,6 +10,7 @@ public final class JsonSchema {
     }
 
     public static boolean conformsSchema(Object instance, JsonSchemaResolver.Schema schema) {
+
         if (schema == null) {
             return true;
         }

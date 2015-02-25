@@ -16,16 +16,15 @@ public final class JsonSchemaResolver {
         private static final long serialVersionUID = 1l;
 
         private Schema parent;
-        private final String resolvedId;
+        private final String id;
 
-        public Schema(JsonObject json, String resolvedId) {
-            super(json.toMap());
-            this.resolvedId = resolvedId;
+        private Schema(Map<String, Object> map) {
+            this(map, (String) map.get("id"));
         }
 
-        public Schema(Map<String, Object> map) {
+        private Schema(Map<String, Object> map, String id) {
             super(map);
-            this.resolvedId = null;
+            this.id = id;
         }
 
         public void setParent(Schema parent) {
@@ -36,21 +35,13 @@ public final class JsonSchemaResolver {
             return parent;
         }
 
-        public String getResolvedId() {
-            return resolvedId;
+        public String getId() {
+            return id;
         }
 
         @SuppressWarnings("unchecked")
         public <T> T get(String key) {
             return (T) super.get(key);
-        }
-
-        public String getLocation() {
-            if (parent != null) {
-                return parent.getLocation() + "@" + resolvedId;
-            }
-
-            return resolvedId;
         }
     }
 
@@ -62,23 +53,49 @@ public final class JsonSchemaResolver {
         return resolveSchema(uri, null);
     }
 
-    public static Schema resolveSchema(String uri, Schema parentSchema) {
-        uri = resolveUri(uri, parentSchema);
+    public static Schema resolveSchema(String uri, Schema parent) {
+        uri = resolveUri(uri, parent);
         if (!loadedSchemas.containsKey(uri)) {
             tryToLoad(uri);
         }
         return loadedSchemas.get(uri);
     }
 
+    public static Schema resolveSchema(Map<String, Object> schema) {
+        return new JsonSchemaResolver.Schema(schema);
+    }
+
+    public static Schema resolveSchema(Map<String, Object> schema, Schema parent) {
+        final Schema _schema = new JsonSchemaResolver.Schema(schema);
+        _schema.setParent(parent);
+
+        return _schema;
+    }
+
     private static String resolveUri(String uri, Schema parent) {
-        if (parent == null) {
+        // if it is an absolute URI return it, nothing to resolve
+        if (ABSOLUTE.matcher(uri).matches()) {
             return uri;
         }
-        String baseUri = parent.getResolvedId();
-        if (baseUri == null) {
-            baseUri = parent.get("id");
+
+        if (parent == null) {
+            throw new RuntimeException("relative URI without a base URI");
         }
-        return resolveRelativeUri(uri, baseUri);
+
+        String parentBaseUri;
+        int idx = parent.getId().indexOf('#');
+
+        if (idx != -1) {
+            parentBaseUri = parent.getId().substring(0, parent.getId().indexOf('#'));
+        } else {
+            parentBaseUri = parent.getId();
+        }
+
+        if (uri.charAt(0) == '#') {
+            return parentBaseUri + uri;
+        }
+
+        throw new RuntimeException("non relative URI");
     }
 
     private static void tryToLoad(String ref) {
@@ -89,35 +106,24 @@ public final class JsonSchemaResolver {
 
             final String scheme = uri.getScheme();
 
-            if (scheme != null) {
-                // there is a scheme so we can load from http, classpath, or file
-                switch (scheme) {
-                    case "classpath":
-                        json = loadFromClasspath(uri);
-                        break;
-                    case "http":
-                    case "https":
-                        json = loadFromURL(uri);
-                        break;
-                    case "file":
-                        json = loadFromFile(uri);
-                        break;
-                    default:
-                        throw new RuntimeException("Unknown Protocol: " + scheme);
-                }
-            } else {
-                // fallback to class loader when no scheme is present
-                final String path = uri.getPath();
-
-                if (path != null && !"".equals(path)) {
+            // there is a scheme so we can load from http, classpath, or file
+            switch (scheme) {
+                case "classpath":
                     json = loadFromClasspath(uri);
-                } else {
-                    throw new RuntimeException("Unknown URI: " + ref);
-                }
+                    break;
+                case "http":
+                case "https":
+                    json = loadFromURL(uri);
+                    break;
+                case "file":
+                    json = loadFromFile(uri);
+                    break;
+                default:
+                    throw new RuntimeException("Unknown Protocol: " + scheme);
             }
 
-            final Schema schema = new Schema(json, ref);
-            final String schemaId = schema.get("id");
+            final Schema schema = new Schema(json.toMap(), ref);
+            final String schemaId = schema.getId();
 
             if (schemaId != null) {
                 if (loadedSchemas.containsKey(schemaId)) {
@@ -125,14 +131,15 @@ public final class JsonSchemaResolver {
                 }
                 // register the schema into the registry using its Id
                 loadedSchemas.put(schemaId, schema);
+            } else {
+                if (loadedSchemas.containsKey(ref)) {
+                    throw new RuntimeException("Schema URI [" + uri + "] already in use!");
+                }
+
+                // register the schema into the registry using its URI
+                loadedSchemas.put(ref, schema);
             }
 
-            if (loadedSchemas.containsKey(ref)) {
-                throw new RuntimeException("Schema URI [" + uri + "] already in use!");
-            }
-
-            // register the schema into the registry using its URI
-            loadedSchemas.put(ref, schema);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -185,12 +192,19 @@ public final class JsonSchemaResolver {
 
                 final JsonObject json = new JsonObject(writer.toString());
                 final String fragment = uri.getFragment();
-                if (fragment != null) {
-                    if (json.containsField(fragment)) {
-                        return json.getObject(fragment);
-                    } else {
-                        throw new RuntimeException("Fragment #" + fragment + " not found!");
+                if (fragment != null && !"".equals(fragment)) {
+                    String[] nodes = fragment.split("/");
+                    JsonObject subjson = json;
+
+                    for (int i = "".equals(nodes[0]) ? 1 : 0 ; i < nodes.length; i++) {
+                        if (subjson.containsField(nodes[i])) {
+                            subjson = subjson.getObject(nodes[i]);
+                        } else {
+                            throw new RuntimeException("Fragment Node #" + nodes[i] + " not found!");
+                        }
                     }
+
+                    return subjson;
                 }
 
                 return json;
@@ -231,19 +245,5 @@ public final class JsonSchemaResolver {
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
         }
-    }
-
-    private static String resolveRelativeUri(String uri, String base) {
-        if (base == null || isAbsolute(uri)) {
-            return uri;
-        }
-        if (base.endsWith("/")) {
-            return base + uri;
-        }
-        return base.substring(0, base.lastIndexOf("/") + 1) + uri;
-    }
-
-    private static boolean isAbsolute(String uri) {
-        return ABSOLUTE.matcher(uri).matches();
     }
 }

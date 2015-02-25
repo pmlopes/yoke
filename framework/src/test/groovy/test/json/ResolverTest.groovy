@@ -11,7 +11,7 @@ class ResolverTest {
     void testResolveMultipleSchemasInOneFile() {
         def schema
 
-        schema = JsonSchemaResolver.resolveSchema('/schemas/types.json#usage')
+        schema = JsonSchemaResolver.resolveSchema('classpath:///schemas/types.json#usage')
         assertNotNull(schema)
         assertEquals("text statement for bank statement", schema.get("description"))
         schema = JsonSchemaResolver.resolveSchema('classpath:///schemas/types.json#usage')
