@@ -59,6 +59,8 @@ public class YokeTester {
 
                         MultiMap params = null;
                         MultiMap attributes = null;
+                        boolean bodyHandled = false;
+                        boolean endHandled = false;
                         final Random random = new Random();
 
                         final NetSocket netSocket = new NetSocket() {
@@ -236,7 +238,8 @@ public class YokeTester {
 
                         @Override
                         public HttpServerRequest bodyHandler(final Handler<Buffer> bodyHandler) {
-                            if (bodyHandler != null) {
+                            if (!bodyHandled) {
+                                bodyHandled = true;
                                 vertx.runOnContext(new Handler<Void>() {
                                     @Override
                                     public void handle(Void event) {
@@ -249,7 +252,8 @@ public class YokeTester {
 
                         @Override
                         public HttpServerRequest dataHandler(final Handler<Buffer> handler) {
-                            if (handler != null) {
+                            if (!bodyHandled) {
+                                bodyHandled = true;
                                 vertx.runOnContext(new Handler<Void>() {
                                     @Override
                                     public void handle(Void event) {
@@ -272,14 +276,21 @@ public class YokeTester {
 
                         @Override
                         public HttpServerRequest endHandler(final Handler<Void> endHandler) {
-                            if (endHandler != null) {
-                                vertx.runOnContext(new Handler<Void>() {
-                                    @Override
-                                    public void handle(Void event) {
-                                        endHandler.handle(null);
+                            vertx.runOnContext(new Handler<Void>() {
+                                @Override
+                                public void handle(Void event) {
+                                    if (!bodyHandled) {
+                                        // enqueue for later exec
+                                        vertx.runOnContext(this);
+                                    } else {
+                                        if (!endHandled) {
+                                            endHandled = true;
+                                            endHandler.handle(null);
+                                        }
                                     }
-                                });
-                            }
+                                }
+                            });
+
                             return this;
                         }
 

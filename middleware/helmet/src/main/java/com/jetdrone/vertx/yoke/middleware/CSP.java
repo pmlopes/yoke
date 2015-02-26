@@ -11,13 +11,13 @@ import java.util.*;
 
 public class CSP extends Middleware {
 
-    private final List<String> ALL_HEADERS = Arrays.asList(
+    private static final List<String> ALL_HEADERS = Arrays.asList(
             "X-Content-Security-Policy",
             "Content-Security-Policy",
             "X-WebKit-CSP"
     );
 
-    private final List<String> DIRECTIVES = Arrays.asList(
+    private static final List<String> DIRECTIVES = Arrays.asList(
             "default-src",
             "script-src",
             "object-src",
@@ -31,7 +31,7 @@ public class CSP extends Middleware {
             "sandbox"
     );
 
-    private final List<String> MUST_BE_QUOTED = Arrays.asList(
+    private static final List<String> MUST_BE_QUOTED = Arrays.asList(
             "none",
             "self",
             "unsafe-inline",
@@ -101,7 +101,7 @@ public class CSP extends Middleware {
                     "sandbox".equals(directive) && !Boolean.TRUE.equals(value);
 
             if (shouldWrapInArray) {
-                policy.put(directive, value.toString().split("\\s"));
+                policy.put(directive, value != null ? value.toString().split("\\s") : new String[0]);
             }
 
         }
