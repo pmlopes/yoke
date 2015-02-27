@@ -16,36 +16,15 @@ public final class JsonSchemaResolver {
         private static final long serialVersionUID = 1l;
 
         private Schema parent;
-        private final URI id;
+        private final String id;
 
-        Schema(Map<String, Object> json) {
-            this(json, null);
+        private Schema(Map<String, Object> map) {
+            this(map, (String) map.get("id"));
         }
 
-        Schema(Map<String, Object> json, Schema parent) {
-            super(json);
-
-            String id = (String) json.get("id");
-            if (id != null) {
-                try {
-                    if (ABSOLUTE.matcher(id).matches()) {
-                        this.id = new URI(id);
-                    } else {
-                        if (id.charAt(0) == '#') {
-                            // this is a fragment, in this case resolve to parent
-                            this.id = new URI(parent.id.getScheme(), parent.id.getUserInfo(), parent.id.getHost(), parent.id.getPort(), parent.id.getPath(), parent.id.getQuery(), id.substring(1));
-                        } else {
-                            // this is a file relative to the parent path
-                            File path = new File(new File(parent.id.getPath()).getParent(), id);
-                            this.id = new URI(parent.id.getScheme(), parent.id.getUserInfo(), parent.id.getHost(), parent.id.getPort(), path.getPath(), parent.id.getQuery(), "");
-                        }
-                    }
-                }catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                this.id = null;
-            }
+        private Schema(Map<String, Object> map, String id) {
+            super(map);
+            this.id = id;
         }
 
         public void setParent(Schema parent) {
@@ -57,7 +36,7 @@ public final class JsonSchemaResolver {
         }
 
         public String getId() {
-            return id != null ? id.toString() : null;
+            return id;
         }
 
         @SuppressWarnings("unchecked")
@@ -77,17 +56,17 @@ public final class JsonSchemaResolver {
     public static Schema resolveSchema(String uri, Schema parent) {
         uri = resolveUri(uri, parent);
         if (!loadedSchemas.containsKey(uri)) {
-            load(uri, parent);
+            tryToLoad(uri);
         }
         return loadedSchemas.get(uri);
     }
 
     public static Schema resolveSchema(Map<String, Object> schema) {
-        return new JsonSchemaResolver.Schema(schema, null);
+        return new JsonSchemaResolver.Schema(schema);
     }
 
     public static Schema resolveSchema(Map<String, Object> schema, Schema parent) {
-        final Schema _schema = new JsonSchemaResolver.Schema(schema, parent);
+        final Schema _schema = new JsonSchemaResolver.Schema(schema);
         _schema.setParent(parent);
 
         return _schema;
@@ -119,7 +98,7 @@ public final class JsonSchemaResolver {
         throw new RuntimeException("non relative URI");
     }
 
-    private static void load(String ref, Schema parent) {
+    private static void tryToLoad(String ref) {
         try {
             JsonObject json;
 
@@ -143,20 +122,7 @@ public final class JsonSchemaResolver {
                     throw new RuntimeException("Unknown Protocol: " + scheme);
             }
 
-            final String fragment = uri.getFragment();
-            if (fragment != null && !"".equals(fragment)) {
-                String[] nodes = fragment.split("/");
-
-                for (int i = "".equals(nodes[0]) ? 1 : 0 ; i < nodes.length; i++) {
-                    if (json.containsField(nodes[i])) {
-                        json = json.getObject(nodes[i]);
-                    } else {
-                        throw new RuntimeException("Fragment Node #" + nodes[i] + " not found!");
-                    }
-                }
-            }
-
-            final Schema schema = new Schema(json.toMap(), parent);
+            final Schema schema = new Schema(json.toMap(), ref);
             final String schemaId = schema.getId();
 
             if (schemaId != null) {
@@ -191,7 +157,17 @@ public final class JsonSchemaResolver {
                     writer.write(buffer, 0, n);
                 }
 
-                return new JsonObject(writer.toString());
+                final JsonObject json = new JsonObject(writer.toString());
+                final String fragment = uri.getFragment();
+                if (fragment != null) {
+                    if (json.containsField(fragment)) {
+                        return json.getObject(fragment);
+                    } else {
+                        throw new RuntimeException("Fragment #" + fragment + " not found!");
+                    }
+                }
+
+                return json;
             }
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
@@ -214,7 +190,24 @@ public final class JsonSchemaResolver {
                     writer.write(buffer, 0, n);
                 }
 
-                return new JsonObject(writer.toString());
+                final JsonObject json = new JsonObject(writer.toString());
+                final String fragment = uri.getFragment();
+                if (fragment != null && !"".equals(fragment)) {
+                    String[] nodes = fragment.split("/");
+                    JsonObject subjson = json;
+
+                    for (int i = "".equals(nodes[0]) ? 1 : 0 ; i < nodes.length; i++) {
+                        if (subjson.containsField(nodes[i])) {
+                            subjson = subjson.getObject(nodes[i]);
+                        } else {
+                            throw new RuntimeException("Fragment Node #" + nodes[i] + " not found!");
+                        }
+                    }
+
+                    return subjson;
+                }
+
+                return json;
             }
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
@@ -237,7 +230,17 @@ public final class JsonSchemaResolver {
                     writer.write(buffer, 0, n);
                 }
 
-                return new JsonObject(writer.toString());
+                final JsonObject json = new JsonObject(writer.toString());
+                final String fragment = uri.getFragment();
+                if (fragment != null) {
+                    if (json.containsField(fragment)) {
+                        return json.getObject(fragment);
+                    } else {
+                        throw new RuntimeException("Fragment #" + fragment + " not found!");
+                    }
+                }
+
+                return json;
             }
         } catch (IOException ioe) {
             throw new RuntimeException(ioe);
