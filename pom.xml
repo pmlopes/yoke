@@ -111,6 +111,9 @@
         <!-- Dependency versions -->
         <vertx.version>2.1.5</vertx.version>
         <groovy.version>2.3.3</groovy.version>
+        <!-- Groovy compiler -->
+        <groovy.eclipse.batch.version>2.3.7-01</groovy.eclipse.batch.version>
+        <groovy.eclipse.compiler.version>2.9.1-01</groovy.eclipse.compiler.version>
     </properties>
 
     <distributionManagement>
