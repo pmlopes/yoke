@@ -59,9 +59,6 @@ public class InMemoryStore implements Store {
 
     @Override
     public void create(String entity, JsonObject object, AsyncResultHandler<String> response) {
-
-        System.out.println("create");
-
         final Map<String, JsonObject> collection = getCollection(entity);
 
         final String _id = Integer.toString(collection.size());
@@ -74,9 +71,6 @@ public class InMemoryStore implements Store {
 
     @Override
     public void read(String entity, String id, AsyncResultHandler<JsonObject> response) {
-
-        System.out.println("read");
-
         final Map<String, JsonObject> collection = getCollection(entity);
 
         response.handle(new YokeAsyncResult<>(collection.get(id)));
@@ -84,9 +78,6 @@ public class InMemoryStore implements Store {
 
     @Override
     public void update(String entity, String id, JsonObject object, AsyncResultHandler<Number> response) {
-
-        System.out.println("update");
-
         final Map<String, JsonObject> collection = getCollection(entity);
 
         response.handle(new YokeAsyncResult<Number>(collection.put(id, object) == null ? 0 : 1));
@@ -94,9 +85,6 @@ public class InMemoryStore implements Store {
 
     @Override
     public void delete(String entity, String id, AsyncResultHandler<Number> response) {
-
-        System.out.println("delete");
-
         final Map<String, JsonObject> collection = getCollection(entity);
 
         response.handle(new YokeAsyncResult<Number>(collection.remove(id) == null ? 0 : 1));
@@ -104,9 +92,6 @@ public class InMemoryStore implements Store {
 
     @Override
     public void query(String entity, JsonObject query, Number start, Number end, JsonObject sort, AsyncResultHandler<JsonArray> response) {
-
-        System.out.println("query");
-
         final Map<String, JsonObject> collection = getCollection(entity);
 
         final List<JsonObject> values = new ArrayList<>(collection.values());
@@ -149,15 +134,11 @@ public class InMemoryStore implements Store {
             i++;
         }
 
-        System.out.println(array.size());
-
         response.handle(new YokeAsyncResult<>(array));
     }
 
     @Override
     public void count(String entity, JsonObject query, AsyncResultHandler<Number> response) {
-
-        System.out.println("count");
 
         final Map<String, JsonObject> collection = getCollection(entity);
         final List<JsonObject> values = new ArrayList<>(collection.values());
