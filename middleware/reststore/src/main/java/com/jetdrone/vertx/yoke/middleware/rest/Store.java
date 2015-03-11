@@ -40,6 +40,13 @@ public interface Store {
      */
     void delete(String entity, String id, AsyncResultHandler<Number> response);
 
+    /**
+     * Queries for a collection of objects given a query, limit and sorting.
+     */
     void query(String entity, JsonObject query, Number start, Number end, JsonObject sort, AsyncResultHandler<JsonArray> response);
+
+    /**
+     * Counts the elements of a collection given a query.
+     */
     void count(String entity, JsonObject query, AsyncResultHandler<Number> response);
 }

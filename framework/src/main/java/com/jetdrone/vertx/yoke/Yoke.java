@@ -212,7 +212,7 @@ public class Yoke {
     private IMiddleware errorHandler;
 
     /**
-     * Adds a Middleware to the chain. If the middleware is an Error Handler Middleware then it is
+     * Adds a IMiddleware to the chain. If the middleware is an Error Handler IMiddleware then it is
      * treated differently and only the last error handler is kept.
      *
      * You might want to add a middleware that is only supposed to run on a specific route (path prefix).
@@ -267,7 +267,7 @@ public class Yoke {
      *
      * @param middleware The middleware add to the chain
      */
-    public Yoke use(@NotNull Middleware... middleware) {
+    public Yoke use(@NotNull IMiddleware... middleware) {
         return use("/", middleware);
     }
 
@@ -292,7 +292,7 @@ public class Yoke {
      * @param handler The Handler to add
      */
     public Yoke use(@NotNull String route, final @NotNull Handler<YokeRequest> handler) {
-        middlewareList.add(new MountedMiddleware(route, new Middleware() {
+        middlewareList.add(new MountedMiddleware(route, new IMiddleware() {
             @Override
             public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 handler.handle(request);

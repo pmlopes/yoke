@@ -1,3 +1,3 @@
 {
-  "main": "com.jetdrone.vertx.extras.ExtrasExample"
+  "main": "com.jetdrone.vertx.extras.JsonRestExample"
 }

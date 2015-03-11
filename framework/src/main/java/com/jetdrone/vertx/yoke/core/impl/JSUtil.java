@@ -575,7 +575,7 @@ class JSUtil {
                 if (json.isArray()) {
                     int size = json.asArray().size();
                     Object[] ids = new Object[size];
-                    for (int i = 0; i < size; ++i) ids[i] = Integer.valueOf(i);
+                    for (int i = 0; i < size; ++i) ids[i] = i;
                     return ids;
                 }
                 return EMPTY_OBJECT_ARRAY;
@@ -701,7 +701,7 @@ class JSUtil {
                 if (json.isArray()) {
                     int size = json.asArray().size();
                     Object[] ids = new Object[size];
-                    for (int i = 0; i < size; ++i) ids[i] = Integer.valueOf(i);
+                    for (int i = 0; i < size; ++i) ids[i] = i;
                     return ids;
                 }
                 return EMPTY_OBJECT_ARRAY;

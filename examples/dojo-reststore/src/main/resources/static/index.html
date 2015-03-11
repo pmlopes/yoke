@@ -2,36 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Dojo Toolkit REST</title>
-    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojox/grid/resources/claroGrid.css" />
+    <title>Demo: Connecting DataGrid to a Store</title>
+    <link rel="stylesheet" href="style.css" media="screen">
+    <link rel="stylesheet" href="demo.css" media="screen">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.9/dojo/resources/dojo.css" />
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.9/dijit/themes/claro/claro.css" />
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.9/dojox/grid/resources/Grid.css" />
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.8.9/dojox/grid/resources/claroGrid.css" />
 </head>
-<body>
-<div id="grid"></div>
-<button id="save">Save</button>
+<body class="claro">
+<h1>Demo: Connecting DataGrid to a Store</h1>
 
-<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.3/dojo/dojo.js" data-dojo-config="isDebug: true, async: true"></script>
+<div id="target-node-id"></div>
+<button id="save">Save</button>
+<!-- load dojo and provide config via data attribute -->
+<script src="//ajax.googleapis.com/ajax/libs/dojo/1.8.9/dojo/dojo.js" data-dojo-config="async: true, isDebug: true, parseOnLoad: true"></script>
 <script>
     require([
-    "dojo/store/JsonRest",
-    "dojo/store/Memory",
-    "dojo/store/Cache",
-    "dojox/grid/DataGrid",
-    "dojo/data/ObjectStore",
-    "dojo/domReady!"
-    ], function(JsonRest, Memory, Cache, DataGrid, ObjectStore) {
-        var store = new Cache(new JsonRest({idProperty: '_id', target: '/persons/'}), new Memory());
-
-        var grid = new DataGrid({
-            store: new ObjectStore({objectStore: store}),
+        "dojo/store/JsonRest",
+        "dojo/store/Memory",
+        "dojo/store/Cache",
+        "dojox/grid/DataGrid",
+        "dojo/data/ObjectStore",
+        "dojo/query",
+        "dojo/domReady!"
+    ], function(JsonRest, Memory, Cache, DataGrid, ObjectStore, query){
+        var myStore, dataStore, grid;
+        myStore = new Cache(JsonRest({idProperty: 'id', target: '/states/'}), new Memory());
+        grid = new DataGrid({
+            store: dataStore = new ObjectStore({objectStore: myStore}),
             structure: [
-                {name:"id", field:"_id", width: "20%"},
-                {name:"name", field:"name", width: "80%", editable: true}
+                {name:"State Name", field:"name", width: "200px"},
+                {name:"Abbreviation", field:"abbreviation", width: "200px", editable: true}
             ]
-        }, "grid");
-        grid.startup();
+        }, "target-node-id"); // make sure you have a target HTML element with this id
 
-        dojo.query("#save").onclick(function(){
-            grid.store.save();
+        //grid.set("query", { name: "Oregon" });
+
+        grid.startup();
+        query("#save").on("click", function(){
+            dataStore.save();
+        });
+
+        // Store an object identified by identity
+        myStore.add({
+            name: "XPTO"
         });
     });
 </script>

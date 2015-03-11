@@ -20,8 +20,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerResponse;
 
 import com.jetdrone.vertx.yoke.Middleware;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 
 /**
  * Basic CORS support.
@@ -137,12 +135,12 @@ public class Cors extends Middleware
 
     private static boolean isEmpty(final Collection<?> c)
     {
-        return c == null ? true : c.isEmpty();
+        return c == null || c.isEmpty();
     }
 
     private static boolean isNotBlank(final String s)
     {
-        return s == null ? false : !s.trim().isEmpty();
+        return s != null && !s.trim().isEmpty();
     }
 
     private static String join(final Collection<String> ss, final String j)
@@ -152,7 +150,7 @@ public class Cors extends Middleware
             return "";
         }
 
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (final String s : ss)
         {
