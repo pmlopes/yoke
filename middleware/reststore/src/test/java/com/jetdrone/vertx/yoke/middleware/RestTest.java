@@ -48,9 +48,11 @@ public class RestTest extends TestVerticle {
     public void restTest() {
 
         Yoke yoke = new Yoke(this);
-        JsonRestRouter restStore = new JsonRestRouter(dummyStore);
-        restStore.rest("/persons", "persons");
-        yoke.use(restStore);
+
+        JsonRestRouter router = new JsonRestRouter(dummyStore)
+                .rest("/persons", "persons");
+
+        yoke.use(router);
 
         testComplete();
     }

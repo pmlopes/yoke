@@ -27,7 +27,6 @@
             <groupId>com.jetdrone</groupId>
             <artifactId>yoke</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.jetdrone</groupId>
@@ -98,7 +97,7 @@
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-maven-plugin</artifactId>
                 <configuration>
-                    <configFile>${project.basedir}/conf.json</configFile>
+                    <configFile>${project.basedir}/config.json</configFile>
                 </configuration>
                 <!-- Make sure that the plugin uses the vert.x versions from this pom.xml not from its own pom.xml -->
                 <dependencies>

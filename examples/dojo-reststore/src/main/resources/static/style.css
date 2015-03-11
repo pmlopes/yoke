@@ -1,0 +1,12 @@
+/* Any demo specific styling needed for this tutorial only */
+#target-node-id {
+    width: 420px;
+}
+
+.tip {
+    background: #fffff1;
+    border: 1px solid #ececcd;
+    color: #333;
+    max-width: 40em;
+    padding: 14px;
+}

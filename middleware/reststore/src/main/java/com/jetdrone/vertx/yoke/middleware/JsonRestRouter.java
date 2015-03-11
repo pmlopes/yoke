@@ -19,6 +19,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 
 import com.jetdrone.vertx.yoke.middleware.rest.Store;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.AsyncResultHandler;
 import org.vertx.java.core.Handler;
@@ -56,9 +57,13 @@ public class JsonRestRouter extends Router {
         }
     };
 
-    public JsonRestRouter(Store store) {
+    public JsonRestRouter(final @NotNull Store store) {
+        this(store, null);
+    }
+
+    public JsonRestRouter(final @NotNull Store store, final @Nullable String sortParam) {
         this.store = store;
-        this.sortParam = null;
+        this.sortParam = sortParam;
     }
 
     private boolean isAllowed(int operation, int allowedOperations) {
@@ -72,46 +77,46 @@ public class JsonRestRouter extends Router {
 
     public JsonRestRouter rest(String resource, String entity, int allowedOperations) {
         // build the resource url
-        String resourcePath = entity.endsWith("/") ? resource.substring(0, resource.length() - 1) : resource;
+        final String resourcePath = entity.endsWith("/") ? resource.substring(0, resource.length() - 1) : resource;
 
         if (isAllowed(QUERY, allowedOperations)) {
-            super.get(resourcePath, query(entity));
+            get(resourcePath, query(entity));
         } else {
-            super.get(resourcePath, NOT_ALLOWED);
+            get(resourcePath, NOT_ALLOWED);
         }
 
         if (isAllowed(READ, allowedOperations)) {
-            super.get(resourcePath + "/:" + entity, read(entity));
+            get(resourcePath + "/:" + entity, read(entity));
         } else {
-            super.get(resourcePath + "/:" + entity, NOT_ALLOWED);
+            get(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         if (isAllowed(UPDATE, allowedOperations)) {
-            super.put(resourcePath + "/:" + entity, update(entity));
+            put(resourcePath + "/:" + entity, update(entity));
         } else {
-            super.put(resourcePath + "/:" + entity, NOT_ALLOWED);
+            put(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         if (isAllowed(APPEND, allowedOperations)) {
             // shortcut for patch (as by Dojo Toolkit)
-            super.post(resourcePath + "/:" + entity, append(entity));
-            super.patch(resourcePath + "/:" + entity, append(entity));
+            post(resourcePath + "/:" + entity, append(entity));
+            patch(resourcePath + "/:" + entity, append(entity));
         } else {
             // shortcut for patch (as by Dojo Toolkit)
-            super.post(resourcePath + "/:" + entity, NOT_ALLOWED);
-            super.patch(resourcePath + "/:" + entity, NOT_ALLOWED);
+            post(resourcePath + "/:" + entity, NOT_ALLOWED);
+            patch(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         if (isAllowed(CREATE, allowedOperations)) {
-            super.post(resourcePath, create(entity));
+            post(resourcePath, create(entity));
         } else {
-            super.post(resourcePath, NOT_ALLOWED);
+            post(resourcePath, NOT_ALLOWED);
         }
 
         if (isAllowed(DELETE, allowedOperations)) {
-            super.delete(resourcePath + "/:" + entity, delete(entity));
+            delete(resourcePath + "/:" + entity, delete(entity));
         } else {
-            super.delete(resourcePath + "/:" + entity, NOT_ALLOWED);
+            delete(resourcePath + "/:" + entity, NOT_ALLOWED);
         }
 
         return this;
@@ -133,8 +138,7 @@ public class JsonRestRouter extends Router {
                         }
 
                         if (event.result().intValue() == 0) {
-                            request.response().setStatusCode(404);
-                            request.response().end();
+                            next.handle(404);
                         } else {
                             request.response().setStatusCode(204);
                             request.response().end();
@@ -163,7 +167,8 @@ public class JsonRestRouter extends Router {
                             next.handle(event.cause());
                             return;
                         }
-                        request.response().putHeader("location", request.path() + "/" + event.result());
+
+                        request.response().putHeader("location", request.normalizedPath() + "/" + event.result());
                         request.response().setStatusCode(201);
                         request.response().end();
                     }
@@ -187,45 +192,53 @@ public class JsonRestRouter extends Router {
                             return;
                         }
 
+                        final String ifMatch = request.getHeader("If-Match");
+                        final String ifNoneMatch = request.getHeader("If-None-Match");
+
+                        // merge existing json with incoming one
+                        final boolean overwrite =
+                                // pure PUT, must exist and will be updated
+                                (ifMatch == null && ifNoneMatch == null) ||
+                                // must exist and will be updated
+                                ("*".equals(ifMatch));
+
                         if (event.result() == null) {
-                            // does not exist, returns 404
-                            request.response().setStatusCode(404);
-                            request.response().end();
+                            // does not exist but was marked as overwrite
+                            if (overwrite) {
+                                // does not exist, returns 412
+                                next.handle(412);
+                            } else {
+                                // does not exist, returns 404
+                                next.handle(404);
+                            }
                         } else {
-                            // merge existing json with incoming one
-                            Boolean overwrite = null;
+                            // does exist but was marked as not overwrite
+                            if (!overwrite) {
+                                // does exist, returns 412
+                                next.handle(412);
+                            } else {
+                                final JsonObject obj = event.result();
+                                obj.mergeIn((JsonObject) request.body());
 
-                            if ("*".equals(request.getHeader("if-match"))) {
-                                overwrite = true;
-                            }
+                                // update back to the db
+                                store.update(idName, id, obj, new AsyncResultHandler<Number>() {
+                                    @Override
+                                    public void handle(AsyncResult<Number> event) {
+                                        if (event.failed()) {
+                                            next.handle(event.cause());
+                                            return;
+                                        }
 
-                            if ("*".equals(request.getHeader("if-none-match"))) {
-                                overwrite = false;
-                            }
-
-                            // TODO: handle overwrite
-                            final JsonObject obj = event.result();
-                            obj.mergeIn((JsonObject) request.body());
-
-                            // update back to the db
-                            store.update(idName, id, obj, new AsyncResultHandler<Number>() {
-                                @Override
-                                public void handle(AsyncResult<Number> event) {
-                                    if (event.failed()) {
-                                        next.handle(event.cause());
-                                        return;
+                                        if (event.result().intValue() == 0) {
+                                            // nothing was updated
+                                            next.handle(404);
+                                        } else {
+                                            request.response().setStatusCode(204);
+                                            request.response().end();
+                                        }
                                     }
-
-                                    if (event.result().intValue() == 0) {
-                                        // nothing was updated
-                                        request.response().setStatusCode(404);
-                                        request.response().end();
-                                    } else {
-                                        request.response().setStatusCode(204);
-                                        request.response().end();
-                                    }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                 });
@@ -257,8 +270,7 @@ public class JsonRestRouter extends Router {
 
                         if (event.result().intValue() == 0) {
                             // nothing was updated
-                            request.response().setStatusCode(404);
-                            request.response().end();
+                            next.handle(404);
                         } else {
                             request.response().setStatusCode(204);
                             request.response().end();
@@ -406,8 +418,7 @@ public class JsonRestRouter extends Router {
 
                         if (event.result() == null) {
                             // does not exist, returns 404
-                            request.response().setStatusCode(404);
-                            request.response().end();
+                            next.handle(404);
                         } else {
                             request.response().end(event.result());
                         }
