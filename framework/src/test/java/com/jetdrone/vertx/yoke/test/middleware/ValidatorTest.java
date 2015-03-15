@@ -60,6 +60,36 @@ public class ValidatorTest extends TestVerticle {
     }
 
     @Test
+    public void testParamValidatorOptional() {
+
+        Yoke yoke = new Yoke(this);
+        yoke.use(new Middleware() {
+            @Override
+            public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
+                com.jetdrone.vertx.yoke.util.Validator validator = new com.jetdrone.vertx.yoke.util.Validator(
+                        that("param:k1").is(Type.String),
+                        that("param:?k2").is(Type.Integer)
+                );
+
+                if (!validator.isValid(request)) {
+                    next.handle(400);
+                    return;
+                }
+
+                request.response().end();
+            }
+        });
+
+        new YokeTester(yoke).request("GET", "/?k1=v1&k2=v2", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(400, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
+
+    @Test
     public void testJsonBodyValidator() {
 
         final JsonObject json = new JsonObject().putObject("user", new JsonObject().putString("login", "paulo").putString("password", "pwd"));
