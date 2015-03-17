@@ -1,5 +1,6 @@
 package com.jetdrone.vertx.yoke.jmx;
 
+import com.jetdrone.vertx.yoke.IMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 
 import javax.management.*;
@@ -9,11 +10,11 @@ import java.util.regex.Pattern;
 
 public final class RouteMBean implements DynamicMBean {
 
-    private final List<Middleware> middleware;
+    private final List<IMiddleware> middleware;
 
     private final Pattern middlewarePattern = Pattern.compile("middleware\\[(\\d+)\\]");
 
-    public RouteMBean(List<Middleware> middleware) {
+    public RouteMBean(List<IMiddleware> middleware) {
         this.middleware = middleware;
     }
 
