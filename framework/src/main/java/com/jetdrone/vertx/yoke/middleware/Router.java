@@ -3,6 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import com.jetdrone.vertx.yoke.IMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.annotations.*;
@@ -67,9 +68,12 @@ public class Router extends Middleware {
 
     private void init(Yoke yoke, String mount, List<PatternBinding> bindings) {
         for (PatternBinding binding : bindings) {
-            for (Middleware m : binding.middleware) {
-                if (!m.isInitialized()) {
-                    m.init(yoke, mount);
+            for (IMiddleware m : binding.middleware) {
+                if (m instanceof Middleware) {
+                    final Middleware middleware = (Middleware) m;
+                    if (!middleware.isInitialized() && isInitialized()) {
+                        middleware.init(yoke, mount);
+                    }
                 }
             }
         }
@@ -138,7 +142,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router get(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router get(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("GET", pattern, handlers, getBindings);
         return this;
     }
@@ -162,7 +166,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router put(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router put(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("PUT", pattern, handlers, putBindings);
         return this;
     }
@@ -186,7 +190,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router post(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router post(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("POST", pattern, handlers, postBindings);
         return this;
     }
@@ -210,7 +214,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router delete(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router delete(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("DELETE", pattern, handlers, deleteBindings);
         return this;
     }
@@ -234,7 +238,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router options(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router options(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("OPTIONS", pattern, handlers, optionsBindings);
         return this;
     }
@@ -258,7 +262,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router head(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router head(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("HEAD", pattern, handlers, headBindings);
         return this;
     }
@@ -282,7 +286,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router trace(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router trace(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("TRACE", pattern, handlers, traceBindings);
         return this;
     }
@@ -306,7 +310,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router connect(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router connect(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("CONNECT", pattern, handlers, connectBindings);
         return this;
     }
@@ -330,7 +334,7 @@ public class Router extends Middleware {
      * @param pattern The simple pattern
      * @param handlers The middleware to call
      */
-    public Router patch(@NotNull final String pattern, @NotNull final Middleware... handlers) {
+    public Router patch(@NotNull final String pattern, @NotNull final IMiddleware... handlers) {
         addPattern("PATCH", pattern, handlers, patchBindings);
         return this;
     }
@@ -390,7 +394,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router get(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router get(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("GET", regex, handlers, getBindings);
         return this;
     }
@@ -414,7 +418,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router put(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router put(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("PUT", regex, handlers, putBindings);
         return this;
     }
@@ -438,7 +442,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router post(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router post(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("POST", regex, handlers, postBindings);
         return this;
     }
@@ -462,7 +466,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router delete(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router delete(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("DELETE", regex, handlers, deleteBindings);
         return this;
     }
@@ -486,7 +490,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router options(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router options(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("OPTIONS", regex, handlers, optionsBindings);
         return this;
     }
@@ -510,7 +514,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router head(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router head(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("HEAD", regex, handlers, headBindings);
         return this;
     }
@@ -534,7 +538,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router trace(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router trace(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("TRACE", regex, handlers, traceBindings);
         return this;
     }
@@ -558,7 +562,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router connect(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router connect(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("CONNECT", regex, handlers, connectBindings);
         return this;
     }
@@ -582,7 +586,7 @@ public class Router extends Middleware {
      * @param regex A regular expression
      * @param handlers The middleware to call
      */
-    public Router patch(@NotNull final Pattern regex, @NotNull final Middleware... handlers) {
+    public Router patch(@NotNull final Pattern regex, @NotNull final IMiddleware... handlers) {
         addRegEx("PATCH", regex, handlers, patchBindings);
         return this;
     }
@@ -661,7 +665,7 @@ public class Router extends Middleware {
         });
     }
 
-    private void addPattern(String verb, String input, Middleware[] handler, List<PatternBinding> bindings) {
+    private void addPattern(String verb, String input, IMiddleware[] handler, List<PatternBinding> bindings) {
         // We need to search for any :<token name> tokens in the String and replace them with named capture groups
         Matcher m =  Pattern.compile(":([A-Za-z][A-Za-z0-9_]*)").matcher(input);
         StringBuffer sb = new StringBuffer();
@@ -697,14 +701,17 @@ public class Router extends Middleware {
         }
 
         // also pass the vertx object to the routes
-        for (Middleware h : handler) {
-            if (!h.isInitialized() && isInitialized()) {
-                h.init(yoke, mount);
+        for (IMiddleware h : handler) {
+            if (h instanceof Middleware) {
+                final Middleware middleware = (Middleware) h;
+                if (!middleware.isInitialized() && isInitialized()) {
+                    middleware.init(yoke, mount);
+                }
             }
         }
     }
 
-    private void addRegEx(String verb, Pattern regex, Middleware handler[], List<PatternBinding> bindings) {
+    private void addRegEx(String verb, Pattern regex, IMiddleware handler[], List<PatternBinding> bindings) {
         boolean exists = false;
         // verify if the binding already exists, if yes add to it
         for (PatternBinding pb : bindings) {
@@ -721,9 +728,12 @@ public class Router extends Middleware {
         }
 
         // also pass the vertx object to the routes
-        for (Middleware h : handler) {
-            if (!h.isInitialized() && isInitialized()) {
-                h.init(yoke, mount);
+        for (IMiddleware h : handler) {
+            if (h instanceof Middleware) {
+                final Middleware middleware = (Middleware) h;
+                if (!middleware.isInitialized() && isInitialized()) {
+                    middleware.init(yoke, mount);
+                }
             }
         }
     }
@@ -789,9 +799,9 @@ public class Router extends Middleware {
                             }
                         } else {
                             // middlewares
-                            new AsyncIterator<Middleware>(binding.middleware) {
+                            new AsyncIterator<IMiddleware>(binding.middleware) {
                                 @Override
-                                public void handle(final Middleware middleware) {
+                                public void handle(final IMiddleware middleware) {
                                     if (hasNext()) {
                                         // do not block main loop
                                         vertx.runOnContext(new Handler<Void>() {
@@ -824,9 +834,9 @@ public class Router extends Middleware {
                 }
 
                 // middlewares
-                new AsyncIterator<Middleware>(binding.middleware) {
+                new AsyncIterator<IMiddleware>(binding.middleware) {
                     @Override
-                    public void handle(final Middleware middleware) {
+                    public void handle(final IMiddleware middleware) {
                         if (hasNext()) {
                             // do not block main loop
                             vertx.runOnContext(new Handler<Void>() {
@@ -863,12 +873,12 @@ public class Router extends Middleware {
         private final Pattern pattern;
         private final String route;
 
-        private final List<Middleware> middleware = new ArrayList<>();
+        private final List<IMiddleware> middleware = new ArrayList<>();
         private final Set<String> paramNames;
 
         private final ObjectName objectName;
 
-        private PatternBinding(int hasCode, @NotNull String verb, @Nullable String route, @NotNull Pattern pattern, @Nullable Set<String> paramNames, @NotNull Middleware[] middleware) {
+        private PatternBinding(int hasCode, @NotNull String verb, @Nullable String route, @NotNull Pattern pattern, @Nullable Set<String> paramNames, @NotNull IMiddleware[] middleware) {
             this.route = route;
             this.pattern = pattern;
             this.paramNames = paramNames;
@@ -896,7 +906,7 @@ public class Router extends Middleware {
             }
         }
 
-        private void addMiddleware(@NotNull Middleware[] middleware) {
+        private void addMiddleware(@NotNull IMiddleware[] middleware) {
             Collections.addAll(this.middleware, middleware);
 
             // un register if present
