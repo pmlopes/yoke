@@ -37,7 +37,7 @@ public final class That {
     private static class SimpleNumberComparator implements Comparator<Number>, Serializable {
 
         private static final long serialVersionUID = 1l;
-        
+
         @Override
         public int compare(Number o1, Number o2) {
             if (o1 instanceof Short && o2 instanceof Short) {
@@ -103,7 +103,7 @@ public final class That {
     private Object get(final YokeRequest request) throws YokeException {
         switch (type) {
             case 0:
-                return request.getParameter(path);
+                return request.getParameter(isOptional() ? this.path.substring(1) : this.path);
             case 1:
                 return request.getFormParameter(path);
             case 2:
