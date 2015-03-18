@@ -175,9 +175,10 @@ public class JsonStore extends Router {
                             return;
                         }
 
-                        request.response().putHeader("location", request.normalizedPath() + "/" + reply.getField("value"));
-                        request.response().setStatusCode(201);
-                        request.response().end();
+                        final JsonObject result = reply.getObject("value");
+
+                        request.response().putHeader("location", request.normalizedPath() + "/" + result.getField(key));
+                        request.response().end(result);
                     }
                 });
             }
