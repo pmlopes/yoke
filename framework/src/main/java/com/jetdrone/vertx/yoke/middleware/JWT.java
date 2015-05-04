@@ -92,7 +92,10 @@ public class JWT extends Middleware {
         try {
             final JsonObject jwtToken = jwt.decode(token);
 
-            final long now = System.currentTimeMillis();
+            // All dates in JWT are of type NumericDate
+            // a NumericDate is: numeric value representing the number of seconds from 1970-01-01T00:00:00Z UTC until
+            // the specified UTC date/time, ignoring leap seconds
+            final long now = System.currentTimeMillis() / 1000;
 
             if (jwtToken.containsField("iat")) {
                 Long iat = jwtToken.getLong("iat");
