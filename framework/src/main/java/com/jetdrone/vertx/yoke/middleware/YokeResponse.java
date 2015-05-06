@@ -296,7 +296,8 @@ public class YokeResponse implements HttpServerResponse {
             // if there is a filter then set the right header
             if (filter != null) {
                 // verify if the filter can filter this content
-                if (filter.canFilter(response.headers().get("content-type"))) {
+                String contentType = response.headers().get("content-type");
+                if (contentType != null && filter.canFilter(contentType)) {
                     response.putHeader("content-encoding", filter.encoding());
                 } else {
                     // disable the filter
