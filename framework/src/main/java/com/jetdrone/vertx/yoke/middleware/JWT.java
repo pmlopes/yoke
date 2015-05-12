@@ -100,7 +100,7 @@ public class JWT extends Middleware {
             if (jwtToken.containsField("iat")) {
                 Long iat = jwtToken.getLong("iat");
                 // issue at must be in the past
-                if (iat >= now) {
+                if (iat > now) {
                     next.handle(new YokeException(401, "Invalid Token!"));
                     return;
                 }
@@ -109,7 +109,7 @@ public class JWT extends Middleware {
             if (jwtToken.containsField("nbf")) {
                 Long nbf = jwtToken.getLong("nbf");
                 // not before must be after now
-                if (nbf >= now) {
+                if (nbf > now) {
                     next.handle(new YokeException(401, "Invalid Token!"));
                     return;
                 }
