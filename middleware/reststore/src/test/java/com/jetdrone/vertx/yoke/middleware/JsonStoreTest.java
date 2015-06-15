@@ -24,11 +24,7 @@ import static org.vertx.testtools.VertxAssert.*;
 
 public class JsonStoreTest extends TestVerticle {
 
-    protected YokeTester getTester() {
-        Yoke yoke = new Yoke(this);
-        yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
-
-        JsonStore store = new JsonStore("/api");
+    protected CRUD getHappyFlowCRUD() {
         CRUD crud = new CRUD();
 
         crud.readHandler = new CRUD.Handler() {
@@ -77,6 +73,33 @@ public class JsonStoreTest extends TestVerticle {
             }
         };
 
+        return crud;
+    }
+
+    protected CRUD getFailingCRUD() {
+        CRUD crud = new CRUD();
+
+        crud.readHandler = new CRUD.Handler() {
+            @Override
+            public void handle(@NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+                JsonObject json = new JsonObject();
+                json.putString("status", "ok");
+                JsonArray list = new JsonArray();
+                json.putArray("value", list);
+
+                next.handle(json);
+            }
+        };
+
+        return crud;
+    }
+
+    protected YokeTester getTester(CRUD crud) {
+        Yoke yoke = new Yoke(this);
+        yoke.use(new com.jetdrone.vertx.yoke.middleware.BodyParser());
+
+        JsonStore store = new JsonStore("/api");
+
         store.collection("persons", "personId", crud , null);
         yoke.use(store);
 
@@ -85,7 +108,7 @@ public class JsonStoreTest extends TestVerticle {
 
     @Test
     public void getAllTest() {
-        getTester().request("GET", "/api/persons", new Handler<Response>() {
+        getTester(getHappyFlowCRUD()).request("GET", "/api/persons", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
@@ -96,10 +119,21 @@ public class JsonStoreTest extends TestVerticle {
 
     @Test
     public void getOneTest() {
-        getTester().request("GET", "/api/persons/1", new Handler<Response>() {
+        getTester(getHappyFlowCRUD()).request("GET", "/api/persons/1", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(200, resp.getStatusCode());
+                testComplete();
+            }
+        });
+    }
+
+    @Test
+    public void getOneTestWhenNotFound() {
+        getTester(getFailingCRUD()).request("GET", "/api/persons/1", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {
+                assertEquals(404, resp.getStatusCode());
                 testComplete();
             }
         });
@@ -115,7 +149,7 @@ public class JsonStoreTest extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        getTester().request("PUT", "/api/persons/1", headers, body, new Handler<Response>() {
+        getTester(getHappyFlowCRUD()).request("PUT", "/api/persons/1", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(204, resp.getStatusCode());
@@ -134,7 +168,7 @@ public class JsonStoreTest extends TestVerticle {
         headers.add("content-type", "application/json");
         headers.add("content-length", Integer.toString(body.length()));
 
-        getTester().request("POST", "/api/persons", headers, body, new Handler<Response>() {
+        getTester(getHappyFlowCRUD()).request("POST", "/api/persons", headers, body, new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(201, resp.getStatusCode());
@@ -145,7 +179,7 @@ public class JsonStoreTest extends TestVerticle {
 
     @Test
     public void deleteTest() {
-        getTester().request("DELETE", "/api/persons/1", new Handler<Response>() {
+        getTester(getHappyFlowCRUD()).request("DELETE", "/api/persons/1", new Handler<Response>() {
             @Override
             public void handle(Response resp) {
                 assertEquals(204, resp.getStatusCode());
