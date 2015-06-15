@@ -178,6 +178,7 @@ public class JsonStore extends Router {
                         final JsonObject result = reply.getObject("value");
 
                         request.response().putHeader("location", request.normalizedPath() + "/" + result.getField(key));
+                        request.response().setStatusCode(201);
                         request.response().end(result);
                     }
                 });
