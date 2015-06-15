@@ -283,16 +283,18 @@ public class JsonStore extends Router {
                         }
 
                         final JsonArray result = reply.getArray("value");
-                        if (result == null) {
+                        if (result == null || result.size() == 0) {
+                            next.handle(404);
+                            return;
+                        }
+
+                        final JsonObject item = result.get(0);
+                        if (item == null) {
                             next.handle(404);
                         } else {
-                            final JsonObject item = result.get(0);
-                            if (item == null) {
-                                next.handle(404);
-                            } else {
-                                request.response().end(item);
-                            }
+                            request.response().end(item);
                         }
+
                     }
                 });
             }
