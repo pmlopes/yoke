@@ -16,8 +16,8 @@ public class GCRUD extends CRUD {
 
         return new Handler() {
             @Override
-            public void handle(@NotNull JsonObject filter, @NotNull final org.vertx.java.core.Handler<JsonObject> next) {
-                closure.call(filter.toMap(), new org.vertx.java.core.Handler<Map<String, Object>>() {
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull final org.vertx.java.core.Handler<JsonObject> next) {
+                closure.call(filter.toMap(), request, new org.vertx.java.core.Handler<Map<String, Object>>() {
                     @Override
                     public void handle(Map<String, Object> json) {
                         next.handle(new JsonObject(json));
