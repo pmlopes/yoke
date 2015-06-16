@@ -63,30 +63,30 @@ public class JsonStore extends Router {
             // READ ALL
             get(prefix + "/" + name, validator, query(name, key, crud));
             // READ ONE
-            get(prefix + "/" + name + "/:" + name, validator, read(name, key, crud));
+            get(prefix + "/" + name + "/:" + key, validator, read(name, key, crud));
             // UPDATE
-            put(prefix + "/" + name + "/:" + name, validator, update(name, key, crud));
+            put(prefix + "/" + name + "/:" + key, validator, update(name, key, crud));
             // DELETE
-            delete(prefix + "/" + name + "/:" + name, validator, delete(name, key, crud));
+            delete(prefix + "/" + name + "/:" + key, validator, delete(name, key, crud));
 
             // shortcut for patch (as by Dojo Toolkit)
-            post(prefix + "/" + name + "/:" + name, validator, append(name, key, crud));
-            patch(prefix + "/" + name + "/:" + name, validator, append(name, key, crud));
+            post(prefix + "/" + name + "/:" + key, validator, append(name, key, crud));
+            patch(prefix + "/" + name + "/:" + key, validator, append(name, key, crud));
         } else {
             // CREATE
             post(prefix + "/" + name, create(name, key, crud));
             // READ ALL
             get(prefix + "/" + name, query(name, key, crud));
             // READ ONE
-            get(prefix + "/" + name + "/:" + name, read(name, key, crud));
+            get(prefix + "/" + name + "/:" + key, read(name, key, crud));
             // UPDATE
-            put(prefix + "/" + name + "/:" + name, update(name, key, crud));
+            put(prefix + "/" + name + "/:" + key, update(name, key, crud));
             // DELETE
-            delete(prefix + "/" + name + "/:" + name, delete(name, key, crud));
+            delete(prefix + "/" + name + "/:" + key, delete(name, key, crud));
 
             // shortcut for patch (as by Dojo Toolkit)
-            post(prefix + "/" + name + "/:" + name, append(name, key, crud));
-            patch(prefix + "/" + name + "/:" + name, append(name, key, crud));
+            post(prefix + "/" + name + "/:" + key, append(name, key, crud));
+            patch(prefix + "/" + name + "/:" + key, append(name, key, crud));
         }
     }
 
@@ -100,7 +100,7 @@ public class JsonStore extends Router {
                 }
 
                 // get the real id from the params multimap
-                final String id = request.params().get(collection);
+                final String id = request.params().get(key);
 
                 final JsonObject filter = new JsonObject()
                         .putObject("query", new JsonObject().putString(key, id));
@@ -111,7 +111,7 @@ public class JsonStore extends Router {
                     filter.mergeIn(userFilter);
                 }
 
-                crud.deleteHandler.handle(filter, new Handler<JsonObject>() {
+                crud.deleteHandler.handle(request, filter, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject reply) {
                         if ("error".equals(reply.getString("status"))) {
@@ -162,7 +162,7 @@ public class JsonStore extends Router {
                     filter.mergeIn(userFilter);
                 }
 
-                crud.createHandler.handle(filter, new Handler<JsonObject>() {
+                crud.createHandler.handle(request, filter, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject reply) {
                         if ("error".equals(reply.getString("status"))) {
@@ -203,7 +203,7 @@ public class JsonStore extends Router {
                 }
 
                 // get the real id from the params multimap
-                String id = request.params().get(collection);
+                String id = request.params().get(key);
 
                 final JsonObject filter = new JsonObject()
                         .putObject("value", item)
@@ -215,7 +215,7 @@ public class JsonStore extends Router {
                     filter.mergeIn(userFilter);
                 }
 
-                crud.updateHandler.handle(filter, new Handler<JsonObject>() {
+                crud.updateHandler.handle(request, filter, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject reply) {
                         if ("error".equals(reply.getString("status"))) {
@@ -258,7 +258,7 @@ public class JsonStore extends Router {
                 }
 
                 // get the real id from the params multimap
-                final String id = request.params().get(collection);
+                final String id = request.params().get(key);
 
                 final JsonObject filter = new JsonObject()
                         .putObject("query", new JsonObject().putString(key, id));
@@ -269,7 +269,7 @@ public class JsonStore extends Router {
                     filter.mergeIn(userFilter);
                 }
 
-                crud.readHandler.handle(filter, new Handler<JsonObject>() {
+                crud.readHandler.handle(request, filter, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject reply) {
                         if ("error".equals(reply.getString("status"))) {
@@ -311,7 +311,7 @@ public class JsonStore extends Router {
                 }
 
                 // get the real id from the params multimap
-                final String id = request.params().get(collection);
+                final String id = request.params().get(key);
 
                 final JsonObject filter = new JsonObject()
                         .putObject("query", new JsonObject().putString(key, id));
@@ -322,7 +322,7 @@ public class JsonStore extends Router {
                     filter.mergeIn(userFilter);
                 }
 
-                crud.readHandler.handle(filter, new Handler<JsonObject>() {
+                crud.readHandler.handle(request, filter, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject reply) {
                         if ("error".equals(reply.getString("status"))) {
@@ -375,7 +375,7 @@ public class JsonStore extends Router {
                                 }
 
                                 // update back to the db
-                                crud.updateHandler.handle(filter, new Handler<JsonObject>() {
+                                crud.updateHandler.handle(request, filter, new Handler<JsonObject>() {
                                     @Override
                                     public void handle(JsonObject reply) {
                                         if ("error".equals(reply.getString("status"))) {
@@ -495,7 +495,7 @@ public class JsonStore extends Router {
                     filter.mergeIn(userFilter);
                 }
 
-                crud.readHandler.handle(filter, new Handler<JsonObject>() {
+                crud.readHandler.handle(request, filter, new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject reply) {
                         if ("error".equals(reply.getString("status"))) {
