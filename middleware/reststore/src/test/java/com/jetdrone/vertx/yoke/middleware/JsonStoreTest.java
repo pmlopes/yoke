@@ -187,4 +187,31 @@ public class JsonStoreTest extends TestVerticle {
             }
         });
     }
+
+    @Test
+    public void paramsInUrlTest() {
+        Yoke yoke = new Yoke(this);
+
+        JsonStore store = new JsonStore("/api");
+
+        CRUD crud = new CRUD();
+
+        crud.readHandler = new CRUD.Handler() {
+            @Override
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+
+                assertEquals(request.params().get("basketId"), "7");
+                assertEquals(request.params().get("appleId"), "11");
+                testComplete();
+            }
+        };
+
+        store.collection("baskets/:basketId/apples", "appleId", crud , null);
+        yoke.use(store);
+
+        new YokeTester(yoke).request("GET", "/api/baskets/7/apples/11", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {}
+        });
+    }
 }
