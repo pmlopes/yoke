@@ -29,7 +29,7 @@ public class JsonStoreTest extends TestVerticle {
 
         crud.readHandler = new CRUD.Handler() {
             @Override
-            public void handle(@NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
                 JsonObject json = new JsonObject();
                 json.putString("status", "ok");
                 JsonArray list = new JsonArray();
@@ -42,7 +42,7 @@ public class JsonStoreTest extends TestVerticle {
 
         crud.createHandler = new CRUD.Handler() {
             @Override
-            public void handle(@NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
                 JsonObject json = new JsonObject();
                 json.putString("status", "ok");
                 json.putObject("value", new JsonObject());
@@ -53,7 +53,7 @@ public class JsonStoreTest extends TestVerticle {
 
         crud.updateHandler = new CRUD.Handler() {
             @Override
-            public void handle(@NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
                 JsonObject json = new JsonObject();
                 json.putString("status", "ok");
                 json.putNumber("value", 1);
@@ -64,7 +64,7 @@ public class JsonStoreTest extends TestVerticle {
 
         crud.deleteHandler = new CRUD.Handler() {
             @Override
-            public void handle(@NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
                 JsonObject json = new JsonObject();
                 json.putString("status", "ok");
                 json.putNumber("value", 1);
@@ -81,7 +81,7 @@ public class JsonStoreTest extends TestVerticle {
 
         crud.readHandler = new CRUD.Handler() {
             @Override
-            public void handle(@NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
                 JsonObject json = new JsonObject();
                 json.putString("status", "ok");
                 JsonArray list = new JsonArray();
@@ -185,6 +185,33 @@ public class JsonStoreTest extends TestVerticle {
                 assertEquals(204, resp.getStatusCode());
                 testComplete();
             }
+        });
+    }
+
+    @Test
+    public void paramsInUrlTest() {
+        Yoke yoke = new Yoke(this);
+
+        JsonStore store = new JsonStore("/api");
+
+        CRUD crud = new CRUD();
+
+        crud.readHandler = new CRUD.Handler() {
+            @Override
+            public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull Handler<JsonObject> next) {
+
+                assertEquals(request.params().get("basketId"), "7");
+                assertEquals(request.params().get("appleId"), "11");
+                testComplete();
+            }
+        };
+
+        store.collection("baskets/:basketId/apples", "appleId", crud , null);
+        yoke.use(store);
+
+        new YokeTester(yoke).request("GET", "/api/baskets/7/apples/11", new Handler<Response>() {
+            @Override
+            public void handle(Response resp) {}
         });
     }
 }
