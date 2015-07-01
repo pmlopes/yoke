@@ -10,14 +10,14 @@ public class GCRUD extends CRUD {
 
     private static Handler wrapClosure(final Closure closure) {
         final int params = closure.getMaximumNumberOfParameters();
-        if (params != 2) {
-            throw new RuntimeException("Cannot infer the closure signature, should be: filter [, next]");
+        if (params != 3) {
+            throw new RuntimeException("Cannot infer the closure signature, should be: request, filter [, next]");
         }
 
         return new Handler() {
             @Override
             public void handle(@NotNull YokeRequest request, @NotNull JsonObject filter, @NotNull final org.vertx.java.core.Handler<JsonObject> next) {
-                closure.call(filter.toMap(), request, new org.vertx.java.core.Handler<Map<String, Object>>() {
+                closure.call(request, filter.toMap(), new org.vertx.java.core.Handler<Map<String, Object>>() {
                     @Override
                     public void handle(Map<String, Object> json) {
                         next.handle(new JsonObject(json));
