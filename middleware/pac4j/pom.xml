@@ -44,27 +44,27 @@
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-oauth</artifactId>
-            <version>1.5.1</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-openid</artifactId>
-            <version>1.5.1</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-cas</artifactId>
-            <version>1.5.1</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-saml</artifactId>
-            <version>1.5.1</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>org.pac4j</groupId>
             <artifactId>pac4j-http</artifactId>
-            <version>1.5.1</version>
+            <version>1.7.0</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
