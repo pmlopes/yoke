@@ -4,9 +4,9 @@ import com.jetdrone.vertx.yoke.IMiddleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 import java.util.regex.Matcher;

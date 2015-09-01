@@ -6,8 +6,8 @@ import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
 import javax.xml.stream.XMLStreamException;

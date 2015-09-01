@@ -5,7 +5,7 @@ import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;

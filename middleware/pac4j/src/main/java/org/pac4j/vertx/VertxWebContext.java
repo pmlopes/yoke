@@ -21,7 +21,7 @@ import java.util.Map;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import org.pac4j.core.context.WebContext;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 /**
  * WebContext implementation for Vert.x.

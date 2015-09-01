@@ -6,7 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import javax.crypto.Mac;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.YokeCookie;

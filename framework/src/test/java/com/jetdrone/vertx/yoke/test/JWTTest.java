@@ -3,8 +3,8 @@ package com.jetdrone.vertx.yoke.test;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.security.JWT;
 import org.junit.Test;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.assertEquals;

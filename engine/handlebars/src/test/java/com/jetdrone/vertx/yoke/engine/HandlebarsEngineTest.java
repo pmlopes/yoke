@@ -11,7 +11,7 @@ import java.util.Map;
 
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 import org.vertx.testtools.TestVerticle;
 
 import com.jetdrone.vertx.yoke.Middleware;

@@ -3,13 +3,13 @@
  */
 package com.jetdrone.vertx.yoke.test;
 
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.CaseInsensitiveMultiMap;
-import org.vertx.java.core.http.HttpServerResponse;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.CaseInsensitiveMultiMap;
+import io.vertx.core.http.HttpServerResponse;
 
 /** # Response */
 public class Response implements HttpServerResponse {

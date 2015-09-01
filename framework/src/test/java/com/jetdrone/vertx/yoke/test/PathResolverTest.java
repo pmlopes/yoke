@@ -1,8 +1,8 @@
 package com.jetdrone.vertx.yoke.test;
 
 import org.junit.Test;
-import org.vertx.java.core.file.impl.PathAdjuster;
-import org.vertx.java.core.impl.VertxInternal;
+import io.vertx.core.file.impl.PathAdjuster;
+import io.vertx.core.impl.VertxInternal;
 import org.vertx.testtools.TestVerticle;
 
 import java.io.File;

@@ -4,7 +4,7 @@ import com.jetdrone.vertx.yoke.IMiddleware;
 import groovy.lang.Closure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 public class GJsonStore extends JsonStore {
 

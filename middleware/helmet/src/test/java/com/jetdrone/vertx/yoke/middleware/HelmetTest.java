@@ -4,9 +4,9 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.http.CaseInsensitiveMultiMap;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.http.CaseInsensitiveMultiMap;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;

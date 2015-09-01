@@ -4,7 +4,7 @@
 package com.jetdrone.vertx.yoke.core;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.AsyncResult;
+import io.vertx.core.AsyncResult;
 
 /**
  * # YokeAsyncResult

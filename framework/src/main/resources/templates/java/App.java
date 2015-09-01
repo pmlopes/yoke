@@ -1,5 +1,5 @@
 import org.vertx.java.platform.Verticle;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.*;

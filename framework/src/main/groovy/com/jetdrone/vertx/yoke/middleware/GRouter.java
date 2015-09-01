@@ -7,7 +7,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import groovy.lang.Closure;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import java.util.List;
 import java.util.regex.Pattern;

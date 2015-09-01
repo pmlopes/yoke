@@ -3,9 +3,9 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.rest.Store;
 import org.junit.Test;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.AsyncResultHandler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;

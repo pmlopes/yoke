@@ -5,10 +5,10 @@ package com.jetdrone.vertx.yoke.test;
 
 import com.jetdrone.vertx.yoke.Yoke;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import org.vertx.java.core.*;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.*;
-import org.vertx.java.core.net.NetSocket;
+import io.vertx.core.*;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.*;
+import io.vertx.core.net.NetSocket;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLPeerUnverifiedException;

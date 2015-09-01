@@ -5,8 +5,8 @@ import com.jetdrone.vertx.yoke.util.Utils;
 import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.junit.Test;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;

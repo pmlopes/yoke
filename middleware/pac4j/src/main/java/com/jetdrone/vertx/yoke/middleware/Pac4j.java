@@ -10,8 +10,8 @@ import org.pac4j.core.credentials.Credentials;
 import org.pac4j.core.exception.RequiresHttpAction;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.vertx.VertxWebContext;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 public class Pac4j extends Middleware {
 

@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.yoke.security;
 
 import com.jetdrone.vertx.yoke.YokeSecurity;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 import javax.crypto.Mac;
 import java.security.Signature;

@@ -4,11 +4,11 @@
 package com.jetdrone.vertx.yoke.store;
 
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.eventbus.Message;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /** # RedisSessionStore */
 public class RedisSessionStore implements SessionStore {

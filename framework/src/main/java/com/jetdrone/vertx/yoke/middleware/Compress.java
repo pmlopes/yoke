@@ -7,7 +7,7 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.filters.DeflateWriterFilter;
 import com.jetdrone.vertx.yoke.middleware.filters.GZipWriterFilter;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import java.io.IOException;
 import java.util.regex.Pattern;

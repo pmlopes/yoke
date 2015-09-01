@@ -1,7 +1,7 @@
 package com.jetdrone.vertx.kitcms;
 
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.regex.Pattern;
 

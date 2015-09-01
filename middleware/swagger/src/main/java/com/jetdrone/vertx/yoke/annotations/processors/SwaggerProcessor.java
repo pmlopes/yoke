@@ -4,9 +4,9 @@ import com.jetdrone.vertx.yoke.json.JsonSchemaResolver;
 import com.jetdrone.vertx.yoke.annotations.*;
 import com.jetdrone.vertx.yoke.middleware.Swagger;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

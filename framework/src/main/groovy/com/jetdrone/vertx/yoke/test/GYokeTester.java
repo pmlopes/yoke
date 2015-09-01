@@ -5,12 +5,12 @@ package com.jetdrone.vertx.yoke.test;
 
 import com.jetdrone.vertx.yoke.GYoke;
 import groovy.lang.Closure;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
 import org.vertx.groovy.core.buffer.Buffer;
-import org.vertx.java.core.http.CaseInsensitiveMultiMap;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.http.CaseInsensitiveMultiMap;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;

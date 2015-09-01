@@ -4,7 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware.filters;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.io.OutputStream;

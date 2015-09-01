@@ -6,7 +6,7 @@ package com.jetdrone.vertx.yoke.core;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerRequest;
 
 import java.util.Map;
 

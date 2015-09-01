@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.json;
 
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.json.JsonArray;
 
 import java.util.HashSet;
 import java.util.List;

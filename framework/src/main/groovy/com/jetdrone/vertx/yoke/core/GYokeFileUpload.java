@@ -4,8 +4,8 @@
 package com.jetdrone.vertx.yoke.core;
 
 import groovy.lang.Closure;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 
 import java.nio.charset.Charset;
 

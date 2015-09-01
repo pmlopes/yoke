@@ -4,7 +4,7 @@
 package com.jetdrone.vertx.yoke.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import java.util.Iterator;
 

@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.json;
 
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Map;

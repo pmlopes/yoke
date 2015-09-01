@@ -5,8 +5,8 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.Handler;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.Handler;
 import org.vertx.java.platform.Verticle;
 
 public class YokeBench extends Verticle {

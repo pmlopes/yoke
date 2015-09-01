@@ -9,11 +9,11 @@
 //import org.mozilla.javascript.NativeJSON;
 //import org.mozilla.javascript.NativeObject;
 //import org.mozilla.javascript.Scriptable;
-//import org.vertx.java.core.MultiMap;
-//import org.vertx.java.core.json.JsonArray;
-//import org.vertx.java.core.json.JsonElement;
-//import org.vertx.java.core.json.JsonObject;
-//import org.vertx.java.core.json.impl.Json;
+//import io.vertx.core.MultiMap;
+//import io.vertx.core.json.JsonArray;
+//import io.vertx.core.json.JsonElement;
+//import io.vertx.core.json.JsonObject;
+//import io.vertx.core.json.impl.Json;
 //
 //import com.jetdrone.vertx.yoke.store.json.ChangeAwareJsonArray;
 //import com.jetdrone.vertx.yoke.store.json.ChangeAwareJsonElement;

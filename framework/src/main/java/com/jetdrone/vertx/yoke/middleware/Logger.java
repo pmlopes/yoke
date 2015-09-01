@@ -6,9 +6,9 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpVersion;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpVersion;
+import io.vertx.core.logging.impl.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.Date;

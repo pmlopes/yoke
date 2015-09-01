@@ -5,8 +5,8 @@ import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import com.jetdrone.vertx.yoke.json.JsonSchema;
 import com.jetdrone.vertx.yoke.json.JsonSchemaResolver;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

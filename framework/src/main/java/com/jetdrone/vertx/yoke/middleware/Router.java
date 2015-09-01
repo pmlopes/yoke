@@ -11,9 +11,9 @@ import com.jetdrone.vertx.yoke.jmx.RouteMBean;
 import com.jetdrone.vertx.yoke.util.AsyncIterator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.Vertx;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;

@@ -19,10 +19,10 @@ import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import org.mvel2.templates.CompiledTemplate;
 import org.mvel2.templates.TemplateCompiler;
 import org.mvel2.templates.TemplateRuntime;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.AsyncResultHandler;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.util.Map;

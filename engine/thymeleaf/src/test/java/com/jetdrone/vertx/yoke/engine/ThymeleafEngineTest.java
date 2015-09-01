@@ -7,7 +7,7 @@ import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 import org.vertx.testtools.TestVerticle;
 
 import static org.vertx.testtools.VertxAssert.*;

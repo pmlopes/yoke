@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import groovy.lang.Closure;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 

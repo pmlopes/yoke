@@ -9,7 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
-import org.vertx.java.core.json.*;
+import io.vertx.core.json.*;
 
 import java.io.IOException;
 import java.text.ParseException;

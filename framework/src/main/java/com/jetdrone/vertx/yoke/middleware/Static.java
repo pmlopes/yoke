@@ -7,10 +7,10 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.*;
-import org.vertx.java.core.file.FileProps;
-import org.vertx.java.core.file.FileSystem;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.*;
+import io.vertx.core.file.FileProps;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.json.JsonArray;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

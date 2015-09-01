@@ -4,11 +4,11 @@
 package com.jetdrone.vertx.yoke.core;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.file.FileSystem;
-import org.vertx.java.core.http.HttpServerFileUpload;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.http.HttpServerFileUpload;
 
 import java.io.File;
 import java.nio.charset.Charset;
