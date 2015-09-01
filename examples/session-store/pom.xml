@@ -86,41 +86,6 @@
                 <artifactId>groovy-eclipse-compiler</artifactId>
                 <extensions>true</extensions>
             </plugin>
-            <!-- The vert.x Maven plugin -->
-            <plugin>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-maven-plugin</artifactId>
-                <configuration>
-                    <configFile>${project.basedir}/conf.json</configFile>
-                </configuration>
-                <!-- Make sure that the plugin uses the vert.x versions from this pom.xml not from its own pom.xml -->
-                <dependencies>
-                    <dependency>
-                        <groupId>io.vertx</groupId>
-                        <artifactId>vertx-platform</artifactId>
-                        <version>${vertx.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.vertx</groupId>
-                        <artifactId>vertx-core</artifactId>
-                        <version>${vertx.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>io.vertx</groupId>
-                        <artifactId>vertx-hazelcast</artifactId>
-                        <version>${vertx.version}</version>
-                    </dependency>
-                </dependencies>
-                <executions>
-                    <execution>
-                        <id>PullInDeps</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>pullInDeps</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

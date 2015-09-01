@@ -96,16 +96,6 @@
         <maven.compiler.testTarget>1.8</maven.compiler.testTarget>
         <maven.compiler.testSource>1.8</maven.compiler.testSource>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Set pullInDeps to true if you want any modules specified in the 'includes' and 'deploys' fields
-               in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
-               module won't download and install those dependencies at run-time when they're first requested. -->
-        <vertx.pullInDeps>false</vertx.pullInDeps>
-        <!-- Set createFatJar to true if you want to create a fat executable jar which contains the Vert.x binaries
-        along with the module so it can be run with java -jar <jarname> -->
-        <vertx.createFatJar>false</vertx.createFatJar>
-        <!-- The directory where the module will be assembled - you can override this on the command line
-        with -Dmods.directory=mydir -->
-        <mods.directory>target/mods</mods.directory>
         <!-- Plugin versions -->
         <cobertura.plugin.version>2.6</cobertura.plugin.version>
         <!-- Dependency versions -->
@@ -186,11 +176,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>2.5.3</version>
-                </plugin>
-                <plugin>
-                    <groupId>io.vertx</groupId>
-                    <artifactId>vertx-maven-plugin</artifactId>
-                    <version>2.0.11-final</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
