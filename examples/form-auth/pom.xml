@@ -15,8 +15,6 @@
     <name>example-form-auth</name>
 
     <properties>
-        <!--Vertx module name-->
-        <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
         <sonar.sources>src/main</sonar.sources>
         <sonar.tests>src/test,target/generated-sources</sonar.tests>
         <!--<sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>-->
