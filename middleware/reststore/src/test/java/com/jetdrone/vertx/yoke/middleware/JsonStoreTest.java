@@ -5,7 +5,6 @@ import com.jetdrone.vertx.yoke.test.Response;
 import com.jetdrone.vertx.yoke.test.YokeTester;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import org.vertx.groovy.core.http.HttpClientRequest;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.buffer.Buffer;

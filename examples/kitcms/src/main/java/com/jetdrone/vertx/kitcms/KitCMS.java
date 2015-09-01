@@ -69,9 +69,9 @@ public class KitCMS extends Verticle {
 
                                 for (int i = 0; i < json.size(); i++) {
                                     keys.append("<li data-value=\"");
-                                    keys.append(json.get(i));
+                                    keys.append((String) json.get(i));
                                     keys.append("\">");
-                                    keys.append(json.get(i));
+                                    keys.append((String) json.get(i));
                                     keys.append("</li>");
                                 }
 

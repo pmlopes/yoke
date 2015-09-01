@@ -100,10 +100,10 @@
         <cobertura.plugin.version>2.6</cobertura.plugin.version>
         <!-- Dependency versions -->
         <vertx.version>2.1.5</vertx.version>
-        <groovy.version>2.3.3</groovy.version>
-        <!-- Groovy compiler -->
-        <groovy.eclipse.batch.version>2.3.7-01</groovy.eclipse.batch.version>
-        <groovy.eclipse.compiler.version>2.9.1-01</groovy.eclipse.compiler.version>
+        <!--<groovy.version>2.3.3</groovy.version>-->
+        <!--&lt;!&ndash; Groovy compiler &ndash;&gt;-->
+        <!--<groovy.eclipse.batch.version>2.3.7-01</groovy.eclipse.batch.version>-->
+        <!--<groovy.eclipse.compiler.version>2.9.1-01</groovy.eclipse.compiler.version>-->
     </properties>
 
     <distributionManagement>
@@ -124,7 +124,7 @@
                 <module>examples/cluster-benchmark</module>
                 <module>examples/dojo-reststore</module>
                 <module>examples/form-auth</module>
-                <module>examples/groovy</module>
+                <!--<module>examples/groovy</module>-->
                 <module>examples/javascript</module>
                 <module>examples/kitcms</module>
                 <module>examples/mozilla-persona</module>

@@ -19,7 +19,7 @@
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
         <sonar.sources>src/main</sonar.sources>
         <sonar.tests>src/test,target/generated-sources</sonar.tests>
-        <sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>
+        <!--<sonar.groovy.cobertura.reportPath>target/site/cobertura/coverage.xml</sonar.groovy.cobertura.reportPath>-->
     </properties>
 
     <dependencies>
@@ -34,12 +34,12 @@
             <artifactId>yoke.middleware.swagger</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>${groovy.version}</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.codehaus.groovy</groupId>-->
+            <!--<artifactId>groovy-all</artifactId>-->
+            <!--<version>${groovy.version}</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
@@ -52,12 +52,12 @@
             <version>${vertx.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>lang-groovy</artifactId>
-            <version>2.1.1-final</version>
-            <scope>provided</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>io.vertx</groupId>-->
+            <!--<artifactId>lang-groovy</artifactId>-->
+            <!--<version>2.1.1-final</version>-->
+            <!--<scope>provided</scope>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>testtools</artifactId>
@@ -77,27 +77,27 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerId>groovy-eclipse-compiler</compilerId>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-eclipse-batch</artifactId>
-                        <version>${groovy.eclipse.batch.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.codehaus.groovy</groupId>
-                        <artifactId>groovy-eclipse-compiler</artifactId>
-                        <version>${groovy.eclipse.compiler.version}</version>
-                    </dependency>
-                </dependencies>
+                <!--<configuration>-->
+                    <!--<compilerId>groovy-eclipse-compiler</compilerId>-->
+                <!--</configuration>-->
+                <!--<dependencies>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.codehaus.groovy</groupId>-->
+                        <!--<artifactId>groovy-eclipse-batch</artifactId>-->
+                        <!--<version>${groovy.eclipse.batch.version}</version>-->
+                    <!--</dependency>-->
+                    <!--<dependency>-->
+                        <!--<groupId>org.codehaus.groovy</groupId>-->
+                        <!--<artifactId>groovy-eclipse-compiler</artifactId>-->
+                        <!--<version>${groovy.eclipse.compiler.version}</version>-->
+                    <!--</dependency>-->
+                <!--</dependencies>-->
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.groovy</groupId>
-                <artifactId>groovy-eclipse-compiler</artifactId>
-                <extensions>true</extensions>
-            </plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.codehaus.groovy</groupId>-->
+                <!--<artifactId>groovy-eclipse-compiler</artifactId>-->
+                <!--<extensions>true</extensions>-->
+            <!--</plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
