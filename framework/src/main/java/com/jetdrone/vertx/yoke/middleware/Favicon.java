@@ -12,6 +12,7 @@ import org.vertx.java.core.buffer.Buffer;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class Favicon extends Middleware {
 
             try {
                 MessageDigest md = MessageDigest.getInstance("MD5");
-                headers.put("etag", "\"" + Utils.base64(md.digest(buffer.getBytes())) + "\"");
+                headers.put("etag", "\"" + Base64.getEncoder().encodeToString(md.digest(buffer.getBytes())) + "\"");
             } catch (NoSuchAlgorithmException e) {
                 // ignore
             }

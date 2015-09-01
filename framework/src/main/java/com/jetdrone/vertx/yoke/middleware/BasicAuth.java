@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
 
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 /**
  * # BasicAuth
@@ -146,7 +146,7 @@ public class BasicAuth extends Middleware {
             try {
                 String[] parts = authorization.split(" ");
                 scheme = parts[0];
-                String[] credentials = new String(DatatypeConverter.parseBase64Binary(parts[1])).split(":");
+                String[] credentials = new String(Base64.getDecoder().decode(parts[1])).split(":");
                 user = credentials[0];
                 // when the header is: "user:"
                 pass = credentials.length > 1 ? credentials[1] : null;

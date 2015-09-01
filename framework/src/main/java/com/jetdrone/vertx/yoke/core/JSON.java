@@ -10,10 +10,10 @@ import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import org.vertx.java.core.json.*;
-import org.vertx.java.core.json.impl.Base64;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +76,7 @@ public final class JSON {
                 if (value == null) {
                     jgen.writeNull();
                 } else {
-                    jgen.writeString(Base64.encodeBytes(value));
+                    jgen.writeString(Base64.getEncoder().encodeToString(value));
                 }
             }
         });
