@@ -131,7 +131,7 @@ public class Favicon extends Middleware {
             if (path == null) {
                 icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {
-                icon = new Icon(fileSystem().readFileSync(path));
+                icon = new Icon(fileSystem().readFileBlocking(path));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -144,7 +144,7 @@ public class Favicon extends Middleware {
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if ("/favicon.ico".equals(request.normalizedPath())) {
-            request.response().headers().set(icon.headers);
+            request.response().headers().setAll(icon.headers);
             request.response().end(icon.body);
         } else {
             next.handle(null);

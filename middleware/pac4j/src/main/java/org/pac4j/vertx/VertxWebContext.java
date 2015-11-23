@@ -15,6 +15,8 @@
  */
 package org.pac4j.vertx;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,7 +77,7 @@ public class VertxWebContext implements WebContext {
     @Override
     public void setSessionAttribute(String name, Object value) {
         JsonObject session = request.get("session");
-        session.putValue(name, value);
+        session.put(name, value);
     }
 
     @Override
@@ -86,7 +88,7 @@ public class VertxWebContext implements WebContext {
 
     @Override
     public String getRequestMethod() {
-        return request.method();
+        return request.method().name();
     }
 
     @Override
@@ -124,7 +126,11 @@ public class VertxWebContext implements WebContext {
 
     @Override
     public String getScheme() {
-        return request.absoluteURI().getScheme();
+        try {
+            return new URL(request.absoluteURI()).getProtocol();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

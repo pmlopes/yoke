@@ -122,7 +122,7 @@ public final class JsonSchemaResolver {
                     throw new RuntimeException("Unknown Protocol: " + scheme);
             }
 
-            final Schema schema = new Schema(json.toMap(), ref);
+            final Schema schema = new Schema(json.getMap(), ref);
             final String schemaId = schema.getId();
 
             if (schemaId != null) {
@@ -160,8 +160,8 @@ public final class JsonSchemaResolver {
                 final JsonObject json = new JsonObject(writer.toString());
                 final String fragment = uri.getFragment();
                 if (fragment != null) {
-                    if (json.containsField(fragment)) {
-                        return json.getObject(fragment);
+                    if (json.containsKey(fragment)) {
+                        return json.getJsonObject(fragment);
                     } else {
                         throw new RuntimeException("Fragment #" + fragment + " not found!");
                     }
@@ -197,8 +197,8 @@ public final class JsonSchemaResolver {
                     JsonObject subjson = json;
 
                     for (int i = "".equals(nodes[0]) ? 1 : 0 ; i < nodes.length; i++) {
-                        if (subjson.containsField(nodes[i])) {
-                            subjson = subjson.getObject(nodes[i]);
+                        if (subjson.containsKey(nodes[i])) {
+                            subjson = subjson.getJsonObject(nodes[i]);
                         } else {
                             throw new RuntimeException("Fragment Node #" + nodes[i] + " not found!");
                         }
@@ -233,8 +233,8 @@ public final class JsonSchemaResolver {
                 final JsonObject json = new JsonObject(writer.toString());
                 final String fragment = uri.getFragment();
                 if (fragment != null) {
-                    if (json.containsField(fragment)) {
-                        return json.getObject(fragment);
+                    if (json.containsKey(fragment)) {
+                        return json.getJsonObject(fragment);
                     } else {
                         throw new RuntimeException("Fragment #" + fragment + " not found!");
                     }

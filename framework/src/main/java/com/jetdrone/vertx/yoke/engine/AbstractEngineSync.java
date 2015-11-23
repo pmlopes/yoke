@@ -49,9 +49,9 @@ public abstract class AbstractEngineSync<T> implements Engine {
         final FileSystem fileSystem = vertx.fileSystem();
 
         try {
-            FileProps fileProps = fileSystem.propsSync(filename);
+            FileProps fileProps = fileSystem.propsBlocking(filename);
             LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
-            final Date lastModified = fileProps.lastModifiedTime();
+            final long lastModified = fileProps.lastModifiedTime();
 
             if (cacheEntry == null) {
                 return false;
@@ -83,11 +83,11 @@ public abstract class AbstractEngineSync<T> implements Engine {
     private void loadToCache(final String filename) {
         final FileSystem fileSystem = vertx.fileSystem();
 
-        if (fileSystem.existsSync(filename)) {
-            FileProps fileProps = fileSystem.propsSync(filename);
-            final Date lastModified = fileProps.lastModifiedTime();
+        if (fileSystem.existsBlocking(filename)) {
+            FileProps fileProps = fileSystem.propsBlocking(filename);
+            final long lastModified = fileProps.lastModifiedTime();
             // load from the file system
-            Buffer content = fileSystem.readFileSync(filename);
+            Buffer content = fileSystem.readFileBlocking(filename);
             // cache the result
             cache.put(filename, new LRUCache.CacheEntry<String, T>(lastModified, content.toString(contentEncoding())));
         }

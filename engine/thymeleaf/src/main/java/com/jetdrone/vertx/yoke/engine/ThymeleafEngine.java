@@ -79,11 +79,11 @@ public class ThymeleafEngine implements Engine {
             @Override
             public InputStream getResourceAsStream(TemplateProcessingParameters templateProcessingParameters, String resourceName) {
 
-                if (!fs.existsSync(resourceName)) {
+                if (!fs.existsBlocking(resourceName)) {
                     return null;
                 }
 
-                final Buffer buffer = fs.readFileSync(resourceName);
+                final Buffer buffer = fs.readFileBlocking(resourceName);
 
                 return new InputStream() {
                     int pos = 0;
@@ -142,7 +142,7 @@ public class ThymeleafEngine implements Engine {
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
 
-        final Buffer buffer = new Buffer();
+        final Buffer buffer = Buffer.buffer();
 
         try {
             engine.process(filename, toIContext(context), new Writer() {

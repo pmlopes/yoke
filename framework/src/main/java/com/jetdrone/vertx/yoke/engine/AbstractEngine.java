@@ -14,9 +14,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileProps;
 import io.vertx.core.file.FileSystem;
 
-import java.util.Date;
-import java.util.Map;
-
 /**
  * # AbstractEngine
  *
@@ -61,7 +58,7 @@ public abstract class AbstractEngine<T> implements Engine {
                     next.handle(false);
                 } else {
                     LRUCache.CacheEntry<String, T> cacheEntry = cache.get(filename);
-                    final Date lastModified = asyncResult.result().lastModifiedTime();
+                    final long lastModified = asyncResult.result().lastModifiedTime();
 
                     if (cacheEntry == null) {
                         next.handle(false);
@@ -88,7 +85,7 @@ public abstract class AbstractEngine<T> implements Engine {
                 if (asyncResult.failed()) {
                     next.handle(asyncResult.cause());
                 } else {
-                    final Date lastModified = asyncResult.result().lastModifiedTime();
+                    final long lastModified = asyncResult.result().lastModifiedTime();
                     // load from the file system
                     fileSystem.readFile(filename, new AsyncResultHandler<Buffer>() {
                         @Override

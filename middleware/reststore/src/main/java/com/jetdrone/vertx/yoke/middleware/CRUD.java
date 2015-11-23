@@ -6,7 +6,7 @@ import io.vertx.core.json.JsonObject;
 public class CRUD {
 
     public static interface Handler {
-        void handle(@NotNull YokeRequest request, @NotNull final JsonObject filter, @NotNull final org.vertx.java.core.Handler<JsonObject> next);
+        void handle(@NotNull YokeRequest request, @NotNull final JsonObject filter, @NotNull final io.vertx.core.Handler<JsonObject> next);
     }
 
     Handler createHandler;

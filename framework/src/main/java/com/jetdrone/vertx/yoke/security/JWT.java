@@ -140,8 +140,8 @@ public final class JWT {
 
         // header, typ is fixed value.
         JsonObject header = new JsonObject()
-                .putString("typ", "JWT")
-                .putString("alg", algorithm);
+                .put("typ", "JWT")
+                .put("alg", algorithm);
 
 
         // create segments, all segment should be base64 string

@@ -61,7 +61,7 @@ public class MVELEngine extends AbstractEngine<CompiledTemplate> {
                 } else {
                     try {
                         CompiledTemplate template = compile(prefix + filename, asyncResult.result());
-                        next.handle(new YokeAsyncResult<>(new Buffer((String) TemplateRuntime.execute(template, context))));
+                        next.handle(new YokeAsyncResult<>(Buffer.buffer((String) TemplateRuntime.execute(template, context))));
                     } catch (IOException ex) {
                         next.handle(new YokeAsyncResult<Buffer>(ex));
                     }

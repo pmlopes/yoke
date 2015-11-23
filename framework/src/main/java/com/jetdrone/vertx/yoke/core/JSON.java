@@ -15,8 +15,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 /**
  * # JSON
@@ -120,29 +118,6 @@ public final class JSON {
         try {
             // Untyped List/Map
             return (R) MAPPER.readValue(source, Object.class);
-        } catch (IOException | RuntimeException e) {
-            throw new DecodeException(e.getMessage());
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static JsonElement decodeElement(String source) {
-        if (source == null) {
-            return null;
-        }
-
-        try {
-            // Untyped List/Map
-            Object json = MAPPER.readValue(source, Object.class);
-
-            if (json instanceof List) {
-                return new JsonArray((List) json);
-            }
-            if (json instanceof Map) {
-                return new JsonObject((Map) json);
-            }
-
-            throw new DecodeException("Cannot cast to JsonElement");
         } catch (IOException | RuntimeException e) {
             throw new DecodeException(e.getMessage());
         }

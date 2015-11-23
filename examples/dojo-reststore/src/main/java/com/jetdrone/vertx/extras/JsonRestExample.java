@@ -3,10 +3,10 @@ package com.jetdrone.vertx.extras;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.*;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
-import org.vertx.java.platform.Verticle;
 
-public class JsonRestExample extends Verticle {
+public class JsonRestExample extends AbstractVerticle {
 
     @Override
     public void start() {
@@ -19,7 +19,7 @@ public class JsonRestExample extends Verticle {
         final InMemoryStore db = new InMemoryStore();
 
         // preload states from config
-        db.bulkLoad("states", "id", container.config().getArray("states"));
+        db.bulkLoad("states", "id", config().getJsonArray("states"));
 
         yoke.use(new JsonRestRouter(db)
                 .rest("/states", "states")
@@ -36,6 +36,6 @@ public class JsonRestExample extends Verticle {
 
         yoke.listen(8080);
 
-        container.logger().info("Yoke server listening on port 8080");
+        System.out.println("Yoke server listening on port 8080");
     }
 }

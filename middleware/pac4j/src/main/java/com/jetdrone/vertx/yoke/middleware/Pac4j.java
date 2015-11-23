@@ -45,7 +45,7 @@ public class Pac4j extends Middleware {
             final String requestedUrlToSave = webContext.getFullRequestURL();
 
             // this gets saved in the end of the request
-            session.putString("pac4jRequestedUrl", requestedUrlToSave);
+            session.put("pac4jRequestedUrl", requestedUrlToSave);
 
             try {
                 RedirectAction action = client.getRedirectAction(webContext, true, isAjax);

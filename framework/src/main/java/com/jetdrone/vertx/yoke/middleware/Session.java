@@ -5,12 +5,12 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import javax.crypto.Mac;
 
+import io.vertx.core.json.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import io.vertx.core.Handler;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.core.YokeCookie;
-import com.jetdrone.vertx.yoke.store.json.SessionObject;
 
 /**
  * # Session
@@ -57,7 +57,7 @@ public class Session extends Middleware {
         cookie.setMaxAge(maxAge);
 
         // path validation mismatch
-        if (request.normalizedPath().indexOf(cookie.getPath()) != 0) {
+        if (request.normalizedPath().indexOf(cookie.path()) != 0) {
             next.handle(null);
             return;
         }
@@ -85,7 +85,7 @@ public class Session extends Middleware {
         response.headersHandler(new Handler<Void>() {
             @Override
             public void handle(Void done) {
-            	SessionObject session = request.get("session");
+            	JsonObject session = request.get("session");
                 String sessionId = session == null ? null : session.getString("id");
 
                 // removed

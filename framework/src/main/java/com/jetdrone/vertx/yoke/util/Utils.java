@@ -32,7 +32,7 @@ public final class Utils {
      */
     public static Buffer readResourceToBuffer(@NotNull Class<?> clazz, @NotNull String resource) {
         try {
-            Buffer buffer = new Buffer(0);
+            Buffer buffer = Buffer.buffer(0);
 
             try (InputStream in = clazz.getResourceAsStream(resource)) {
                 int read;
@@ -160,7 +160,7 @@ public final class Utils {
 
     private static void jsonToXml(XMLStreamWriter writer, JsonObject json, String name) throws XMLStreamException {
         // get all field names
-        Set<String> fields = json.getFieldNames();
+        Set<String> fields = json.fieldNames();
 
         if (fields.size() == 0) {
             // start with element name
@@ -171,7 +171,7 @@ public final class Utils {
         // start with element name
         writer.writeStartElement(name);
         for (String field : fields) {
-            Object value = json.getField(field);
+            Object value = json.getValue(field);
             if (value != null) {
                 if (value instanceof JsonObject) {
                     // process child
@@ -200,7 +200,7 @@ public final class Utils {
         }
 
         for (int i = 0 ; i < json.size(); i++) {
-            Object element = json.get(i);
+            Object element = json.getValue(i);
 
             if (element == null) {
                 writer.writeEmptyElement(name);

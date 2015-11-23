@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
 
@@ -101,21 +102,21 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             int len = finalNotes.length() - 1;
             len = len > 0 ? len : 0;
             finalNotes = finalNotes.substring(0, len);
-            operations.putString("notes", finalNotes);
+            operations.put("notes", finalNotes);
         }
 
         // add nickname (deducted from the method name)
-        operations.putString("nickname", method.getName());
+        operations.put("nickname", method.getName());
 
         DataType returnType = doc.type();
 
         if (returnType == DataType.REF) {
-            operations.putString("type", doc.refId());
+            operations.put("type", doc.refId());
         } else {
-            operations.putString("type", returnType.type());
+            operations.put("type", returnType.type());
             String format = returnType.format();
             if (format != null) {
-                operations.putString("format", format);
+                operations.put("format", format);
             }
         }
 
@@ -124,44 +125,44 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         // add parameters
         if (doc.parameters().length > 0) {
             JsonArray jsonParameters = new JsonArray();
-            operations.putArray("parameters", jsonParameters);
+            operations.put("parameters", jsonParameters);
 
             for (Parameter parameter : doc.parameters()) {
-                jsonParameters.addObject(parseParameter(parameter, clazzConsumesAnn, consumesAnn));
+                jsonParameters.add(parseParameter(parameter, clazzConsumesAnn, consumesAnn));
             }
         }
 
         // add response messages
         if (doc.responseMessages().length > 0) {
             JsonArray jsonResponseMessages = new JsonArray();
-            operations.putArray("responseMessages", jsonResponseMessages);
+            operations.put("responseMessages", jsonResponseMessages);
 
             for (ResponseMessage responseMessage : doc.responseMessages()) {
                 JsonObject json = new JsonObject()
-                        .putNumber("code", responseMessage.code())
-                        .putString("message", responseMessage.message());
+                        .put("code", responseMessage.code())
+                        .put("message", responseMessage.message());
 
                 if (!responseMessage.responseModel().equals("")) {
-                    json.putString("responseModel", responseMessage.responseModel());
+                    json.put("responseModel", responseMessage.responseModel());
                 }
 
-                jsonResponseMessages.addObject(json);
+                jsonResponseMessages.add(json);
             }
         }
 
         // produces
         if (produces != null) {
-            operations.putArray("produces", new JsonArray(produces));
+            operations.put("produces", new JsonArray(Arrays.asList(produces)));
         }
 
         // consumes
         if (consumes != null) {
-            operations.putArray("consumes", new JsonArray(consumes));
+            operations.put("consumes", new JsonArray(Arrays.asList(consumes)));
         }
 
         if (deprecated != null) {
             // TODO: once SWAGGER API changes this should be boolean
-            operations.putString("deprecated", "true");
+            operations.put("deprecated", "true");
         }
 
         // process the methods that have both YokeRequest and Handler
@@ -205,45 +206,45 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
         final JsonObject response = new JsonObject();
 
         // must be lower case
-        response.putString("paramType", parameter.paramType().name().toLowerCase());
-        response.putString("name", parameter.name());
+        response.put("paramType", parameter.paramType().name().toLowerCase());
+        response.put("name", parameter.name());
         // recommended
         String description = parameter.description();
         if (!description.equals("")) {
-            response.putString("description", parameter.description());
+            response.put("description", parameter.description());
         }
         // optional
-        response.putBoolean("required", parameter.required());
-        response.putBoolean("allowMultiple", parameter.allowMultiple());
+        response.put("required", parameter.required());
+        response.put("allowMultiple", parameter.allowMultiple());
 
         // describe the type
         final DataType type = parameter.type();
 
         switch (type) {
             case REF:
-                response.putString("type", parameter.modelRef());
+                response.put("type", parameter.modelRef());
                 break;
             // primitives
             case INTEGER:
             case LONG:
             case FLOAT:
             case DOUBLE:
-                response.putString("type", type.type());
+                response.put("type", type.type());
                 if (type.format() != null) {
-                    response.putString("format", type.format());
+                    response.put("format", type.format());
                 }
                 if (!parameter.minimum().equals("")) {
-                    response.putString("minimum", parameter.minimum());
+                    response.put("minimum", parameter.minimum());
                 }
                 if (!parameter.maximum().equals("")) {
-                    response.putString("maximum", parameter.maximum());
+                    response.put("maximum", parameter.maximum());
                 }
                 if (!parameter.defaultValue().equals("")) {
                     String val = parameter.defaultValue();
                     if (val.indexOf('.') != -1) {
-                        response.putNumber("defaultValue", Double.parseDouble(parameter.defaultValue()));
+                        response.put("defaultValue", Double.parseDouble(parameter.defaultValue()));
                     } else {
-                        response.putNumber("defaultValue", Integer.parseInt(parameter.defaultValue()));
+                        response.put("defaultValue", Integer.parseInt(parameter.defaultValue()));
                     }
                 }
                 break;
@@ -251,41 +252,41 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
             case STRING:
             case DATE:
             case DATETIME:
-                response.putString("type", type.type());
+                response.put("type", type.type());
                 if (type.format() != null) {
-                    response.putString("format", type.format());
+                    response.put("format", type.format());
                 }
                 if (!parameter.defaultValue().equals("")) {
-                    response.putString("defaultValue", parameter.defaultValue());
+                    response.put("defaultValue", parameter.defaultValue());
                 }
                 if (!parameter.minimum().equals("")) {
-                    response.putString("minimum", parameter.minimum());
+                    response.put("minimum", parameter.minimum());
                 }
                 if (!parameter.maximum().equals("")) {
-                    response.putString("maximum", parameter.maximum());
+                    response.put("maximum", parameter.maximum());
                 }
                 if (parameter.enumeration().length > 0) {
                     JsonArray enumeration = new JsonArray();
-                    response.putArray("enum", enumeration);
+                    response.put("enum", enumeration);
                     for (String item : parameter.enumeration()) {
-                        enumeration.addString(item);
+                        enumeration.add(item);
                     }
                 }
                 break;
             case BOOLEAN:
-                response.putString("type", type.type());
+                response.put("type", type.type());
                 if (!parameter.defaultValue().equals("")) {
-                    response.putBoolean("defaultValue", Boolean.parseBoolean(parameter.defaultValue()));
+                    response.put("defaultValue", Boolean.parseBoolean(parameter.defaultValue()));
                 }
                 break;
             // containers
             case SET:
-                response.putBoolean("uniqueItems", true);
+                response.put("uniqueItems", true);
             case ARRAY:
-                response.putString("type", type.type());
+                response.put("type", type.type());
                 if (parameter.items() == DataType.UNDEFINED) {
                     if (!"".equals(parameter.itemsRefId())) {
-                        response.putObject("items", new JsonObject().putString("$ref", parameter.itemsRefId()));
+                        response.put("items", new JsonObject().put("$ref", parameter.itemsRefId()));
                     } else {
                         throw new RuntimeException("ARRAY/SET must specify items type or items refId");
                     }
@@ -294,23 +295,23 @@ public class SwaggerProcessor extends AbstractAnnotationHandler<Swagger> {
                         throw new RuntimeException("ARRAY/SET cannot contain ARRAYS/SETs");
                     } else {
                         if (parameter.items() == DataType.REF) {
-                            response.putObject("items", new JsonObject()
-                                    .putString("$ref", parameter.modelRef()));
+                            response.put("items", new JsonObject()
+                                    .put("$ref", parameter.modelRef()));
                         } else {
-                            response.putObject("items", new JsonObject()
-                                    .putString("type", parameter.items().type())
-                                    .putString("format", parameter.items().format()));
+                            response.put("items", new JsonObject()
+                                    .put("type", parameter.items().type())
+                                    .put("format", parameter.items().format()));
                         }
                     }
                 }
                 break;
             // void
             case VOID:
-                response.putString("type", type.type());
+                response.put("type", type.type());
                 break;
             // file
             case FILE:
-                response.putString("type", type.type());
+                response.put("type", type.type());
                 if (parameter.paramType() != ParamType.FORM) {
                     throw new RuntimeException("File requires paramType to be FORM");
                 }

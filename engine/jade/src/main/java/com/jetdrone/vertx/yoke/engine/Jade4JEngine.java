@@ -91,7 +91,7 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
                 putTemplateToCache(resolve(filename), template);
             }
 
-            next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));
+            next.handle(new YokeAsyncResult<>(Buffer.buffer(config.renderTemplate(template, context))));
         } catch (Exception ex) {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));

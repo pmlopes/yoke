@@ -144,7 +144,7 @@ public class ErrorHandler extends Middleware {
 
             response.setContentType("text/html");
             response.end(
-                    errorTemplate.replace("{title}", (String) request.get("title"))
+                    errorTemplate.replace("{title}", request.get("title"))
                             .replace("{errorCode}", Integer.toString(errorCode))
                             .replace("{errorMessage}", errorMessage == null ? "" : errorMessage)
                             .replace("{stackTrace}", stack.toString())
@@ -154,20 +154,20 @@ public class ErrorHandler extends Middleware {
 
         if (mime.startsWith("application/json")) {
             JsonObject jsonError = new JsonObject();
-            JsonObject jsonErrorMessage = new JsonObject().putNumber("code", errorCode);
+            JsonObject jsonErrorMessage = new JsonObject().put("code", errorCode);
 
-            jsonError.putObject("error", jsonErrorMessage);
+            jsonError.put("error", jsonErrorMessage);
 
             if (errorMessage != null) {
-                jsonError.putString("message", errorMessage);
+                jsonError.put("message", errorMessage);
             }
 
             if (!stackTrace.isEmpty()) {
                 JsonArray stack = new JsonArray();
                 for (String t : stackTrace) {
-                    stack.addString(t);
+                    stack.add(t);
                 }
-                jsonError.putArray("stack", stack);
+                jsonError.put("stack", stack);
             }
             response.setContentType("application/json", "UTF-8");
             response.end(jsonError.encode());

@@ -20,7 +20,7 @@ public final class ObjectValidator {
 
         // from now on work with maps
         if (instance instanceof JsonObject) {
-            instance = ((JsonObject) instance).toMap();
+            instance = ((JsonObject) instance).getMap();
         }
 
         final Map object = (Map) instance;

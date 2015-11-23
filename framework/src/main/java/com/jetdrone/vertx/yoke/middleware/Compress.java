@@ -6,6 +6,7 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.filters.DeflateWriterFilter;
 import com.jetdrone.vertx.yoke.middleware.filters.GZipWriterFilter;
+import io.vertx.core.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
 import io.vertx.core.Handler;
 
@@ -47,14 +48,14 @@ public class Compress extends Middleware {
 
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
-        final String method = request.method();
+        final HttpMethod method = request.method();
         final YokeResponse response = request.response();
 
         // vary
         response.putHeader("vary", "accept-encoding");
 
         // head requests are not compressed
-        if ("HEAD".equals(method)) {
+        if (HttpMethod.HEAD == method) {
             next.handle(null);
             return;
         }

@@ -124,7 +124,7 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
                 putTemplateToCache(resolve(filename), template);
             }
 
-            next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
+            next.handle(new YokeAsyncResult<>(Buffer.buffer(template.apply(context))));
         } catch (Exception ex) {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));

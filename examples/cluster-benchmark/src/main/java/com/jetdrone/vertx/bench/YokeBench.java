@@ -3,10 +3,10 @@ package com.jetdrone.vertx.bench;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
-import org.vertx.java.platform.Verticle;
 
-public class YokeBench extends Verticle {
+public class YokeBench extends AbstractVerticle {
 
     @Override
     public void start() {

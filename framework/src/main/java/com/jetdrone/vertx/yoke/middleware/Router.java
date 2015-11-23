@@ -107,31 +107,31 @@ public class Router extends Middleware {
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
 
         switch (request.method()) {
-            case "GET":
+            case GET:
                 route(request, next, getBindings);
                 break;
-            case "PUT":
+            case PUT:
                 route(request, next, putBindings);
                 break;
-            case "POST":
+            case POST:
                 route(request, next, postBindings);
                 break;
-            case "DELETE":
+            case DELETE:
                 route(request, next, deleteBindings);
                 break;
-            case "OPTIONS":
+            case OPTIONS:
                 route(request, next, optionsBindings);
                 break;
-            case "HEAD":
+            case HEAD:
                 route(request, next, headBindings);
                 break;
-            case "TRACE":
+            case TRACE:
                 route(request, next, traceBindings);
                 break;
-            case "PATCH":
+            case PATCH:
                 route(request, next, patchBindings);
                 break;
-            case "CONNECT":
+            case CONNECT:
                 route(request, next, connectBindings);
                 break;
         }

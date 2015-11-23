@@ -333,9 +333,9 @@ public class JsonRestRouter extends Router {
                             sortArgs = sort.group(1).split(",");
                             for (String arg : sortArgs) {
                                 if (arg.charAt(0) == '+' || arg.charAt(0) == ' ') {
-                                    dbsort.putNumber(arg.substring(1), 1);
+                                    dbsort.put(arg.substring(1), 1);
                                 } else if (arg.charAt(0) == '-') {
-                                    dbsort.putNumber(arg.substring(1), -1);
+                                    dbsort.put(arg.substring(1), -1);
                                 }
                             }
                             continue;
@@ -345,15 +345,15 @@ public class JsonRestRouter extends Router {
                             sortArgs = entry.getValue().split(",");
                             for (String arg : sortArgs) {
                                 if (arg.charAt(0) == '+' || arg.charAt(0) == ' ') {
-                                    dbsort.putNumber(arg.substring(1), 1);
+                                    dbsort.put(arg.substring(1), 1);
                                 } else if (arg.charAt(0) == '-') {
-                                    dbsort.putNumber(arg.substring(1), -1);
+                                    dbsort.put(arg.substring(1), -1);
                                 }
                             }
                             continue;
                         }
                     }
-                    dbquery.putString(entry.getKey(), entry.getValue());
+                    dbquery.put(entry.getKey(), entry.getValue());
                 }
 
                 store.query(idName, dbquery, start, end, dbsort, new AsyncResultHandler<JsonArray>() {

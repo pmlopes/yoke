@@ -47,7 +47,7 @@ public class BasicAuth extends Middleware {
             public void handle(String _username, String _password, Handler<JsonObject> result) {
                 boolean success = username.equals(_username) && password.equals(_password);
                 if (success) {
-                    result.handle(new JsonObject().putString("username", _username));
+                    result.handle(new JsonObject().put("username", _username));
                 } else {
                     result.handle(null);
                 }

@@ -5,13 +5,13 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.AuthHandler;
 import com.jetdrone.vertx.yoke.middleware.FormAuth;
 import com.jetdrone.vertx.yoke.middleware.*;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
 
 import javax.crypto.Mac;
 
-public class FormAuthExample extends Verticle {
+public class FormAuthExample extends AbstractVerticle {
 
     @Override
     public void start() {
@@ -29,7 +29,7 @@ public class FormAuthExample extends Verticle {
             @Override
             public void handle(String username, String password, Handler<JsonObject> result) {
                 if ("foo".equals(username) && "bar".equals(password)) {
-                    result.handle(new JsonObject().putString("username", "foo"));
+                    result.handle(new JsonObject().put("username", "foo"));
                 } else {
                     result.handle(null);
                 }

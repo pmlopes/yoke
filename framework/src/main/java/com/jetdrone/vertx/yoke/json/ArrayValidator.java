@@ -21,7 +21,7 @@ public final class ArrayValidator {
 
         // from now on work with lists
         if (instance instanceof JsonArray) {
-            instance = ((JsonArray) instance).toList();
+            instance = ((JsonArray) instance).getList();
         }
 
         final List array = (List) instance;

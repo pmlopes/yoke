@@ -158,7 +158,7 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
             }
         }
 
-        return new Buffer(buf.toString());
+        return Buffer.buffer(buf.toString());
     }
 
     private static int findPlaceholderEndIndex(CharSequence buf, int startIndex) {

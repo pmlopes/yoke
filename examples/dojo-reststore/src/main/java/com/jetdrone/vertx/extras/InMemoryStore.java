@@ -28,7 +28,7 @@ public class InMemoryStore implements Store {
 
         for (Object _state : source) {
             JsonObject state = (JsonObject) _state;
-            collection.put(state.getField(idField).toString(), state);
+            collection.put(state.getValue(idField).toString(), state);
         }
     }
 
@@ -36,8 +36,8 @@ public class InMemoryStore implements Store {
         return new Comparator<JsonObject>() {
             @Override
             public int compare(JsonObject o1, JsonObject o2) {
-                final Object f1 = o1.getField(field);
-                final Object f2 = o2.getField(field);
+                final Object f1 = o1.getValue(field);
+                final Object f2 = o2.getValue(field);
 
                 if (f1 == null && f2 == null) {
                     return 0;
@@ -62,7 +62,7 @@ public class InMemoryStore implements Store {
         final Map<String, JsonObject> collection = getCollection(entity);
 
         final String _id = Integer.toString(collection.size());
-        object.putString("id", _id);
+        object.put("id", _id);
 
         collection.put(_id, object);
 
@@ -97,7 +97,7 @@ public class InMemoryStore implements Store {
         final List<JsonObject> values = new ArrayList<>(collection.values());
 
         if (sort.size() > 0) {
-            for (String field : sort.getFieldNames()) {
+            for (String field : sort.fieldNames()) {
                 Collections.sort(values, buildComparator(field, sort.getInteger(field)));
             }
         }
@@ -108,8 +108,8 @@ public class InMemoryStore implements Store {
             filteredValues = new ArrayList<>();
 
             for (JsonObject item : values) {
-                for (String field : query.getFieldNames()) {
-                    Object f = item.getField(field);
+                for (String field : query.fieldNames()) {
+                    Object f = item.getValue(field);
                     if (f != null && f.toString().equals(query.getString(field))) {
                         filteredValues.add(item);
                         break;
@@ -126,10 +126,10 @@ public class InMemoryStore implements Store {
         for (JsonObject json : filteredValues) {
             if (start != null && end != null) {
                 if (i >= start.intValue() && i < end.intValue()) {
-                    array.addObject(json);
+                    array.add(json);
                 }
             } else {
-                array.addObject(json);
+                array.add(json);
             }
             i++;
         }
@@ -149,8 +149,8 @@ public class InMemoryStore implements Store {
             filteredValues = new ArrayList<>();
 
             for (JsonObject item : values) {
-                for (String field : query.getFieldNames()) {
-                    Object f = item.getField(field);
+                for (String field : query.fieldNames()) {
+                    Object f = item.getValue(field);
                     if (f != null && f.toString().equals(query.getString(field))) {
                         filteredValues.add(item);
                         break;

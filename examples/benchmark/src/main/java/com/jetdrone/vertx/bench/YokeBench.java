@@ -5,11 +5,11 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
 import com.jetdrone.vertx.yoke.middleware.Router;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.Handler;
-import org.vertx.java.platform.Verticle;
 
-public class YokeBench extends Verticle {
+public class YokeBench extends AbstractVerticle {
 
     @Override
     public void start() {
@@ -37,7 +37,7 @@ public class YokeBench extends Verticle {
                         .get("/json", new Handler<YokeRequest>() {
                             @Override
                             public void handle(YokeRequest request) {
-                                request.response().end(new JsonObject().putString("name", "Tobi").putString("role", "admin"));
+                                request.response().end(new JsonObject().put("name", "Tobi").put("role", "admin"));
                             }
                         })
                         .get("/middleware", new Handler<YokeRequest>() {
