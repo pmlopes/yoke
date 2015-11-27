@@ -19,29 +19,31 @@
   <script type="text/javascript">
     $(function () {
       window.swaggerUi = new SwaggerUi({
-      url: "http://localhost:8080/api-docs",
-      dom_id: "swagger-ui-container",
-      supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
-      onComplete: function(swaggerApi, swaggerUi){
-        log("Loaded SwaggerUI");
-        $('pre code').each(function(i, e) {hljs.highlightBlock(e)});
-      },
-      onFailure: function(data) {
-        log("Unable to Load SwaggerUI");
-      },
-      docExpansion: "none"
-    });
+        url: "http://localhost:8080/api-docs",
+        dom_id: "swagger-ui-container",
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
+        onComplete: function (swaggerApi, swaggerUi) {
+          log("Loaded SwaggerUI");
+          $('pre code').each(function (i, e) {
+            hljs.highlightBlock(e)
+          });
+        },
+        onFailure: function (data) {
+          log("Unable to Load SwaggerUI");
+        },
+        docExpansion: "none"
+      });
 
-    $('#input_apiKey').change(function() {
-      var key = $('#input_apiKey')[0].value;
-      log("key: " + key);
-      if(key && key.trim() != "") {
-        log("added key " + key);
-        window.authorizations.add("key", new ApiKeyAuthorization("api_key", key, "query"));
-      }
+      $('#input_apiKey').change(function () {
+        var key = $('#input_apiKey')[0].value;
+        log("key: " + key);
+        if (key && key.trim() != "") {
+          log("added key " + key);
+          window.authorizations.add("key", new ApiKeyAuthorization("api_key", key, "query"));
+        }
+      });
+      window.swaggerUi.load();
     });
-    window.swaggerUi.load();
-  });
 
   </script>
 </head>
@@ -58,7 +60,8 @@
       <div class='input icon-btn'>
         <img id="show-wordnik-dev-icon" src="images/wordnik_api.png" title="Show Wordnik Developer Apis">
       </div>
-      <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/></div>
+      <div class='input'><input placeholder="http://example.com/api" id="input_baseUrl" name="baseUrl" type="text"/>
+      </div>
       <div class='input'><input placeholder="api_key" id="input_apiKey" name="apiKey" type="text"/></div>
       <div class='input'><a id="explore" href="#">Explore</a></div>
     </form>

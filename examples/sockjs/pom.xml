@@ -10,28 +10,18 @@
     <relativePath>../..</relativePath>
   </parent>
 
-  <artifactId>yoke.examples.dojo-reststore</artifactId>
+  <artifactId>yoke.examples.sockjs</artifactId>
   <packaging>jar</packaging>
-  <name>example-dojo-reststore</name>
+  <name>example-sockjs</name>
 
   <properties>
-    <main.verticle>com.jetdrone.vertx.extras.JsonRestExample</main.verticle>
+    <main.verticle>com.jetdrone.vertx.extras.SockJSExample</main.verticle>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>com.jetdrone</groupId>
       <artifactId>yoke</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.jetdrone</groupId>
-      <artifactId>yoke.middleware.reststore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.jetdrone</groupId>
-      <artifactId>yoke.engine.handlebars</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

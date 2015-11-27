@@ -119,6 +119,7 @@
                 <module>examples/dojo-reststore</module>
                 <module>examples/form-auth</module>
                 <module>examples/swagger-petstore</module>
+                <module>examples/sockjs</module>
         </modules>
         </profile>
     </profiles>

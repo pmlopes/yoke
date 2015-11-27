@@ -11,41 +11,41 @@ import io.vertx.core.Handler;
 
 public class YokeBench extends AbstractVerticle {
 
-    @Override
-    public void start() {
+  @Override
+  public void start() {
 
-        final Middleware foo = new Middleware() {
-            @Override
-            public void handle(YokeRequest request, Handler<Object> next) {
-                next.handle(null);
-            }
-        };
+    final Middleware foo = new Middleware() {
+      @Override
+      public void handle(YokeRequest request, Handler<Object> next) {
+        next.handle(null);
+      }
+    };
 
-        new Yoke(this)
-                .use(new BodyParser())
-                .use("/middleware", foo)
-                .use("/middleware", foo)
-                .use("/middleware", foo)
-                .use("/middleware", foo)
-                .use(new Router()
-                        .get("/", new Handler<YokeRequest>() {
-                            @Override
-                            public void handle(YokeRequest request) {
-                                request.response().end("Hello World\n");
-                            }
-                        })
-                        .get("/json", new Handler<YokeRequest>() {
-                            @Override
-                            public void handle(YokeRequest request) {
-                                request.response().end(new JsonObject().put("name", "Tobi").put("role", "admin"));
-                            }
-                        })
-                        .get("/middleware", new Handler<YokeRequest>() {
-                            @Override
-                            public void handle(YokeRequest request) {
-                                request.response().end("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
-                            }
-                        })
-                ).listen(8080);
-    }
+    new Yoke(this)
+        .use(new BodyParser())
+        .use("/middleware", foo)
+        .use("/middleware", foo)
+        .use("/middleware", foo)
+        .use("/middleware", foo)
+        .use(new Router()
+            .get("/", new Handler<YokeRequest>() {
+              @Override
+              public void handle(YokeRequest request) {
+                request.response().end("Hello World\n");
+              }
+            })
+            .get("/json", new Handler<YokeRequest>() {
+              @Override
+              public void handle(YokeRequest request) {
+                request.response().end(new JsonObject().put("name", "Tobi").put("role", "admin"));
+              }
+            })
+            .get("/middleware", new Handler<YokeRequest>() {
+              @Override
+              public void handle(YokeRequest request) {
+                request.response().end("1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890");
+              }
+            })
+        ).listen(8080);
+  }
 }
