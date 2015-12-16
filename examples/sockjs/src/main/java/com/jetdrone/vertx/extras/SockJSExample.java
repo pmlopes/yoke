@@ -4,10 +4,8 @@ import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.middleware.BodyParser;
 import com.jetdrone.vertx.yoke.middleware.ErrorHandler;
 import com.jetdrone.vertx.yoke.middleware.Static;
-import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.sockjs.*;
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Handler;
 
 /*
  * @author <a href="http://tfox.org">Tim Fox</a>
@@ -23,6 +21,7 @@ public class SockJSExample extends AbstractVerticle {
 
     BridgeOptions options = new BridgeOptions().addOutboundPermitted(new PermittedOptions().setAddress("news-feed"));
 
+    // TODO: This MUST be /eventbus since the regex's at the yoke side are hardcoded
     yoke.use("/eventbus", new SockJS(vertx, new SockJSHandlerOptions()).bridge(options, event -> {
 
       // You can also optionally provide a handler like this which will be passed any events that occur on the bridge
