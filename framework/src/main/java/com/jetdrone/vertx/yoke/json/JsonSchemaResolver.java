@@ -53,7 +53,7 @@ public final class JsonSchemaResolver {
         return resolveSchema(uri, null);
     }
 
-    public static Schema resolveSchema(String uri, Schema parent) {
+    public synchronized static Schema resolveSchema(String uri, Schema parent) {
         uri = resolveUri(uri, parent);
         if (!loadedSchemas.containsKey(uri)) {
             tryToLoad(uri);
