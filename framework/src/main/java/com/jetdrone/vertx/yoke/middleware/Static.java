@@ -131,7 +131,7 @@ public class Static extends Middleware {
         }
 
         if (!headers.contains("date")) {
-            headers.set("date", ISODATE.format(new Date()));
+            headers.set("date", format(new Date()));
         }
 
         if (!headers.contains("cache-control")) {
@@ -139,7 +139,29 @@ public class Static extends Middleware {
         }
 
         if (!headers.contains("last-modified")) {
-            headers.set("last-modified", ISODATE.format(props.lastModifiedTime()));
+            headers.set("last-modified", format(props.lastModifiedTime()));
+        }
+    }
+
+    /**
+     * Parse thread safe a string to date using a SimpleDateFormat
+     *
+     * @param source
+     * @throws ParseException
+     */
+    private Date parse(String source) throws ParseException {
+        synchronized (ISODATE) {
+            return ISODATE.parse(source);
+        }
+    }
+
+    /**
+     * Convert thread safe a date to a string  using a SimpleDateFormat
+     * @param date
+     */
+    private String format(Date date) {
+        synchronized (ISODATE) {
+            return ISODATE.format(date);
         }
     }
 
@@ -315,8 +337,8 @@ public class Static extends Middleware {
         // if-modified-since
         if (modifiedSince != null) {
             try {
-                Date modifiedSinceDate = ISODATE.parse(modifiedSince);
-                Date lastModifiedDate = ISODATE.parse(lastModified);
+                Date modifiedSinceDate = parse(modifiedSince);
+                Date lastModifiedDate = parse(lastModified);
                 notModified = lastModifiedDate.getTime() <= modifiedSinceDate.getTime();
             } catch (ParseException e) {
                 notModified = false;
