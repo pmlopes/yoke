@@ -139,7 +139,7 @@ public class Static extends Middleware {
         }
 
         if (!headers.contains("last-modified")) {
-            headers.set("last-modified", format(props.lastModifiedTime()));
+            headers.set("last-modified", format(new Date(props.lastModifiedTime())));
         }
     }
 
