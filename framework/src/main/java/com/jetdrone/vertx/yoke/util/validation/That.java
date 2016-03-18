@@ -5,8 +5,8 @@ import com.jetdrone.vertx.yoke.core.impl.ThreadLocalUTCDateFormat;
 import com.jetdrone.vertx.yoke.json.JsonSchema;
 import com.jetdrone.vertx.yoke.json.JsonSchemaResolver;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -103,9 +103,9 @@ public final class That {
     private Object get(final YokeRequest request) throws YokeException {
         switch (type) {
             case 0:
-                return request.getParameter(isOptional() ? this.path.substring(1) : this.path);
+                return request.getParam(isOptional() ? this.path.substring(1) : this.path);
             case 1:
-                return request.getFormParameter(path);
+                return request.getFormAttribute(path);
             case 2:
                 if (!request.hasBody()) {
                     throw new YokeException(400, "No Body");
@@ -131,7 +131,7 @@ public final class That {
                         }
                     }
 
-                    json = json.getObject(optional ? keys[i].substring(1) : keys[i]);
+                    json = json.getJsonObject(optional ? keys[i].substring(1) : keys[i]);
                 }
 
                 boolean optional = keys[keys.length - 1].charAt(0) == '?';
@@ -144,7 +144,7 @@ public final class That {
                     }
                 }
 
-                return json.getField(optional ? keys[keys.length - 1].substring(1) : keys[keys.length - 1]);
+                return json.getValue(optional ? keys[keys.length - 1].substring(1) : keys[keys.length - 1]);
             case 3:
                 return request.get(path);
             case 4:

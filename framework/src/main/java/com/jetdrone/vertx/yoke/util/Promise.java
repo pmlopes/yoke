@@ -1,8 +1,8 @@
 package com.jetdrone.vertx.yoke.util;
 
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Handler;
+import io.vertx.core.AsyncResultHandler;
+import io.vertx.core.Handler;
 
 final class Promise<T> {
 

@@ -10,27 +10,20 @@ Yoke is a polyglot middleware framework for Vert.x, shipping with over 12 bundle
 To get started with Yoke in your project you can use Vert.x module system to download it from the maven repository or
 include the maven dependency your self. The moment this module is only compatible with Vert.x 2.
 
-The Vert.x module id is: `com.jetdrone~yoke~2.0.20`. If you prefer to use [maven](http://maven.apache.org), you can get
+The Vert.x module id is: `com.jetdrone~yoke~3.0.0`. If you prefer to use [maven](http://maven.apache.org), you can get
 the artifacts using the following dependency:
 
     <dependency>
       <groupId>com.jetdrone</groupId>
       <artifactId>yoke</artifactId>
-      <version>2.0.20</version>
-      <scope>provided</scope>
+      <version>3.0.0</version>
     </dependency>
-
-The scope is provided because you should include the module from your Vert.x application to avoid having duplicated jars
-in the server classpath.
 
 
 ## Getting started
 
-Yoke is a polyglot framework so you should choose a trail to follow with your favourite language:
-
-* Java
-* Groovy
-* JavaScript
+Yoke 3 is a transitional package that you can use to port your existing apps to Vert.x3, however it is recommended to
+use Vert.x-Web for new development since that is where the focus is now.
 
 If you need help with Yoke. just ask your questions on [yoke framework group](https://groups.google.com/forum/#!forum/yoke-framework).
 

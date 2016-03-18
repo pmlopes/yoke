@@ -3,9 +3,10 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.core.YokeException;
+import io.vertx.core.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 import java.util.regex.Pattern;
 
@@ -55,7 +56,7 @@ public class JWT extends Middleware {
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         String token = null;
 
-        if ("OPTIONS".equals(request.method()) && request.getHeader("access-control-request-headers") != null) {
+        if (HttpMethod.OPTIONS.equals(request.method()) && request.getHeader("access-control-request-headers") != null) {
             for (String ctrlReq : request.getHeader("access-control-request-headers").split(",")) {
                 if (ctrlReq.contains("authorization")) {
                     next.handle(null);
@@ -97,7 +98,7 @@ public class JWT extends Middleware {
             // the specified UTC date/time, ignoring leap seconds
             final long now = System.currentTimeMillis() / 1000;
 
-            if (jwtToken.containsField("iat")) {
+            if (jwtToken.containsKey("iat")) {
                 Long iat = jwtToken.getLong("iat");
                 // issue at must be in the past
                 if (iat > now) {
@@ -106,7 +107,7 @@ public class JWT extends Middleware {
                 }
             }
 
-            if (jwtToken.containsField("nbf")) {
+            if (jwtToken.containsKey("nbf")) {
                 Long nbf = jwtToken.getLong("nbf");
                 // not before must be after now
                 if (nbf > now) {
@@ -115,7 +116,7 @@ public class JWT extends Middleware {
                 }
             }
 
-            if (jwtToken.containsField("exp")) {
+            if (jwtToken.containsKey("exp")) {
                 Long exp = jwtToken.getLong("exp");
                 // expires must be after now
                 if (now > exp) {

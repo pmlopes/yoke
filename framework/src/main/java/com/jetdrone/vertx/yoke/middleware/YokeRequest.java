@@ -3,8 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,22 +19,20 @@ import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.security.cert.X509Certificate;
 
 import com.jetdrone.vertx.yoke.util.Utils;
+import io.vertx.core.http.*;
+import io.vertx.core.net.SocketAddress;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerFileUpload;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpVersion;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.net.NetSocket;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.NetSocket;
 
 import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.core.YokeCookie;
 import com.jetdrone.vertx.yoke.core.YokeFileUpload;
 import com.jetdrone.vertx.yoke.store.SessionStore;
-import com.jetdrone.vertx.yoke.store.json.SessionObject;
 
 /** YokeRequest is an extension to Vert.x *HttpServerRequest* with some helper methods to make it easier to perform common
  * tasks related to web application development.
@@ -79,12 +75,12 @@ public class YokeRequest implements HttpServerRequest {
     // the request context
     final protected Context context;
     // is this request secure (if extensions need to access it, use the accessor)
-    final private boolean secure;
+    final private boolean secure = false;
     // session data store
     final protected SessionStore store;
 
     // we can overrride the setMethod
-    private String method;
+    private HttpMethod method;
     private long bodyLengthLimit = -1;
     // the body is protected so extensions can access the raw object instead of casted versions.
     protected Object body;
@@ -93,13 +89,12 @@ public class YokeRequest implements HttpServerRequest {
     // control flags
     private boolean expectMultiPartCalled = false;
 
-    public YokeRequest(@NotNull final HttpServerRequest request, @NotNull final YokeResponse response, final boolean secure, @NotNull final Context context, @NotNull final SessionStore store) {
+    public YokeRequest(@NotNull final HttpServerRequest request, @NotNull final YokeResponse response, @NotNull final Context context, @NotNull final SessionStore store) {
         this.context = context;
         this.request = request;
         this.method = request.method();
         response.setMethod(this.method);
         this.response = response;
-        this.secure = secure;
         this.store = store;
     }
 
@@ -155,8 +150,14 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return The found object
      */
+    @Override
     public String getHeader(@NotNull final String name) {
         return headers().get(name);
+    }
+
+    @Override
+    public String getHeader(CharSequence charSequence) {
+        return headers().get(charSequence);
     }
 
     /** Allow getting headers in a generified way.
@@ -198,7 +199,7 @@ public class YokeRequest implements HttpServerRequest {
     public YokeCookie getCookie(@NotNull final String name) {
         if (cookies != null) {
             for (YokeCookie c : cookies) {
-                if (name.equals(c.getName())) {
+                if (name.equals(c.name())) {
                     return c;
                 }
             }
@@ -215,7 +216,7 @@ public class YokeRequest implements HttpServerRequest {
         List<YokeCookie> foundCookies = new ArrayList<>();
         if (cookies != null) {
             for (YokeCookie c : cookies) {
-                if (name.equals(c.getName())) {
+                if (name.equals(c.name())) {
                     foundCookies.add(c);
                 }
             }
@@ -225,14 +226,14 @@ public class YokeRequest implements HttpServerRequest {
 
     // The original HTTP setMethod for the request. One of GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
     public String originalMethod() {
-        return request.method();
+        return request.method().name();
     }
 
     /** Package level mutator for the overrided setMethod
      * @param newMethod new setMethod GET, PUT, POST, DELETE, TRACE, CONNECT, OPTIONS or HEAD
      */
-    void setMethod(@NotNull final String newMethod) {
-        this.method = newMethod.toUpperCase();
+    void setMethod(@NotNull final HttpMethod newMethod) {
+        this.method = newMethod;
         response.setMethod(this.method);
     }
 
@@ -316,7 +317,7 @@ public class YokeRequest implements HttpServerRequest {
     /** Destroys a session from the request context and also from the storage engine.
      */
     public void destroySession() {
-    	SessionObject session = get("session");
+    	JsonObject session = get("session");
         if (session == null) {
             return;
         }
@@ -354,7 +355,7 @@ public class YokeRequest implements HttpServerRequest {
             @Override
             public void handle(JsonObject session) {
                 if (session != null) {
-                    put("session", new SessionObject(session));
+                    put("session", session);
                 }
 
                 response().headersHandler(new Handler<Void>() {
@@ -363,9 +364,9 @@ public class YokeRequest implements HttpServerRequest {
                         int responseStatus = response().getStatusCode();
                         // Only save on success and redirect status codes
                         if (responseStatus >= 200 && responseStatus < 400) {
-                        	SessionObject session = get("session");
-                            if (session != null && session.isChanged()) {
-                                store.set(sessionId, session.jsonObject(), new Handler<Object>() {
+                        	JsonObject session = get("session");
+                            if (session != null) {
+                                store.set(sessionId, session, new Handler<Object>() {
                                     @Override
                                     public void handle(Object error) {
                                         if (error != null) {
@@ -404,9 +405,9 @@ public class YokeRequest implements HttpServerRequest {
      * @return {JsonObject} session
      */
     public JsonObject createSession(@NotNull final String sessionId) {
-        final JsonObject session = new JsonObject().putString("id", sessionId);
+        final JsonObject session = new JsonObject().put("id", sessionId);
 
-        put("session", new SessionObject(session, true));
+        put("session", session);
 
         response().headersHandler(new Handler<Void>() {
             @Override
@@ -414,9 +415,9 @@ public class YokeRequest implements HttpServerRequest {
                 int responseStatus = response().getStatusCode();
                 // Only save on success and redirect status codes
                 if (responseStatus >= 200 && responseStatus < 400) {
-                	SessionObject session = get("session");
-                    if (session != null && session.isChanged()) {
-                        store.set(sessionId, session.jsonObject(), new Handler<Object>() {
+                	JsonObject session = get("session");
+                    if (session != null) {
+                        store.set(sessionId, session, new Handler<Object>() {
                             @Override
                             public void handle(Object error) {
                                 if (error != null) {
@@ -585,7 +586,7 @@ public class YokeRequest implements HttpServerRequest {
             }
         }
 
-        return request.remoteAddress().getHostName();
+        return request.remoteAddress().host();
     }
 
     /** Allow getting parameters in a generified way.
@@ -593,8 +594,9 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {String} The found object
      */
-    public String getParameter(@NotNull final String name) {
-        return params().get(name);
+    @Override
+    public String getParam(@NotNull final String name) {
+        return request.getParam(name);
     }
 
     /** Allow getting parameters in a generified way and return defaultValue if the key does not exist.
@@ -603,8 +605,8 @@ public class YokeRequest implements HttpServerRequest {
      * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
-    public String getParameter(@NotNull final String name, String defaultValue) {
-        String value = getParameter(name);
+    public String getParam(@NotNull final String name, String defaultValue) {
+        String value = getParam(name);
 
         if (value == null) {
             return defaultValue;
@@ -627,8 +629,19 @@ public class YokeRequest implements HttpServerRequest {
      * @param name The key to get
      * @return {String} The found object
      */
-    public String getFormParameter(@NotNull final String name) {
-        return request.formAttributes().get(name);
+    @Override
+    public String getFormAttribute(@NotNull final String name) {
+        return request.getFormAttribute(name);
+    }
+
+    @Override
+    public ServerWebSocket upgrade() {
+        return request.upgrade();
+    }
+
+    @Override
+    public boolean isEnded() {
+        return request.isEnded();
     }
 
     /** Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
@@ -637,7 +650,7 @@ public class YokeRequest implements HttpServerRequest {
      * @param defaultValue value returned when the key does not exist
      * @return {String} The found object
      */
-    public String getFormParameter(@NotNull final String name, String defaultValue) {
+    public String getFormAttribute(@NotNull final String name, String defaultValue) {
         String value = request.formAttributes().get(name);
 
         if (value == null) {
@@ -698,7 +711,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public String method() {
+    public HttpMethod method() {
         if (method != null) {
             return method;
         }
@@ -792,7 +805,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public InetSocketAddress remoteAddress() {
+    public SocketAddress remoteAddress() {
         return request.remoteAddress();
     }
 
@@ -802,7 +815,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public URI absoluteURI() {
+    public String absoluteURI() {
         return request.absoluteURI();
     }
 
@@ -818,20 +831,25 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public YokeRequest expectMultiPart(final boolean expect) {
+    public YokeRequest setExpectMultipart(final boolean expect) {
         // if we expect
         if (expect) {
             // then only call it once
             if (!expectMultiPartCalled) {
                 expectMultiPartCalled = true;
-                request.expectMultiPart(true);
+                request.setExpectMultipart(true);
             }
         } else {
             // if we don't expect reset even if we were called before
             expectMultiPartCalled = false;
-            request.expectMultiPart(false);
+            request.setExpectMultipart(false);
         }
         return this;
+    }
+
+    @Override
+    public boolean isExpectMultipart() {
+        return request.isExpectMultipart();
     }
 
     @Override
@@ -846,8 +864,8 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public YokeRequest dataHandler(Handler<Buffer> handler) {
-        request.dataHandler(handler);
+    public YokeRequest handler(Handler<Buffer> handler) {
+        request.handler(handler);
         return this;
     }
 
@@ -876,7 +894,7 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
-    public InetSocketAddress localAddress() {
+    public SocketAddress localAddress() {
         return request.localAddress();
     }
 }

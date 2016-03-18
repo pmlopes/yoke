@@ -5,10 +5,10 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
-import javax.xml.bind.DatatypeConverter;
+import java.util.Base64;
 
 /**
  * # BasicAuth
@@ -47,7 +47,7 @@ public class BasicAuth extends Middleware {
             public void handle(String _username, String _password, Handler<JsonObject> result) {
                 boolean success = username.equals(_username) && password.equals(_password);
                 if (success) {
-                    result.handle(new JsonObject().putString("username", _username));
+                    result.handle(new JsonObject().put("username", _username));
                 } else {
                     result.handle(null);
                 }
@@ -146,7 +146,7 @@ public class BasicAuth extends Middleware {
             try {
                 String[] parts = authorization.split(" ");
                 scheme = parts[0];
-                String[] credentials = new String(DatatypeConverter.parseBase64Binary(parts[1])).split(":");
+                String[] credentials = new String(Base64.getDecoder().decode(parts[1])).split(":");
                 user = credentials[0];
                 // when the header is: "user:"
                 pass = credentials.length > 1 ? credentials[1] : null;

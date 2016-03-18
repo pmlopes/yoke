@@ -16,9 +16,9 @@
 package com.jetdrone.vertx.yoke.middleware.rest;
 
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.AsyncResultHandler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 public class ValidatingStore extends AbstractValidatingStore {
 

@@ -26,11 +26,11 @@ import org.thymeleaf.messageresolver.IMessageResolver;
 import org.thymeleaf.messageresolver.MessageResolution;
 import org.thymeleaf.resourceresolver.IResourceResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.file.FileSystem;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.file.FileSystem;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,11 +79,11 @@ public class ThymeleafEngine implements Engine {
             @Override
             public InputStream getResourceAsStream(TemplateProcessingParameters templateProcessingParameters, String resourceName) {
 
-                if (!fs.existsSync(resourceName)) {
+                if (!fs.existsBlocking(resourceName)) {
                     return null;
                 }
 
-                final Buffer buffer = fs.readFileSync(resourceName);
+                final Buffer buffer = fs.readFileBlocking(resourceName);
 
                 return new InputStream() {
                     int pos = 0;
@@ -142,7 +142,7 @@ public class ThymeleafEngine implements Engine {
     @Override
     public void render(final String filename, final Map<String, Object> context, final Handler<AsyncResult<Buffer>> next) {
 
-        final Buffer buffer = new Buffer();
+        final Buffer buffer = Buffer.buffer();
 
         try {
             engine.process(filename, toIContext(context), new Writer() {

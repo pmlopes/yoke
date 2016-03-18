@@ -3,7 +3,6 @@
  */
 package com.jetdrone.vertx.yoke.core.impl;
 
-import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,18 +24,18 @@ public class LRUCache<R, C> extends LinkedHashMap<String, LRUCache.CacheEntry<R,
         public final R raw;
         public C compiled;
 
-        public CacheEntry(Date lastModified, R raw, C compiled) {
-            this.lastModified = lastModified.getTime();
+        public CacheEntry(long lastModified, R raw, C compiled) {
+            this.lastModified = lastModified;
             this.raw = raw;
             this.compiled = compiled;
         }
 
-        public CacheEntry(Date lastModified, R raw) {
+        public CacheEntry(long lastModified, R raw) {
             this(lastModified, raw, null);
         }
 
-        public boolean isFresh(Date newDate) {
-            return newDate.getTime() <= lastModified;
+        public boolean isFresh(long newDate) {
+            return newDate <= lastModified;
         }
     }
 

@@ -4,9 +4,9 @@
 package com.jetdrone.vertx.yoke.util;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -27,57 +27,12 @@ public final class Utils {
     // no instantiation
     private Utils () {}
 
-    private final static char[] HEXARRAY = "0123456789ABCDEF".toCharArray();
-
-    public static String hex(@NotNull byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        int v;
-        for ( int j = 0; j < bytes.length; j++ ) {
-            v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEXARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEXARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
-    }
-
-    private static final String BASE64ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-    private static byte[] zeroPad(final int length, final byte[] bytes) {
-        final byte[] padded = new byte[length];
-        System.arraycopy(bytes, 0, padded, 0, bytes.length);
-        return padded;
-    }
-
-    public static String base64(final @NotNull byte[] stringArray) {
-
-        final StringBuilder encoded = new StringBuilder();
-
-        // determine how many padding bytes to add to the output
-        final int paddingCount = (3 - (stringArray.length % 3)) % 3;
-        // add any necessary padding to the input
-        final byte[] paddedArray = zeroPad(stringArray.length + paddingCount, stringArray);
-        // process 3 bytes at a time, churning out 4 output bytes
-        for (int i = 0; i < paddedArray.length; i += 3) {
-            final int j = ((paddedArray[i] & 0xff) << 16) +
-                    ((paddedArray[i + 1] & 0xff) << 8) +
-                    (paddedArray[i + 2] & 0xff);
-
-            encoded.append(BASE64ALPHA.charAt((j >> 18) & 0x3f));
-            encoded.append(BASE64ALPHA.charAt((j >> 12) & 0x3f));
-            encoded.append(BASE64ALPHA.charAt((j >> 6) & 0x3f));
-            encoded.append(BASE64ALPHA.charAt(j & 0x3f));
-        }
-
-        encoded.setLength(encoded.length() - paddingCount);
-        return encoded.toString();
-    }
-
     /**
      * Avoid using this method for constant reads, use it only for one time only reads from resources in the classpath
      */
     public static Buffer readResourceToBuffer(@NotNull Class<?> clazz, @NotNull String resource) {
         try {
-            Buffer buffer = new Buffer(0);
+            Buffer buffer = Buffer.buffer(0);
 
             try (InputStream in = clazz.getResourceAsStream(resource)) {
                 int read;
@@ -205,7 +160,7 @@ public final class Utils {
 
     private static void jsonToXml(XMLStreamWriter writer, JsonObject json, String name) throws XMLStreamException {
         // get all field names
-        Set<String> fields = json.getFieldNames();
+        Set<String> fields = json.fieldNames();
 
         if (fields.size() == 0) {
             // start with element name
@@ -216,7 +171,7 @@ public final class Utils {
         // start with element name
         writer.writeStartElement(name);
         for (String field : fields) {
-            Object value = json.getField(field);
+            Object value = json.getValue(field);
             if (value != null) {
                 if (value instanceof JsonObject) {
                     // process child
@@ -245,7 +200,7 @@ public final class Utils {
         }
 
         for (int i = 0 ; i < json.size(); i++) {
-            Object element = json.get(i);
+            Object element = json.getValue(i);
 
             if (element == null) {
                 writer.writeEmptyElement(name);

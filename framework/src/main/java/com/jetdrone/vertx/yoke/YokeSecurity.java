@@ -1,11 +1,10 @@
 package com.jetdrone.vertx.yoke;
 
-import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.*;
-import javax.xml.bind.DatatypeConverter;
 import java.security.*;
+import java.util.Base64;
 
 public abstract class YokeSecurity {
 
@@ -44,7 +43,7 @@ public abstract class YokeSecurity {
      * Signs a String value with a given MAC
      */
     public static String sign(@NotNull String val, @NotNull Mac mac) {
-        return val + "." + Utils.base64(mac.doFinal(val.getBytes()));
+        return val + "." + Base64.getEncoder().encodeToString(val.getBytes());
     }
 
     /**
@@ -67,7 +66,7 @@ public abstract class YokeSecurity {
     public static String encrypt(@NotNull String val, @NotNull Cipher cipher) {
         try {
             byte[] encVal = cipher.doFinal(val.getBytes());
-            return Utils.base64(encVal);
+            return Base64.getEncoder().encodeToString(encVal);
         } catch (IllegalBlockSizeException | BadPaddingException e) {
             throw new RuntimeException(e);
         }
@@ -75,7 +74,7 @@ public abstract class YokeSecurity {
 
     public static String decrypt(@NotNull String val, @NotNull Cipher cipher) {
         try {
-            byte[] decordedValue = DatatypeConverter.parseBase64Binary(val);
+            byte[] decordedValue = Base64.getDecoder().decode(val);
             byte[] decValue = cipher.doFinal(decordedValue);
             return new String(decValue);
         } catch (IllegalBlockSizeException | BadPaddingException e) {

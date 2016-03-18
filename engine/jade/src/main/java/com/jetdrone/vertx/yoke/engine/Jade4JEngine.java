@@ -19,9 +19,9 @@ import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
 import de.neuland.jade4j.JadeConfiguration;
 import de.neuland.jade4j.template.JadeTemplate;
 import de.neuland.jade4j.template.TemplateLoader;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -91,7 +91,7 @@ public class Jade4JEngine extends AbstractEngineSync<JadeTemplate> {
                 putTemplateToCache(resolve(filename), template);
             }
 
-            next.handle(new YokeAsyncResult<>(new Buffer(config.renderTemplate(template, context))));
+            next.handle(new YokeAsyncResult<>(Buffer.buffer(config.renderTemplate(template, context))));
         } catch (Exception ex) {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));

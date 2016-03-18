@@ -7,11 +7,12 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.util.Utils;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class Favicon extends Middleware {
 
             try {
                 MessageDigest md = MessageDigest.getInstance("MD5");
-                headers.put("etag", "\"" + Utils.base64(md.digest(buffer.getBytes())) + "\"");
+                headers.put("etag", "\"" + Base64.getEncoder().encodeToString(md.digest(buffer.getBytes())) + "\"");
             } catch (NoSuchAlgorithmException e) {
                 // ignore
             }
@@ -130,7 +131,7 @@ public class Favicon extends Middleware {
             if (path == null) {
                 icon = new Icon(Utils.readResourceToBuffer(getClass(), "favicon.ico"));
             } else {
-                icon = new Icon(fileSystem().readFileSync(path));
+                icon = new Icon(fileSystem().readFileBlocking(path));
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -143,7 +144,7 @@ public class Favicon extends Middleware {
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if ("/favicon.ico".equals(request.normalizedPath())) {
-            request.response().headers().set(icon.headers);
+            request.response().headers().setAll(icon.headers);
             request.response().end(icon.body);
         } else {
             next.handle(null);

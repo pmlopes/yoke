@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.json;
 
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.json.JsonArray;
 
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +21,7 @@ public final class ArrayValidator {
 
         // from now on work with lists
         if (instance instanceof JsonArray) {
-            instance = ((JsonArray) instance).toList();
+            instance = ((JsonArray) instance).getList();
         }
 
         final List array = (List) instance;

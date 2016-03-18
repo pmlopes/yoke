@@ -3,9 +3,9 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.middleware.impl.WebClient;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.*;
 
@@ -44,7 +44,7 @@ public class CSP extends Middleware {
     private final boolean safari5;
 
     public CSP() {
-        this(new JsonObject().putArray("default-src", new JsonArray().add("'self'")));
+        this(new JsonObject().put("default-src", new JsonArray().add("'self'")));
     }
 
     public CSP(JsonObject options) {
@@ -53,10 +53,10 @@ public class CSP extends Middleware {
         setAllHeaders = options.getBoolean("setAllHeaders", false);
         safari5 = options.getBoolean("safari5", false);
 
-        Set<String> keys = options.getFieldNames();
+        Set<String> keys = options.fieldNames();
 
         for (String key : keys) {
-            Object value = options.getField(key);
+            Object value = options.getValue(key);
             if (value instanceof JsonArray) {
                 for (String must : MUST_BE_QUOTED) {
                     if (!((JsonArray) value).contains(must)) {
@@ -91,7 +91,7 @@ public class CSP extends Middleware {
         int version = webClient.getMajorVersion();
 
         for (String directive : DIRECTIVES) {
-            Object value = options.getField(directive);
+            Object value = options.getValue(directive);
             if (value != null) {
                 policy.put(directive, value);
             }
@@ -131,11 +131,11 @@ public class CSP extends Middleware {
                         policy.put("default-src", Arrays.asList("*"));
                     }
 
-                    final Set<String> keys = options.getFieldNames();
+                    final Set<String> keys = options.fieldNames();
 
                     for (String key : keys) {
 
-                        Object value = options.getField(key);
+                        Object value = options.getValue(key);
 
                         if ("connect-src".equals(key)) {
                             policy.put("xhr-src", value);

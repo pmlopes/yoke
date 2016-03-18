@@ -4,7 +4,7 @@
 package com.jetdrone.vertx.yoke.middleware.filters;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.buffer.Buffer;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 public abstract class AbstractWriterFilter implements WriterFilter {
     final Pattern filter;
     final OutputStream stream;
-    final Buffer buffer = new Buffer();
+    final Buffer buffer = Buffer.buffer();
 
     public AbstractWriterFilter(@NotNull final Pattern filter) throws IOException {
         this.filter = filter;

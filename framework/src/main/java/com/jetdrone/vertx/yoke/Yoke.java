@@ -16,19 +16,13 @@ import com.jetdrone.vertx.yoke.store.SessionStore;
 import com.jetdrone.vertx.yoke.store.SharedDataSessionStore;
 import com.jetdrone.vertx.yoke.core.YokeException;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.file.impl.PathAdjuster;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.impl.VertxInternal;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.*;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.impl.VertxInternal;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import org.jetbrains.annotations.*;
 
@@ -65,11 +59,6 @@ public class Yoke {
     private final Vertx vertx;
 
     /**
-     * Vert.x container
-     */
-    private final Container container;
-
-    /**
      * request wrapper in use
      */
     private final RequestWrapper requestWrapper;
@@ -100,7 +89,7 @@ public class Yoke {
      * system and timers.
      *
      * <pre>
-     * public class MyVerticle extends Verticle {
+     * public class MyVerticle extends AbstractVerticle {
      *   public void start() {
      *     final Yoke yoke = new Yoke(this);
      *     ...
@@ -111,7 +100,7 @@ public class Yoke {
      * @param verticle the main verticle
      */
     public Yoke(@NotNull Verticle verticle) {
-        this(verticle.getVertx(), verticle.getContainer(), new DefaultRequestWrapper());
+        this(verticle.getVertx());
     }
 
     /**
@@ -122,7 +111,7 @@ public class Yoke {
      * features such as file system and timers.
      *
      * <pre>
-     * public class MyVerticle extends Verticle {
+     * public class MyVerticle extends AbstractVerticle {
      *   public void start() {
      *     final Yoke yoke = new Yoke(getVertx());
      *     ...
@@ -133,29 +122,7 @@ public class Yoke {
      * @param vertx
      */
     public Yoke(@NotNull Vertx vertx) {
-        this(vertx, null, new DefaultRequestWrapper());
-    }
-
-    /**
-     * Creates a Yoke instance.
-     *
-     * This constructor should be called from a verticle and pass a valid Vertx instance and a Container. This instance
-     * will be shared with all registered middleware. The reason behind this is to allow middleware to use Vertx
-     * features such as file system and timers.
-     *
-     * <pre>
-     * public class MyVerticle extends Verticle {
-     *   public void start() {
-     *     final Yoke yoke = new Yoke(getVertx());
-     *     ...
-     *   }
-     * }
-     * </pre>
-     *
-     * @param vertx
-     */
-    public Yoke(@NotNull Vertx vertx, Container container) {
-        this(vertx, container, new DefaultRequestWrapper());
+        this(vertx, new DefaultRequestWrapper());
     }
 
     /**
@@ -164,10 +131,9 @@ public class Yoke {
      * This constructor should be called internally or from other language bindings.
      *
      * <pre>
-     * public class MyVerticle extends Verticle {
+     * public class MyVerticle extends AbstractVerticle {
      *   public void start() {
      *     final Yoke yoke = new Yoke(getVertx(),
-     *         getContainer(),
      *         new RequestWrapper() {...});
      *     ...
      *   }
@@ -175,12 +141,10 @@ public class Yoke {
      * </pre>
      *
      * @param vertx
-     * @param container
      * @param requestWrapper
      */
-    public Yoke(@NotNull Vertx vertx, @Nullable Container container, @NotNull RequestWrapper requestWrapper) {
+    public Yoke(@NotNull Vertx vertx, @NotNull RequestWrapper requestWrapper) {
         this.vertx = vertx;
-        this.container = container;
         this.requestWrapper = requestWrapper;
         defaultContext.put("title", "Yoke");
         defaultContext.put("x-powered-by", true);
@@ -356,11 +320,11 @@ public class Yoke {
         try {
             KeyStore ks = KeyStore.getInstance(storeType);
 
-            try (InputStream in = new FileInputStream(PathAdjuster.adjust((VertxInternal) vertx, fileName))) {
+            try (InputStream in = new FileInputStream(((VertxInternal) vertx).resolveFile(fileName))) {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
-            this.security = new KeyStoreSecurity(ks, keyPasswords.toMap());
+            this.security = new KeyStoreSecurity(ks, keyPasswords.getMap());
 
         } catch (KeyStoreException | IOException | CertificateException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -381,7 +345,7 @@ public class Yoke {
         try {
             KeyStore ks = KeyStore.getInstance(storeType);
 
-            try (InputStream in = new FileInputStream(PathAdjuster.adjust((VertxInternal) vertx, fileName))) {
+            try (InputStream in = new FileInputStream(((VertxInternal) vertx).resolveFile(fileName))) {
                 ks.load(in, keyStorePassword.toCharArray());
             }
 
@@ -491,14 +455,11 @@ public class Yoke {
      * @return {Yoke}
      */
     public Yoke listen(final @NotNull HttpServer server) {
-        // is this server HTTPS?
-        final boolean secure = server.isSSL();
-
         server.requestHandler(new Handler<HttpServerRequest>() {
             @Override
             public void handle(HttpServerRequest req) {
                 // the context map is shared with all middlewares
-                final YokeRequest request = requestWrapper.wrap(req, secure, new Context(defaultContext), engineMap, store);
+                final YokeRequest request = requestWrapper.wrap(req, new Context(defaultContext), engineMap, store);
 
                 // add x-powered-by header is enabled
                 Boolean poweredBy = request.get("x-powered-by");
@@ -583,19 +544,19 @@ public class Yoke {
      *
      * The current format for the config is either a single item or an array:
      * <pre>
-     * {
+     * [{
      *   module: String, // the name of the module
      *   verticle: String, // the name of the verticle (either verticle or module must be present)
      *   instances: Number, // how many instances, default 1
      *   worker: Boolean, // is it a worker verticle? default false
      *   multiThreaded: Boolean, // is it a multiThreaded verticle? default false
      *   config: JsonObject // any config you need to pass to the module/verticle
-     * }
+     * }]
      * </pre>
      *
-     * @param config either a json object or a json array.
+     * @param config a json array.
      */
-    public Yoke deploy(@NotNull JsonElement config) {
+    public Yoke deploy(@NotNull JsonArray config) {
         return deploy(config, null);
     }
 
@@ -619,9 +580,9 @@ public class Yoke {
      * @param config either a json object or a json array.
      * @param handler A handler that is called once all middleware is deployed or on error.
      */
-    public Yoke deploy(final @NotNull JsonElement config, final Handler<Object> handler) {
+    public Yoke deploy(final @NotNull JsonArray config, final Handler<Object> handler) {
 
-        if (config.isArray() && config.asArray().size() == 0) {
+        if (config.size() == 0) {
             if (handler == null) {
                 return this;
             } else {
@@ -630,14 +591,10 @@ public class Yoke {
             }
         }
 
-        if (config.isObject()) {
-            return deploy(new JsonArray().addObject(config.asObject()), handler);
-        }
-
         // wait for all deployments before calling the real handler
         Handler<AsyncResult<String>> waitFor = new Handler<AsyncResult<String>>() {
 
-            private int latch = config.asArray().size();
+            private int latch = config.size();
             private boolean handled = false;
 
             @Override
@@ -652,39 +609,11 @@ public class Yoke {
             }
         };
 
-        for (Object o : config.asArray()) {
-            JsonObject mod = (JsonObject) o;
-            if (mod.getString("module") != null) {
-                deploy(mod.getString("module"), true, false, false, mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
-            } else {
-                deploy(mod.getString("verticle"), false, mod.getBoolean("worker", false), mod.getBoolean("multiThreaded", false), mod.getInteger("instances", 1), mod.getObject("config", new JsonObject()), waitFor);
-            }
+        for (Object o : config) {
+            JsonObject json = (JsonObject) o;
+            vertx.deployVerticle(json.getString("verticle"), new DeploymentOptions(json), waitFor);
         }
 
         return this;
-    }
-
-    private void deploy(String name, boolean module, boolean worker, boolean multiThreaded, int instances, JsonObject config, Handler<AsyncResult<String>> handler) {
-        if (module) {
-            if (handler != null) {
-                container.deployModule(name, config, instances, handler);
-            } else {
-                container.deployModule(name, config, instances);
-            }
-        } else {
-            if (worker) {
-                if (handler != null) {
-                    container.deployWorkerVerticle(name, config, instances, multiThreaded, handler);
-                } else {
-                    container.deployWorkerVerticle(name, config, instances, multiThreaded);
-                }
-            } else {
-                if (handler != null) {
-                    container.deployVerticle(name, config, instances, handler);
-                } else {
-                    container.deployVerticle(name, config, instances);
-                }
-            }
-        }
     }
 }

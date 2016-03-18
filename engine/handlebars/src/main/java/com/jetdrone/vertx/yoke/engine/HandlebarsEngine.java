@@ -20,9 +20,9 @@ import com.github.jknack.handlebars.Template;
 import com.github.jknack.handlebars.io.TemplateLoader;
 import com.github.jknack.handlebars.io.TemplateSource;
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -124,7 +124,7 @@ public class HandlebarsEngine extends AbstractEngineSync<Template> {
                 putTemplateToCache(resolve(filename), template);
             }
 
-            next.handle(new YokeAsyncResult<>(new Buffer(template.apply(context))));
+            next.handle(new YokeAsyncResult<>(Buffer.buffer(template.apply(context))));
         } catch (Exception ex) {
             ex.printStackTrace();
             next.handle(new YokeAsyncResult<Buffer>(ex));

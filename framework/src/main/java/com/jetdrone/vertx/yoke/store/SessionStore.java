@@ -3,9 +3,9 @@
  */
 package com.jetdrone.vertx.yoke.store;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 /** # SessionStore */
 public interface SessionStore {

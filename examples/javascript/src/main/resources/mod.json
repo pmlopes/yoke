@@ -1,4 +1,0 @@
-{
-  "main": "example.js",
-  "includes": "com.jetdrone~yoke~${project.version}"
-}

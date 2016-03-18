@@ -6,7 +6,7 @@ package com.jetdrone.vertx.yoke.core;
 import com.jetdrone.vertx.yoke.Engine;
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.store.SessionStore;
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerRequest;
 
 import java.util.Map;
 
@@ -22,11 +22,10 @@ public interface RequestWrapper {
      * For other language bindings this method can be override.
      *
      * @param request The Vertx HttpServerRequest
-     * @param secure Is the server SSL?
      * @param context The request context a map where data can be temporarily stored during the lifespan of the request
      * @param engines the current list of render engines (this is an unmodifiable map)
      * @param store the current Session Store implementation
      * @return an Implementation of YokeRequest
      */
-    YokeRequest wrap(HttpServerRequest request, boolean secure, Context context, Map<String, Engine> engines, SessionStore store);
+    YokeRequest wrap(HttpServerRequest request, Context context, Map<String, Engine> engines, SessionStore store);
 }

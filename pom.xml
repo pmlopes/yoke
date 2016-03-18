@@ -10,11 +10,11 @@
 
     <groupId>com.jetdrone</groupId>
     <artifactId>yoke-project</artifactId>
-    <version>2.0.22-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Yoke</name>
-    <description>Yoke a middleware framework for Vert.x 2</description>
+    <description>Yoke a middleware framework for Vert.x 3</description>
     <url>http://pmlopes.github.io/yoke</url>
 
     <developers>
@@ -91,29 +91,13 @@
     </licenses>
 
     <properties>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.testTarget>1.7</maven.compiler.testTarget>
-        <maven.compiler.testSource>1.7</maven.compiler.testSource>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.testTarget>1.8</maven.compiler.testTarget>
+        <maven.compiler.testSource>1.8</maven.compiler.testSource>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- Set pullInDeps to true if you want any modules specified in the 'includes' and 'deploys' fields
-               in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
-               module won't download and install those dependencies at run-time when they're first requested. -->
-        <vertx.pullInDeps>false</vertx.pullInDeps>
-        <!-- Set createFatJar to true if you want to create a fat executable jar which contains the Vert.x binaries
-        along with the module so it can be run with java -jar <jarname> -->
-        <vertx.createFatJar>false</vertx.createFatJar>
-        <!-- The directory where the module will be assembled - you can override this on the command line
-        with -Dmods.directory=mydir -->
-        <mods.directory>target/mods</mods.directory>
-        <!-- Plugin versions -->
-        <cobertura.plugin.version>2.6</cobertura.plugin.version>
         <!-- Dependency versions -->
-        <vertx.version>2.1.5</vertx.version>
-        <groovy.version>2.3.3</groovy.version>
-        <!-- Groovy compiler -->
-        <groovy.eclipse.batch.version>2.3.7-01</groovy.eclipse.batch.version>
-        <groovy.eclipse.compiler.version>2.9.1-01</groovy.eclipse.compiler.version>
+        <vertx.version>3.1.0</vertx.version>
     </properties>
 
     <distributionManagement>
@@ -134,13 +118,8 @@
                 <module>examples/cluster-benchmark</module>
                 <module>examples/dojo-reststore</module>
                 <module>examples/form-auth</module>
-                <module>examples/groovy</module>
-                <module>examples/javascript</module>
-                <module>examples/kitcms</module>
-                <module>examples/mozilla-persona</module>
-                <module>examples/session-store</module>
                 <module>examples/swagger-petstore</module>
-                <module>examples/techempower</module>
+                <module>examples/sockjs</module>
         </modules>
         </profile>
     </profiles>
@@ -149,7 +128,6 @@
         <module>framework</module>
 
         <module>middleware/helmet</module>
-        <module>middleware/jersey</module>
         <module>middleware/pac4j</module>
         <module>middleware/reststore</module>
         <module>middleware/swagger</module>
@@ -159,9 +137,6 @@
         <module>engine/jade</module>
         <module>engine/mvel</module>
         <module>engine/thymeleaf</module>
-
-        <module>store/redis</module>
-        <module>store/mongodb</module>
     </modules>
 
     <build>
@@ -188,16 +163,6 @@
                     <version>2.5.3</version>
                 </plugin>
                 <plugin>
-                    <groupId>io.vertx</groupId>
-                    <artifactId>vertx-maven-plugin</artifactId>
-                    <version>2.0.11-final</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.gmaven</groupId>
-                    <artifactId>gmaven-plugin</artifactId>
-                    <version>1.5</version>
-                </plugin>
-                <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.1</version>
                 </plugin>
@@ -217,17 +182,12 @@
                             <configuration>
                                 <rules>
                                     <requireJavaVersion>
-                                        <version>1.7</version>
+                                        <version>1.8</version>
                                     </requireJavaVersion>
                                 </rules>
                             </configuration>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.sonar</groupId>
-                    <artifactId>sonar-maven3-plugin</artifactId>
-                    <version>4.5.2</version>
                 </plugin>
                 <plugin>
                     <groupId>com.amashchenko.maven.plugin</groupId>
@@ -247,21 +207,8 @@
                     </configuration>
                 </plugin>
                 <plugin>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.3</version>
-                </plugin>
-                <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.10.1</version>
-                </plugin>
-                <plugin>
-                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.7</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>${cobertura.plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
