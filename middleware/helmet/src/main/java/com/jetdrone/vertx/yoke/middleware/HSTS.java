@@ -2,7 +2,7 @@ package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 /**
  * HTTP Strict Transport Security (HSTS)
@@ -31,7 +31,7 @@ public final class HSTS extends Middleware {
 
     @Override
     public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
-        boolean isSecure = (request.isSecure())
+        boolean isSecure = (request.isSSL())
                 || ("on".equals(request.getHeader("front-end-https")))
                 || ("https".equals(request.getHeader("x-forwarded-proto")));
 

@@ -4,12 +4,11 @@
 package com.jetdrone.vertx.yoke.core;
 
 import com.jetdrone.vertx.yoke.YokeSecurity;
-import io.netty.handler.codec.http.Cookie;
-import io.netty.handler.codec.http.DefaultCookie;
+import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.DefaultCookie;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.Mac;
-import java.util.Set;
 
 /**
  * # YokeCookie
@@ -26,7 +25,7 @@ public class YokeCookie implements Cookie {
         this.mac = mac;
 
         // get the original value
-        value = nettyCookie.getValue();
+        value = nettyCookie.value();
         // if the prefix is there then it is signed
         if (value.startsWith("s:")) {
             signed = true;
@@ -67,8 +66,8 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public String getValue() {
-        return nettyCookie.getValue();
+    public String value() {
+        return nettyCookie.value();
     }
 
     @Override
@@ -79,13 +78,23 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public String getName() {
-        return nettyCookie.getName();
+    public boolean wrap() {
+        return nettyCookie.wrap();
     }
 
     @Override
-    public String getDomain() {
-        return nettyCookie.getDomain();
+    public void setWrap(boolean wrap) {
+        nettyCookie.setWrap(wrap);
+    }
+
+    @Override
+    public String name() {
+        return nettyCookie.name();
+    }
+
+    @Override
+    public String domain() {
+        return nettyCookie.domain();
     }
 
     @Override
@@ -94,8 +103,8 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public String getPath() {
-        return nettyCookie.getPath();
+    public String path() {
+        return nettyCookie.path();
     }
 
     @Override
@@ -104,33 +113,13 @@ public class YokeCookie implements Cookie {
     }
 
     @Override
-    public String getComment() {
-        return nettyCookie.getComment();
-    }
-
-    @Override
-    public void setComment(final String comment) {
-        nettyCookie.setComment(comment);
-    }
-
-    @Override
-    public long getMaxAge() {
-        return nettyCookie.getMaxAge();
+    public long maxAge() {
+        return nettyCookie.maxAge();
     }
 
     @Override
     public void setMaxAge(final long maxAge) {
         nettyCookie.setMaxAge(maxAge);
-    }
-
-    @Override
-    public int getVersion() {
-        return nettyCookie.getVersion();
-    }
-
-    @Override
-    public void setVersion(final int version) {
-        nettyCookie.setVersion(version);
     }
 
     @Override
@@ -151,41 +140,6 @@ public class YokeCookie implements Cookie {
     @Override
     public void setHttpOnly(final boolean httpOnly) {
         nettyCookie.setHttpOnly(httpOnly);
-    }
-
-    @Override
-    public String getCommentUrl() {
-        return nettyCookie.getCommentUrl();
-    }
-
-    @Override
-    public void setCommentUrl(final String commentUrl) {
-        nettyCookie.setCommentUrl(commentUrl);
-    }
-
-    @Override
-    public boolean isDiscard() {
-        return nettyCookie.isDiscard();
-    }
-
-    @Override
-    public void setDiscard(final boolean discard) {
-        nettyCookie.setDiscard(discard);
-    }
-
-    @Override
-    public Set<Integer> getPorts() {
-        return nettyCookie.getPorts();
-    }
-
-    @Override
-    public void setPorts(final int... ports) {
-        nettyCookie.setPorts(ports);
-    }
-
-    @Override
-    public void setPorts(final Iterable<Integer> ports) {
-        nettyCookie.setPorts(ports);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.jetdrone.vertx.yoke.json;
 
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +20,7 @@ public final class ObjectValidator {
 
         // from now on work with maps
         if (instance instanceof JsonObject) {
-            instance = ((JsonObject) instance).toMap();
+            instance = ((JsonObject) instance).getMap();
         }
 
         final Map object = (Map) instance;

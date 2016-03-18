@@ -8,21 +8,16 @@ import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.core.Context;
 import com.jetdrone.vertx.yoke.middleware.filters.WriterFilter;
 import com.jetdrone.vertx.yoke.core.YokeException;
-import io.netty.handler.codec.http.Cookie;
+import io.netty.handler.codec.http.cookie.Cookie;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.ServerCookieEncoder;
+import io.netty.handler.codec.http.cookie.ServerCookieEncoder;
+import io.vertx.core.*;
+import io.vertx.core.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.streams.Pump;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.streams.ReadStream;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.*;
 
@@ -37,7 +32,7 @@ public class YokeResponse implements HttpServerResponse {
     // response cookies
     private Set<Cookie> cookies;
     // link to request method
-    private String method;
+    private HttpMethod method;
 
     // extra handlers
     private List<Handler<Void>> headersHandler;
@@ -56,7 +51,7 @@ public class YokeResponse implements HttpServerResponse {
 
     // protected extension
 
-    void setMethod(String method) {
+    void setMethod(HttpMethod method) {
         this.method = method;
     }
 
@@ -175,23 +170,25 @@ public class YokeResponse implements HttpServerResponse {
         end();
     }
 
-    public void end(JsonElement json) {
-        if (json.isArray()) {
-            JsonArray jsonArray = json.asArray();
-            setContentType("application/json", "UTF-8");
-            end(jsonArray.encode());
-        } else if (json.isObject()) {
-            JsonObject jsonObject = json.asObject();
-            setContentType("application/json", "UTF-8");
-            end(jsonObject.encode());
-        }
+    public void end(JsonArray jsonArray) {
+        setContentType("application/json", "UTF-8");
+        end(jsonArray.encode());
     }
 
-    public void jsonp(JsonElement json) {
+    public void end(JsonObject jsonObject) {
+        setContentType("application/json", "UTF-8");
+        end(jsonObject.encode());
+    }
+
+    public void jsonp(JsonArray json) {
         jsonp("callback", json);
     }
 
-    public void jsonp(String callback, JsonElement json) {
+    public void jsonp(JsonObject json) {
+        jsonp("callback", json);
+    }
+
+    public void jsonp(String callback, JsonArray json) {
 
         if (callback == null) {
             // treat as normal json response
@@ -202,13 +199,24 @@ public class YokeResponse implements HttpServerResponse {
         String body = null;
 
         if (json != null) {
-            if (json.isArray()) {
-                JsonArray jsonArray = json.asArray();
-                body = jsonArray.encode();
-            } else if (json.isObject()) {
-                JsonObject jsonObject = json.asObject();
-                body = jsonObject.encode();
-            }
+            body = json.encode();
+        }
+
+        jsonp(callback, body);
+    }
+
+    public void jsonp(String callback, JsonObject json) {
+
+        if (callback == null) {
+            // treat as normal json response
+            end(json);
+            return;
+        }
+
+        String body = null;
+
+        if (json != null) {
+            body = json.encode();
         }
 
         jsonp(callback, body);
@@ -238,21 +246,6 @@ public class YokeResponse implements HttpServerResponse {
         setContentType("text/javascript", "UTF-8");
         String cb = callback.replaceAll("[^\\[\\]\\w$.]", "");
         end(cb + " && " + cb + "(" + body + ");");
-    }
-
-    public void end(ReadStream<?> stream) {
-        // TODO: filter stream?
-        hasBody = true;
-        filter = null;
-        triggerHeadersHandlers();
-        Pump.createPump(stream, response).start();
-        stream.endHandler(new Handler<Void>() {
-            @Override
-            public void handle(Void event) {
-                response.end();
-                triggerEndHandlers();
-            }
-        });
     }
 
     public YokeResponse addCookie(Cookie cookie) {
@@ -290,13 +283,14 @@ public class YokeResponse implements HttpServerResponse {
             }
             // convert the cookies set to the right header
             if (cookies != null) {
-                response.putHeader("set-cookie", ServerCookieEncoder.encode(cookies));
+                response.putHeader("set-cookie", ServerCookieEncoder.STRICT.encode(cookies));
             }
 
             // if there is a filter then set the right header
             if (filter != null) {
                 // verify if the filter can filter this content
-                if (filter.canFilter(response.headers().get("content-type"))) {
+                String contentType = response.headers().get("content-type");
+                if (contentType != null && filter.canFilter(contentType)) {
                     response.putHeader("content-encoding", filter.encoding());
                 } else {
                     // disable the filter
@@ -472,6 +466,11 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse writeContinue() {
+        return response.writeContinue();
+    }
+
+    @Override
     public void end(@NotNull String chunk) {
         hasBody = true;
         triggerHeadersHandlers();
@@ -522,12 +521,22 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public YokeResponse sendFile(String filename, String notFoundFile) {
+    public HttpServerResponse sendFile(String filename, long offset) {
         // TODO: filter file?
         hasBody = true;
         filter = null;
         triggerHeadersHandlers();
-        response.sendFile(filename, notFoundFile);
+        response.sendFile(filename, offset);
+        triggerEndHandlers();
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse sendFile(String s, long l, long l1) {
+        hasBody = true;
+        filter = null;
+        triggerHeadersHandlers();
+        response.sendFile(s, l, l1);
         triggerEndHandlers();
         return this;
     }
@@ -544,12 +553,22 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
-    public YokeResponse sendFile(String filename, String notFoundFile, Handler<AsyncResult<Void>> resultHandler) {
+    public HttpServerResponse sendFile(String filename, long offset, Handler<AsyncResult<Void>> resultHandler) {
         // TODO: filter file?
         hasBody = true;
         filter = null;
         triggerHeadersHandlers();
-        response.sendFile(filename, notFoundFile, resultHandler);
+        response.sendFile(filename, offset, resultHandler);
+        triggerEndHandlers();
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse sendFile(String s, long l, long l1, Handler<AsyncResult<Void>> handler) {
+        hasBody = true;
+        filter = null;
+        triggerHeadersHandlers();
+        response.sendFile(s, l, l1, handler);
         triggerEndHandlers();
         return this;
     }
@@ -558,6 +577,36 @@ public class YokeResponse implements HttpServerResponse {
     public void close() {
         response.close();
         triggerEndHandlers();
+    }
+
+    @Override
+    public boolean ended() {
+        return response.ended();
+    }
+
+    @Override
+    public boolean closed() {
+        return response.closed();
+    }
+
+    @Override
+    public boolean headWritten() {
+        return response.headWritten();
+    }
+
+    @Override
+    public HttpServerResponse headersEndHandler(Handler<Void> handler) {
+        return response.headersEndHandler(handler);
+    }
+
+    @Override
+    public HttpServerResponse bodyEndHandler(Handler<Void> handler) {
+        return response.bodyEndHandler(handler);
+    }
+
+    @Override
+    public long bytesWritten() {
+        return response.bytesWritten();
     }
 
     @Override

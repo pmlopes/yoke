@@ -3,13 +3,13 @@
  */
 package com.jetdrone.vertx.yoke.middleware;
 
+import io.vertx.core.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
-import com.jetdrone.vertx.yoke.store.json.SessionObject;
 import com.jetdrone.vertx.yoke.util.Utils;
 
 public class FormAuth extends Middleware {
@@ -60,13 +60,13 @@ public class FormAuth extends Middleware {
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
         if (request.path().equals(loginURI)) {
-            if ("GET".equals(request.method())) {
+            if (HttpMethod.GET.equals(request.method())) {
                 if (loginTemplate != null) {
                     // render internal login
                     request.response().setContentType("text/html");
                     request.response().end(
                             loginTemplate.replace("{title}", (String) request.get("title"))
-                                    .replace("{action}", loginURI + "?redirect_url=" + Utils.encodeURIComponent(request.getParameter("redirect_url", "/")))
+                                    .replace("{action}", loginURI + "?redirect_url=" + Utils.encodeURIComponent(request.getParam("redirect_url", "/")))
                                     .replace("{message}", ""));
                 } else {
                     // render login
@@ -75,22 +75,22 @@ public class FormAuth extends Middleware {
                 return;
             }
 
-            if ("POST".equals(request.method())) {
-                if (forceSSL && !request.isSecure()) {
+            if (HttpMethod.POST.equals(request.method())) {
+                if (forceSSL && !request.isSSL()) {
                     // SSL is required but the post is insecure
                     next.handle(400);
                     return;
                 }
 
-                authHandler.handle(request.getFormParameter("username"), request.getFormParameter("password"), new Handler<JsonObject>() {
+                authHandler.handle(request.getFormAttribute("username"), request.getFormAttribute("password"), new Handler<JsonObject>() {
                     @Override
                     public void handle(JsonObject user) {
                         if (user != null) {
                             JsonObject session = request.createSession();
-                            session.putString("user", request.getFormParameter("username"));
+                            session.put("user", request.getFormAttribute("username"));
 
                             // get the redirect_url parameter
-                            String redirect = request.getParameter("redirect_url", "/");
+                            String redirect = request.getParam("redirect_url", "/");
                             request.response().redirect(Utils.decodeURIComponent(redirect));
                         } else {
                             if (loginTemplate != null) {
@@ -99,7 +99,7 @@ public class FormAuth extends Middleware {
                                 request.response().setStatusCode(401);
                                 request.response().end(
                                         loginTemplate.replace("{title}", (String) request.get("title"))
-                                                .replace("{action}", loginURI + "?redirect_url=" + Utils.encodeURIComponent(request.getParameter("redirect_url", "/")))
+                                                .replace("{action}", loginURI + "?redirect_url=" + Utils.encodeURIComponent(request.getParam("redirect_url", "/")))
                                                 .replace("{message}", "Invalid username and/or password, please try again."));
                             } else {
                                 next.handle(401);
@@ -113,11 +113,11 @@ public class FormAuth extends Middleware {
         }
 
         if (request.path().equals(logoutURI)) {
-            if ("GET".equals(request.method())) {
+            if (HttpMethod.GET.equals(request.method())) {
                 // remove session from storage
                 request.destroySession();
                 // get the redirect_url parameter
-                String redirect = request.getParameter("redirect_url", "/");
+                String redirect = request.getParam("redirect_url", "/");
                 request.response().redirect(Utils.decodeURIComponent(redirect));
                 return;
             }
@@ -130,7 +130,7 @@ public class FormAuth extends Middleware {
     public final Middleware RequiredAuth = new Middleware() {
         @Override
         public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
-        	SessionObject session = request.get("session");
+        	JsonObject session = request.get("session");
 
             if (session != null) {
                 if (session.getString("id") != null) {
@@ -139,7 +139,7 @@ public class FormAuth extends Middleware {
                 }
             }
 
-            String redirect = request.getParameter("redirect_url", Utils.encodeURIComponent(request.uri()));
+            String redirect = request.getParam("redirect_url", Utils.encodeURIComponent(request.uri()));
             request.response().redirect(loginURI + "?redirect_url=" + Utils.decodeURIComponent(redirect));
         }
     };

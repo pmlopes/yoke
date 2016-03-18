@@ -4,13 +4,14 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import io.vertx.core.http.HttpClientOptions;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.VoidHandler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpClientRequest;
-import org.vertx.java.core.http.HttpClientResponse;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.VoidHandler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
 
 /** # RequestProxy
  *
@@ -45,18 +46,14 @@ public class RequestProxy extends Middleware {
           return;
         }
         final String newUri = req.uri().replaceFirst(prefix, "");
-        final HttpClient client = vertx().createHttpClient().setHost(host).setPort(port);
+        final HttpClient client = vertx().createHttpClient(new HttpClientOptions().setDefaultHost(host).setDefaultPort(port).setSsl(secure));
 
-        if (secure) {
-            client.setSSL(true);
-        }
-        
         final HttpClientRequest cReq = client.request(req.method(), newUri, new Handler<HttpClientResponse>() {
           public void handle(HttpClientResponse cRes) {
             req.response().setStatusCode(cRes.statusCode());
-            req.response().headers().set(cRes.headers());
+            req.response().headers().setAll(cRes.headers());
             req.response().setChunked(true);
-            cRes.dataHandler(new Handler<Buffer>() {
+            cRes.handler(new Handler<Buffer>() {
               public void handle(Buffer data) {
                 req.response().write(data);
               }
@@ -73,9 +70,9 @@ public class RequestProxy extends Middleware {
             });
           }
         });
-        cReq.headers().set(req.headers());
+        cReq.headers().setAll(req.headers());
         cReq.setChunked(true);
-        req.dataHandler(new Handler<Buffer>() {
+        req.handler(new Handler<Buffer>() {
           public void handle(Buffer data) {
             cReq.write(data);
           }

@@ -1,20 +1,16 @@
 package com.jetdrone.vertx.yoke.security;
 
 import com.jetdrone.vertx.yoke.YokeSecurity;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.json.impl.Base64;
+import io.vertx.core.json.JsonObject;
 
 import javax.crypto.Mac;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public final class JWT {
 
-    private static interface Crypto {
+    private interface Crypto {
         byte[] sign(byte[] payload);
         boolean verify(byte[] signature, byte[] payload);
     }
@@ -28,12 +24,16 @@ public final class JWT {
 
         @Override
         public byte[] sign(byte[] payload) {
-            return mac.doFinal(payload);
+            synchronized (mac) {
+                return mac.doFinal(payload);
+            }
         }
 
         @Override
         public boolean verify(byte[] signature, byte[] payload) {
-            return Arrays.equals(signature, mac.doFinal(payload));
+            synchronized (mac) {
+                return Arrays.equals(signature, mac.doFinal(payload));
+            }
         }
     }
 
@@ -47,8 +47,10 @@ public final class JWT {
         @Override
         public byte[] sign(byte[] payload) {
             try {
-                sig.update(payload);
-                return sig.sign();
+                synchronized (sig) {
+                    sig.update(payload);
+                    return sig.sign();
+                }
             } catch (SignatureException e) {
                 throw new RuntimeException(e);
             }
@@ -57,8 +59,10 @@ public final class JWT {
         @Override
         public boolean verify(byte[] signature, byte[] payload) {
             try {
-                sig.update(payload);
-                return sig.verify(signature);
+                synchronized (sig) {
+                    sig.update(payload);
+                    return Arrays.equals(signature, sig.sign());
+                }
             } catch (SignatureException e) {
                 throw new RuntimeException(e);
             }
@@ -110,8 +114,8 @@ public final class JWT {
         String signatureSeg = segments[2];
 
         // base64 decode and parse JSON
-        JsonObject header = new JsonObject(base64urlDecode(headerSeg));
-        JsonObject payload = new JsonObject(base64urlDecode(payloadSeg));
+        JsonObject header = new JsonObject(new String(Base64.getUrlDecoder().decode(headerSeg)));
+        JsonObject payload = new JsonObject(new String(Base64.getUrlDecoder().decode(payloadSeg)));
 
         if (!noVerify) {
             Crypto crypto = CRYPTO_MAP.get(header.getString("alg"));
@@ -123,7 +127,7 @@ public final class JWT {
             // verify signature. `sign` will return base64 string.
             String signingInput = headerSeg + "." + payloadSeg;
 
-            if (!crypto.verify(Base64.decode(base64urlUnescape(signatureSeg), Base64.DONT_BREAK_LINES), signingInput.getBytes())) {
+            if (!crypto.verify(Base64.getUrlDecoder().decode(signatureSeg), signingInput.getBytes())) {
                 throw new RuntimeException("Signature verification failed");
             }
         }
@@ -144,38 +148,16 @@ public final class JWT {
 
         // header, typ is fixed value.
         JsonObject header = new JsonObject()
-                .putString("typ", "JWT")
-                .putString("alg", algorithm);
+                .put("typ", "JWT")
+                .put("alg", algorithm);
 
 
         // create segments, all segment should be base64 string
-        String headerSegment = base64urlEncode(header.encode());
-        String payloadSegment = base64urlEncode(payload.encode());
+        String headerSegment = Base64.getUrlEncoder().encodeToString(header.encode().getBytes());
+        String payloadSegment = Base64.getUrlEncoder().encodeToString(payload.encode().getBytes());
         String signingInput = headerSegment + "." + payloadSegment;
-        String signSegment = base64urlEscape(Base64.encodeBytes(crypto.sign(signingInput.getBytes()), Base64.DONT_BREAK_LINES));
+        String signSegment = Base64.getUrlEncoder().encodeToString(crypto.sign(signingInput.getBytes()));
 
         return headerSegment + "." + payloadSegment + "." + signSegment;
-    }
-
-    private static String base64urlDecode(String str) {
-        return new String(Base64.decode(base64urlUnescape(str), Base64.DONT_BREAK_LINES));
-    }
-
-    private static String base64urlUnescape(String str) {
-        int padding = 5 - str.length() % 4;
-        StringBuilder sb = new StringBuilder(str.length() + padding);
-        sb.append(str);
-        for (int i = 0; i < padding; i++) {
-            sb.append('=');
-        }
-        return sb.toString().replaceAll("\\-", "+").replaceAll("_", "/");
-    }
-
-    private static String base64urlEncode(String str) {
-        return base64urlEscape(Base64.encodeBytes(str.getBytes(), Base64.DONT_BREAK_LINES));
-    }
-
-    private static String base64urlEscape(String str) {
-        return str.replaceAll("\\+", "-").replaceAll("/", "_").replaceAll("=", "");
     }
 }

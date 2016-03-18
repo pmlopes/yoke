@@ -4,8 +4,9 @@
 package com.jetdrone.vertx.yoke.middleware;
 
 import com.jetdrone.vertx.yoke.Middleware;
+import io.vertx.core.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import java.util.UUID;
 
@@ -112,13 +113,13 @@ public class Csrf extends Middleware {
         }
 
         // ignore these methods
-        if ("GET".equals(request.method()) || "HEAD".equals(request.method()) || "OPTIONS".equals(request.method())) {
+        if (HttpMethod.GET.equals(request.method()) || HttpMethod.HEAD.equals(request.method()) || HttpMethod.OPTIONS.equals(request.method())) {
             next.handle(null);
             return;
         }
 
         // expect multipart
-        request.expectMultiPart(true);
+        request.setExpectMultipart(true);
 
         // determine value
         String val = valueHandler.handle(request);

@@ -3,7 +3,7 @@
  */
 package com.jetdrone.vertx.yoke.middleware.filters;
 
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.buffer.Buffer;
 
 /**
  * # WriterFilter

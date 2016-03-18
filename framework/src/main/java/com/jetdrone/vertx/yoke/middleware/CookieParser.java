@@ -8,7 +8,7 @@ import com.jetdrone.vertx.yoke.core.YokeCookie;
 import io.netty.handler.codec.http.Cookie;
 import io.netty.handler.codec.http.CookieDecoder;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
+import io.vertx.core.Handler;
 
 import javax.crypto.Mac;
 import java.util.Set;

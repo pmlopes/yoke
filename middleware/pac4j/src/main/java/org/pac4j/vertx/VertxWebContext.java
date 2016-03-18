@@ -15,13 +15,15 @@
  */
 package org.pac4j.vertx;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.jetdrone.vertx.yoke.middleware.YokeRequest;
 import com.jetdrone.vertx.yoke.middleware.YokeResponse;
 import org.pac4j.core.context.WebContext;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.json.JsonObject;
 
 /**
  * WebContext implementation for Vert.x.
@@ -75,7 +77,7 @@ public class VertxWebContext implements WebContext {
     @Override
     public void setSessionAttribute(String name, Object value) {
         JsonObject session = request.get("session");
-        session.putValue(name, value);
+        session.put(name, value);
     }
 
     @Override
@@ -86,7 +88,7 @@ public class VertxWebContext implements WebContext {
 
     @Override
     public String getRequestMethod() {
-        return request.method();
+        return request.method().name();
     }
 
     @Override
@@ -124,7 +126,11 @@ public class VertxWebContext implements WebContext {
 
     @Override
     public String getScheme() {
-        return request.absoluteURI().getScheme();
+        try {
+            return new URL(request.absoluteURI()).getProtocol();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

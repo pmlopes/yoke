@@ -1,4 +1,0 @@
-{
-  "main": "com.jetdrone.vertx.bench.TechEmpower",
-  "includes": "com.jetdrone~yoke~${project.version}"
-}

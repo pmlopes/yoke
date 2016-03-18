@@ -4,9 +4,9 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.annotations.Processor;
 import com.jetdrone.vertx.yoke.annotations.processors.SwaggerProcessor;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,13 +37,13 @@ public class Swagger {
         }
 
         private JsonObject getApi(String path) {
-            JsonObject api = apis.getObject(path);
+            JsonObject api = apis.getJsonObject(path);
             if (api == null) {
                 api = new JsonObject()
-                        .putString("path", path)
-                        .putArray("operations", new JsonArray());
+                        .put("path", path)
+                        .put("operations", new JsonArray());
 
-                apis.putObject(path, api);
+                apis.put(path, api);
             }
             return api;
         }
@@ -52,7 +52,7 @@ public class Swagger {
             produces = new JsonArray();
             for (String mime : mimes) {
                 if (!produces.contains(mime)) {
-                    produces.addString(mime);
+                    produces.add(mime);
                 }
             }
 
@@ -63,7 +63,7 @@ public class Swagger {
             consumes = new JsonArray();
             for (String mime : mimes) {
                 if (!consumes.contains(mime)) {
-                    consumes.addString(mime);
+                    consumes.add(mime);
                 }
             }
 
@@ -160,8 +160,8 @@ public class Swagger {
         }
 
         public Resource addModel(String id, JsonObject model) {
-            model.putString("id", id);
-            models.putObject(id, model);
+            model.put("id", id);
+            models.put(id, model);
             return this;
         }
 
@@ -175,13 +175,13 @@ public class Swagger {
             m.appendTail(sb);
 
             JsonObject op = new JsonObject()
-                    .putString("method", verb)
-                    .putString("summary", summary);
+                    .put("method", verb)
+                    .put("summary", summary);
 
             op.mergeIn(operation);
 
             JsonObject api = getApi(sb.toString());
-            api.getArray("operations").addObject(op);
+            api.getJsonArray("operations").add(op);
         }
     }
 
@@ -212,23 +212,23 @@ public class Swagger {
             @Override
             public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 JsonObject result = new JsonObject()
-                        .putString("apiVersion", apiVersion)
-                        .putString("swaggerVersion", "1.2");
+                        .put("apiVersion", apiVersion)
+                        .put("swaggerVersion", "1.2");
 
                 JsonArray apis = new JsonArray();
-                result.putArray("apis", apis);
+                result.put("apis", apis);
 
                 for (Resource r : resources) {
-                    apis.addObject(new JsonObject()
-                            .putString("path", r.path)
-                            .putString("description", r.description));
+                    apis.add(new JsonObject()
+                            .put("path", r.path)
+                            .put("description", r.description));
                 }
 
                 if (authorizations != null) {
-                    result.putObject("authorizations", authorizations);
+                    result.put("authorizations", authorizations);
                 }
 
-                result.putObject("info", info);
+                result.put("info", info);
 
                 request.response().end(result);
             }
@@ -260,26 +260,26 @@ public class Swagger {
             @Override
             public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
                 JsonObject result = new JsonObject()
-                        .putString("apiVersion", apiVersion)
-                        .putString("swaggerVersion", "1.2")
-                        .putString("basePath", "/")
-                        .putString("resourcePath", path);
+                        .put("apiVersion", apiVersion)
+                        .put("swaggerVersion", "1.2")
+                        .put("basePath", "/")
+                        .put("resourcePath", path);
 
                 if (resource.produces != null) {
-                    result.putArray("produces", resource.produces);
+                    result.put("produces", resource.produces);
                 }
 
                 if (resource.consumes != null) {
-                    result.putArray("consumes", resource.consumes);
+                    result.put("consumes", resource.consumes);
                 }
 
                 JsonArray apis = new JsonArray();
-                result.putArray("apis", apis);
+                result.put("apis", apis);
 
-                for (String key : resource.apis.getFieldNames()) {
-                    apis.addObject(resource.apis.getObject(key));
+                for (String key : resource.apis.fieldNames()) {
+                    apis.add(resource.apis.getValue(key));
                 }
-                result.putObject("models", resource.models);
+                result.put("models", resource.models);
                 request.response().end(result);
             }
         });

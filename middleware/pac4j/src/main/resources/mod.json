@@ -1,9 +1,0 @@
-{
-  "description": "PAC4J for Yoke a middleware framework for Vert.x",
-  "licenses": ["The Apache Software License Version 2.0"],
-  "author": "Paulo Lopes <pmlopes@gmail.com>",
-
-  "developers": ["pmlopes"],
-  "keywords": ["middleware", "webapp", "framework", "web", "yoke", "connect", "security", "app", "api"],
-  "homepage": "http://pmlopes.github.io/yoke/"
-}

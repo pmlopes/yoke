@@ -8,9 +8,9 @@ import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.Yoke;
 import com.jetdrone.vertx.yoke.store.SessionStore;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.eventbus.Message;
+import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.eventbus.Message;
 
 /** # BridgeSecureHandler
  *
@@ -38,14 +38,14 @@ public class BridgeSecureHandler extends Middleware {
         super.init(yoke, mount);
 
         // register a new handler for the configured address
-        eventBus().registerHandler(authAddress, new Handler<Message<JsonObject>>() {
+        eventBus().consumer(authAddress, new Handler<Message<JsonObject>>() {
             @Override
             public void handle(final Message<JsonObject> message) {
                 final JsonObject json = new JsonObject();
                 String sessionID = message.body().getString("sessionID");
 
                 if (sessionID == null) {
-                    json.putString("status", "denied");
+                    json.put("status", "denied");
                     message.reply(json);
                     return;
                 }
@@ -54,13 +54,13 @@ public class BridgeSecureHandler extends Middleware {
                     @Override
                     public void handle(JsonObject session) {
                         if (session == null) {
-                            json.putString("status", "denied");
+                            json.put("status", "denied");
                             message.reply(json);
                             return;
                         }
 
-                        json.putString("status", "ok");
-                        json.putString("username", session.getString("username"));
+                        json.put("status", "ok");
+                        json.put("username", session.getString("username"));
                         message.reply(json);
                     }
                 });

@@ -4,10 +4,10 @@
 package com.jetdrone.vertx.yoke.engine;
 
 import com.jetdrone.vertx.yoke.core.YokeAsyncResult;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.AsyncResultHandler;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -158,7 +158,7 @@ public class StringPlaceholderEngine extends AbstractEngine<String> {
             }
         }
 
-        return new Buffer(buf.toString());
+        return Buffer.buffer(buf.toString());
     }
 
     private static int findPlaceholderEndIndex(CharSequence buf, int startIndex) {

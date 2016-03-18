@@ -4,14 +4,13 @@
 package com.jetdrone.vertx.yoke.core;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.file.FileSystem;
-import org.vertx.java.core.http.HttpServerFileUpload;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.http.HttpServerFileUpload;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.UUID;
 
 /**
@@ -25,7 +24,7 @@ public class YokeFileUpload {
     private final String name;
     private final String contentType;
     private final String contentTransferEncoding;
-    private final Charset charset;
+    private final String charset;
     private final long size;
     private final String path;
 
@@ -48,7 +47,7 @@ public class YokeFileUpload {
         this.path = uploadDir + UUID.randomUUID().toString();
     }
 
-    public YokeFileUpload(@NotNull final FileSystem fileSystem, @NotNull final String filename, @NotNull final String name, @NotNull final String contentType, @NotNull final String contentTransferEncoding, @NotNull final Charset charset, final long size, @NotNull final String path) {
+    public YokeFileUpload(@NotNull final FileSystem fileSystem, @NotNull final String filename, @NotNull final String name, @NotNull final String contentType, @NotNull final String contentTransferEncoding, @NotNull final String charset, final long size, @NotNull final String path) {
         this.fileSystem = fileSystem;
         this.filename = filename;
         this.name = name;
@@ -98,7 +97,7 @@ public class YokeFileUpload {
     /**
      * Returns the charset for the upload
      */
-    public Charset charset() {
+    public String charset() {
         return charset;
     }
 

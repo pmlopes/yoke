@@ -6,15 +6,17 @@ package com.jetdrone.vertx.yoke.middleware;
 import com.jetdrone.vertx.yoke.Middleware;
 import com.jetdrone.vertx.yoke.MimeType;
 import com.jetdrone.vertx.yoke.util.Utils;
+import io.vertx.core.http.HttpMethod;
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.*;
-import org.vertx.java.core.file.FileProps;
-import org.vertx.java.core.file.FileSystem;
-import org.vertx.java.core.json.JsonArray;
+import io.vertx.core.*;
+import io.vertx.core.file.FileProps;
+import io.vertx.core.file.FileSystem;
+import io.vertx.core.json.JsonArray;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
 /**
@@ -125,11 +127,11 @@ public class Static extends Middleware {
         MultiMap headers = request.response().headers();
 
         if (!headers.contains("etag")) {
-            headers.set("etag", "\"" + props.size() + "-" + props.lastModifiedTime().getTime() + "\"");
+            headers.set("etag", "\"" + props.size() + "-" + props.lastModifiedTime() + "\"");
         }
 
         if (!headers.contains("date")) {
-            headers.set("date", ISODATE.format(new Date()));
+            headers.set("date", format(new Date()));
         }
 
         if (!headers.contains("cache-control")) {
@@ -137,7 +139,29 @@ public class Static extends Middleware {
         }
 
         if (!headers.contains("last-modified")) {
-            headers.set("last-modified", ISODATE.format(props.lastModifiedTime()));
+            headers.set("last-modified", format(new Date(props.lastModifiedTime())));
+        }
+    }
+
+    /**
+     * Parse thread safe a string to date using a SimpleDateFormat
+     *
+     * @param source
+     * @throws ParseException
+     */
+    private Date parse(String source) throws ParseException {
+        synchronized (ISODATE) {
+            return ISODATE.parse(source);
+        }
+    }
+
+    /**
+     * Convert thread safe a date to a string  using a SimpleDateFormat
+     * @param date
+     */
+    private String format(Date date) {
+        synchronized (ISODATE) {
+            return ISODATE.format(date);
         }
     }
 
@@ -156,7 +180,7 @@ public class Static extends Middleware {
         request.response().putHeader("Content-Length", Long.toString(props.size()));
 
         // head support
-        if ("HEAD".equals(request.method())) {
+        if (HttpMethod.HEAD.equals(request.method())) {
             request.response().end();
         } else {
             request.response().sendFile(file);
@@ -173,9 +197,9 @@ public class Static extends Middleware {
     private void sendDirectory(final YokeRequest request, final String dir, final Handler<Object> next) {
         final FileSystem fileSystem = vertx().fileSystem();
 
-        fileSystem.readDir(dir, new AsyncResultHandler<String[]>() {
+        fileSystem.readDir(dir, new AsyncResultHandler<List<String>>() {
             @Override
-            public void handle(AsyncResult<String[]> asyncResult) {
+            public void handle(AsyncResult<List<String>> asyncResult) {
                 if (asyncResult.failed()) {
                     next.handle(asyncResult.cause());
                 } else {
@@ -244,7 +268,7 @@ public class Static extends Middleware {
                             if (!includeHidden && file.charAt(0) == '.') {
                                 continue;
                             }
-                            json.addString(file);
+                            json.add(file);
                         }
 
                         request.response().end(json);
@@ -313,8 +337,8 @@ public class Static extends Middleware {
         // if-modified-since
         if (modifiedSince != null) {
             try {
-                Date modifiedSinceDate = ISODATE.parse(modifiedSince);
-                Date lastModifiedDate = ISODATE.parse(lastModified);
+                Date modifiedSinceDate = parse(modifiedSince);
+                Date lastModifiedDate = parse(lastModified);
                 notModified = lastModifiedDate.getTime() <= modifiedSinceDate.getTime();
             } catch (ParseException e) {
                 notModified = false;
@@ -326,7 +350,7 @@ public class Static extends Middleware {
 
     @Override
     public void handle(@NotNull final YokeRequest request, @NotNull final Handler<Object> next) {
-        if (!"GET".equals(request.method()) && !"HEAD".equals(request.method())) {
+        if (!HttpMethod.GET.equals(request.method()) && !HttpMethod.HEAD.equals(request.method())) {
             next.handle(null);
         } else {
             String path = request.normalizedPath();

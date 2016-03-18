@@ -16,8 +16,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.jetbrains.annotations.NotNull;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerResponse;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerResponse;
 
 import com.jetdrone.vertx.yoke.Middleware;
 

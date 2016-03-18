@@ -1,4 +1,0 @@
-{
-  "main": "com.jetdrone.vertx.persona.Persona",
-  "includes": "com.jetdrone~yoke~${project.version}"
-}

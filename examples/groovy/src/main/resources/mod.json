@@ -1,4 +1,0 @@
-{
-  "main": "GroovyExample.groovy",
-  "includes": "com.jetdrone~yoke~${project.version}"
-}
