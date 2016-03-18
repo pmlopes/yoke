@@ -55,13 +55,13 @@ public enum Transport {
   HTML_FILE,
 
   /**
-   * Slow and old fashioned <a hred="https://developer.mozilla.org/en/DOM/window.postMessage">JSONP polling</a>.
+   * Slow and old fashioned <a href="https://developer.mozilla.org/en/DOM/window.postMessage">JSONP polling</a>.
    * This transport will show "busy indicator" (aka: "spinning wheel") when sending data.
    */
   JSON_P,
 
   /**
-   * Long-polling using <a hred="https://secure.wikimedia.org/wikipedia/en/wiki/XMLHttpRequest#Cross-domain_requests">cross domain XHR</a>
+   * Long-polling using <a href="https://secure.wikimedia.org/wikipedia/en/wiki/XMLHttpRequest#Cross-domain_requests">cross domain XHR</a>
    */
   XHR
 }

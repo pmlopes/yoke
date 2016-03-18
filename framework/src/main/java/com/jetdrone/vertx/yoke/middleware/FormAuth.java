@@ -76,7 +76,7 @@ public class FormAuth extends Middleware {
             }
 
             if (HttpMethod.POST.equals(request.method())) {
-                if (forceSSL && !request.isSecure()) {
+                if (forceSSL && !request.isSSL()) {
                     // SSL is required but the post is insecure
                     next.handle(400);
                     return;
