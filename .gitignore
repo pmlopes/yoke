@@ -1,5 +1,0 @@
-# Ignore project files
-.idea
-*.iml
-# Ignore generated html
-site/*.html
