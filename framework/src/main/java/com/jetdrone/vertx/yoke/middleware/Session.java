@@ -97,7 +97,7 @@ public class Session extends Middleware {
                     }
                 } else {
                     // only send secure cookies over https
-                    if (cookie.isSecure() && !request.isSecure()) {
+                    if (cookie.isSecure() && !request.isSSL()) {
                         return;
                     }
 

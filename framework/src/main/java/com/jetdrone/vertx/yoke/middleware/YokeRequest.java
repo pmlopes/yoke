@@ -74,8 +74,6 @@ public class YokeRequest implements HttpServerRequest {
     final private YokeResponse response;
     // the request context
     final protected Context context;
-    // is this request secure (if extensions need to access it, use the accessor)
-    final private boolean secure = false;
     // session data store
     final protected SessionStore store;
 
@@ -434,10 +432,6 @@ public class YokeRequest implements HttpServerRequest {
         return session;
     }
 
-    public boolean isSecure() {
-        return secure;
-    }
-
     private static String[] splitMime(@NotNull String mime) {
         // find any ; e.g.: "application/json;q=0.8"
         int space = mime.indexOf(';');
@@ -716,6 +710,11 @@ public class YokeRequest implements HttpServerRequest {
             return method;
         }
         return request.method();
+    }
+
+    @Override
+    public boolean isSSL() {
+        return request.isSSL();
     }
 
     @Override

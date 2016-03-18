@@ -31,7 +31,7 @@ public final class HSTS extends Middleware {
 
     @Override
     public void handle(@NotNull YokeRequest request, @NotNull Handler<Object> next) {
-        boolean isSecure = (request.isSecure())
+        boolean isSecure = (request.isSSL())
                 || ("on".equals(request.getHeader("front-end-https")))
                 || ("https".equals(request.getHeader("x-forwarded-proto")));
 

@@ -521,6 +521,17 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public HttpServerResponse sendFile(String filename, long offset) {
+        // TODO: filter file?
+        hasBody = true;
+        filter = null;
+        triggerHeadersHandlers();
+        response.sendFile(filename, offset);
+        triggerEndHandlers();
+        return this;
+    }
+
+    @Override
     public HttpServerResponse sendFile(String s, long l, long l1) {
         hasBody = true;
         filter = null;
@@ -537,6 +548,17 @@ public class YokeResponse implements HttpServerResponse {
         filter = null;
         triggerHeadersHandlers();
         response.sendFile(filename, resultHandler);
+        triggerEndHandlers();
+        return this;
+    }
+
+    @Override
+    public HttpServerResponse sendFile(String filename, long offset, Handler<AsyncResult<Void>> resultHandler) {
+        // TODO: filter file?
+        hasBody = true;
+        filter = null;
+        triggerHeadersHandlers();
+        response.sendFile(filename, offset, resultHandler);
         triggerEndHandlers();
         return this;
     }
@@ -580,6 +602,11 @@ public class YokeResponse implements HttpServerResponse {
     @Override
     public HttpServerResponse bodyEndHandler(Handler<Void> handler) {
         return response.bodyEndHandler(handler);
+    }
+
+    @Override
+    public long bytesWritten() {
+        return response.bytesWritten();
     }
 
     @Override
