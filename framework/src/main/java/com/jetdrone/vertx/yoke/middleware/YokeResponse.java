@@ -610,6 +610,41 @@ public class YokeResponse implements HttpServerResponse {
     }
 
     @Override
+    public int streamId() {
+        return response.streamId();
+    }
+
+    @Override
+    public HttpServerResponse push(HttpMethod method, String host, String path, Handler<AsyncResult<HttpServerResponse>> handler) {
+        return response.push(method, host, path, handler);
+    }
+
+    @Override
+    public HttpServerResponse push(HttpMethod method, String path, MultiMap headers, Handler<AsyncResult<HttpServerResponse>> handler) {
+        return response.push(method, path, headers, handler);
+    }
+
+    @Override
+    public HttpServerResponse push(HttpMethod method, String path, Handler<AsyncResult<HttpServerResponse>> handler) {
+        return response.push(method, path, handler);
+    }
+
+    @Override
+    public HttpServerResponse push(HttpMethod method, String host, String path, MultiMap headers, Handler<AsyncResult<HttpServerResponse>> handler) {
+        return response.push(method, host, path, headers, handler);
+    }
+
+    @Override
+    public void reset(long code) {
+        response.reset(code);
+    }
+
+    @Override
+    public HttpServerResponse writeCustomFrame(int type, int flags, Buffer payload) {
+        return response.writeCustomFrame(type, flags, payload);
+    }
+
+    @Override
     public YokeResponse exceptionHandler(Handler<Throwable> handler) {
         response.exceptionHandler(handler);
         return this;

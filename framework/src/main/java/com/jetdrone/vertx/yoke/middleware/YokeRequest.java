@@ -638,6 +638,16 @@ public class YokeRequest implements HttpServerRequest {
         return request.isEnded();
     }
 
+    @Override
+    public HttpServerRequest customFrameHandler(Handler<HttpFrame> handler) {
+        return null;
+    }
+
+    @Override
+    public HttpConnection connection() {
+        return null;
+    }
+
     /** Allow getting form parameters in a generified way and return defaultValue if the key does not exist.
      *
      * @param name The key to get
@@ -713,8 +723,18 @@ public class YokeRequest implements HttpServerRequest {
     }
 
     @Override
+    public String rawMethod() {
+        return request.rawMethod();
+    }
+
+    @Override
     public boolean isSSL() {
         return request.isSSL();
+    }
+
+    @Override
+    public String scheme() {
+        return request.scheme();
     }
 
     @Override
@@ -786,6 +806,11 @@ public class YokeRequest implements HttpServerRequest {
     @Override
     public String query() {
         return request.query();
+    }
+
+    @Override
+    public String host() {
+        return request.host();
     }
 
     @Override
