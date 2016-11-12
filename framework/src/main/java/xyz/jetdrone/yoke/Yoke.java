@@ -126,7 +126,7 @@ public class Yoke implements Handler<HttpServerRequest> {
     );
 
     app.use("/users", new Router()
-      .all("/:id", ctx -> {
+      .get("/:id", ctx -> {
         ctx.end(ctx.getRequest().getParam("id"));
       })
     );
@@ -137,9 +137,9 @@ public class Yoke implements Handler<HttpServerRequest> {
     app.use(middleware);
     app.use(middleware);
     app.use(middleware);
-    app.use(ctx -> {
-      ctx.end("durp!");
-    });
+//    app.use(ctx -> {
+//      ctx.end("durp!");
+//    });
 
     vertx.createHttpServer().requestHandler(app).listen(8080);
   }

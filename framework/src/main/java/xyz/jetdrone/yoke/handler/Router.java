@@ -42,23 +42,14 @@ import java.util.regex.Pattern;
  */
 public class Router implements Handler<Context> {
 
-  private final Map<HttpMethod, List<Route>> routes = new IdentityHashMap<>();
-
+  private final List<Route> routes = new ArrayList<>();
   private final Map<String, Handler<Context>> paramHandlers = new HashMap<>();
-
-  public Router() {
-    for (HttpMethod m : HttpMethod.values()) {
-      routes.put(m, new ArrayList<>());
-    }
-  }
 
   @Override
   public void handle(@NotNull final Context context) {
-
-    final List<Route> handlers = routes.get(context.getRequest().method());
     final AbstractContext ctx = (AbstractContext) context;
 
-    ctx.setIterator(handlers);
+    ctx.setIterator(routes);
     ctx.next();
   }
 
@@ -299,11 +290,14 @@ public class Router implements Handler<Context> {
   }
 
   public Router param(@NotNull final String paramName, @NotNull final Handler<Context> handler) {
+    if (paramHandlers.containsKey(paramName)) {
+      throw new IllegalStateException("There is already a parameter handler for '" + paramName + "'");
+    }
+
     paramHandlers.put(paramName, handler);
-    for (List<Route> routes : this.routes.values()) {
-      for (Route route : routes) {
-        route.addParam(paramName, handler);
-      }
+    // update the route params
+    for (Route route : routes) {
+      route.addParam(paramName, handler);
     }
     return this;
   }
@@ -343,16 +337,16 @@ public class Router implements Handler<Context> {
     }
 
     // verify if the binding already exists, if yes add to it
-    for (Route route : routes.get(verb)) {
+    for (Route route : routes) {
       if (route.isFor(input)) {
-        route.addHandler(handler);
+        route.addHandler(verb, handler);
         return;
       }
     }
 
     final Route route = new Route(input, Pattern.compile(sb.toString()), groups);
 
-    route.addHandler(handler);
+    route.addHandler(verb, handler);
 
     for (String param : groups) {
       Handler<Context> paramHandler = paramHandlers.get(param);
@@ -361,8 +355,7 @@ public class Router implements Handler<Context> {
       }
     }
 
-    routes.get(verb).add(route);
-
+    routes.add(route);
   }
 
   private void addRegEx(HttpMethod verb, Pattern regex, Handler<Context> handler) {
@@ -370,17 +363,16 @@ public class Router implements Handler<Context> {
       throw new UnsupportedOperationException("Cannot mount router on router");
     }
     // verify if the binding already exists, if yes add to it
-    for (Route route : routes.get(verb)) {
+    for (Route route : routes) {
       if (route.isFor(regex)) {
-        route.addHandler(handler);
+        route.addHandler(verb, handler);
         return;
       }
     }
 
-    final Route route = new Route(regex.pattern(), regex);
+    final Route route = new Route(regex.pattern(), regex, null);
 
-    route.addHandler(handler);
-
-    routes.get(verb).add(route);
+    route.addHandler(verb, handler);
+    routes.add(route);
   }
 }
