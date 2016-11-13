@@ -49,8 +49,7 @@ final class Route implements Handler<Context> {
 
             final String body = String.join(",", options);
             ctx.set("Allow", body);
-            ctx.setStatus(405);
-            ctx.end();
+            ctx.fail(405);
           } else {
             ctx.next();
           }

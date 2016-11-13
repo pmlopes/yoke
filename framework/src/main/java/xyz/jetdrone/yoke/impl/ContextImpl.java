@@ -246,11 +246,11 @@ public final class ContextImpl extends AbstractContext implements Context {
   }
 
   @Override
-  public void binary(byte[] chunk) {
+  public void binary(Buffer chunk) {
     if (chunk == null) {
       end();
     } else {
-      getResponse().end(Buffer.buffer(chunk));
+      getResponse().end(chunk);
     }
   }
 

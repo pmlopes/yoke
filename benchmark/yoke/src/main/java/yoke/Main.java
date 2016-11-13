@@ -29,7 +29,7 @@ public class Main extends AbstractVerticle {
 
     Buffer body = Buffer.buffer("Hello World");
 
-    app.use(ctx -> ctx.end(body));
+    app.use(ctx -> ctx.binary(body));
 
     vertx.createHttpServer().requestHandler(app).listen(3333);
   }

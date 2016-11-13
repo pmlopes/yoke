@@ -1,6 +1,7 @@
 package xyz.jetdrone.yoke;
 
 import io.vertx.core.MultiMap;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.logging.Logger;
@@ -142,7 +143,7 @@ public interface Context {
 
   void end(String chunk);
 
-  void binary(byte[] chunk);
+  void binary(Buffer chunk);
 
   void end();
 
