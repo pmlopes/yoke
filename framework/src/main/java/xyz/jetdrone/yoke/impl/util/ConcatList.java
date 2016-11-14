@@ -1,4 +1,4 @@
-package xyz.jetdrone.yoke.impl;
+package xyz.jetdrone.yoke.impl.util;
 
 import java.util.Collection;
 import java.util.Iterator;

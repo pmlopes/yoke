@@ -11,6 +11,8 @@ import io.vertx.core.json.EncodeException;
 import io.vertx.core.json.Json;
 import org.jetbrains.annotations.NotNull;
 import xyz.jetdrone.yoke.Context;
+import xyz.jetdrone.yoke.Yoke;
+import xyz.jetdrone.yoke.impl.util.ShadowMap;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -648,24 +650,29 @@ public final class ContextImpl extends AbstractContext implements Context {
 //  }
 
 
-  private final Map<String, Object> globals;
+  private final Yoke app;
 
   private String prefix;
 
   private ShadowMap data;
 
-  public ContextImpl(@NotNull HttpServerRequest req, @NotNull Map<String, Object> globals) {
+  public ContextImpl(@NotNull HttpServerRequest req, @NotNull Yoke app) {
     super(req);
-    this.globals = globals;
+    this.app = app;
   }
 
   @Override
   public Map<String, Object> getData() {
     if (data == null) {
-      data = new ShadowMap(globals);
+      data = new ShadowMap(app.getGlobals());
     }
 
     return data;
+  }
+
+  @Override
+  public Yoke getApp() {
+    return app;
   }
 
   @Override

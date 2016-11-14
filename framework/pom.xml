@@ -1,31 +1,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.jetdrone</groupId>
-        <artifactId>yoke-project</artifactId>
-        <version>3.0.0</version>
-        <relativePath>..</relativePath>
-    </parent>
+  <parent>
+    <groupId>com.jetdrone</groupId>
+    <artifactId>yoke-project</artifactId>
+    <version>3.0.0</version>
+    <relativePath>..</relativePath>
+  </parent>
 
-    <artifactId>yoke</artifactId>
-    <packaging>jar</packaging>
-    <name>Yoke micro-framework</name>
-    <url>http://pmlopes.github.io/yoke</url>
+  <artifactId>yoke</artifactId>
+  <packaging>jar</packaging>
+  <name>Yoke micro-framework</name>
+  <url>http://pmlopes.github.io/yoke</url>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>13.0</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-core</artifactId>
-            <version>${vertx.version}</version>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>13.0</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.vertx</groupId>
+      <artifactId>vertx-core</artifactId>
+      <version>${vertx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 </project>

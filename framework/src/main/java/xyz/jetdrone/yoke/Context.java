@@ -39,6 +39,8 @@ public interface Context {
 
   void fail(int statusCode, Throwable throwable);
 
+  Yoke getApp();
+
   /**
    * Return the prefix where the current handler was used
    *

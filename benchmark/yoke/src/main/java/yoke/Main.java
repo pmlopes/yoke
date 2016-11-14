@@ -9,7 +9,7 @@ public class Main extends AbstractVerticle {
 
   @Override
   public void start() {
-    final Yoke app = new Yoke();
+    final Yoke app = new Yoke(vertx);
 
     // number of middleware
     int n;

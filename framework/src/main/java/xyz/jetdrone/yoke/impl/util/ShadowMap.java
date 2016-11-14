@@ -1,7 +1,7 @@
 /**
  * Copyright 2011-2014 the original author or authors.
  */
-package xyz.jetdrone.yoke.impl;
+package xyz.jetdrone.yoke.impl.util;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -5,7 +5,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import org.jetbrains.annotations.NotNull;
-import xyz.jetdrone.yoke.handler.Router;
 import xyz.jetdrone.yoke.impl.AbstractContext;
 import xyz.jetdrone.yoke.impl.ContextImpl;
 import xyz.jetdrone.yoke.impl.MountedHandler;
@@ -15,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Yoke implements Handler<HttpServerRequest> {
+public final class Yoke implements Handler<HttpServerRequest> {
 
   /**
    * default globals available to all requests
@@ -29,6 +28,8 @@ public class Yoke implements Handler<HttpServerRequest> {
    * </pre>
    */
   private final Map<String, Object> globals = new HashMap<>();
+
+  private final Vertx vertx;
 
   /**
    * Creates a Yoke instance.
@@ -46,10 +47,12 @@ public class Yoke implements Handler<HttpServerRequest> {
    * }
    * </pre>
    */
-  public Yoke() {
+  public Yoke(Vertx vertx) {
     globals.put("title", "Yoke");
     globals.put("x-powered-by", true);
     globals.put("trust-proxy", true);
+
+    this.vertx = vertx;
   }
 
   /**
@@ -112,42 +115,14 @@ public class Yoke implements Handler<HttpServerRequest> {
     return globals;
   }
 
-  public static void main (String[] args) {
-    final Vertx vertx = Vertx.vertx();
-
-    final Yoke app = new Yoke();
-
-    final Handler<Context> middleware = ctx -> { ctx.next(); };
-
-    app.use(new Router()
-      .all("/:id", ctx -> {
-        ctx.end(ctx.getRequest().getParam("id"));
-      })
-    );
-
-    app.use("/users", new Router()
-      .get("/:id", ctx -> {
-        ctx.end(ctx.getRequest().getParam("id"));
-      })
-    );
-
-    app.use(middleware);
-    app.use(middleware);
-    app.use(middleware);
-    app.use(middleware);
-    app.use(middleware);
-    app.use(middleware);
-//    app.use(ctx -> {
-//      ctx.end("durp!");
-//    });
-
-    vertx.createHttpServer().requestHandler(app).listen(8080);
+  public Vertx getVertx() {
+    return vertx;
   }
 
   @Override
   public void handle(HttpServerRequest req) {
     // the context map is shared with all middlewares
-    final AbstractContext ctx = new ContextImpl(req, globals);
+    final AbstractContext ctx = new ContextImpl(req, this);
 
     // add x-powered-by header is enabled
     Boolean poweredBy = (Boolean) ctx.getData().get("x-powered-by");
